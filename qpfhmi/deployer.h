@@ -53,6 +53,7 @@
 #include <iostream>
 //#include <thread>
 //#include <future>
+#include <atomic>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -79,8 +80,6 @@
 #include "taskorc.h"
 #include "config.h"
 #include "tools.h"
-
-using namespace QPF;
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -116,39 +115,19 @@ public:
     // Current version of Event Manager takes external events from
     // the HMI (simulated external events)
     //----------------------------------------------------------------------
-    int run(int argc, char * argv[]);
-
-private:
+    int run();
 
     //----------------------------------------------------------------------
-    // Type: QPFConfig (struct)
-    // Holds the configuration of the QPF system to be deployed
+    // Method: mustLaunchHMI
+    // Returns true if the application must launch the HMI
     //----------------------------------------------------------------------
-    struct QPFConfig {
-        std::string appName;
-        std::string appVersion;
-        std::string lastAccess;
-        TaskOrchestrator::OrchestrationParameters     orcParams;
-        std::vector<std::string>                      peerNames;
-        std::vector<LibComm::Router2RouterPeer::Peer> peersCfg;
-        LibComm::Router2RouterPeer::Peer              qpfhmiCfg;
-    };
+    bool mustLaunchHMI();
 
     //----------------------------------------------------------------------
-    // Type: PeerNodesData (struct)
-    // Holds the specifications of the different nodes part of the system
+    // Method: getConfigFileName
+    // Returns the name of the configuration file name used
     //----------------------------------------------------------------------
-    struct PeerNodesData {
-        PeerNodesData() :
-            evtMng(0), dataMng(0), logMng(0), tskMng(0), tskOrc(0) {}
-        EventManager *           evtMng;
-        DataManager *            dataMng;
-        LogManager *             logMng;
-        TaskManager *            tskMng;
-        TaskOrchestrator *       tskOrc;
-        std::vector<TaskAgent *> tskAgents;
-        std::vector<CommNode *>  nodes;
-    };
+    char * getConfigFileName();
 
 private:
 
@@ -171,24 +150,11 @@ private:
     void readConfig(const char * configFile = 0);
 
     //----------------------------------------------------------------------
-    // Function: createPeerNodes
-    // Creates the peer node objects with the information from the system
-    // configuration
-    //----------------------------------------------------------------------
-    void createPeerNodes();
-
-    //----------------------------------------------------------------------
-    // Function: createPeerNodeConnections
-    // Creates the node connections
-    //----------------------------------------------------------------------
-    void createPeerNodeConnections();
-
-    //----------------------------------------------------------------------
     // Function: launchPeerNodes
     // Launches the different nodes execution, either by creating a new
     // thread or by spawning a new process
     //----------------------------------------------------------------------
-    void launchPeerNodes(std::vector<pid_t> & childrenPids);
+    void launchPeerNodes();
 
     //----------------------------------------------------------------------
     // Function: start
@@ -200,7 +166,7 @@ private:
     // Function: cleanUp
     // Removes any remaining children
     //----------------------------------------------------------------------
-    void cleanUp(std::vector<pid_t> & childrenPids);
+    void cleanUp();
 
     //----------------------------------------------------------------------
     // Function: fexists
@@ -222,12 +188,6 @@ private:
     void removeOldFiles();
 
 private:
-
-    //----------------------------------------------------------------------
-    // Variable: thr
-    // The running thread
-    //----------------------------------------------------------------------
-//    std::future<int> futDply;
 
     //----------------------------------------------------------------------
     // Flags: Execution options
@@ -254,9 +214,36 @@ private:
     //----------------------------------------------------------------------
     std::string newConfigFile;
 
-    QPFConfig     * qpfCfg;
-    PeerNodesData * pnd;
-    pid_t qpfhmiPid;
+    //----------------------------------------------------------------------
+    // Variable: configFile
+    // Constant pointer to the name of the config.file, or zero if config.
+    // must be acquired from the central DB
+    //----------------------------------------------------------------------
+    const char * configFile;
+
+    //----------------------------------------------------------------------
+    // Variable: cfg
+    // Configuration object (pointer)
+    //----------------------------------------------------------------------
+    Configuration * cfg;
+
+    //----------------------------------------------------------------------
+    // Variable: childrenPids
+    // Vector with PIDs of deployer children commnodes
+    //----------------------------------------------------------------------
+    std::vector<pid_t> childrenPids;
+
+    //----------------------------------------------------------------------
+    // Variable: evtMng
+    // Pointer to the CommNode for the Event Manager (main component)
+    //----------------------------------------------------------------------
+    EventManager * evtMng;
+
+    //----------------------------------------------------------------------
+    // Variable: hmiNeeded
+    // Set to TRUE when the machine is the one hosting the HMI
+    //----------------------------------------------------------------------
+    bool hmiNeeded;
 };
 
 }

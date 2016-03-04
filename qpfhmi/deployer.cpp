@@ -59,11 +59,19 @@ Deployer::Deployer(int argc, char *argv[]) :
     verboseOutput(false),
     usec(50000),
     newConfigFile(std::string()),
-    qpfCfg(new QPFConfig),
-    pnd(new PeerNodesData)
-
+    configFile(0),
+    cfg(0),
+    evtMng(0),
+    hmiNeeded(false)
 {
-    std::thread(&Deployer::run, this, argc, argv).detach();
+    // Change value for delay between peer nodes launches (default: 50000us)
+    if (!processCmdLineOpts(argc, argv)) { exit(EXIT_FAILURE); }
+
+    //===== Read Configuration =====
+    if (!newConfigFile.empty()) { configFile = newConfigFile.c_str(); }
+    readConfig(configFile);
+
+    std::thread(&Deployer::run, this).detach();
 }
 
 //----------------------------------------------------------------------
@@ -71,11 +79,24 @@ Deployer::Deployer(int argc, char *argv[]) :
 //----------------------------------------------------------------------
 Deployer::~Deployer()
 {
-//    int retRun = futDply.get();
+}
 
-//    if (retRun != EXIT_SUCCESS) {
-//        L("ERROR: Deployer finished with code " << retRun);
-//    }
+//----------------------------------------------------------------------
+// Method: mustLaunchHMI
+// Returns true if the application must launch the HMI
+//----------------------------------------------------------------------
+bool Deployer::mustLaunchHMI()
+{
+    return hmiNeeded;
+}
+
+//----------------------------------------------------------------------
+// Method: getConfigFileName
+// Returns the name of the configuration file name used
+//----------------------------------------------------------------------
+char * Deployer::getConfigFileName()
+{
+    return const_cast<char*>(configFile);
 }
 
 //----------------------------------------------------------------------
@@ -87,43 +108,20 @@ Deployer::~Deployer()
 // Current version of Event Manager takes external events from
 // the HMI (simulated external events)
 //----------------------------------------------------------------------
-int Deployer::run(int argc, char * argv[])
+int Deployer::run()
 {
-    // Change value for delay between peer nodes launches (default: 50000us)
-    if (!processCmdLineOpts(argc, argv)) {
-        return(EXIT_FAILURE);
-    }
-
     //===== Initial (quick and dirty) cleanup =====
     removeOldFiles();
     LibComm::Log::setConsoleOutput(verboseOutput);
 
-    //===== Read Configuration =====
-
-    const char * configFile = 0;
-    if (!newConfigFile.empty()) { configFile = newConfigFile.c_str(); }
-    readConfig(configFile);
-
-    //===== Create peer nodes =====
-
-    createPeerNodes();
-
-    //===== Launch HMI =====
-    //L("Launching and connecting QPF HMI . . .");
-    //pid_t qpfhmiPid = 0; //launchQPFHMI();
-
-    //===== Create peer node connections =====
-    createPeerNodeConnections();
-
     //===== Launch them =====
-    std::vector<pid_t> childrenPids;
-    launchPeerNodes(childrenPids);
+    launchPeerNodes();
 
     //===== Start System =====
     start();
 
     //===== System cleanup at shutdown =====
-    cleanUp(childrenPids);
+    cleanUp();
 
     return EXIT_SUCCESS;
 }
@@ -138,7 +136,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     int exitCode = EXIT_FAILURE;
 
     int opt;
-    while ((opt = getopt(argc, argv, "hpvt:c:")) != -1) {
+    while ((opt = getopt(argc, argv, "hpvt:c:m:")) != -1) {
         switch (opt) {
         case 'p':
             spawnPeerProcesses = true;
@@ -172,172 +170,14 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 }
 
 //----------------------------------------------------------------------
-// Method: launchQPFHMI
-// Launches (fork) HMI as a separate process
-//----------------------------------------------------------------------
-pid_t Deployer::launchQPFHMI()
-{
-    pid_t pid = fork();
-
-    if (pid < 0) {
-        // Error, failed to fork()
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        // We are the child
-        char * qpfhmiExe = getenv("QPFHMI");
-        //char * newArgv[] = { qpfhmiExe, "-style", "fusion", NULL };
-        char * newArgv[] = { qpfhmiExe, NULL };
-        execv(newArgv[0], newArgv);
-        L("execv: " << strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    return pid;
-}
-
-//----------------------------------------------------------------------
 // Method: readConfig
 // Reads configuration file
 //----------------------------------------------------------------------
 void Deployer::readConfig(const char * configFile)
 {
-    Configuration * cfg = new Configuration(configFile);
-
-    cfg->getGeneralInfo(qpfCfg->appName, qpfCfg->appVersion, qpfCfg->lastAccess);
-    cfg->getProductTypes(qpfCfg->orcParams.productTypes);
-    cfg->reset();
-
-    for (int i = 0; i < cfg->getNumOrchRules(); ++i) {
-        TaskOrchestrator::Rule * rule = new TaskOrchestrator::Rule;
-        cfg->getOrchRule(rule->name, rule->inputs,
-                         rule->outputs, rule->processingElement);
-        qpfCfg->orcParams.rules.push_back(rule);
-    }
-
-    for (int i = 0; i < cfg->getNumProcs(); ++i) {
-        TaskOrchestrator::ProcElem * pe = new TaskOrchestrator::ProcElem;
-        cfg->getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
-        qpfCfg->orcParams.procElems[pe->name] = pe;
-    }
-
-    for (int i = 0; i < cfg->getNumNodes(); ++i) {
-        LibComm::Router2RouterPeer::Peer * peer = new LibComm::Router2RouterPeer::Peer;
-        cfg->getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
-        qpfCfg->peersCfg.push_back(*peer);
-        qpfCfg->peerNames.push_back(peer->name);
-    }
-
-    qpfCfg->qpfhmiCfg.name = cfg->getHMINodeName();
-    cfg->getNodeByName(qpfCfg->qpfhmiCfg.name,
-                       qpfCfg->qpfhmiCfg.type,
-                       qpfCfg->qpfhmiCfg.clientAddr,
-                       qpfCfg->qpfhmiCfg.serverAddr);
-    delete cfg;
-}
-
-//----------------------------------------------------------------------
-// Method: createPeerNodes
-// Creates the peer node objects with the information from the system
-// configuration
-//----------------------------------------------------------------------
-void Deployer::createPeerNodes()
-{
-    L("Creating peer nodes . . .");
-
-    for (unsigned int i = 0; i < qpfCfg->peersCfg.size(); ++i) {
-
-        std::string & peerName = qpfCfg->peersCfg[i].name;
-        std::string & peerType = qpfCfg->peersCfg[i].type;
-
-        const char * cpeerName = qpfCfg->peersCfg[i].name.c_str();
-
-        L("Creating peer node " << peerName << " . . .");
-
-        if        (peerType == "evtmng") {
-            assert(pnd->evtMng == 0);
-            pnd->evtMng = new EventManager(cpeerName);
-            pnd->evtMng->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->nodes.push_back(pnd->evtMng);
-        } else if (peerType == "datamng") {
-            assert(pnd->dataMng == 0);
-            pnd->dataMng = new DataManager(cpeerName);
-            pnd->dataMng->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->nodes.push_back(pnd->dataMng);
-        } else if (peerType == "logmng") {
-            assert(pnd->logMng == 0);
-            pnd->logMng = new LogManager(cpeerName);
-            pnd->logMng->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->nodes.push_back(pnd->logMng);
-        } else if (peerType == "taskmng") {
-            assert(pnd->tskMng == 0);
-            pnd->tskMng = new TaskManager(cpeerName);
-            pnd->tskMng->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->nodes.push_back(pnd->tskMng);
-        } else if (peerType == "taskorc") {
-            assert(pnd->tskOrc == 0);
-            pnd->tskOrc = new TaskOrchestrator(cpeerName);
-            pnd->tskOrc->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->nodes.push_back(pnd->tskOrc);
-        } else if (peerType == "taskagent") {
-            TaskAgent * tskAg = new TaskAgent(cpeerName);
-            tskAg->addPeer(&(qpfCfg->peersCfg[i]), true);
-            pnd->tskAgents.push_back(tskAg);
-            pnd->nodes.push_back(tskAg);
-        } else {
-            // Do nothing, not yet implemented
-        }
-
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: createPeerNodeConnections
-// Creates the node connections
-//----------------------------------------------------------------------
-void Deployer::createPeerNodeConnections()
-{
-    L("Creating peer connections . . .");
-
-    // - Event Manager
-    pnd->evtMng->addPeer(pnd->dataMng->selfPeer());
-    pnd->evtMng->addPeer(pnd->logMng->selfPeer());
-    pnd->evtMng->addPeer(pnd->tskMng->selfPeer());
-    pnd->evtMng->addPeer(pnd->tskOrc->selfPeer());
-    // Set connection to QPFHMI
-    pnd->evtMng->addPeer(&qpfCfg->qpfhmiCfg);
-    // TaskAgents must be awaked by the Event Manager
-    // (though no other direct messages are expected by them
-    //  comming from the Event Manager)
-    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
-        pnd->evtMng->addPeer(pnd->tskAgents.at(k)->selfPeer());
-    }
-
-    // - Data Manager
-    pnd->dataMng->addPeer(pnd->evtMng->selfPeer());
-    pnd->dataMng->addPeer(pnd->tskOrc->selfPeer());
-    pnd->dataMng->addPeer(pnd->tskMng->selfPeer());
-
-    // - Log Manager
-    pnd->logMng->addPeer(pnd->evtMng->selfPeer());
-
-    // - Task Manager
-    pnd->tskMng->addPeer(pnd->evtMng->selfPeer());
-    pnd->tskMng->addPeer(pnd->tskOrc->selfPeer());
-    pnd->tskMng->addPeer(pnd->dataMng->selfPeer());
-    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
-        pnd->tskMng->addPeer(pnd->tskAgents.at(k)->selfPeer());
-    }
-
-    // - Task Orchestrator
-    pnd->tskOrc->addPeer(pnd->evtMng->selfPeer());
-    pnd->tskOrc->addPeer(pnd->tskMng->selfPeer());
-    pnd->tskOrc->addPeer(pnd->dataMng->selfPeer());
-
-    // - Task Agents
-    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
-        pnd->tskAgents[k]->addPeer(pnd->tskMng->selfPeer());
-        pnd->tskAgents[k]->addPeer(pnd->evtMng->selfPeer());
-    }
+    cfg   = new Configuration(configFile);
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    hmiNeeded = cfgInfo.hmiPresent;
 }
 
 //----------------------------------------------------------------------
@@ -345,23 +185,28 @@ void Deployer::createPeerNodeConnections()
 // Launches the different nodes execution, either by creating a new
 // thread or by spawning a new process
 //----------------------------------------------------------------------
-void Deployer::launchPeerNodes(std::vector<pid_t> & childrenPids)
+void Deployer::launchPeerNodes()
 {
-    L("Launching nodes . . .");
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+
+    L("Running as " << cfgInfo.currentUser << " @ " << cfgInfo.currentMachine);
 
     // Launch all (as processes or as threads)
-    // Event Manager launched as thread
-    for (unsigned int k = 0; k < pnd->nodes.size(); ++k) {
-        CommNode * node = pnd->nodes.at(k);
+    // Event Manager launched always as a thread
+    L("Launching nodes . . .");
+    for (unsigned int k = 0; k < cfgInfo.peerNodes.size(); ++k) {
+        CommNode * node = cfgInfo.peerNodes.at(k);
         node->initialize();
         L("   ====> Initialising " << node->selfPeer()->name);
         usleep(usec);
         if (node->selfPeer()->type == "evtmng") {
             node->create();
+            evtMng = dynamic_cast<EventManager*>(node);
             L("   ====> Creating " << node->selfPeer()->name);
         } else {
             if (node->selfPeer()->type == "taskorc") {
-                pnd->tskOrc->defineOrchestrationParams(qpfCfg->orcParams);
+                TaskOrchestrator * taskOrc = dynamic_cast<TaskOrchestrator*>(node);
+                taskOrc->defineOrchestrationParams(cfgInfo.orcParams);
             }
             if (spawnPeerProcesses) {
                 childrenPids.push_back(node->spawn(node));
@@ -382,19 +227,15 @@ void Deployer::launchPeerNodes(std::vector<pid_t> & childrenPids)
 void Deployer::start()
 {
     // Send the GO! signal
-    L("Waiting for START signal . . .");
-    //usleep(10000000);
-    //while (waitingForSignalToGo) {}
-    while (waitingForGoAhead()) { usleep(10000); }
-    L("GO!");
-    pnd->evtMng->go();
+    if (hmiNeeded) {
+        L("Waiting for START signal . . .");
+        while (waitingForGoAhead()) { usleep(10000); }
+        L("GO!");
+        evtMng->go();
+    } else {
+        L("Starting...");
+    }
 
-    // Endless loop (just for the test)
-    //L("Waiting for QPF HMI to end . . .");
-    //int qpfhmiStatus;
-    //waitpid(qpfhmiPid, &qpfhmiStatus, 0);
-
-    //L("Endless loop . . .");
     while(true) {}
 }
 
@@ -402,7 +243,7 @@ void Deployer::start()
 // Method: cleanUp
 // Removes any remaining children
 //----------------------------------------------------------------------
-void Deployer::cleanUp(std::vector<pid_t> & childrenPids)
+void Deployer::cleanUp()
 {
     // Kill remaining children
     for (unsigned int i = 0; i < childrenPids.size(); ++i) {
