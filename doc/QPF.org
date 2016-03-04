@@ -9,6 +9,35 @@
 
 * QPF - QLA Processing Framework
 
+** Euclid Operations Main Entities
+
+The main elements interfacing each other at the mission operation phase are the *Science Operations Centre* (SOC) and the *Mission Operations Centre* (MOC). In addition, there are two Instrument Operations Teams (IOTs), responsible for the definition of the instrument operational procedures as well as to ensure the operability of the different instruments along the mission.
+
+*** Mission Operations Centre
+
+The Euclid Mission Operations Centre at ESOC is the responsible for the consolidation and uplink of all the telecommanding to Euclid, including those related to instrument operations. It is also the responsible to obtain the telemetry generated on board, and make it available to the SOC and, (through MOC infrastructures), to the IOTs-SDCs during the Commissioning and PV phases, and for contingencies.
+
+Being the responsible to uplink telecommands, it is the final responsible to guarantee the instrument safety and health, following the given criteria and procedures provided by IOTs.
+
+The MOC shall also act as configuration control holder of the instruments operational DBs (MIB), being the entity in charge of its formal dissemination to SOC and operational deployment.
+
+*** Science Operations Centre
+
+The Science Operations Centre at ESAC is the responsible of the Survey execution. It generates the required commanding requests to ensure its fulfilment as well as the routine calibration plan. It also acts as formal interface from the IOT’s to the MOC during the routine mission, consolidating instrument operational requests against the on-going survey, and if required and not covered by a coordinating IOT entity, across instrument consolidation. It is part of the Instrument Monitoring to provide a quick look assessment on the instrument performance and survey execution.
+
+The SOC is the entity responsible to gather the data provided by the MOC and make it available to the rest of the Science Ground Segment in appropriate format, generating the Level 1. The content and format of Level 1 is not part of this document, but it is foreseen that will comprise the scientific, house-keeping and ancillary information received from MOC.
+
+*** Instrument Operation Teams
+
+The Instrument Operations Teams are the entities responsible to define the Instrument Operations, mainly the instrument operational procedures, the instrument DBs and the criteria for instrument safety and health, as well as for instrument monitoring. They must ensure operability along the mission, and also ensure optimal operations strategy through an overall instrument monitoring, capability to update or modify the instrument SW, DB or procedures, and generate updates to the calibration and characterisation. They should inherit and build on expertise from the Instrument Development Teams, in order to understand and react to instrument anomalies and also to assess instrument data.
+
+The two IOT’s will have a single IOT coordinator that will act as single point of contact regarding overall system architecture, issues of mutual concern and also as main responsible of ensuring towards SOC (and therefore MOC) the coordination of combined instrument activities.
+
+*** Science Data Centres
+
+The Science Data Centres are entrusted to run pipelines to process the Science Telemetry of the instruments. Part of this process can encompass the Instrument Monitoring assessment and flagging, to be used by IOTs in identification of trends or misbehaviours, and also to process specific calibration observations that may end up in updates to On Board or Ground items. However, it could also be the case that the IOT’s themselves will be OU-SDC’s related to this dedicated pipelines. Both IOT’s and SDC’s will feed int0 EAS relevant information to allow the assessment of the survey execution by SOC. Even if the key personnel is the same running IOT and SDC tasks, a clear functional split across the two domains may be desirable.
+
+
 ** Euclid SOC Architecture Design
 
 *** Euclid SOC responsibilities
@@ -43,7 +72,7 @@ The SOC is responsible for the development, procurement, integration, validation
 - SOC Storage :: Storage at SOC
 
 
-** QLA
+** QLA Subsystem
 
 *** QLA Capabilities
 
