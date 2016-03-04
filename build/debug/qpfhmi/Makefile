@@ -705,6 +705,7 @@ moc_mainwindow.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../qpfhmi/archivemodel.h \
 		/opt/Qt/5.4/gcc_64/include/QtGui/QStandardItemModel \
 		/opt/Qt/5.4/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -1345,6 +1346,7 @@ moc_app.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QApplication \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/datamng.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
@@ -1462,9 +1464,14 @@ moc_frmagentstatus.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QFrame \
 		../../../../libcomm/src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		../../../qpfhmi/frmagentstatus.h
 	/opt/Qt/5.4/gcc_64/bin/moc $(DEFINES) -I/opt/Qt/5.4/gcc_64/mkspecs/linux-g++ -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/opt/cots/include -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/home/jcgonzalez/ws/personal/libcomm/src -I/home/jcgonzalez/ws/personal/QPF/json -I/opt/PostgreSQL/9.4/include -I/opt/Qt/5.4/gcc_64/include -I/opt/Qt/5.4/gcc_64/include/QtWidgets -I/opt/Qt/5.4/gcc_64/include/QtGui -I/opt/Qt/5.4/gcc_64/include/QtCore -I. ../../../qpfhmi/frmagentstatus.h -o moc_frmagentstatus.cpp
 
@@ -1472,9 +1479,14 @@ moc_simindata.cpp: ../../../src/msgtypes.h \
 		../../../../libcomm/src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/QObject \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qobject.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs.h \
@@ -1689,6 +1701,7 @@ main.o: ../../../qpfhmi/main.cpp ../../../qpfhmi/app.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/datamng.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
@@ -1906,6 +1919,7 @@ mainwindow.o: ../../../qpfhmi/mainwindow.cpp ../../../qpfhmi/mainwindow.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../qpfhmi/archivemodel.h \
 		/opt/Qt/5.4/gcc_64/include/QtGui/QStandardItemModel \
 		/opt/Qt/5.4/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -2014,7 +2028,9 @@ mainwindow.o: ../../../qpfhmi/mainwindow.cpp ../../../qpfhmi/mainwindow.h \
 		/opt/Qt/5.4/gcc_64/include/QtWidgets/QProgressBar \
 		/opt/Qt/5.4/gcc_64/include/QtWidgets/qprogressbar.h \
 		../../../qpfhmi/dlgshowtaskinfo.h \
-		/opt/Qt/5.4/gcc_64/include/QtWidgets/QDialog
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/QDialog \
+		/opt/Qt/5.4/gcc_64/include/QtCore/QProcess \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qprocess.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../../qpfhmi/mainwindow.cpp
 
 hmipxy.o: ../../../qpfhmi/hmipxy.cpp ../../../qpfhmi/hmipxy.h \
@@ -2030,6 +2046,7 @@ hmipxy.o: ../../../qpfhmi/hmipxy.cpp ../../../qpfhmi/hmipxy.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hmipxy.o ../../../qpfhmi/hmipxy.cpp
 
@@ -2286,9 +2303,14 @@ archivemodel.o: ../../../qpfhmi/archivemodel.cpp ../../../qpfhmi/archivemodel.h 
 		../../../../libcomm/src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		../../../src/dbhdlpostgre.h \
 		/opt/PostgreSQL/9.4/include/libpq-fe.h \
 		/opt/PostgreSQL/9.4/include/postgres_ext.h \
@@ -2867,6 +2889,7 @@ app.o: ../../../qpfhmi/app.cpp ../../../qpfhmi/app.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/datamng.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
@@ -2891,6 +2914,7 @@ deployer.o: ../../../qpfhmi/deployer.cpp ../../../qpfhmi/deployer.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/datamng.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
@@ -3008,9 +3032,14 @@ frmagentstatus.o: ../../../qpfhmi/frmagentstatus.cpp ../../../qpfhmi/frmagentsta
 		../../../../libcomm/src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		ui_frmagentstatus.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/QVariant \
 		/opt/Qt/5.4/gcc_64/include/QtWidgets/QAction \
@@ -3060,9 +3089,14 @@ simindata.o: ../../../qpfhmi/simindata.cpp ../../../qpfhmi/simindata.h \
 		../../../../libcomm/src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/QObject \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qobject.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs.h \
@@ -3129,10 +3163,6 @@ simindata.o: ../../../qpfhmi/simindata.cpp ../../../qpfhmi/simindata.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../qpfhmi/hmipxy.h \
 		../../../src/component.h \
-		../../../../libcomm/src/commnode.h \
-		../../../../libcomm/src/statem.h \
-		../../../../libcomm/src/log.h \
-		../../../../libcomm/src/thread.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/QDebug \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qdebug.h \
 		/opt/Qt/5.4/gcc_64/include/QtCore/qmap.h \

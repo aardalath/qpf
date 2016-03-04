@@ -191,6 +191,7 @@ DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		propdef.h \
 		version.h \
 		procelem.h \
+		cfg.h \
 		config.h \
 		component.h \
 		dbhdlpostgre.h \
@@ -531,20 +532,32 @@ compiler_clean:
 ####### Compile
 
 config.o: ../../../src/config.cpp ../../../src/config.h \
+		../../../src/cfg.h \
+		../../../src/msgtypes.h \
 		../../../src/propdef.h \
+		../../../json/json/json.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
-		../../../json/json/json.h \
+		../../../../libcomm/src/thread.h \
+		../../../src/evtmng.h \
+		../../../src/component.h \
+		../../../src/datamng.h \
+		../../../src/logmng.h \
+		../../../src/taskmng.h \
+		../../../src/taskorc.h \
+		../../../src/taskagent.h \
+		../../../src/procelem.h \
 		../../../../libcomm/src/tools.h \
 		../../../src/dbhdlpostgre.h \
 		/opt/PostgreSQL/9.4/include/libpq-fe.h \
 		/opt/PostgreSQL/9.4/include/postgres_ext.h \
 		/opt/PostgreSQL/9.4/include/pg_config_ext.h \
 		../../../src/dbhdl.h \
-		../../../src/msgtypes.h \
-		../../../src/except.h \
-		../../../../libcomm/src/log.h
+		../../../src/except.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o config.o ../../../src/config.cpp
 
 component.o: ../../../src/component.cpp ../../../src/component.h \
@@ -559,6 +572,7 @@ component.o: ../../../src/component.cpp ../../../src/component.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/dbhdlpostgre.h \
 		/opt/PostgreSQL/9.4/include/libpq-fe.h \
 		/opt/PostgreSQL/9.4/include/postgres_ext.h \
@@ -580,6 +594,11 @@ dbhdlpostgre.o: ../../../src/dbhdlpostgre.cpp ../../../src/dbhdlpostgre.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
+		../../../../libcomm/src/thread.h \
 		../../../src/except.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dbhdlpostgre.o ../../../src/dbhdlpostgre.cpp
@@ -600,6 +619,7 @@ evtmng.o: ../../../src/evtmng.cpp ../../../src/evtmng.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o evtmng.o ../../../src/evtmng.cpp
 
@@ -616,6 +636,7 @@ datamng.o: ../../../src/datamng.cpp ../../../src/datamng.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../../libcomm/src/tools.h \
 		../../../src/dbhdlpostgre.h \
 		/opt/PostgreSQL/9.4/include/libpq-fe.h \
@@ -637,7 +658,8 @@ logmng.o: ../../../src/logmng.cpp ../../../src/logmng.h \
 		../../../../libcomm/src/thread.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
-		../../../src/config.h
+		../../../src/config.h \
+		../../../src/cfg.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o logmng.o ../../../src/logmng.cpp
 
 taskagent.o: ../../../src/taskagent.cpp ../../../src/taskagent.h \
@@ -653,6 +675,7 @@ taskagent.o: ../../../src/taskagent.cpp ../../../src/taskagent.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../src/procelem.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o taskagent.o ../../../src/taskagent.cpp
@@ -670,6 +693,7 @@ taskmng.o: ../../../src/taskmng.cpp ../../../src/taskmng.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o taskmng.o ../../../src/taskmng.cpp
 
@@ -686,6 +710,7 @@ taskorc.o: ../../../src/taskorc.cpp ../../../src/taskorc.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o taskorc.o ../../../src/taskorc.cpp
 
@@ -694,9 +719,14 @@ procelem.o: ../../../src/procelem.cpp ../../../src/procelem.h \
 		../../../src/propdef.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/cfg.h \
+		../../../../libcomm/src/commnode.h \
+		../../../../libcomm/src/statem.h \
+		../../../../libcomm/src/log.h \
 		../../../../libcomm/src/r2rpeer.h \
 		/opt/cots/include/zmq.hpp \
 		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/thread.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o procelem.o ../../../src/procelem.cpp
 
