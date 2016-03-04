@@ -82,6 +82,7 @@ void SimInData::sendInData(QString start, QString end,
     m.productStatus  = status.toStdString();
     m.productSize    = 12345678;
     m.url            = url.toStdString();
+    m.urlSpace       = ExternalSpace;
 
     qDebug() << "Trying to send InData";
     hmiNode->sendInData(m);
@@ -143,6 +144,7 @@ bool SimInData::sendMultInData(QDateTime start, QDateTime end,
                     m.productStatus  = prodStatus.toStdString();
                     m.productSize    = 12345678;
                     m.url            = "http://euclid.esa.int/data/" + prodId.toStdString() + ".zip";
+                    m.urlSpace       = ExternalSpace;
 
                     // Append to InData message list
                     multInDataContentValues.append(m);
@@ -216,6 +218,7 @@ bool SimInData::sendInDataFromFile(QString fileInDataParams)
         m.productStatus  = productStatus.toStdString();
         m.productSize    = 12345678;
         m.url            = ("http://euclid-data.esa.int/data/" + prodId + ".bin").toStdString();
+        m.urlSpace       = ExternalSpace;
 
         // Append to InData message list
         multInDataContentValues.append(m);
@@ -254,7 +257,7 @@ bool SimInData::processInbox(QString folder)
     if (multInDataContentValues.size() < 1) { readMetaFile(fullMetaFile); }
 
     // Send messages, every 10 s
-    int freq = 10;
+    int freq = 120;
     if (multInDataContentValues.size() > 0) {
         // Prepare sending timer
         timerMultInData = new QTimer(this);
@@ -336,6 +339,7 @@ void SimInData::generateMetaFile(const QString& folder, const QString& metaFile)
 
         m.startTime      = sDateTime.toStdString();
         m.endTime        = eDateTime.toStdString();
+        m.creator        = "UNKNOWN";
         m.instrument     = instrument.toStdString();
         m.productId      = fs.baseName().toStdString();
         m.productType    = prodType.toStdString();
@@ -343,6 +347,7 @@ void SimInData::generateMetaFile(const QString& folder, const QString& metaFile)
         m.productStatus  = "OK";
         m.productSize    = fs.size();
         m.url            = "file://" + file.toStdString();
+        m.urlSpace       = UserSpace;
 
         metadata.productList.push_back(m);
 
