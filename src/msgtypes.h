@@ -52,6 +52,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <iostream>
 #include <memory>
 
@@ -67,8 +68,7 @@
 //------------------------------------------------------------
 
 #include "propdef.h"
-//#include "json/json.h"
-#include "sdc.h"
+#include "json/json.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -89,6 +89,7 @@ namespace QPF {
 typedef std::string   ProductType;
 typedef std::string   DateTime;
 typedef std::string   URL;
+typedef std::string   URLSpace;
 typedef std::string   Instrument;
 typedef std::string   ObsMode;
 typedef std::string   Creator;
@@ -101,39 +102,55 @@ typedef unsigned int  ProductSize;
 // Topic: Structures
 //------------------------------------------------------------
 
-struct SDCStruct {
-    SDCStruct() { SDC::Dict d; data.set(d); }
-    virtual ~SDCStruct() {}
+struct JsonStruct {
+    JsonStruct() : data(Json::nullValue) {}
+    virtual ~JsonStruct() {}
 
-    virtual void setData(SDC::Value & v) {
+    JsonStruct & operator=(const JsonStruct& other) { // copy assignment
+        if (this != &other) { // self-assignment check expected
+            const_cast<JsonStruct&>(other).toData();
+            this->data = other.data;
+            this->toFields();
+        }
+        return *this;
+    }
+
+    virtual void setData(Json::Value & v) {
         data = v;
+//        Json::StyledWriter w;
+//        std::cerr << w.write(v) << std::endl;
         toFields();
     }
-    virtual void setData(std::string key, SDC::Value & v) {
+    virtual void setData(std::string key, Json::Value & v) {
         data[key] = v;
         toFields();
     }
     virtual void setDataString(std::string vStr) {
-        data.deserialize(vStr);
+        Json::Reader reader;
+        reader.parse(vStr, data);
         toFields();
     }
-    virtual SDC::Value & getData() {
+    virtual Json::Value & getData() {
         toData();
         return data;
     }
     virtual std::string getDataString() {
         toData();
-        string s;
-        data.serialize(s);
-        return s;
+        Json::FastWriter writer;
+        return writer.write(data);
     }
     virtual void toFields() = 0;
     virtual void toData() = 0;
 
-    SDC::Value data;
+    friend std::ostream &operator<<(std::ostream &out, const JsonStruct & c) {
+        out << const_cast<JsonStruct & >(c).getDataString() << std::endl << std::flush;
+        return out;
+    }
+
+    Json::Value data;
 };
 
-struct ProductMetadata : public SDCStruct {
+struct ProductMetadata : public JsonStruct {
     DateTime       startTime;
     DateTime       endTime;
     DateTime       regTime;
@@ -146,19 +163,21 @@ struct ProductMetadata : public SDCStruct {
     ProductStatus  productStatus;
     ProductSize    productSize;
     URL            url;
+    URLSpace       urlSpace;
 
     virtual void toFields() {
-        startTime      = data["startTime"     ].asStr();
-        endTime        = data["endTime"       ].asStr();
-        instrument     = data["instrument"    ].asStr();
-        obsMode        = data["obsMode"       ].asStr();
-        creator        = data["creator"       ].asStr();
-        productId      = data["productId"     ].asStr();
-        productType    = data["productType"   ].asStr();
-        productVersion = data["productVersion"].asStr();
-        productStatus  = data["productStatus" ].asStr();
-        productSize    = data["productSize"   ].asInt();
-        url            = data["url"           ].asStr();
+        startTime      = data["startTime"     ].asString();
+        endTime        = data["endTime"       ].asString();
+        instrument     = data["instrument"    ].asString();
+        obsMode        = data["obsMode"       ].asString();
+        creator        = data["creator"       ].asString();
+        productId      = data["productId"     ].asString();
+        productType    = data["productType"   ].asString();
+        productVersion = data["productVersion"].asString();
+        productStatus  = data["productStatus" ].asString();
+        productSize    = data["productSize"   ].asUInt();
+        url            = data["url"           ].asString();
+        urlSpace       = data["urlSpace"      ].asString();
     }
 
     virtual void toData() {
@@ -166,16 +185,18 @@ struct ProductMetadata : public SDCStruct {
         data["endTime"       ] = endTime;
         data["instrument"    ] = instrument;
         data["obsMode"       ] = obsMode;
+        data["creator"       ] = creator;
         data["productId"     ] = productId;
         data["productType"   ] = productType;
         data["productVersion"] = productVersion;
         data["productStatus" ] = productStatus;
         data["productSize"   ] = productSize;
         data["url"           ] = url;
+        data["urlSpace"      ] = urlSpace;
     }
 };
 
-struct ProductCollection : public SDCStruct {
+struct ProductCollection : public JsonStruct {
     std::map<ProductType, ProductMetadata> productList;
 
     virtual void toFields() {
@@ -201,7 +222,7 @@ struct ProductCollection : public SDCStruct {
     }
 };
 
-struct ProductList : public SDCStruct {
+struct ProductList : public JsonStruct {
     std::vector<ProductMetadata> productList;
 
     virtual void toFields() {
@@ -222,7 +243,7 @@ struct ProductList : public SDCStruct {
     }
 };
 
-struct StringList : public SDCStruct {
+struct StringList : public JsonStruct {
     std::vector<std::string> items;
 
     virtual void toFields() {
@@ -242,7 +263,7 @@ struct StringList : public SDCStruct {
 
 struct ProductShortList : public StringList {};
 
-struct ParameterList : public SDCStruct {
+struct ParameterList : public JsonStruct {
     std::map<std::string, std::string> paramList;
 
     virtual void toFields() {
@@ -285,7 +306,7 @@ enum TaskStatus { TLIST_TASK_STATUS };
 extern std::map<TaskStatus, std::string> TaskStatusName;
 extern std::map<std::string, TaskStatus> TaskStatusValue;
 
-struct TaskInfo : public SDCStruct {
+struct TaskInfo : public JsonStruct {
     TaskInfo() : taskData(Json::nullValue) {}
     TaskName           taskName;
     TaskPath           taskPath;
@@ -325,7 +346,7 @@ struct TaskInfo : public SDCStruct {
     }
 };
 
-struct TaskAgentInfo : public SDCStruct {
+struct TaskAgentInfo : public JsonStruct {
     int         total;
     int         maxnum;
     int         running;
@@ -402,7 +423,7 @@ struct NodeList : public StringList {};
 
 typedef int                   CRC;
 
-struct MessageHeader : public SDCStruct {
+struct MessageHeader : public JsonStruct {
     MessageId      msgId;
     MessageVersion msgVersion;
     NodeName       source;
@@ -438,7 +459,7 @@ struct MessageHeader : public SDCStruct {
     }
 };
 
-struct Message : public SDCStruct {
+struct Message : public JsonStruct {
     MessageHeader header;
     virtual void toFields() {}
     virtual void toData() {}
