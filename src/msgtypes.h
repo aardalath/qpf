@@ -274,13 +274,14 @@ typedef Json::Value                            TaskData;
     T(FAILED,-1), \
     T(FINISHED,0), \
     T(RUNNING,1), \
-    T(PAUSED,2)
+    T(WAITING,2)
 
 #define T(a,b) TASK_ ## a = b
 enum TaskStatus { TLIST_TASK_STATUS };
 #undef T
 
 extern std::map<TaskStatus, std::string> TaskStatusName;
+extern std::map<std::string, TaskStatus> TaskStatusValue;
 
 struct TaskInfo : public JsonStruct {
     TaskName           taskName;
@@ -318,6 +319,54 @@ struct TaskInfo : public JsonStruct {
         data["outputs"]  = outputs.getData();
         data["params" ]  = params .getData();
         data["taskData"] = taskData;
+    }
+};
+
+struct TaskAgentInfo : public JsonStruct {
+    int         total;
+    int         maxnum;
+    int         running;
+    int         waiting;
+    int         failed;
+    int         finished;
+    int         load1min;
+    int         load5min;
+    int         load15min;
+    int         uptimesecs;
+    std::string name;
+    std::string client;
+    std::string server;
+
+    virtual void toFields() {
+        total      = data["total"].asInt();
+        maxnum     = data["maxnum"].asInt();
+        running    = data["running"].asInt();
+        waiting    = data["waiting"].asInt();
+        failed     = data["failed"].asInt();
+        finished   = data["finished"].asInt();
+        load1min   = data["load1min"].asInt();
+        load5min   = data["load5min"].asInt();
+        load15min  = data["load15min"].asInt();
+        uptimesecs = data["uptimesecs"].asInt();
+        name       = data["name"].asString();
+        client     = data["client"].asString();
+        server     = data["server"].asString();
+    }
+
+    virtual void toData() {
+        data["total"]      = total;
+        data["maxnum"]     = maxnum;
+        data["running"]    = running;
+        data["waiting"]    = waiting;
+        data["failed"]     = failed;
+        data["finished"]   = finished;
+        data["load1min"]   = load1min;
+        data["load5min"]   = load5min;
+        data["load15min"]  = load15min;
+        data["uptimesecs"] = uptimesecs;
+        data["name"]       = name;
+        data["client"]     = client;
+        data["server"]     = server;
     }
 };
 
