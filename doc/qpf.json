@@ -1,0 +1,212 @@
+{
+    "general": {
+        "app_name": "QPF",
+        "app_version": "0.1",
+        "last_access": "20150616T121555",
+        "run_path": "/var/run/qpf"
+    },
+    "nodes": {
+        "node_list": {
+            "DataMng": {
+                "client": "tcp://127.0.0.1:7101",
+                "server": "tcp://*:7101",
+                "type": "datamng"
+            },
+            "EvtMng": {
+                "client": "tcp://127.0.0.1:7100",
+                "server": "tcp://*:7100",
+                "type": "evtmng"
+            },
+            "LogMng": {
+                "client": "tcp://127.0.0.1:7102",
+                "server": "tcp://*:7102",
+                "type": "logmng"
+            },
+            "QPFHMI": {
+                "client": "tcp://127.0.0.1:7999",
+                "server": "tcp://*:7999",
+                "type": "hmi"
+            },
+            "TskAge1": {
+                "client": "tcp://127.0.0.1:7111",
+                "server": "tcp://*:7111",
+                "type": "taskagent"
+            },
+            "TskAge2": {
+                "client": "tcp://127.0.0.1:7112",
+                "server": "tcp://*:7112",
+                "type": "taskagent"
+            },
+            "TskAge3": {
+                "client": "tcp://127.0.0.1:7113",
+                "server": "tcp://*:7113",
+                "type": "taskagent"
+            },
+            "TskAge4": {
+                "client": "tcp://127.0.0.1:7114",
+                "server": "tcp://*:7114",
+                "type": "taskagent"
+            },
+            "TskAge5": {
+                "client": "tcp://127.0.0.1:7115",
+                "server": "tcp://*:7115",
+                "type": "taskagent"
+            },
+            "TskMng": {
+                "client": "tcp://127.0.0.1:7103",
+                "server": "tcp://*:7103",
+                "type": "taskmng"
+            },
+            "TskOrc": {
+                "client": "tcp://127.0.0.1:7104",
+                "server": "tcp://*:7104",
+                "type": "taskorc"
+            }
+        },
+        "hmi_node": "QPFHMI"
+    },
+    "machines": {
+        "vmu1": [
+            "DataMng",
+            "EvtMng",
+            "LogMng",
+            "QPFHMI",
+            "TskAge1",
+            "TskAge2",
+            "TskAge3",
+            "TskAge4",
+            "TskAge5",
+            "TskMng",
+            "TskOrc"]
+    },
+    "connections": {
+        "EvtMng": [
+            "DataMng",
+            "LogMng",
+            "TskMng",
+            "TskOrc",
+            "QPFHMI",
+            "TskAge1",
+            "TskAge2",
+            "TskAge3",
+            "TskAge4",
+            "TskAge5"],
+        "DataMng": [
+            "EvtMng",
+            "TskMng",
+            "TskOrc"],
+        "LogMng": [
+            "EvtMng"],
+        "TskMng": [
+            "EvtMng",
+            "TskOrc",
+            "DataMng",
+            "TskAge1",
+            "TskAge2",
+            "TskAge3",
+            "TskAge4",
+            "TskAge5"],
+        "TskOrc": [
+            "EvtMng",
+            "TskMng",
+            "DataMng"],
+        "TskAge1": [
+            "EvtMng",
+            "TskMng"],
+        "TskAge2": [
+            "EvtMng",
+            "TskMng"],
+        "TskAge3": [
+            "EvtMng",
+            "TskMng"],
+        "TskAge4": [
+            "EvtMng",
+            "TskMng"],
+        "TskAge5": [
+            "EvtMng",
+            "TskMng"],
+
+    }
+    "orchestration": {
+        "rules": {
+            "rule1": {
+                "inputs": "NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1",
+                "outputs": "NISP_P_CAL_1",
+                "processing": "PE_NISP_P_CAL"
+            },
+            "rule2": {
+                "inputs": "NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1",
+                "outputs": "NISP_P_QLA",
+                "processing": "PE_NISP_P"
+            },
+            "rule3": {
+                "inputs": "NISP_S_CAL_1,NISP_S_1",
+                "outputs": "NISP_S_QLA",
+                "processing": "PE_NISP_S"
+            },
+            "rule4": {
+                "inputs": "VIS_CAL_1,VIS_1",
+                "outputs": "VIS_QLA",
+                "processing": "PE_VIS"
+            },
+            "rule5": {
+                "inputs": "HK_RAW",
+                "outputs": "HK_QLA",
+                "processing": "PE_HK"
+            }
+        }
+    },
+    "processing": {
+        "processors": {
+            "processor1": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "PE_NISP_P_CAL",
+                "output_path": "/opt/pe/output"
+            },
+            "processor2": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "PE_NISP_P",
+                "output_path": "/opt/pe/output"
+            },
+            "processor3": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "PE_NISP_S",
+                "output_path": "/opt/pe/output"
+            },
+            "processor4": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "PE_VIS",
+                "output_path": "/opt/pe/output"
+            },
+            "processor5": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "PE_HK",
+                "output_path": "/opt/pe/output"
+            }
+        }
+    },
+    "products": {
+        "product_types": [
+            "NISP_PY_CAL_1",
+            "NISP_PH_CAL_1",
+            "NISP_PJ_CAL_1",
+            "NISP_P_CAL_1",
+            "NISP_S_CAL_1",
+            "VIS_CAL_1",
+            "NISP_PY_1",
+            "NISP_PH_1",
+            "NISP_PJ_1",
+            "NISP_S_1",
+            "VIS_1",
+            "NISP_P_QLA",
+            "NISP_S_QLA",
+            "VIS_QLA",
+            "HK_RAW",
+            "HK_QLA"]
+    }
+}
