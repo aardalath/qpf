@@ -113,11 +113,9 @@ void DataManager::processINDATA()
         msgDataToRecip.msg->setData(msg->getData());
         Json::StyledWriter w;
         setForwardTo(recip, msgDataToRecip.msg->header);
-        PeerMessage * msgForRecip = new PeerMessage;
-        buildPeerMsg(*msgForRecip,
-                     msgDataToRecip.msg->header.destination,
-                     msgDataToRecip.msg->getDataString(),
-                     MSG_INDATA);
+        PeerMessage * msgForRecip = buildPeerMsg(msgDataToRecip.msg->header.destination,
+                                                 msgDataToRecip.msg->getDataString(),
+                                                 MSG_INDATA);
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }

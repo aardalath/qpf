@@ -249,11 +249,9 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
         MessageData msgToRecip(new Message_TASK_PROC);
         msgToRecip.msg->setData(msg.getData());
         setForwardTo(recip, msgToRecip.msg->header);
-        PeerMessage * msgForRecip = new PeerMessage;
-        buildPeerMsg(*msgForRecip,
-                     msgToRecip.msg->header.destination,
-                     msgToRecip.msg->getDataString(),
-                     MSG_TASK_PROC);
+        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
+                                                 msgToRecip.msg->getDataString(),
+                                                 MSG_TASK_PROC);
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }

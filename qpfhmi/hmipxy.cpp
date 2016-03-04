@@ -125,8 +125,7 @@ void HMIProxy::sendInData(ProductMetadata metadata)
     buildMsgINDATA(hdr, products, msg);
 
     // Send message
-    PeerMessage * pmsg = new PeerMessage;
-    buildPeerMsg(*pmsg, hdr.destination, msg.getDataString(), MSG_INDATA);
+    PeerMessage * pmsg = buildPeerMsg(hdr.destination, msg.getDataString(), MSG_INDATA);
     registerMsg(selfPeer()->name, *pmsg);
     setTransmissionToPeer(hdr.destination, pmsg);
 }
@@ -138,13 +137,12 @@ void HMIProxy::sendInData(ProductMetadata metadata)
 void HMIProxy::requestStop()
 {
     InfoMsg("Requesting STOP . . .");
-    PeerMessage * msg = new PeerMessage;
-    buildPeerMsg(*msg, "EvtMng", "Please, perform an ordered shut down", MSG_STOP);
+    PeerMessage * msg = buildPeerMsg("EvtMng", "Please, shut down!", MSG_STOP);
     registerMsg(selfPeer()->name, *msg);
     setTransmissionToPeer("EvtMng", msg);
 }
 
-bool checkForCorruption(HMIProxy::TaskResultsInfo  m)
+bool checkForCorruption(HMIProxy::TaskResultsInfo & m)
 {
     int sum = 0;
     for (auto & kv : m) {

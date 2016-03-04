@@ -84,9 +84,8 @@ void EventManager::fromInitialisedToRunning()
 
     // Broadcast START message
     InfoMsg("Broadcasting START message . . .");
-    PeerMessage startMsg;
-    buildPeerMsg(startMsg, "", "Wake up!", MSG_START);
-    registerMsg(selfPeer()->name, startMsg, true);
+    PeerMessage * startMsg = buildPeerMsg("", "Wake up!", MSG_START);
+    registerMsg(selfPeer()->name, *startMsg, true);
     broadcast(startMsg);
 }
 
@@ -97,9 +96,8 @@ void EventManager::fromOperationalToRunning()
 {
     // Broadcast STOP message
     InfoMsg("Broadcasting STOP message . . .");
-    PeerMessage stopMsg;
-    buildPeerMsg(stopMsg, "", "Shut down!", MSG_STOP);
-    registerMsg(selfPeer()->name, stopMsg, true);
+    PeerMessage * stopMsg = buildPeerMsg("", "Shut down!", MSG_STOP);
+    registerMsg(selfPeer()->name, *stopMsg, true);
     broadcast(stopMsg);
 }
 
@@ -124,11 +122,9 @@ void EventManager::processINDATA()
         msgDataToRecip.msg->setData(msgData.msg->getData());
         Json::StyledWriter w;
         setForwardTo(recip, msgDataToRecip.msg->header);
-        PeerMessage * msgForRecip = new PeerMessage;
-        buildPeerMsg(*msgForRecip,
-                     msgDataToRecip.msg->header.destination,
-                     msgDataToRecip.msg->getDataString(),
-                     MSG_INDATA);
+        PeerMessage * msgForRecip = buildPeerMsg(msgDataToRecip.msg->header.destination,
+                                                 msgDataToRecip.msg->getDataString(),
+                                                 MSG_INDATA);
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
@@ -145,11 +141,9 @@ void EventManager::processTASK_RES()
     MessageData msgToHMI(new Message_TASK_RES);
     msgToHMI.msg->setData(msg->getData());
     setForwardTo("QPFHMI", msgToHMI.msg->header);
-    PeerMessage * msgForHMI = new PeerMessage;
-    buildPeerMsg(*msgForHMI,
-                 msgToHMI.msg->header.destination,
-                 msgToHMI.msg->getDataString(),
-                 MSG_TASK_RES);
+    PeerMessage * msgForHMI = buildPeerMsg(msgToHMI.msg->header.destination,
+                                           msgToHMI.msg->getDataString(),
+                                           MSG_TASK_RES);
     registerMsg(selfPeer()->name, *msgForHMI);
     setTransmissionToPeer("QPFHMI", msgForHMI);
 }

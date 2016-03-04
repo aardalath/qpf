@@ -173,11 +173,9 @@ bool TaskManager::sendTaskAgMsg(Message_TASK_PROC * msg,
     MessageData msgDataToAg(new Message_TASK_PROC);
     msgDataToAg.msg->setData(msg->getData());
     setForwardTo(agName, msgDataToAg.msg->header);
-    PeerMessage * msgForAg = new PeerMessage;
-    buildPeerMsg(*msgForAg,
-                 msgDataToAg.msg->header.destination,
-                 msgDataToAg.msg->getDataString(),
-                 MSG_TASK_PROC);
+    PeerMessage * msgForAg = buildPeerMsg(msgDataToAg.msg->header.destination,
+                                          msgDataToAg.msg->getDataString(),
+                                          MSG_TASK_PROC);
     registerMsg(selfPeer()->name, *msgForAg);
     setTransmissionToPeer(agName, msgForAg);
 
@@ -197,11 +195,9 @@ bool TaskManager::sendTaskRes(Message_TASK_RES * msg)
         MessageData msgToRecip(new Message_TASK_RES);
         msgToRecip.msg->setData(msg->getData());
         setForwardTo(recip, msgToRecip.msg->header);
-        PeerMessage * msgForRecip = new PeerMessage;
-        buildPeerMsg(*msgForRecip,
-                     msgToRecip.msg->header.destination,
-                     msgToRecip.msg->getDataString(),
-                     MSG_TASK_RES);
+        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
+                                                 msgToRecip.msg->getDataString(),
+                                                 MSG_TASK_RES);
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }

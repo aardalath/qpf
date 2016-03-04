@@ -297,8 +297,7 @@ bool TaskAgent::sendTaskResMsg(TaskInfo & task)
     buildMsgHeader(MSG_TASK_RES_IDX, selfPeer()->name, "TskMng", msg.header);
     msg.task.setData(task.getData());
     //std::cerr << "TASKRES: " << msg.getDataString() << std::endl;
-    PeerMessage * taskResMsg = new PeerMessage;
-    buildPeerMsg(*taskResMsg, "TskMng", msg.getDataString(), MSG_TASK_RES);
+    PeerMessage * taskResMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_TASK_RES);
     registerMsg(selfPeer()->name, *taskResMsg);
     setTransmissionToPeer("TskMng", taskResMsg);
     return true;
