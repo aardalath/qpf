@@ -2,10 +2,13 @@
 #define FRMAGENTSTATUS_H
 
 #include <QFrame>
+#include "msgtypes.h"
 
 namespace Ui {
 class FrmAgentStatus;
 }
+
+namespace QPF {
 
 class FrmAgentStatus : public QFrame
 {
@@ -15,8 +18,12 @@ public:
     explicit FrmAgentStatus(QWidget *parent = 0);
     ~FrmAgentStatus();
 
+    void updateInfo(TaskAgentInfo &d);
+
 private:
     Ui::FrmAgentStatus *ui;
 };
+
+}
 
 #endif // FRMAGENTSTATUS_H
