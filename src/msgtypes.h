@@ -326,6 +326,8 @@ struct TaskAgentInfo : public JsonStruct {
     int         maxnum;
     int         running;
     int         waiting;
+    int         paused;
+    int         stopped;
     int         failed;
     int         finished;
     int         load1min;

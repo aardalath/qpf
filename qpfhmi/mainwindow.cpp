@@ -767,6 +767,8 @@ void MainWindow::showTaskRes()
         taInfo->maxnum = 3;
         taInfo->running = 0;
         taInfo->waiting = 0;
+        taInfo->paused = 0;
+        taInfo->stopped = 0;
         taInfo->failed = 0;
         taInfo->finished = 0;
         taInfo->load1min = loadAvgs.at(0) * 100;
