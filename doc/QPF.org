@@ -452,7 +452,7 @@ deactivate TaskOrc
 @enduml
 #+END_SRC
 
-**** Processing Inbox Data
+**** Processing Data from User-selected Input Folder
 
 #+BEGIN_SRC PlantUML
 @startuml
@@ -470,12 +470,13 @@ participant DataMng
 participant TaskOrc
 participant "Local\nArchive" as LA #cyan
 database "Database" as DB #cyan
-Op -> HMI: select inbox folder
+Op -> HMI: select input folder
 HMI -> HMI: generate INDATA msgs
 loop for each message/product
 HMI -> HMIpxy: send MSG_INDATA
 SEND(HMIpxy, EvtMng, MSG_INDATA)
 START1(EvtMng)
+EvtMng -> EvtMng: changeOrigin(InboxArea)
 SEND(EvtMng, DataMng, MSG_INDATA)
 START1(DataMng)
 /' EvtMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font> '/
@@ -559,7 +560,7 @@ DataMng -> DB: registerOutputs
 @enduml
 #+END_SRC
 
-**** Processing Inbox Products - Complete Sequence
+**** Processing Products fro User-selected Input Folder - Complete Sequence
 
 #+BEGIN_SRC PlantUML
 @startuml
@@ -580,7 +581,7 @@ START2(a)
 STOP(a)
 !enddefinelong
 
-title Processing Inbox Products - Complete Sequence
+title Processing Products fro User-selected Input Folder - Complete Sequence
 
 actor Operator as Op
 
@@ -605,12 +606,13 @@ participant "Shared\nStorage" as SH #lightcyan
 database "Database" as DB #cyan
 end box
 
-Op -> HMI: select inbox folder
+Op -> HMI: select input folder
 HMI -> HMI: generate INDATA msgs
 loop for each message/product
 HMI -> HMIpxy: send MSG_INDATA
 SEND(HMIpxy, EvtMng, MSG_INDATA)
 START1(EvtMng)
+EvtMng -> EvtMng: changeOrigin(InboxArea)
 SEND(EvtMng, DataMng, MSG_INDATA)
 START1(DataMng)
 STOP(EvtMng)
@@ -628,7 +630,7 @@ end loop
 group rule fired
 DO(TaskOrc, buildProcessingTask)
 DataMng -> SH: placeProductsAtSharedArea
-DO(TaskOrc, chageOrigin(SharedArea))
+DO(TaskOrc, chageOrigin(SharedAreaIn))
 SEND(TaskOrc, TaskMng, MSG_TASK_PROC)
 START1(TaskMng)
 SEND(TaskOrc, DataMng, MSG_TASK_PROC)

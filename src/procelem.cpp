@@ -37,8 +37,8 @@
  ******************************************************************************/
 #include "procelem.h"
 #include "tools.h"
-
-#include "dbg.h"
+#include "taskagent.h"
+#include "urlhdl.h"
 
 #include <sys/time.h>
 #include <iostream>
@@ -61,15 +61,25 @@ namespace QPF {
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-ProcessingElement::ProcessingElement() :
-    numTask(1),
+ProcessingElement::ProcessingElement(TaskAgent * parent) :
+    super(parent),
     status(TASK_SCHEDULED),
-    peThread(0),
     startProc(false),
     endProc(false),
     checkStartSleepPeriod( 500000), // microseconds
-    threadLoopSleepPeriod(2000000) // microseconds
+    threadLoopSleepPeriod(3000000)  // microseconds
+#ifdef DEBUG_BUILD
+    ,chkLevel(0)
+#endif
 {
+}
+
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
+ProcessingElement::~ProcessingElement()
+{
+//    peThread.join();
 }
 
 //----------------------------------------------------------------------
@@ -120,20 +130,12 @@ void ProcessingElement::end()
 }
 
 //----------------------------------------------------------------------
-// Method: markAsFinished
-// Mark pe as finished
-//----------------------------------------------------------------------
-void ProcessingElement::markAsArchived()
-{
-    status = TASK_ARCHIVED;
-}
-
-//----------------------------------------------------------------------
 // Method: exec
 // Executes a task
 //----------------------------------------------------------------------
 void ProcessingElement::exec()
 {
+    CHKIN;
     // START
 
     //--------------------------------------------------
@@ -150,9 +152,49 @@ void ProcessingElement::exec()
     // Execute processor in a separate thread
     //--------------------------------------------------
     if (status != TASK_FAILED) {
-        peThread = new std::thread(&ProcessingElement::executeProcessor,
-                                   this);
+        peThread = std::thread(&ProcessingElement::executeProcessor, this);
+        peThread.detach();
     }
+    CHKOUT;
+}
+
+//----------------------------------------------------------------------
+// Method: executeProcessor
+// Forks process to run processor
+//----------------------------------------------------------------------
+void ProcessingElement::executeProcessor()
+{
+    CHKIN;
+    //--------------------------------------------------
+    // 3. Fork process to run actual processor
+    //--------------------------------------------------
+    while (!startProc) { goIdle(checkStartSleepPeriod); }
+    forkProcess();
+
+    //--------------------------------------------------
+    // 4. Get Identifier
+    //--------------------------------------------------
+    obtainProcElemId();
+
+    //--------------------------------------------------
+    // 5. Monitor running processing element (loop)
+    //--------------------------------------------------
+    {
+        monitorProcElemLoop();
+    }
+
+    //--------------------------------------------------
+    // 6. Retrieve output products for archive
+    //--------------------------------------------------
+    retrieveOutputProducts();
+
+    //--------------------------------------------------
+    // 7. Clean-up
+    //--------------------------------------------------
+    cleanup();
+
+    // END
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -161,6 +203,7 @@ void ProcessingElement::exec()
 //----------------------------------------------------------------------
 void ProcessingElement::initTaskInfo()
 {
+    CHKIN;
     // Save actual processing element to be executed
     pe = task.taskPath;
 
@@ -169,7 +212,6 @@ void ProcessingElement::initTaskInfo()
     internalTaskNameIdx = (agentName + "-" +
                            LibComm::timeTag() + "-" +
                            LibComm::toStr<int>(numTask));
-    status = TASK_SCHEDULED;
 
     mutexTask.lock();
 
@@ -211,6 +253,7 @@ void ProcessingElement::initTaskInfo()
     task.outputs.productList.clear();
 
     mutexTask.unlock();
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -219,6 +262,7 @@ void ProcessingElement::initTaskInfo()
 //----------------------------------------------------------------------
 void ProcessingElement::configureProcElem()
 {
+    CHKIN;
     int mn = 60;
     int mx = 180;
 
@@ -239,12 +283,31 @@ void ProcessingElement::configureProcElem()
     // Create input files
     if (task.taskPath == "QLA_VIS") {
         //std::string sourceImg("/qpf/data/mef.fits");
-        std::map<ProductType, ProductMetadata>::iterator it = task.inputs.productList.begin();
+        std::map<ProductType, ProductMetadata>::iterator it =
+                task.inputs.productList.begin();
         ProductMetadata & m = it->second;
         std::string sourceImg = m.url.substr(7,1000);
         std::string inputProduct = exchgIn + "/" + m.productId + ".fits";
-        if (link(sourceImg.c_str(), inputProduct.c_str()) != 0) {
-            perror("hardlink input product");
+        URLHandler urlh;
+        // Next, we place the data to be analyzed in the task inputs folder
+        // With the Host+2 VM Proc.Nodes the symlink version freezes the VMs
+        // and the copyfile version eats too much disk space, and is terribly
+        // slow.
+        // We must find a solution, but in the meanwhile we make a symlink to
+        // a VM resident file (with it is in fact identical to the original
+        // source)
+
+// Symlink version
+//        if (symlink(sourceImg.c_str(), inputProduct.c_str()) != 0) {
+//            perror(std::string("symlink input product: from " + sourceImg +
+//                               " to " + inputProduct).c_str());
+// Copyfile version
+//        if (urlh.copyfile(sourceImg, inputProduct) != 0) {
+//            perror(std::string("copygile input product: from " + sourceImg +
+//                               " to " + inputProduct).c_str());
+        if (link("/qpf/data/mef.fits", inputProduct.c_str()) != 0) {
+            perror(std::string("link input product: from " + sourceImg +
+                               " to " + inputProduct).c_str());
             status = TASK_FAILED;
         }
     } else {
@@ -257,43 +320,7 @@ void ProcessingElement::configureProcElem()
             status = TASK_FAILED;
         }
     }
-}
-
-//----------------------------------------------------------------------
-// Method: executeProcessor
-// Forks process to run processor
-//----------------------------------------------------------------------
-void ProcessingElement::executeProcessor()
-{
-    //--------------------------------------------------
-    // 3. Fork process to run actual processor
-    //--------------------------------------------------
-    while (!startProc) { goIdle(checkStartSleepPeriod); }
-    forkProcess();
-
-    //--------------------------------------------------
-    // 4. Get Identifier
-    //--------------------------------------------------
-    obtainProcElemId();
-
-    //--------------------------------------------------
-    // 5. Monitor running processing element (loop)
-    //--------------------------------------------------
-    {
-        monitorProcElemLoop();
-    }
-
-    //--------------------------------------------------
-    // 6. Retrieve output products for archive
-    //--------------------------------------------------
-    retrieveOutputProducts();
-
-    //--------------------------------------------------
-    // 7. Clean-up
-    //--------------------------------------------------
-    cleanup();
-
-    // END
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -302,6 +329,7 @@ void ProcessingElement::executeProcessor()
 //----------------------------------------------------------------------
 void ProcessingElement::forkProcess()
 {
+    CHKIN;
     // Execute task driver
     pid_t pid = fork();
 
@@ -321,6 +349,7 @@ void ProcessingElement::forkProcess()
     }
 
     status = TASK_RUNNING;
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -329,6 +358,7 @@ void ProcessingElement::forkProcess()
 //----------------------------------------------------------------------
 void ProcessingElement::obtainProcElemId()
 {
+    CHKIN;
     // Get dockerId
     dockerIdFile = exchangeDir + "/docker.id";
     dockerId = "";
@@ -337,6 +367,7 @@ void ProcessingElement::obtainProcElemId()
         if (ifDockerId.good()) { ifDockerId >> dockerId; }
         ifDockerId.close();
     } while (dockerId.empty());
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -345,6 +376,7 @@ void ProcessingElement::obtainProcElemId()
 //----------------------------------------------------------------------
 void ProcessingElement::monitorProcElemLoop()
 {
+    CHKIN;
     // Monitor executing task
     Json::Reader jsonReader;
 
@@ -352,51 +384,61 @@ void ProcessingElement::monitorProcElemLoop()
     progressValue     = 0.;
 
     Json::Value & taskData = task.taskData;
-    taskData["Key"] = dockerId;
 
     do {
         // Sleep for some time
         goIdle(threadLoopSleepPeriod);
 
         // Get monitoring information from docker task
+        status = TASK_UNKNOWN_STATE; // assumed state
+
         inspectInfo = getMonitoringInfo(dockerId);
-
-        mutexTask.lock();
-
-        // Parse information
-        childEnded = false;
-        if (inspectInfo != "ERROR") {
+        if (inspectInfo == "ERROR") {
+            status = TASK_FINISHED;
+        } else {
             Json::Value td(Json::arrayValue);
             if  (jsonReader.parse(inspectInfo, td)) {
                 taskData = td[0u];
             } else {
-                childEnded = true;
+                status = TASK_FAILED;
             }
-        } else {
-            childEnded = true;
         }
 
-        running  = taskData["State"]["Running"].asBool();
-        dead     = taskData["State"]["Dead"].asBool();
-        paused   = taskData["State"]["Paused"].asBool();
-        killed   = taskData["State"]["OOMKilled"].asBool();
-        excode   = taskData["State"]["ExitCode"].asInt();
-        finished = (taskData["State"]["FinishedAt"].asString()
-                    != "0001-01-01T00:00:00Z");
+        if (status == TASK_UNKNOWN_STATE) {
+            // Check  flags from docker container info
+            running  = taskData["State"]["Running"].asBool();
+            dead     = taskData["State"]["Dead"].asBool();
+            paused   = taskData["State"]["Paused"].asBool();
+            killed   = taskData["State"]["OOMKilled"].asBool();
+            excode   = taskData["State"]["ExitCode"].asInt();
+            finished = (taskData["State"]["FinishedAt"].asString()
+                        != "0001-01-01T00:00:00Z");
+
+            if (finished) {
+                status = (excode == 0) ? TASK_FINISHED : TASK_FAILED;
+            } else if (dead || killed) {
+                status = TASK_FAILED;
+            } else if (paused) {
+                status = TASK_PAUSED;
+            } else {
+                status = TASK_RUNNING;
+                assert(running);
+            }
+        }
+
+
+        mutexTask.lock();
 
         task.taskExitCode = excode;
 
-        if (finished) {
-            status = (excode == 0) ? TASK_FINISHED : TASK_FAILED;
-        } else if (dead || killed) {
-            status = TASK_FAILED;
-        } else if (paused) {
-            status = TASK_PAUSED;
+        // Update progress
+        if (status == TASK_FINISHED) {
+            taskData["State"]["Progress"] = "100";
+            task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
         } else {
-            status = TASK_RUNNING;
-            assert(running);
+            progressValue = updateProgress(progressValue);
+            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
         }
-        childEnded = (status == TASK_FAILED) || (status == TASK_FINISHED);
 
         // Additional info
         taskData["TaskAgent"]    = agentName;
@@ -410,23 +452,21 @@ void ProcessingElement::monitorProcElemLoop()
         // Set actual start time
         task.taskStart = getSimplifiedDateTime(taskData["State"]["StartedAt"]);
 
-        // Update progress
-        if (status == TASK_FINISHED) {
-            taskData["State"]["Progress"] = "100";
-            task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
-        } else {
-            progressValue = updateProgress(progressValue);
-            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
-        }
-
         // Incorporate taskData to task data structure
         task.taskStatus = status;
         taskData["State"]["TaskStatus"] = (int)(status);
 
+        // Send updated task progress and status info
+        sendUpdatedInfo();
+
         mutexTask.unlock();
 
+        childEnded = ((status == TASK_FAILED) ||
+                      (status == TASK_FINISHED) ||
+                      (status == TASK_STOPPED));
     } while ((!childEnded) && (!endProc));
 
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -435,6 +475,7 @@ void ProcessingElement::monitorProcElemLoop()
 //----------------------------------------------------------------------
 void ProcessingElement::retrieveOutputProducts()
 {
+    CHKIN;
     DBG("Retrieving output products for task: " << originalRegKey);
 
     //-------------------------------------------------------------------
@@ -456,10 +497,14 @@ void ProcessingElement::retrieveOutputProducts()
 
     task.outputs.productList.clear();
 
+    URLHandler urlh;
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
         ProductMetadata m;
         std::string & outFileName = outFiles.at(i);
         if (outFileName.substr(0, 5).compare("EUCL_") == 0) {
+            // Set metadata for output product
             m.startTime = task.taskStart;
             m.endTime  = task.taskEnd;
             m.creator = task.taskPath;
@@ -470,8 +515,17 @@ void ProcessingElement::retrieveOutputProducts()
             m.productVersion = "1";
             m.productId = outFileName.substr(0, 47);
             m.regTime = LibComm::timeTag();
-            m.url = "http://euclid.esa.int/archive/" + outFileName;
+            m.url = ("file://" +
+                     cfgInfo.storage.shared.external_path + "/out/" +
+                     outFileName);
+
+            // Place output product at external (output) shared area
+            urlh.setProduct(m);
+            std::string relFileName = cfgInfo.storage.shared.external_path + "/out/" +
+                                      outFileName;
+            urlh.relocate(outFileName, relFileName, 0, COPY);
         } else {
+            // Set metadata for output product
             m.startTime = task.taskStart;
             m.endTime  = task.taskEnd;
             m.creator = task.taskPath;
@@ -491,6 +545,27 @@ void ProcessingElement::retrieveOutputProducts()
         task.outputs.productList[m.productType] = m;
     }
 
+    CHKOUT;
+}
+
+//----------------------------------------------------------------------
+// Method: sendUpdatedInfo
+// Sends updated information about the running task
+//----------------------------------------------------------------------
+void ProcessingElement::sendUpdatedInfo()
+{
+    CHKIN;
+    static float lastProgress = -1.;
+
+    bool sendMsg = ((status == TASK_FINISHED) ||
+                    (status == TASK_FAILED) ||
+                    (status == TASK_PAUSED) ||
+                    (status == TASK_STOPPED) ||
+                    ((status == TASK_RUNNING) &&
+                     (progressValue != lastProgress)));
+
+    if (sendMsg) { super->sendTaskResMsg(task); }
+    CHKOUT;
 }
 
 //----------------------------------------------------------------------
@@ -500,6 +575,10 @@ void ProcessingElement::retrieveOutputProducts()
 void ProcessingElement::cleanup()
 {
     // Cleaning up . . .
+    status = TASK_ARCHIVED;
+    task.taskStatus = status;
+    task.taskData["State"]["TaskStatus"] = (int)(status);
+    super->procElemFinished(this);
 }
 
 //----------------------------------------------------------------------
@@ -508,6 +587,7 @@ void ProcessingElement::cleanup()
 //----------------------------------------------------------------------
 std::string ProcessingElement::getMonitoringInfo(std::string id)
 {
+    CHKIN;
     std::string cmd("docker inspect " + id);
 /*
     std::string info("");
@@ -528,6 +608,8 @@ std::string ProcessingElement::getMonitoringInfo(std::string id)
         pclose(pipe);
         info = std::string(buffer);
     }
+    if (info.empty()) { info = "ERROR"; }
+    CHKOUT;
     return info;
 }
 
@@ -537,14 +619,15 @@ std::string ProcessingElement::getMonitoringInfo(std::string id)
 //----------------------------------------------------------------------
 float ProcessingElement::updateProgress(float f)
 {
+    CHKIN;
     float p = f;
 
-    if ((status != TASK_FINISHED) && (status != TASK_ARCHIVED)){
+    if (status == TASK_RUNNING) {
         p = f + 2;
         if (p > 99.) { p = 99.; }
     }
-    if (status == TASK_ARCHIVED) { p = 100.0; }
 
+    CHKOUT;
     return p;
 }
 
@@ -578,7 +661,9 @@ std::string ProcessingElement::getExpandedDateTime(std::string s)
 //----------------------------------------------------------------------
 void ProcessingElement::goIdle(int us)
 {
+    CHKIN;
     std::this_thread::sleep_for(std::chrono::microseconds(us));
+    CHKOUT;
 }
 
 }

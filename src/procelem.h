@@ -40,6 +40,9 @@
 #define PROCESSINGELEMENT_H
 
 #include "msgtypes.h"
+#include "cfg.h"
+
+#include "dbg.h"
 
 #include <atomic>
 #include <thread>
@@ -47,10 +50,13 @@
 
 namespace QPF {
 
+class TaskAgent;
+
 class ProcessingElement
 {
 public:
-    ProcessingElement();
+    ProcessingElement(TaskAgent * parent = 0);
+    ~ProcessingElement();
 
     Property(ProcessingElement, std::string, agentName, AgentName);
     Property(ProcessingElement, std::string, workDir,   WorkDir);
@@ -89,12 +95,6 @@ public:
     void end();
 
     //----------------------------------------------------------------------
-    // Method: markAsFinished
-    // Mark pe as finished
-    //----------------------------------------------------------------------
-    void markAsArchived();
-
-    //----------------------------------------------------------------------
     // Method: exec
     // Executes a task
     //----------------------------------------------------------------------
@@ -114,7 +114,7 @@ protected:
     void configureProcElem();
 
     //----------------------------------------------------------------------
-    // Method: executeProcessor
+    // Method: executeProcessorinternalTaskNameIdx
     // Forks process to run processor
     //----------------------------------------------------------------------
     void executeProcessor();
@@ -142,6 +142,12 @@ protected:
     // Gets information about output product files for archival purposes
     //----------------------------------------------------------------------
     void retrieveOutputProducts();
+
+    //----------------------------------------------------------------------
+    // Method: sendUpdatedInfo
+    // Sends updated information about the running task
+    //----------------------------------------------------------------------
+    void sendUpdatedInfo();
 
     //----------------------------------------------------------------------
     // Method: cleanup
@@ -180,6 +186,8 @@ protected:
     void goIdle(int us);
 
 private:
+    TaskAgent * super;
+
     TaskInfo task;
     std::mutex mutexTask;
 
@@ -201,7 +209,7 @@ private:
     std::string inspectInfo;
     std::string originalRegKey;
 
-    std::thread * peThread;
+    std::thread peThread;
 
     bool childEnded = false;
 
@@ -217,6 +225,10 @@ private:
 
     const int checkStartSleepPeriod;
     const int threadLoopSleepPeriod;
+
+#ifdef DEBUG_BUILD
+    int chkLevel;
+#endif
 };
 
 }

@@ -158,6 +158,9 @@ private slots:
     void switchLayoutDirection();
     void setActiveSubWindow(QWidget *window);
 
+    void showConfigTool();
+
+
 private:
     void createActions();
     void createMenus();
@@ -173,6 +176,7 @@ private:
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *windowMenu;
+    QMenu *toolsMenu;
     QMenu *helpMenu;
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
@@ -184,6 +188,9 @@ private:
     QAction *copyAct;
     QAction *pasteAct;
 #endif
+
+    QAction *configToolAct;
+
     QAction *dbgInfoAct;
     QAction *closeAct;
     QAction *closeAllAct;

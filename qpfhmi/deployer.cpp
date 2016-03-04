@@ -190,7 +190,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 void Deployer::readConfig(const char * configFile)
 {
     cfg   = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
     hmiNeeded = cfgInfo.hmiPresent;
 
     // Ensure paths for the execution are available and readu
@@ -219,7 +219,7 @@ void Deployer::readConfig(const char * configFile)
 //----------------------------------------------------------------------
 void Deployer::launchPeerNodes()
 {
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     L("Running as " << cfgInfo.currentUser << " @ " << cfgInfo.currentMachine);
 

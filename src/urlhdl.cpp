@@ -41,6 +41,8 @@
 #include "tools.h"
 using LibComm::replaceAll;
 
+#include "dbg.h"
+
 #include <unistd.h>
 #include <ctime>
 #include <cstdio>
@@ -60,9 +62,8 @@ namespace QPF {
 //----------------------------------------------------------------------
 // Method: Constructor
 //----------------------------------------------------------------------
-URLHandler::URLHandler(ConfigurationInfo & aCfgInfo)
+URLHandler::URLHandler()
 {
-    cfgInfo = aCfgInfo;
 }
 
 //----------------------------------------------------------------------
@@ -70,6 +71,8 @@ URLHandler::URLHandler(ConfigurationInfo & aCfgInfo)
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromExternal2Inbox()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     // Get product basename
     std::vector<std::string> tokens = split(product.url, '/');
     std::string baseName = tokens.at(tokens.size() - 1);
@@ -80,7 +83,7 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 
     // This method should only be called once the download has been done,
     // hence the only action left is setting the url
-    std::cerr << "Changing URL from " << product.url << " to " << newUrl << std::endl;
+    DBG("Changing URL from " << product.url << " to " << newUrl);
 
     // Change url in processing task
     product.url = newUrl;
@@ -93,6 +96,8 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromFolder2Inbox()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     assert(product.url.substr(0,8) == "file:///");
 
     // Get product basename
@@ -118,6 +123,8 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromInbox2Local()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     assert(product.url.substr(0,8) == "file:///");
 
     // Set new location and url
@@ -141,6 +148,8 @@ ProductMetadata & URLHandler::fromInbox2Local()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromLocal2Shared()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     assert(product.url.substr(0,8) == "file:///");
 
     // Set new location and url
@@ -164,6 +173,8 @@ ProductMetadata & URLHandler::fromLocal2Shared()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromShared2Local()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     assert(product.url.substr(0,8) == "file:///");
 
     // Set new location and url
@@ -174,7 +185,7 @@ ProductMetadata & URLHandler::fromShared2Local()
     replaceAll(newUrl,  cfgInfo.storage.shared.local_path    + "/out", cfgInfo.storage.local.path + "/out");
 
     // Set (hard) link
-    (void)relocate(file, newFile);
+    (void)relocate(file, newFile, 0, MOVE);
 
     // Change url in processing task
     product.url = newUrl;
@@ -237,7 +248,7 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
         perror((std::string("ERROR relocating product: ") +
                 sFrom + std::string(" => ") + sTo).c_str());
     } else {
-        std::cerr << "Relocatiion from " << sFrom << " to " << sTo << std::endl;
+        DBG("Relocation from " << sFrom << " to " << sTo);
     }
     return retVal;
 }

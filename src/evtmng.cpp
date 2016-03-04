@@ -42,6 +42,8 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "urlhdl.h"
+
 #include <sys/time.h>
 #include <unistd.h>
 #include <array>
@@ -64,7 +66,7 @@ EventManager::EventManager(const char * name) :
     canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this for EvtMng in favour of DB
     canProcessMessage(MSG_MONIT_INFO_IDX);
 
-    setHeartBeatPeriod(0, 10000);
+    setHeartBeatPeriod(0, 100000);
 }
 
 //----------------------------------------------------------------------
@@ -116,6 +118,31 @@ void EventManager::fromRunningToOff()
 //----------------------------------------------------------------------
 void EventManager::processINDATA()
 {
+    // If INDATA messages is coming from the outside, download the files
+    // into the INBOX and adapt the URLs;
+    // otherwise, just link the files from their folder into the INBOX
+
+    Message_INDATA * currMsg = dynamic_cast<Message_INDATA*>(msgData.msg);
+    std::map<ProductType, ProductMetadata>::iterator it =
+            currMsg->productsMetadata.productList.begin();
+    ProductMetadata & m = it->second;
+    bool syntheticMsg = (m.url.substr(0,6) == "file:/");
+
+    URLHandler urlh(getCfgInfo());
+
+    if (syntheticMsg) {
+        // Synthetic INDATA messages, that means reading products from folder
+        for (auto & md : currMsg->productsMetadata.productList) {
+            urlh.setProduct(md.second);
+            md.second = urlh.fromFolder2Inbox();
+        }
+    } else {
+        // Non-synthetic, that means external INDATA messages, that is,
+        // external products that must be downloaded
+
+        // TODO: download external products into inbox
+    }
+
     // Send InData message to DataMng
     std::array<std::string,1> fwdRecip = {"DataMng"};
     for (std::string & recip : fwdRecip) {

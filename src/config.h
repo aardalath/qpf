@@ -49,7 +49,7 @@
 //------------------------------------------------------------
 // Topic: Project dependencies
 //------------------------------------------------------------
-#include "cfg.h"
+#include "cfginfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -219,8 +219,6 @@ private:
 private:
     std::string           cfgFileName;
     Json::Value           cfg;
-
-    ConfigurationInfo     cfgInfo;
 
     Json::Value::iterator ruleIt;
     Json::Value::iterator procIt;

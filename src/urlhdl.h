@@ -60,7 +60,7 @@
 //   - msgtypes.h
 //------------------------------------------------------------
 #include "msgtypes.h"
-#include "cfg.h"
+#include "cfginfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -76,10 +76,9 @@ namespace QPF {
 class URLHandler {
 
 public:
-    URLHandler(ConfigurationInfo & aCfgInfo);
+    URLHandler();
 
     PropertyRef(URLHandler, ProductMetadata, product, Product);
-    PropertyRef(URLHandler, ConfigurationInfo, cfgInfo, CfgInfo);
 
 public:
 

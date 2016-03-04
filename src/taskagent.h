@@ -62,7 +62,6 @@
 //------------------------------------------------------------
 
 #include "component.h"
-#include "procelem.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -71,6 +70,8 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
+
+class ProcessingElement;
 
 //==========================================================================
 // Class: TaskAgent
@@ -82,6 +83,17 @@ public:
 
     Property(TaskAgent, std::string, workDir, WorkDir);
     Property(TaskAgent, std::string, sysDir,  SysDir);
+
+    //----------------------------------------------------------------------
+    // Method: sendTaskResMsg
+    //----------------------------------------------------------------------
+    bool sendTaskResMsg(TaskInfo & task);
+
+    //----------------------------------------------------------------------
+    // Method: checkProcessingElements
+    // Check list of processing elements
+    //----------------------------------------------------------------------
+    void procElemFinished(ProcessingElement * p);
 
 protected:
 
@@ -121,11 +133,6 @@ private:
     void checkProcessingElements();
 
     //----------------------------------------------------------------------
-    // Method: sendTaskResMsg
-    //----------------------------------------------------------------------
-    bool sendTaskResMsg(TaskInfo & task);
-
-    //----------------------------------------------------------------------
     // Method: sendMonitInfo
     //----------------------------------------------------------------------
     bool sendMonitInfo();
@@ -137,7 +144,8 @@ private:
 
 private:
     std::vector<std::thread *> procTasks;
-    std::vector<ProcessingElement *> processingElements;
+    std::vector<ProcessingElement*> processingElements;
+    std::vector<ProcessingElement*> finishedProcessingElements;
 
     std::atomic<bool> stopTasks;
     std::atomic<int> numTasks;

@@ -62,6 +62,8 @@ using LibComm::Log;
 #include "logwatcher.h"
 #include "progbardlg.h"
 #include "dlgshowtaskinfo.h"
+#include "configtool.h"
+
 #include <QProcess>
 namespace QPF {
 
@@ -327,6 +329,10 @@ void MainWindow::createActions()
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 #endif
 
+    configToolAct = new QAction(tr("&Configuration Tool ..."), this);
+    configToolAct->setStatusTip(tr("Open Configuration Tool with current configuration"));
+    connect(configToolAct, SIGNAL(triggered()), this, SLOT(showConfigTool()));
+
     dbgInfoAct = new QAction(tr("Activate debug"), this);
     dbgInfoAct->setStatusTip(tr("Activate debug information"));
     dbgInfoAct->setCheckable(true);
@@ -399,6 +405,9 @@ void MainWindow::createMenus()
     editMenu->addSeparator();
 #endif
     editMenu->addAction(dbgInfoAct);
+
+    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(configToolAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
@@ -499,8 +508,7 @@ void MainWindow::setActiveSubWindow(QWidget *window)
 //----------------------------------------------------------------------
 void MainWindow::readConfig()
 {
-    cfg = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
@@ -537,6 +545,18 @@ void MainWindow::readConfig()
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
     ui->edInboxPath->setText(QString(cfgInfo.storage.in.inbox.c_str()));
+}
+
+//----------------------------------------------------------------------
+// Method: showConfigTool
+// Shows configuration tool window
+//----------------------------------------------------------------------
+void MainWindow::showConfigTool()
+{
+    ConfigTool cfgTool;
+
+    cfgTool.readConfig();
+    cfgTool.exec();
 }
 
 //----------------------------------------------------------------------
@@ -614,7 +634,7 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
     hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
     hmiNode->setSizeOfLogBuffer(0);
 
@@ -889,6 +909,7 @@ void MainWindow::checkForTaskRes()
             QString key = QString::fromStdString(i->first);
             Json::Value v = i->second;
             v["ZUpdatable"] = true;
+            //qDebug() << "Adding TaskRes with key " << key;
             taskResInfo[key] = v;
             ++i;
         }

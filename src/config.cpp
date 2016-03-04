@@ -101,7 +101,7 @@ Configuration::Configuration(const char * fName)
 //----------------------------------------------------------------------
 ConfigurationInfo & Configuration::getCfgInfo()
 {
-    return cfgInfo;
+    return ConfigurationInfo::data();
 }
 
 //----------------------------------------------------------------------
@@ -466,6 +466,8 @@ void Configuration::saveConfigurationToDB()
 //----------------------------------------------------------------------
 void Configuration::processConfiguration()
 {
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     // Now, fill in ConfigurationInfo structure
     reset();
     cfgInfo.clear();
@@ -547,16 +549,16 @@ void Configuration::processConfiguration()
     cfgInfo.storage.in.port              = stgeIn["port"].asString();
     cfgInfo.storage.in.user              = stgeIn["user"].asString();
     cfgInfo.storage.in.passwd            = stgeIn["password"].asString();
-    cfgInfo.storage.in.inbox       = stgeIn["inbox"].asString();
+    cfgInfo.storage.in.inbox             = stgeIn["inbox"].asString();
     cfgInfo.storage.out.protocol         = stgeOut["protocol"].asString();
     cfgInfo.storage.out.address          = stgeOut["address"].asString();
     cfgInfo.storage.out.port             = stgeOut["port"].asString();
     cfgInfo.storage.out.user             = stgeOut["user"].asString();
     cfgInfo.storage.out.passwd           = stgeOut["password"].asString();
-    cfgInfo.storage.out.inbox      = "";
+    cfgInfo.storage.out.inbox            = "";
     cfgInfo.storage.local.path           = stgeLocal["path"].asString();
-    cfgInfo.storage.shared.local_path    = stgeShared["external_path"].asString();
-    cfgInfo.storage.shared.external_path = stgeShared["local_path"].asString();
+    cfgInfo.storage.shared.local_path    = stgeShared["local_path"].asString();
+    cfgInfo.storage.shared.external_path = stgeShared["external_path"].asString();
 
     // Create peer commnodes for nodes in current machine
     std::vector<std::string> & machineNodes =
@@ -595,7 +597,6 @@ void Configuration::processConfiguration()
 
         if (component == 0) { continue; }
 
-        component->setCfgInfo(cfgInfo);
         component->addPeer(cfgInfo.peersCfgByName[peerName], true);
         DBG("Creating connections for " << peerName
             << "  [" << peer->clientAddr

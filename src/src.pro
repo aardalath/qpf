@@ -34,7 +34,8 @@ HEADERS += \
     procelem.h \
     cfg.h \
     dbg.h \
-    urlhdl.h
+    urlhdl.h \
+    cfginfo.h
 
 HEADERS += \
         config.h \
@@ -60,4 +61,5 @@ SOURCES +=  \
         taskmng.cpp \
         taskorc.cpp \
     procelem.cpp \
-    urlhdl.cpp
+    urlhdl.cpp \
+    dbg.cpp

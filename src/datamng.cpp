@@ -46,6 +46,8 @@ using LibComm::Log;
 #include "except.h"
 #include "config.h"
 
+#include "urlhdl.h"
+
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -104,6 +106,14 @@ void DataManager::processINDATA()
     // Save to DB
     Message_INDATA * msg = dynamic_cast<Message_INDATA *>(msgData.msg);
     saveToDB(msg);
+
+    URLHandler urlh(getCfgInfo());
+
+    // Synthetic INDATA messages, that means reading products from folder
+    for (auto & md : msg->productsMetadata.productList) {
+        urlh.setProduct(md.second);
+        md.second = urlh.fromInbox2Local();
+    }
 
     // Send InData message to TaskOrc
     std::array<std::string,1> fwdRecip = {"TskOrc"};
@@ -200,6 +210,14 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 
     // In case the task has finished, save output products metadata
     if (msg->task.taskStatus == TASK_FINISHED) {
+
+        URLHandler urlh;
+
+        for (auto & md : msg->task.outputs.productList) {
+            urlh.setProduct(md.second);
+            md.second = urlh.fromShared2Local();
+        }
+
         //InfoMsg("Saving outputs...");
         saveProductsToDB(msg->task.outputs);
     }

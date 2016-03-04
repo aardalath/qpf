@@ -97,7 +97,7 @@ void TaskOrchestrator::defineOrchestrationParams(const OrchestrationParameters &
 void TaskOrchestrator::fromRunningToOperational()
 {
     // Setup orchestration parameters
-    defineOrchestrationParams(getCfgInfo().orcParams);
+    defineOrchestrationParams(ConfigurationInfo::data().orcParams);
 
     // Dump rules
     std::stringstream ss;
@@ -129,16 +129,18 @@ void TaskOrchestrator::fromRunningToOff()
 //----------------------------------------------------------------------
 void TaskOrchestrator::processINDATA()
 {
-    Message_INDATA * msgInData = dynamic_cast<Message_INDATA*>(msgData.msg);
-    for (auto it: msgInData->productsMetadata.productList) {
+    Message_INDATA * msg = dynamic_cast<Message_INDATA*>(msgData.msg);
+
+    // Synthetic INDATA messages, that means reading products from folder
+    for (auto & md : msg->productsMetadata.productList) {
         // Append product to catalogue
-        catalogue.productList[it.first] = it.second;
+        catalogue.productList[md.first] = md.second;
 
         // Check the product type as input for any rule
         RuleInputs ruleInputs;
-        if (checkRulesForProductType(it.first, ruleInputs)) {
+        if (checkRulesForProductType(md.first, ruleInputs)) {
             for (auto & kv : ruleInputs) {
-                InfoMsg("Product type " + it.first + " fires rule: " +
+                InfoMsg("Product type " + md.first + " fires rule: " +
                         orcMaps.ruleDesc[kv.first]);
                 for (auto & itInp : kv.second.productList) {
                     InfoMsg("Input: " + itInp.productId);
@@ -230,7 +232,7 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
     task.taskExitCode = 0;
     task.taskStatus = TASK_SCHEDULED;
 
-    URLHandler urlh(getCfgInfo());
+    URLHandler urlh;
 
     for (unsigned int i = 0; i < inputs.productList.size(); ++i) {
         urlh.setProduct(inputs.productList.at(i));

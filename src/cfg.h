@@ -119,66 +119,6 @@ struct StorageConfig {
     StorageExternal out;
 };
 
-class Component;
-
-struct ConfigurationInfo {
-    // Configuration file name
-    std::string                         cfgFileName;
-    std::string                         currentMachine;
-    std::string                         currentUser;
-
-    // General
-    std::string                         appName;
-    std::string                         appVersion;
-    std::string                         lastAccess;
-
-    // Orchestration
-    OrchestrationParameters             orcParams;
-
-    // Nodes
-    std::vector<std::string>            peerNames;
-    std::vector<Peer>                   peersCfg;
-    std::map<std::string, Peer*>        peersCfgByName;
-    std::map<std::string,
-             std::vector<std::string> > connections;
-    Peer                                qpfhmiCfg;
-    Peer                                evtMngCfg;
-
-    // Nodes for current machine
-    std::vector<Component *>            peerNodes;
-    std::vector<Component *>            peerAgents;
-
-    // Machine network
-    std::vector<std::string>            machines;
-    std::map<std::string,
-             std::vector<std::string> > machineNodes;
-    bool                                hmiPresent;
-
-    // Storage information
-    StorageConfig                       storage;
-
-    // Data Base info
-    std::string                         DBHost;
-    std::string                         DBPort;
-    std::string                         DBName;
-    std::string                         DBUser;
-    std::string                         DBPwd;
-
-    void clear() {
-        orcParams.processors.clear();
-        orcParams.productTypes.clear();
-        orcParams.rules.clear();
-        peerNames.clear();
-        peersCfg.clear();
-        peersCfgByName.clear();
-        connections.clear();
-        peerNodes.clear();
-        peerAgents.clear();
-        machines.clear();
-        machineNodes.clear();
-    }
-};
-
 }
 
 #endif  /* CFG_H */
