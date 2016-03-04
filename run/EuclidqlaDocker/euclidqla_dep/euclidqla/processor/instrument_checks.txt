@@ -1,0 +1,12 @@
+{
+    "VIS": {
+        "SCIENCE": {
+            "NOMINAL":
+            [
+                "OVERSCAN",
+                "SCIENCE STATS",
+                "PIXELS BELOW ADC"
+            ]
+        }
+    }
+}

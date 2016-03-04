@@ -1,0 +1,566 @@
+{
+    "common": {
+        "quadrant1": {
+            "overscan": [
+                [2099, 1],
+                [2118, 2066]
+            ],
+            "prescan": [
+                [1, 1],
+                [50, 2066]
+            ],
+            "science": [
+                [51, 1],
+                [2098, 2066]
+            ]
+        },
+        "quadrant2": {
+            "overscan": [
+                [1, 1],
+                [20, 2066]
+            ],
+            "prescan": [
+                [2069, 1],
+                [2118, 2066]
+            ],
+            "science": [
+                [21, 1],
+                [2068, 2066]
+            ]
+        },
+        "quadrant3": {
+            "overscan": [
+                [2099, 1],
+                [2118, 2066]
+            ],
+            "prescan": [
+                [1, 1],
+                [50, 2066]
+            ],
+            "science": [
+                [51, 1],
+                [2098, 2066]
+            ]
+        },
+        "quadrant4": {
+            "overscan": [
+                [1, 1],
+                [20, 2066]
+            ],
+            "prescan": [
+                [2069, 1],
+                [2118, 2066]
+            ],
+            "science": [
+                [21, 1],
+                [2068, 2066]
+            ]
+        }
+    },
+    "detectors": {
+        "1": {
+            "quadrant1": {
+                "overscan_threshold": 1006
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "2": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "3": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "4": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "5": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "6": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "7": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "8": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "9": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "10": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "11": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "12": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "13": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "14": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "15": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "16": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "17": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "18": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "19": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "20": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "21": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "22": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "23": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "24": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "25": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "26": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "27": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "28": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "29": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "30": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "31": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "32": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "33": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "34": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "35": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        },
+        "36": {
+            "quadrant1": {
+                "overscan_threshold": 1020
+            },
+            "quadrant2": {
+                "overscan_threshold": 1021
+            },
+            "quadrant3": {
+                "overscan_threshold": 1022
+            },
+            "quadrant4": {
+                "overscan_threshold": 1023
+            }
+        }
+    }
+}

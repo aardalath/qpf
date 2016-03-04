@@ -1,0 +1,16 @@
+{
+    "VIS": {
+        "SCIENCE": {
+            "FULL": [
+                "FULL_POSTSCAN_REP",
+                "PRESCAN_REP",
+                "SCIENCES_STATS_REP"
+            ],
+            "NOMINAL": [
+                "POSTSCAN_REP",
+                "PRESCAN_REP",
+                "SCIENCES_STATS_REP"
+            ]
+        }
+    }
+}

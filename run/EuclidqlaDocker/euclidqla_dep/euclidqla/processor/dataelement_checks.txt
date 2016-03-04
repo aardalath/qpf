@@ -1,0 +1,14 @@
+{
+    "VISCCD": {
+        "COMMON": [],
+        "SCIENCE": []
+    },
+    "VISQUADRANT": {
+        "COMMON": [],
+        "SCIENCE": [
+            "POSTSCAN_REP",
+            "PRESCAN_REP",
+            "SCIENCES_STATS_REP"
+        ]
+    }
+}

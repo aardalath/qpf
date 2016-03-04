@@ -1,0 +1,1 @@
+docker run -i -t -v /home/vvillar/Devel/dum/euclidqla_dep:/bin -v /home/vvillar/Devel/dum/in/:/in -v /home/vvillar/Devel/dum/out:/out euclidqla python /bin/driver.py -i /in -o /out/out_Report.txt -r /out/out_Results.txt -v
