@@ -40,6 +40,8 @@
 
 #include "config.h"
 
+#include "dbg.h"
+
 #include "evtmng.h"
 #include "datamng.h"
 #include "logmng.h"
@@ -437,7 +439,10 @@ void Configuration::readConfigurationFromFile()
         } else if (peerType == "taskorc") {
             commNode = new TaskOrchestrator(cpeerName);
         } else if (peerType == "taskagent") {
-            commNode = new TaskAgent(cpeerName);
+            TaskAgent * ag = new TaskAgent(cpeerName);
+            ag->setSysDir(Configuration::PATHBase);
+            ag->setWorkDir(Configuration::PATHTsk);
+            commNode = ag;
             cfgInfo.peerAgents.push_back(commNode);
         } else {
             // Do nothing, not yet implemented
@@ -446,18 +451,18 @@ void Configuration::readConfigurationFromFile()
         if (commNode == 0) { continue; }
 
         commNode->addPeer(cfgInfo.peersCfgByName[peerName], true);
-        std::cerr << "Creating connections for " << peerName
-                  << "  [" << peer->clientAddr
-                  << " ; " << peer->serverAddr << "]\n";
+        DBG("Creating connections for " << peerName
+            << "  [" << peer->clientAddr
+            << " ; " << peer->serverAddr << "]");
 
         std::vector<std::string> & connectNodes = cfgInfo.connections[peerName];
 
         for (unsigned int j = 0; j < connectNodes.size(); ++j) {
             Peer * otherPeer = cfgInfo.peersCfgByName[connectNodes.at(j)];
             commNode->addPeer(otherPeer);
-            std::cerr << "  Connecting to " << otherPeer->name
-                      << "  [" << otherPeer->clientAddr
-                      << " ; " << otherPeer->serverAddr << "]\n";
+            DBG("  Connecting to " << otherPeer->name
+                << "  [" << otherPeer->clientAddr
+                << " ; " << otherPeer->serverAddr << "]");
         }
 
         cfgInfo.peerNodes.push_back(commNode);
