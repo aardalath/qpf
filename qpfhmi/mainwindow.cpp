@@ -465,9 +465,9 @@ void MainWindow::readSettings()
 //----------------------------------------------------------------------
 void MainWindow::writeSettings()
 {
-    QSettings settings("QPF", "QLA Processing Framework");
-    settings.setValue("pos", pos());
-    settings.setValue("size", size());
+//    QSettings settings("QPF", "QLA Processing Framework");
+//    settings.setValue("pos", pos());
+//    settings.setValue("size", size());
 }
 
 //----------------------------------------------------------------------
