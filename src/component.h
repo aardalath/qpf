@@ -166,6 +166,11 @@ protected:
     virtual void processUNKNOWN() {}
 
     //----------------------------------------------------------------------
+    // Method: execAdditonalLoopTasks
+    //----------------------------------------------------------------------
+    virtual void execAdditonalLoopTasks() {}
+
+    //----------------------------------------------------------------------
     // Method: canProcessMessage
     // Activates the component as able to process the specified message
     //----------------------------------------------------------------------
