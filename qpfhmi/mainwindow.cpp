@@ -776,15 +776,6 @@ void MainWindow::showTaskRes()
 
     }
 
-    for (auto & kv : taskAgentsInfo ) {
-        qDebug() << kv.first.c_str()
-                 << kv.second->name.c_str()
-                 << kv.second->client.c_str()
-                 << kv.second->server.c_str()
-                 << kv.second->total << kv.second->running << kv.second->waiting
-                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
-    }
-
     // 2. Count tasks
     for (int i = 0; i < ui->treeTaskMonit->topLevelItemCount(); ++i) {
         QTreeWidgetItem * treeItem = ui->treeTaskMonit->topLevelItem(i);
