@@ -39,11 +39,26 @@
 #ifndef PROPDEF_H
 #define PROPDEF_H
 
+//============================================================
+// Group: Public Declarations
+//============================================================
+
 //------------------------------------------------------------
-// Topic: Declarations
+// Topic: Constants
+//   SET_NAMED_PROPERTIES - If defined, named property macro
+//                          is defined instead of normal
+//                          property macro.
 //------------------------------------------------------------
 
 #define SET_NAMED_PROPERTIES
+
+//------------------------------------------------------------
+// Topic: Macros
+//   - Property(c,t,p,n) - Defines an internal variable with
+//                         a getter and named setter
+//   - PropertyRef(c,t,p,n) - Defines an internal variable with
+//                            a getter and named setter
+//------------------------------------------------------------
 
 #ifdef SET_NAMED_PROPERTIES
 #define Property(c,t,p,n)					\
@@ -52,6 +67,11 @@
   inline t get ## n (void) const { return p; }			\
   inline t get ## n (void) { return p; }			\
   inline c & set ## n (t new ## n ) { p = new ## n ; return *this; }	
+#define PropertyRef(c,t,p,n)					\
+  private: t p;							\
+  public:							\
+  inline t & get ## n (void) { return p; }			\
+  inline c & set ## n (t & new ## n ) { p = new ## n ; return *this; }
 # define with(s)   s
 #else
 # define Property(t,p,n)					\
