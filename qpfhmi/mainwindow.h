@@ -107,7 +107,6 @@ signals:
 
 public slots:
     void commandSystem();
-    void processPendingEvents();
 
 protected slots:
     void transitToOperational();
@@ -120,6 +119,7 @@ protected slots:
     void endOfInDataMsgs();
 
     void handleFinishedHMI();
+    void processPendingEvents();
 
     void checkForTaskRes();
     void showTaskRes();
@@ -194,7 +194,7 @@ private:
     QMap<QString, Json::Value> processedTasksInfo;
 
     QAction * acWorkDir;
-    QAction * acDisplayTaskInfo;
+    QAction * acShowTaskInfo;
     QAction * acPauseTask;
     QAction * acResumeTask;
     QAction * acStopTask;

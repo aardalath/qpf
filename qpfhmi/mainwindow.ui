@@ -34,15 +34,29 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QTabWidget" name="tabLogs">
+         <widget class="QMdiArea" name="mdiArea">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="activationOrder">
+           <enum>QMdiArea::ActivationHistoryOrder</enum>
+          </property>
+          <property name="viewMode">
+           <enum>QMdiArea::TabbedView</enum>
+          </property>
+          <property name="documentMode">
+           <bool>true</bool>
+          </property>
+          <property name="tabsClosable">
+           <bool>false</bool>
+          </property>
+          <property name="tabsMovable">
+           <bool>true</bool>
+          </property>
           <property name="tabPosition">
            <enum>QTabWidget::South</enum>
-          </property>
-          <property name="tabShape">
-           <enum>QTabWidget::Triangular</enum>
-          </property>
-          <property name="movable">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -59,8 +73,105 @@
            <number>-1</number>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
+          <widget class="QWidget" name="tabpgInputsFromInbox">
+           <attribute name="title">
+            <string>Data from Inbox</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_16" stretch="1,10000,1,1,0">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <item>
+               <widget class="QLabel" name="label_24">
+                <property name="text">
+                 <string>Select Inbox folder:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edInboxPath"/>
+              </item>
+              <item>
+               <widget class="QToolButton" name="btnSelectInboxPath">
+                <property name="text">
+                 <string>...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="pltxtInboxProducts"/>
+            </item>
+            <item>
+             <widget class="QListView" name="listInboxProducts"/>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>173</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Injection Frequency:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spbxInjFreq">
+                <property name="suffix">
+                 <string>s</string>
+                </property>
+                <property name="minimum">
+                 <number>5</number>
+                </property>
+                <property name="maximum">
+                 <number>300</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>30</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_17">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnProcessInbox">
+                <property name="text">
+                 <string>Process Inbox Products</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tabpgSingleInData">
            <attribute name="title">
             <string>Single Incoming Data Message</string>
@@ -799,13 +910,69 @@
         <string>Monitoring</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QTreeWidget" name="treeTaskMonit">
-          <column>
-           <property name="text">
-            <string notr="true">1</string>
+          <property name="tabKeyNavigation">
+           <bool>true</bool>
+          </property>
+          <property name="columnCount">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame_3">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>6</number>
            </property>
-          </column>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblLastUpdate">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -825,8 +992,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>839</width>
-             <height>484</height>
+             <width>841</width>
+             <height>483</height>
             </rect>
            </property>
           </widget>
@@ -854,23 +1021,9 @@
      <x>0</x>
      <y>0</y>
      <width>1112</width>
-     <height>21</height>
+     <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionQuit"/>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Tools</string>
-    </property>
-    <addaction name="actionActivate_Debug_Info"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -960,7 +1113,6 @@
          </spacer>
         </item>
        </layout>
-       <zorder>btnStart</zorder>
       </widget>
      </item>
      <item>
@@ -1002,8 +1154,8 @@
           <item>
            <widget class="QPushButton" name="btnStopMultInDataEvt">
             <property name="text">
-             <string>Stop sending
-INDATA messages</string>
+             <string>Stop processing
+incoming data</string>
             </property>
            </widget>
           </item>
@@ -1081,22 +1233,6 @@ INDATA messages</string>
  <resources/>
  <connections>
   <connection>
-   <sender>actionQuit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>305</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>dtStartMult</sender>
    <signal>dateTimeChanged(QDateTime)</signal>
    <receiver>dtEndMult</receiver>
@@ -1109,54 +1245,6 @@ INDATA messages</string>
     <hint type="destinationlabel">
      <x>712</x>
      <y>179</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionActivate_Debug_Info</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>setDebugInfo(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>555</x>
-     <y>305</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionActivate_Debug_Info</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>chkDebugInfo</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>112</x>
-     <y>557</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkDebugInfo</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>actionActivate_Debug_Info</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>112</x>
-     <y>557</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
     </hint>
    </hints>
   </connection>

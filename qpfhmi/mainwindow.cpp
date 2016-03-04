@@ -43,6 +43,7 @@
 
 #include "log.h"
 using LibComm::Log;
+#include "tools.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -50,7 +51,6 @@ using LibComm::Log;
 #include <signal.h>
 
 #include <QDebug>
-#include <QPlainTextEdit>
 #include <QDir>
 #include <QtConcurrent/QtConcurrentRun>
 #include <QTimer>
@@ -62,6 +62,8 @@ using LibComm::Log;
 #include "logwatcher.h"
 #include "progbardlg.h"
 #include "dlgshowtaskinfo.h"
+#include "configtool.h"
+
 #include <QProcess>
 namespace QPF {
 
@@ -71,25 +73,55 @@ static const char * FixedWidthStyle = "font: 7pt \"Droid Sans Mono\";";
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent, char * cfgFile) :
+MainWindow::MainWindow(QWidget *parent, Configuration * cfgHdl) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    configFile(cfgFile)
+    cfg(cfgHdl)
 {
     // Set-up UI
     ui->setupUi(this);
+    manualSetupUI();
 
+    // Read QPF Configuration
+    readConfig();
+
+    // Automatic start-up
+    commandSystem();
+}
+
+//----------------------------------------------------------------------
+// Destructor
+//----------------------------------------------------------------------
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+//----------------------------------------------------------------------
+// Method: manualSetupUI
+// Additional (manual) GUI setup actions
+//----------------------------------------------------------------------
+void MainWindow::manualSetupUI()
+{
     ui->tabpgEvtInj->setEnabled(false);
     ui->btnStopMultInDataEvt->hide();
 
     ui->actionActivate_Debug_Info->setEnabled(false);
     ui->chkDebugInfo->setEnabled(false);
 
-    // Read QPF Configuration
-    readConfig();
+    ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    connect(ui->mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
+            this, SLOT(updateMenus()));
+    windowMapper = new QSignalMapper(this);
+    connect(windowMapper, SIGNAL(mapped(QWidget*)),
+            this, SLOT(setActiveSubWindow(QWidget*)));
 
-    // Launch HMI Proxy
-    //init();
+    createActions();
+    createMenus();
+    createToolBars();
+    createStatusBar();
+    updateMenus();
 
     QFrame * frm = new QFrame(0);
     vlyFrmAgents = new QVBoxLayout;
@@ -114,20 +146,360 @@ MainWindow::MainWindow(QWidget *parent, char * cfgFile) :
     connect(simInData, SIGNAL(simInDataSent(int)), this, SLOT(sentInData(int)));
     connect(simInData, SIGNAL(endOfInData()), this, SLOT(endOfInDataMsgs()));
 
+    connect(ui->btnSelectInboxPath, SIGNAL(pressed()), this, SLOT(selectInboxPath()));
+    connect(ui->btnProcessInbox, SIGNAL(pressed()), this, SLOT(processInbox()));
+
     connect(this, SIGNAL(stopSendingMessages()), simInData, SLOT(stopSendingInData()));
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
-    // Automatic start-up
-    commandSystem();
+    // Read settings and set title
+    readSettings();
+    setWindowTitle(tr("QLA Processing Framework"));
+    setUnifiedTitleAndToolBarOnMac(true);
 }
 
 //----------------------------------------------------------------------
-// Destructor
+// Method: closeEvent
+// Handles close events
 //----------------------------------------------------------------------
-MainWindow::~MainWindow()
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-    delete ui;
+    ui->mdiArea->closeAllSubWindows();
+    if (ui->mdiArea->currentSubWindow()) {
+        event->ignore();
+    } else {
+        writeSettings();
+        event->accept();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: saveAs
+// Saves log text to file
+//----------------------------------------------------------------------
+void MainWindow::saveAs()
+{
+    if (activeTextView() && activeTextView()->saveAs())
+        statusBar()->showMessage(tr("File saved"), MessageDelay);
+}
+
+#ifndef QT_NO_CLIPBOARD
+void MainWindow::cut()
+{
+    if (activeTextView()) activeTextView()->getTextEditor()->cut();
+}
+
+void MainWindow::copy()
+{
+    if (activeTextView()) activeTextView()->getTextEditor()->copy();
+}
+
+void MainWindow::paste()
+{
+    if (activeTextView()) activeTextView()->getTextEditor()->paste();
+}
+#endif
+
+//----------------------------------------------------------------------
+// Method: about
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::about()
+{
+   QMessageBox::about(this, tr("About QPF"),
+            tr("This is the QLA Processing Framework v 0.1"));
+}
+
+//----------------------------------------------------------------------
+// Method: updateMenus
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::updateMenus()
+{
+    bool hasTextView = (activeTextView() != 0);
+
+    saveAsAct->setEnabled(hasTextView);
+#ifndef QT_NO_CLIPBOARD
+    pasteAct->setEnabled(hasTextView);
+#endif
+    closeAct->setEnabled(hasTextView);
+    closeAllAct->setEnabled(hasTextView);
+    tileAct->setEnabled(hasTextView);
+    cascadeAct->setEnabled(hasTextView);
+    nextAct->setEnabled(hasTextView);
+    previousAct->setEnabled(hasTextView);
+    separatorAct->setVisible(hasTextView);
+
+#ifndef QT_NO_CLIPBOARD
+    bool hasSelection = (activeTextView() &&
+                         activeTextView()->getTextEditor()->textCursor().hasSelection());
+    cutAct->setEnabled(hasSelection);
+    copyAct->setEnabled(hasSelection);
+#endif
+}
+
+//----------------------------------------------------------------------
+// Method: updateWindowMenu
+// Updates the Window menu according to the current set of logs displayed
+//----------------------------------------------------------------------
+void MainWindow::updateWindowMenu()
+{
+    windowMenu->clear();
+    windowMenu->addAction(closeAct);
+    windowMenu->addAction(closeAllAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(tileAct);
+    windowMenu->addAction(cascadeAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(nextAct);
+    windowMenu->addAction(previousAct);
+    windowMenu->addAction(separatorAct);
+
+    QList<QMdiSubWindow *> windows = ui->mdiArea->subWindowList();
+    separatorAct->setVisible(!windows.isEmpty());
+
+    for (int i = 0; i < windows.size(); ++i) {
+        TextView *child = qobject_cast<TextView *>(windows.at(i)->widget());
+
+        QString text;
+        if (i < 9) {
+            text = tr("&%1 %2").arg(i + 1).arg(child->logName());
+        } else {
+            text = tr("%1 %2").arg(i + 1).arg(child->logName());
+        }
+        QAction *action  = windowMenu->addAction(text);
+        action->setCheckable(true);
+        action ->setChecked(child == activeTextView());
+        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
+        windowMapper->setMapping(action, windows.at(i));
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: createTextView
+// Create new subwindow
+//----------------------------------------------------------------------
+TextView *MainWindow::createTextView()
+{
+    TextView *child = new TextView;
+    ui->mdiArea->addSubWindow(child);
+
+#ifndef QT_NO_CLIPBOARD
+    connect(child, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+    connect(child, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+#endif
+
+    return child;
+}
+
+//----------------------------------------------------------------------
+// Method: closeEvent
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::createActions()
+{
+    saveAsAct = new QAction(tr("Save &As..."), this);
+    saveAsAct->setShortcuts(QKeySequence::SaveAs);
+    saveAsAct->setStatusTip(tr("Save the document under a new name"));
+    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+    exitAct = new QAction(tr("E&xit"), this);
+    exitAct->setShortcuts(QKeySequence::Quit);
+    exitAct->setStatusTip(tr("Exit the application"));
+    connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+
+#ifndef QT_NO_CLIPBOARD
+    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+    cutAct->setShortcuts(QKeySequence::Cut);
+    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+                            "clipboard"));
+    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
+
+    copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
+    copyAct->setShortcuts(QKeySequence::Copy);
+    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+                             "clipboard"));
+    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+
+    pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
+    pasteAct->setShortcuts(QKeySequence::Paste);
+    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+                              "selection"));
+    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
+#endif
+
+    configToolAct = new QAction(tr("&Configuration Tool ..."), this);
+    configToolAct->setStatusTip(tr("Open Configuration Tool with current configuration"));
+    connect(configToolAct, SIGNAL(triggered()), this, SLOT(showConfigTool()));
+
+    dbgInfoAct = new QAction(tr("Activate debug"), this);
+    dbgInfoAct->setStatusTip(tr("Activate debug information"));
+    dbgInfoAct->setCheckable(true);
+    dbgInfoAct->setChecked(true);
+    connect(dbgInfoAct, SIGNAL(toggled(bool)), this, SLOT(setDebugInfo(bool)));
+    connect(dbgInfoAct, SIGNAL(toggled(bool)), ui->chkDebugInfo, SLOT(setChecked(bool)));
+    connect(ui->chkDebugInfo, SIGNAL(toggled(bool)), dbgInfoAct, SLOT(setChecked(bool)));
+
+    closeAct = new QAction(tr("Cl&ose"), this);
+    closeAct->setStatusTip(tr("Close the active window"));
+    connect(closeAct, SIGNAL(triggered()),
+            ui->mdiArea, SLOT(closeActiveSubWindow()));
+
+    closeAllAct = new QAction(tr("Close &All"), this);
+    closeAllAct->setStatusTip(tr("Close all the windows"));
+    connect(closeAllAct, SIGNAL(triggered()),
+            ui->mdiArea, SLOT(closeAllSubWindows()));
+
+    tileAct = new QAction(tr("&Tile"), this);
+    tileAct->setStatusTip(tr("Tile the windows"));
+    connect(tileAct, SIGNAL(triggered()), ui->mdiArea, SLOT(tileSubWindows()));
+
+    cascadeAct = new QAction(tr("&Cascade"), this);
+    cascadeAct->setStatusTip(tr("Cascade the windows"));
+    connect(cascadeAct, SIGNAL(triggered()), ui->mdiArea, SLOT(cascadeSubWindows()));
+
+    nextAct = new QAction(tr("Ne&xt"), this);
+    nextAct->setShortcuts(QKeySequence::NextChild);
+    nextAct->setStatusTip(tr("Move the focus to the next window"));
+    connect(nextAct, SIGNAL(triggered()),
+            ui->mdiArea, SLOT(activateNextSubWindow()));
+
+    previousAct = new QAction(tr("Pre&vious"), this);
+    previousAct->setShortcuts(QKeySequence::PreviousChild);
+    previousAct->setStatusTip(tr("Move the focus to the previous "
+                                 "window"));
+    connect(previousAct, SIGNAL(triggered()),
+            ui->mdiArea, SLOT(activatePreviousSubWindow()));
+
+    separatorAct = new QAction(this);
+    separatorAct->setSeparator(true);
+
+    aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setStatusTip(tr("Show the application's About box"));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+
+    aboutQtAct = new QAction(tr("About &Qt"), this);
+    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+}
+
+//----------------------------------------------------------------------
+// Method: closeEvent
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::createMenus()
+{
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(saveAsAct);
+    fileMenu->addSeparator();
+//    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
+//    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
+    fileMenu->addAction(exitAct);
+
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+#ifndef QT_NO_CLIPBOARD
+    editMenu->addAction(cutAct);
+    editMenu->addAction(copyAct);
+    editMenu->addAction(pasteAct);
+    editMenu->addSeparator();
+#endif
+    editMenu->addAction(dbgInfoAct);
+
+    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(configToolAct);
+
+    windowMenu = menuBar()->addMenu(tr("&Window"));
+    updateWindowMenu();
+    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
+
+    menuBar()->addSeparator();
+
+    helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(aboutAct);
+    helpMenu->addAction(aboutQtAct);
+}
+
+//----------------------------------------------------------------------
+// Method: closeEvent
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::createToolBars()
+{
+//    fileToolBar = addToolBar(tr("File"));
+//    fileToolBar->addAction(exitAct);
+
+//#ifndef QT_NO_CLIPBOARD
+//    editToolBar = addToolBar(tr("Edit"));
+//    editToolBar->addAction(cutAct);
+//    editToolBar->addAction(copyAct);2000
+//    editToolBar->addAction(pasteAct);
+//#endif
+}
+
+//----------------------------------------------------------------------
+// Method: createStatusBar
+// Shows final Ready message in status bar
+//----------------------------------------------------------------------
+void MainWindow::createStatusBar()
+{
+    statusBar()->showMessage(tr("Ready"));
+}
+
+//----------------------------------------------------------------------
+// Method: readSettings
+// Read settings from system
+//----------------------------------------------------------------------
+void MainWindow::readSettings()
+{
+    QSettings settings("QPF", "QLA Processing Framework");
+    QPoint pos = settings.value("pos", QPoint(40, 40)).toPoint();
+    QSize size = settings.value("size", QSize(800, 600)).toSize();
+    move(pos);
+    resize(size);
+}
+
+//----------------------------------------------------------------------
+// Method: writeSettings
+// Write current values of settings to system
+//----------------------------------------------------------------------
+void MainWindow::writeSettings()
+{
+//    QSettings settings("QPF", "QLA Processing Framework");
+//    settings.setValue("pos", pos());
+//    settings.setValue("size", size());
+}
+
+//----------------------------------------------------------------------
+// Method: activeTextView
+// Reads configuration file
+//----------------------------------------------------------------------
+TextView *MainWindow::activeTextView()
+{
+    if (QMdiSubWindow *activeSubWindow = ui->mdiArea->activeSubWindow())
+        return qobject_cast<TextView *>(activeSubWindow->widget());
+    return 0;
+}
+
+//----------------------------------------------------------------------
+// Method: switchLayoutDirection
+// Reads configuration file
+//----------------------------------------------------------------------
+void MainWindow::switchLayoutDirection()
+{
+    if (layoutDirection() == Qt::LeftToRight)
+        qApp->setLayoutDirection(Qt::RightToLeft);
+    else
+        qApp->setLayoutDirection(Qt::LeftToRight);
+}
+
+//----------------------------------------------------------------------
+// Method: setActiveSubWindow
+//----------------------------------------------------------------------
+void MainWindow::setActiveSubWindow(QWidget *window)
+{
+    if (!window) return;
+    ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
 }
 
 //----------------------------------------------------------------------
@@ -136,8 +508,7 @@ MainWindow::~MainWindow()
 //----------------------------------------------------------------------
 void MainWindow::readConfig()
 {
-    cfg = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
@@ -154,25 +525,38 @@ void MainWindow::readConfig()
         }
     }
 
-//    for (auto & kv : taskAgentsInfo ) {
-//        qDebug() << kv.first.c_str()
-//                 << kv.second->name.c_str()
-//                 << kv.second->client.c_str()
-//                 << kv.second->server.c_str()
-//                 << kv.second->total << kv.second->running << kv.second->waiting
-//                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
-//    }
+    for (auto & kv : taskAgentsInfo ) {
+        qDebug() << kv.first.c_str()
+                 << kv.second->name.c_str()
+                 << kv.second->client.c_str()
+                 << kv.second->server.c_str()
+                 << kv.second->total << kv.second->running << kv.second->waiting
+                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
+    }
 
     cfg->setLastAccess(QDateTime::currentDateTime()
                        .toString("yyyyMMddTHHmmss").toStdString());
 
-    // Modify HMI with the product types obtained from configuration
+    // Modify HMI with the product datatypes obtained from configuration
     ui->cboxProdType->clear();
     ui->lstProductTypes->clear();
     for (unsigned int i = 0; i < cfgInfo.orcParams.productTypes.size(); ++i) {
         ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
+    ui->edInboxPath->setText(QString(cfgInfo.storage.in.inbox.c_str()));
+}
+
+//----------------------------------------------------------------------
+// Method: showConfigTool
+// Shows configuration tool window
+//----------------------------------------------------------------------
+void MainWindow::showConfigTool()
+{
+    ConfigTool cfgTool;
+
+    cfgTool.readConfig();
+    cfgTool.exec();
 }
 
 //----------------------------------------------------------------------
@@ -250,8 +634,9 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
     hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
+    hmiNode->setSizeOfLogBuffer(0);
 
     qDebug() << hmiNode->getCommNodeName().c_str() << "started . . .";
 
@@ -260,15 +645,15 @@ void MainWindow::init()
     hmiNode->addPeer(&(cfgInfo.evtMngCfg));
 
     // Add log tab
-    QString qpfhmiLog = QString::fromStdString(Log::getLogBaseDir() + "/" +
+    QString qpfhmiLog = QString::fromStdString(Log::getLogBaseDir() + "/log/" +
                                                hmiNode->getCommNodeName() + ".log");
-    QPlainTextEdit * pltxted = new QPlainTextEdit;
+    TextView * pltxted = new TextView;
     pltxted->setStyleSheet(FixedWidthStyle);
+    pltxted->setLogName(QString::fromStdString(hmiNode->getCommNodeName()));
     LogWatcher * newLog = new LogWatcher(pltxted);
     newLog->setFile(qpfhmiLog);
     nodeLogs.append(newLog);
-    ui->tabLogs->insertTab(0, pltxted,
-                           QString::fromStdString(hmiNode->getCommNodeName()));
+    ui->mdiArea->addSubWindow(pltxted);
 
     // Initialize and create node part as a separate thread
     qDebug() << "Initializing QPFHMI...";
@@ -291,12 +676,12 @@ void MainWindow::init()
 //----------------------------------------------------------------------
 void MainWindow::initLogWatch()
 {
-    for (int i = ui->tabLogs->count() - 1; i >= 0; --i) {
-        QWidget * w = ui->tabLogs->widget(i);
-        ui->tabLogs->removeTab(i);
+    QList<QMdiSubWindow *> swList = ui->mdiArea->subWindowList();
+    for (int i = swList.count() - 1; i >= 0; --i) {
+        QWidget * w = (QWidget*)(swList.at(i));
+        ui->mdiArea->removeSubWindow(w);
         delete w;
     }
-    ui->tabLogs->clear();
     nodeLogs.clear();
 }
 
@@ -310,8 +695,7 @@ void MainWindow::setLogWatch()
 
     // Establish log monitoring for all components
     initLogWatch();
-    QString logsDir = QString::fromStdString(Log::getLogBaseDir());
-    qDebug() << "Looking at dir " << logsDir;
+    QString logsDir = QString::fromStdString(Log::getLogBaseDir() + "/log");
     QDir msgCommDir(logsDir);
     msgCommDir.setFilter(QDir::Files);
     QStringList filters;
@@ -320,17 +704,16 @@ void MainWindow::setLogWatch()
 
     foreach (const QFileInfo & fs, msgCommDir.entryInfoList()) {
         QString logFileName = fs.absoluteFilePath();
-        qDebug() << "Watching file " << logFileName;
-        QPlainTextEdit * pltxted = new QPlainTextEdit;
+        TextView * pltxted = new TextView;
         pltxted->setStyleSheet(FixedWidthStyle);
+        pltxted->setLogName(QFileInfo(logFileName).baseName());
         LogWatcher * newLog = new LogWatcher(pltxted);
         newLog->setFile(logFileName);
         nodeLogs.append(newLog);
-        if ((fs.baseName() == "EvtMng") || ((fs.baseName() == "QPFHMI"))) {
-            ui->tabLogs->insertTab(0, pltxted, fs.baseName());
-        } else {
-            ui->tabLogs->addTab(pltxted, fs.baseName());
-        }
+        QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
+        subw->setWindowFlags(Qt::CustomizeWindowHint |
+                             Qt::WindowTitleHint |
+                             Qt::WindowMinMaxButtonsHint);
         connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
 }
@@ -389,7 +772,7 @@ void MainWindow::prepareSendMultInData()
 
     bool ok = simInData->sendMultInData(ui->dtStartMult->dateTime(), // start
                                         ui->dtEndMult->dateTime(), // end
-                                        prodTypes, prodStat, // types and status
+                                        prodTypes, prodStat, // datatypes and status
                                         ui->cboxStep->currentText().toInt(), // step in h
                                         ui->cboxFreq->currentText().toInt()); // freq in s
 
@@ -423,6 +806,29 @@ void MainWindow::prepareSendInDataFromFile()
     }
 }
 
+//----------------------------------------------------------------------
+// Method: processInbox
+// Generates INDATA messages into the system, to process all the
+// products in the Inbox directory selected
+//----------------------------------------------------------------------
+void MainWindow::processInbox()
+{
+    QString metadata;
+    simInData->setInjectionFrequency(ui->spbxInjFreq->value());
+    bool ok = simInData->processInbox(ui->edInboxPath->text(), metadata);
+
+    if (ok) {
+        ui->tabEventsToInject->setEnabled(false);
+        ui->btnStopMultInDataEvt->show();
+
+        ui->pltxtInboxProducts->setPlainText(metadata);
+
+        // Activate task monitoring
+        taskMonitTimer = new QTimer(this);
+        connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
+        taskMonitTimer->start(1000);
+    }
+}
 
 //----------------------------------------------------------------------
 // Method: selectInDataParamsFile
@@ -438,6 +844,26 @@ void MainWindow::selectInDataParamsFile()
     if (fileName.isEmpty()) { return; }
     ui->edInDataParamFile->setText(fileName);
     fileInDataParams = fileName;
+}
+
+//----------------------------------------------------------------------
+// Method: selectInboxPath
+// Select directory where the incoming products are being stored
+//----------------------------------------------------------------------
+void MainWindow::selectInboxPath()
+{
+    QString currText = ui->edInboxPath->text();
+    if (currText.isEmpty()) {
+        currText = "/";
+    }
+    QString dirName =
+            QFileDialog::getExistingDirectory(this,
+                                              tr("Select incoming products folder"),
+                                              currText,
+                                              QFileDialog::ShowDirsOnly);
+    if (dirName.isEmpty()) { return; }
+    ui->edInboxPath->setText(dirName);
+    inboxDirName = dirName;
 }
 
 //----------------------------------------------------------------------
@@ -485,11 +911,14 @@ void MainWindow::checkForTaskRes()
         statusBar()->showMessage(QString("Received information from %1 tasks")
                                  .arg(numOfTaskResMsgs),
                                  MessageDelay);
-        // Transform to Qt types
+        // Transform to Qt datatypes
         std::map<std::string, Json::Value>::const_iterator i = newTaskResInfo.begin();
         while (i != newTaskResInfo.end()) {
             QString key = QString::fromStdString(i->first);
-            taskResInfo[key] = i->second;
+            Json::Value v = i->second;
+            v["ZUpdatable"] = true;
+            //qDebug() << "Adding TaskRes with key " << key;
+            taskResInfo[key] = v;
             ++i;
         }
         showTaskRes();
@@ -506,22 +935,22 @@ void MainWindow::showTaskRes()
     int nCols = 8;
 
     // Process pending events from Qt events loop
-    processPendingEvents();
+    qApp->processEvents();
 
     if (firstTime) {
-        firstTime = false;
         // Set up context menu
         initTasksMonitTree(nCols);
     }
 
-    // Process pending events from Qt events loop
-    processPendingEvents();
-
     // Update Tasks Monitorization Tree
     updateTasksMonitTree(nCols);
 
-    // Process pending events from Qt events loop
-    processPendingEvents();
+    if (firstTime) {
+        for (int i = 0; i < nCols; ++i) {
+            ui->treeTaskMonit->resizeColumnToContents(i);
+        }
+        firstTime = false;
+    }
 
     // Now, update information for Task Agents Status Info.
     updateAgentsMonitPanel();
@@ -529,9 +958,8 @@ void MainWindow::showTaskRes()
     // Activate sorting - we are done
     ui->treeTaskMonit->setSortingEnabled(true);
 
-    // Process pending events from Qt events loop
-    processPendingEvents();
-    qDebug() << taskResItems.count() << " tree items, " << taskResInfo.count();
+    // Update last update label
+    ui->lblLastUpdate->setText(QDateTime::currentDateTime().toString());
 }
 
 //----------------------------------------------------------------------
@@ -549,28 +977,25 @@ void MainWindow::initTasksMonitTree(int nCols)
 
     ui->treeTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    acWorkDir = new QAction(tr("Open task working directory..."), ui->treeTaskMonit);
-    connect(acWorkDir, SIGNAL(triggered()), this, SLOT(showWorkDir()));
+    acWorkDir      = new QAction(tr("Open task working directory..."), ui->treeTaskMonit);
+    acShowTaskInfo = new QAction(tr("Display task information"), ui->treeTaskMonit);
+    acPauseTask    = new QAction(tr("Pause"), ui->treeTaskMonit);
+    acResumeTask   = new QAction(tr("Resume"), ui->treeTaskMonit);
+    acStopTask     = new QAction(tr("Stop"), ui->treeTaskMonit);
 
-    acDisplayTaskInfo = new QAction(tr("Display task information"), ui->treeTaskMonit);
-    connect(acDisplayTaskInfo, SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
-
-    acPauseTask = new QAction(tr("Pause"), ui->treeTaskMonit);
-    connect(acPauseTask, SIGNAL(triggered()), this, SLOT(pauseTask()));
-
-    acResumeTask = new QAction(tr("Resume"), ui->treeTaskMonit);
-    connect(acResumeTask, SIGNAL(triggered()), this, SLOT(resumeTask()));
-
-    acStopTask = new QAction(tr("Stop"), ui->treeTaskMonit);
-    connect(acStopTask, SIGNAL(triggered()), this, SLOT(stopTask()));
+    connect(acWorkDir,      SIGNAL(triggered()), this, SLOT(showWorkDir()));
+    connect(acShowTaskInfo, SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
+    connect(acPauseTask,    SIGNAL(triggered()), this, SLOT(pauseTask()));
+    connect(acResumeTask,   SIGNAL(triggered()), this, SLOT(resumeTask()));
+    connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
 
     connect(ui->treeTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTaskMonitContextMenu(const QPoint &)));
 
     connect(ui->treeTaskMonit->header(), SIGNAL(sectionClicked(int)),
             this, SLOT(sortTaskViewByColumn(int)));
-    ui->treeTaskMonit->header()->setSectionsClickable(true);
 
+    ui->treeTaskMonit->header()->setSectionsClickable(true);
     taskResItems.clear();
 
     ui->treeTaskMonit->clear();
@@ -592,12 +1017,16 @@ void MainWindow::updateTasksMonitTree(int nCols)
     QMap<QString, QTreeWidgetItem *>::iterator treeIt;
     bool itemExists = false;
 
-    Json::FastWriter writer;
+    //qDebug() << "Processing " << taskResInfo.size() << " TaskRes chunks";
 
     for (;it != end; ++it) {
 
-        Json::Value const & v = it.value();
-        //QString inspectInfo = QString::fromStdString(writer.write(v));
+        Json::Value & v = const_cast<Json::Value &>(it.value());
+
+        if (v["ZUpdatable"].asBool() == false) {
+            //qDebug() << "    - Not updatable";
+            continue;
+        }
 
         QString name     = QString::fromStdString(v["NameExtended"].asString());
         QString ag       = QString::fromStdString(v["TaskAgent"].asString());
@@ -668,6 +1097,8 @@ void MainWindow::updateTasksMonitTree(int nCols)
             }
         }
 
+        //qDebug() << "    - " << tKey << "," << tRegKey << " => " << treeKey;
+
         //treeItem->setFlags(treeItem->flags() | Qt::ItemIsEditable);
         treeItem->setText(0, start);
         treeItem->setText(1, finish);
@@ -689,13 +1120,17 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_FINISHED: // BG: green
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::darkGreen));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::green));
             }
+            v["ZUpdatable"] = false;
             break;
         case TASK_FAILED: // BG: red
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::white));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::red));
             }
+            v["ZUpdatable"] = false;
             break;
         case TASK_SCHEDULED: // FG: gray
             for (int col = 0; col < nCols; ++col) {
@@ -704,8 +1139,10 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_STOPPED: // BG: gray
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::black));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::darkGray));
             }
+            v["ZUpdatable"] = false;
             break;
         case TASK_PAUSED: // FG: darkYellow
             for (int col = 0; col < nCols; ++col) {
@@ -719,11 +1156,11 @@ void MainWindow::updateTasksMonitTree(int nCols)
         if (!itemExists) {
             ui->treeTaskMonit->addTopLevelItem(treeItem);
         }
+
+//        SDC::FastWriter w;
+//        qDebug() << progress << st << status << QString::fromStdString(w.write(v));
     }
 
-    for (int i = 0; i < nCols; ++i) {
-        ui->treeTaskMonit->resizeColumnToContents(i);
-    }
 }
 
 //----------------------------------------------------------------------
@@ -731,7 +1168,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
 //----------------------------------------------------------------------
 void MainWindow::updateAgentsMonitPanel()
 {
-    QVector<double> loadAvgs(getLoadAvgs());
+    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
 
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
@@ -786,7 +1223,7 @@ void MainWindow::updateAgentsMonitPanel()
     }
 
     // Process pending events from Qt events loop
-    processPendingEvents();
+    qApp->processEvents();
 
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {
@@ -825,7 +1262,7 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
     QList<QAction *> actions;
     if (ui->treeTaskMonit->indexAt(p).isValid()) {
         actions.append(acWorkDir);
-        actions.append(acDisplayTaskInfo);
+        actions.append(acShowTaskInfo);
         actions.append(acPauseTask);
         actions.append(acResumeTask);
         actions.append(acStopTask);
@@ -976,23 +1413,6 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 void MainWindow::setDebugInfo(bool b)
 {
     hmiNode->setDebugInfo(b);
-}
-
-//----------------------------------------------------------------------
-// Method: getLoadAvgs
-// Obtain load averages for host
-//----------------------------------------------------------------------
-QVector<double> MainWindow::getLoadAvgs()
-{
-    double loadAvg[3];
-
-    if (getloadavg(loadAvg, 3) < 0) {
-        return QVector<double>(3, 0);
-    } else {
-        QVector<double> loadValues(0);
-        loadValues << loadAvg[0] << loadAvg[1] << loadAvg[2];
-        return loadValues;
-    }
 }
 
 //----------------------------------------------------------------------
