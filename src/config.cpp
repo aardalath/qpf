@@ -109,6 +109,12 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
     appName = cfg["general"]["app_name"].asString();
     appVer  = cfg["general"]["app_version"].asString();
     last    = cfg["general"]["last_access"].asString();
+
+    PATHRun = PATHBase + "/" + LibComm::timeTag();
+    PATHLog = PATHRun + "/log";
+    PATHTmp = PATHRun + "/tmp";
+    PATHTsk = PATHRun + "/tsk";
+    PATHMsg = PATHRun + "/msg";
 }
     
 //----------------------------------------------------------------------
@@ -668,6 +674,15 @@ std::string Configuration::DBPort("5432");
 std::string Configuration::DBName("qpfdb");
 std::string Configuration::DBUser("jcgonzalez");
 std::string Configuration::DBPwd("euclidjcg");
+
+std::string Configuration::PATHBase("/var/run/qpf");
+std::string Configuration::PATHRun;
+std::string Configuration::PATHLog;
+std::string Configuration::PATHTmp;
+std::string Configuration::PATHTsk;
+std::string Configuration::PATHMsg;
+
+mode_t Configuration::PATHMode = 0755;
 
 }
 

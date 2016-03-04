@@ -230,6 +230,15 @@ public:
     static std::string    DBUser;
     static std::string    DBPwd;
 
+    static std::string PATHBase;
+    static std::string PATHRun;
+    static std::string PATHLog;
+    static std::string PATHTmp;
+    static std::string PATHTsk;
+    static std::string PATHMsg;
+
+    static mode_t      PATHMode;
+
 };
 
 }
