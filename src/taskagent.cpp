@@ -167,8 +167,8 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     taskData["State"]["Restarting"] = false;
     taskData["State"]["Running"] = false;
     taskData["State"]["StartedAt"] = "0001-01-01T00:00:00Z";
-    task.taskStart = "";
-    task.taskEnd = "00010101T000000";
+    task.taskStart = LibComm::timeTag();
+    task.taskEnd = "";
     task.taskExitCode = 0;
     task.taskName = internalTaskNameIdx;
     task.taskPath = t.taskPath;
@@ -336,17 +336,21 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         task.taskStatus = status;
 
         // Set actual start time
-        if (task.taskStart.empty()) {
-            std::string startTime = taskData["State"]["StartedAt"].asString();
-            task.taskStart = (startTime.substr(0,4) + startTime.substr(5,2) +
+        std::string startTime = taskData["State"]["StartedAt"].asString();
+        task.taskStart = (startTime.substr(0,4) + startTime.substr(5,2) +
                               startTime.substr(8,5) +
                               startTime.substr(14,2) + startTime.substr(17,2));
-        }
 
         // Send message
         sendTaskResMsg(task);
 
     } while ((!childEnded) && (!stopTasks));
+
+    // Set end time
+    std::string endTime = taskData["State"]["FinishedAt"].asString();
+    task.taskEnd = (endTime.substr(0,4) + endTime.substr(5,2) +
+                    endTime.substr(8,5) +
+                    endTime.substr(14,2) + endTime.substr(17,2));
 
     //-------------------------------------------------------------------
     // Get output data
@@ -387,12 +391,6 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     //-------------------------------------------------------------------
     // Report end of task
     //-------------------------------------------------------------------
-
-    // Set end time
-    std::string endTime = taskData["State"]["FinishedAt"].asString();
-    task.taskEnd = (endTime.substr(0,4) + endTime.substr(5,2) +
-                    endTime.substr(8,5) +
-                    endTime.substr(14,2) + endTime.substr(17,2));
 
     // Send message
     sendTaskResMsg(task);
