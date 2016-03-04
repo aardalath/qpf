@@ -1,0 +1,37 @@
+digraph QPFtoy_rules {
+//rankdir=LR;
+size="60";
+
+QPFHMI [shape = box, color = red];
+EvtMng [shape = box, color = red];
+DataMng [shape = box, color = red];
+LogMng [shape = box, color = bisque];
+ [shape = box, color = green];
+ [shape = box, color = cyan];
+ [shape = box, color = orchid];
+ [shape = box, color = orchid];
+ [shape = box, color = orchid];
+ [shape = box, color = violet];
+VIS_1 [shape = box, color = purple];
+NISP_P_QLA [shape = box, color = red];
+NISP_S_QLA [shape = box, color = pink];
+VIS_QLA [shape = box, color = blue];
+HK_RAW [shape = box, color = gray60];
+HK_QLA  [shape = box, color = gray80];
+
+PE_NISP_P_CAL PE_NISP_P PE_NISP_S PE_VIS PE_HK [share = hexagon, color = black];
+
+node [shape = circle, color = blue];
+
+NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1,PE_NISP_P_CAL -> Rule1;
+Rule1 -> NISP_P_CAL_1; 
+NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1,PE_NISP_P -> Rule2;
+Rule2 -> NISP_P_QLA; 
+NISP_S_CAL_1,NISP_S_1,PE_NISP_S -> Rule3;
+Rule3 -> NISP_S_QLA; 
+VIS_CAL_1,VIS_1,PE_VIS -> Rule4;
+Rule4 -> VIS_QLA; 
+HK_RAW,PE_HK -> Rule5;
+Rule5 -> HK_QLA; 
+
+}

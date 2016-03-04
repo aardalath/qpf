@@ -1,0 +1,19 @@
+QMAKE_CXXFLAGS += -std=c++11 -Wextra
+INCLUDEPATH += $$PWD/src /opt/cots/include
+SRC_DIR = $$PWD
+
+OLD_LIBDIR = $$QMAKE_LIBDIR
+QMAKE_LIBDIR = /opt/cots/lib $$OLD_LIBDIR
+
+LIBCOMMPATH = /home/jcgonzalez/ws/personal/libcomm
+LIBCOMMLIB = $$LIBCOMMPATH/build/debug/src
+LIBCOMMINC = $$LIBCOMMPATH/src
+
+JSONCPPPATH = $$PWD
+JSONCPPLIB = $$JSONCPPPATH/build/debug/json
+JSONCPPINC = $$JSONCPPPATH/json
+
+PSQLCPPPATH = /opt/PostgreSQL/9.4
+PSQLCPPLIB = $$PSQLCPPPATH/lib
+PSQLCPPINC = $$PSQLCPPPATH/include
+PSQLLIB = pq

@@ -1,0 +1,658 @@
+========================================
+  NLOC    CCN   token  PARAM  location  
+----------------------------------------
+      32     36    243      1 Value::isConvertibleTo@3198-3229@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      76     27    307      1 OurReader::readToken@1384-1459@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      59     25    393      1 OurReader::readObject@1588-1648@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      70     25    282      1 Reader::readToken@426-495@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      46     24    557      4 QPF::MainWindow::qt_static_metacall@132-177@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+      53     22    336      1 Reader::readObject@631-685@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18     18    175      0 OurReader::readNumber@1542-1562@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18     18    175      0 Reader::readNumber@597-617@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      45     17    317      1 Value::operator <@2879-2923@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      52     16    321      1 FastWriter::writeValue@4261-4313@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      72     16    400      0 OurReader::readValue@1295-1372@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      72     16    398      0 Reader::readValue@332-414@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      52     15    239      2 OurReader::decodeString@1795-1846@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      52     15    239      2 Reader::decodeString@832-883@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      50     14    266      2 valueToQuotedStringN@4173-4234@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      39     14    269      1 Value::operator ==@2931-2973@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      43     14    245      1 Value::Value@2779-2821@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      48     13    464      2 createPeerNodes@157-211@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      32     13    187      3 MessageHandler::process@70-116@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+      57     13    324      1 BuiltStyledStreamWriter::writeValue@4824-4881@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      57     13    318      1 StyledStreamWriter::writeValue@4550-4607@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      57     13    316      1 StyledWriter::writeValue@4332-4389@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      49     13    245      1 valueToQuotedString@4096-4156@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      30     13    251      2 Path::makePath@3834-3863@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      76     12    543      0 TaskOrchestrator::run@100-215@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+     214     12    846      1 TaskAgent::executeFakeProcessingElement@325-578@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+      89     12    802      1 TaskAgent::executeProcessingElement@186-322@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+      77     12    470      0 TaskManager::run@72-190@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+      46     12    261      1 BuiltStyledStreamWriter::writeArrayValue@4883-4928@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      31     12    207      2 OurReader::decodeNumber@1698-1736@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      31     12    207      2 Reader::decodeNumber@735-773@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      62     12    673      0 MainWindow::showTaskRes@579-667@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      61     12    587      0 MainWindow::prepareSendMultInData@323-418@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      22     11     70      0 Value@2823-2845@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      43     11    223      4 OurReader::parse@1247-1293@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      63     10    383      0 DataManager::run@78-179@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      55     10    318      0 EventManager::run@80-173@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+      65     10    411      0 TaskAgent::run@83-184@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+      27     10    192      1 BuiltStyledStreamWriter::isMultineArray@4930-4956@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      27     10    192      1 StyledStreamWriter::isMultineArray@4654-4680@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      27     10    192      1 StyledWriter::isMultineArray@4434-4460@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      22     10    107      0 Value::size@3232-3253@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      35     10    196      1 OurReader::readArray@1650-1686@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      35     10    196      1 Reader::readArray@687-723@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      44      9    225      1 StyledStreamWriter::writeArrayValue@4609-4652@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      17      9     73      0 Value::asBool@3180-3196@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      24      9    127      0 Value::asString@2996-3019@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      26      9     95      1 Value::Value@2693-2718@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      27      9    139      4 OurReader::decodeUnicodeEscapeSequence@1877-1903@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      9    114      0 OurReader::readComment@1482-1503@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      27      9    139      4 Reader::decodeUnicodeEscapeSequence@914-940@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      9    114      0 Reader::readComment@518-539@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      49      8    280      0 LogManager::run@71-152@/home/jcgonzalez/ws/personal/QPF/src/logmng.cpp
+      16      8    125      1 BuiltStyledStreamWriter::writeCommentBeforeValue@4990-5007@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      42      8    207      1 StyledWriter::writeArrayValue@4391-4432@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18      8    167      2 Path::resolve@3905-3922@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18      8    159      1 Path::resolve@3882-3903@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18      8     97      0 Value::asFloat@3158-3178@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18      8     91      0 Value::asDouble@3136-3156@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      26      8    147      4 OurReader::decodeUnicodeCodePoint@1848-1875@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      26      8    147      4 Reader::decodeUnicodeCodePoint@885-912@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      37      8    189      4 Reader::parse@290-330@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      53      8    289      0 HMIProxy::run@90-180@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+      30      8    295      2 MainWindow::dumpToTree@739-771@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      79      7    808      0 Configuration::saveConfigurationToDB@341-448@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      61      7    691      0 Configuration::readConfigurationFromDB@256-335@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      15      7    115      1 StyledStreamWriter::writeCommentBeforeValue@4710-4726@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      7     60      0 Value::isUInt64@3671-3689@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      7     69      0 Value::isInt64@3651-3669@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      7     76      0 Value::isUInt@3636-3649@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      7     73      0 Value::isInt@3621-3634@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      7     99      0 Value::asUInt64@3098-3117@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      7     99      0 Value::asInt64@3077-3096@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      21      7    108      0 Value::asUInt@3053-3073@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      21      7    108      0 Value::asInt@3031-3051@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      28      6    219      1 DataManager::saveOutputsToDB@325-358@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      56      6    525      1 DataManager::saveToDB@246-319@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      16      6    108      3 QPF::MainWindow::qt_metacall@198-213@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+      16      6    113      3 QPF::ArchiveModel::qt_metacall@94-109@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_archivemodel.cpp
+      16      6    113      3 QPF::LogWatcher::qt_metacall@94-109@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_logwatcher.cpp
+      29      6    177      0 StreamWriterBuilder::newStreamWriter@5045-5073@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      6    112      1 StyledWriter::writeCommentBeforeValue@4492-4510@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      6     96      3 strnpbrk@4159-4172@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      6    160      1 valueToString@4057-4092@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      6    135      1 Path::make@3924-3941@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      25      6    201      2 Value::resolveReference@3381-3409@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      21      6    166      1 Value::operator [ ]@3298-3322@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      17      6    108      1 Value::resize@3280-3296@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      21      6    106      3 OurReader::getLocationLineAndColumn@1943-1964@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      6     58      0 OurReader::readCppStyleComment@1526-1540@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      6     45      0 OurReader::skipSpaces@1461-1469@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      21      6    106      3 Reader::getLocationLineAndColumn@980-1001@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      6     58      0 Reader::readCppStyleComment@581-595@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      6     45      0 Reader::skipSpaces@497-505@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      26      5    246      3 launchPeerNodes@269-297@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      19      5    229      1 TaskOrchestrator::defineOrchestrationParams@55-77@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+      16      5    142      1 Value::resolveReference@3362-3378@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      15      5     59      0 Value::clear@3264-3278@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      5     87      1 Value::CZString::CZString@2623-2633@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      5     65      1 ValueIteratorBase::computeDistance@2241-2266@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      5     72      1 OurReader::recoverFromError@1915-1926@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      5     72      1 Reader::recoverFromError@952-963@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      5     86      2 normalizeEOL@541-558@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      23      5    287      1 codePointToUTF8@104-130@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      40      5    383      0 MainWindow::prepareSendInDataFromFile@442-496@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      27      4    392      2 createPeerNodeConnections@217-262@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      29      4    324      1 readConfig@116-150@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      20      4    174      1 TaskOrchestrator::checkRulesForProductType@222-256@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+      22      4    132      1 DBHdlPostgreSQL::openConnection@57-80@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+      13      4     93      1 TaskAgent::inspectDockerRunningTask@608-621@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+      14      4     93      0 TaskManager::selectAgent@218-234@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+      17      4    137      1 StreamWriterBuilder::validate@5082-5098@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      4     67      1 BuiltStyledStreamWriter::writeCommentAfterValueOnSameLine@5009-5018@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      4     54      0 StyledWriter::writeIndent@4469-4478@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      4     51      2 containsControlCharacter0@4014-4022@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      4     49      0 Value::end@3789-3800@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      4     49      0 Value::begin@3776-3787@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      4     50      0 Value::end@3763-3774@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      4     50      0 Value::begin@3750-3761@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      4     67      3 Value::setComment@3709-3717@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      4     26      0 Value::isIntegral@3691-3697@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      4    126      0 Value::getMemberNames@3570-3585@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      20      4    160      2 Value::removeIndex@3520-3541@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      4     99      2 Value::find@3418-3428@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      4     79      1 Value::operator [ ]@3331-3342@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      4     33      0 Value::empty@3255-3260@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      4    100      1 Value::CZString::operator <@2650-2661@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      17      4    137      1 CharReaderBuilder::validate@2107-2123@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      17      4    129      3 OurReader::pushError@2030-2046@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      25      4    180      2 OurReader::decodeDouble@1748-1782@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      4     50      0 OurReader::readStringSingleQuote@1576-1586@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      4     50      0 OurReader::readString@1563-1573@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      4     42      0 OurReader::readCStyleComment@1517-1524@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      4     55      2 OurReader::match@1471-1480@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      17      4    129      3 Reader::pushError@1072-1088@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      25      4    180      2 Reader::decodeDouble@785-819@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      4     50      0 Reader::readString@619-629@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      4     42      0 Reader::readCStyleComment@572-579@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      4     55      2 Reader::match@507-516@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      4     42      2 containsNewLine@249-254@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      4    110      1 MainWindow::showTaskMonitContextMenu@672-685@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      28      4    318      0 MainWindow::readConfig@99-134@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      15      3     93      0 launchQPFHMI@92-110@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      40      3    255      0 DataManager::initializeDB@186-239@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      30      3    253      1 TaskOrchestrator::sendTaskProcMsg@263-304@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+      15      3    120      1 DBHdlPostgreSQL::fillWithResult@207-223@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+      13      3     93      1 DBHdlPostgreSQL::runCmd@192-205@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+      32      3    206      1 DBHdlPostgreSQL::storeTask@134-168@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+      36      3    232      1 DBHdlPostgreSQL::storeProducts@88-127@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       7      3     58      1 QPF::MainWindow::qt_metacast@190-196@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+       7      3     56      1 DlgShowTaskInfo::qt_metacast@74-80@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_dlgshowtaskinfo.cpp
+       7      3     58      1 QPF::ArchiveModel::qt_metacast@86-92@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_archivemodel.cpp
+      10      3     85      4 QPF::ArchiveModel::qt_static_metacall@64-73@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_archivemodel.cpp
+       7      3     58      1 QPF::ProgressBarDelegate::qt_metacast@74-80@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_progbardlg.cpp
+       7      3     58      1 QPF::LogWatcher::qt_metacast@86-92@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_logwatcher.cpp
+      10      3     85      4 QPF::LogWatcher::qt_static_metacall@64-73@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_logwatcher.cpp
+      16      3     93      1 showBacktrace@5142-5165@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      3     33      1 BuiltStyledStreamWriter::hasCommentForValue@5021-5025@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      3     33      1 StyledStreamWriter::hasCommentForValue@4739-4743@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     61      1 StyledStreamWriter::writeCommentAfterValueOnSameLine@4728-4737@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      3     33      1 StyledWriter::hasCommentForValue@4523-4527@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     59      1 StyledWriter::writeCommentAfterValueOnSameLine@4512-4521@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      3     67      1 valueToString@4024-4035@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      3     33      1 containsControlCharacter@4006-4012@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      3     66      4 Path::addPathInArg@3865-3876@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      3     54      1 Value::removeMember@3504-3514@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      3    103      3 Value::removeMember@3483-3495@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      3     71      2 Value::getString@2987-2994@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      3     36      1 Value::compare@2871-2877@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      3     77      1 Value::CZString::operator ==@2663-2672@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      3     27      0 CZString@2635-2638@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      11      3     66      2 Value::CommentInfo::setComment@2589-2600@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      3     82      2 duplicateStringValue@2460-2476@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     84      0 ValueIteratorBase::key@2280-2288@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      3    110      2 OurReader::pushError@2013-2028@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      15      3     94      0 OurReader::getFormattedErrorMessages@1982-1996@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     87      1 OurReader::getLocationLineAndColumn@1966-1980@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     43      1 OurReader::skipCommentTokens@1374-1382@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      3    110      2 Reader::pushError@1055-1070@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      15      3     94      0 Reader::getFormattedErrorMessages@1024-1038@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     87      1 Reader::getLocationLineAndColumn@1003-1017@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      3     43      1 Reader::skipCommentTokens@416-424@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      3     37      2 fixNumericLocale@162-169@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      3    121      0 MainWindow::checkForTaskRes@557-573@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      27      3    214      0 MainWindow::setLogWatch@242-271@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      35      3    228      0 MainWindow::commandSystem@141-192@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      26      3    204      3 ProgressBarDelegate::paint@41-75@/home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.cpp
+      29      3    501      1 ArchiveModel::updateView@82-117@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+      20      2    126      2 main@343-380@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+       7      2     56      1 cleanUp@326-333@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      10      2     80      2 start@303-320@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+      26      2    223      2 DataManager::getProductLatest@373-401@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      21      2    173      1 MessageHandler::writeToFile@244-265@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       9      2     60      2 MessageHandler::procTaskRes@199-207@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       9      2     60      2 MessageHandler::procTaskProc@185-193@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       9      2     60      2 MessageHandler::procInData@171-179@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+      16      2    126      2 TaskOrchestrator::sendTaskRes@310-327@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+       9      2     67      4 DBHdlPostgreSQL::updTable@255-263@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      2     40      2 DBHdlPostgreSQL::getQuery@186-190@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      2     47      2 DBHdlPostgreSQL::getTable@180-184@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+      17      2    133      2 EventManager::sendInData@207-225@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       8      2     61      0 toData@203-210@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       7      2     71      0 toFields@195-201@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       6      2     44      0 toData@182-187@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       6      2     46      0 toFields@175-180@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      10      2     64      0 toData@160-169@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      10      2     72      0 toFields@149-158@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      11      2     54      0 Configuration::readConfigurationFromFile@240-250@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      14      2    141      4 Configuration::getNode@177-192@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      14      2    140      4 Configuration::getProc@147-162@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      14      2    165      4 Configuration::getOrchRule@117-132@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       8      2     71      1 Configuration::getProductTypes@95-102@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       8      2     36      1 Configuration::Configuration@62-69@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       8      2     34      1 Configuration::Configuration@50-57@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      11      2     87      2 TaskManager::exeRule@196-211@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+       4      2     30      0 QPF::MainWindow::metaObject@185-188@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+       7      2     43      3 DlgShowTaskInfo::qt_metacall@82-88@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_dlgshowtaskinfo.cpp
+       4      2     28      0 DlgShowTaskInfo::metaObject@69-72@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_dlgshowtaskinfo.cpp
+       4      2     30      0 QPF::ArchiveModel::metaObject@81-84@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_archivemodel.cpp
+       7      2     45      3 QPF::ProgressBarDelegate::qt_metacall@82-88@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_progbardlg.cpp
+       4      2     30      0 QPF::ProgressBarDelegate::metaObject@69-72@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_progbardlg.cpp
+       4      2     30      0 QPF::LogWatcher::metaObject@81-84@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_logwatcher.cpp
+     404      2   4019      1 setupUi@156-738@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_mainwindow.h
+      32      2    296      1 setupUi@39-80@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_dlgshowtaskinfo.h
+       5      2     31      1 BuiltStyledStreamWriter::writeWithIndent@4977-4981@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     25      0 BuiltStyledStreamWriter::writeIndent@4965-4975@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     30      1 BuiltStyledStreamWriter::pushValue@4958-4963@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      15      2     73      2 BuiltStyledStreamWriter::write@4809-4823@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     31      1 StyledStreamWriter::writeWithIndent@4697-4701@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     30      1 StyledStreamWriter::pushValue@4682-4687@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      2     71      2 StyledStreamWriter::write@4536-4548@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     29      1 StyledWriter::pushValue@4462-4467@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      2     32      1 FastWriter::write@4253-4259@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      2     14      1 valueToString@4094-4094@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     28      1 Value::getComment@3731-3735@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      2     24      1 Value::hasComment@3727-3729@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      2     17      0 Value::isNumeric@3701-3701@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      2     17      0 Value::isDouble@3699-3699@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     43      3 Value::get@3468-3472@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     48      1 Value::operator [ ]@3458-3463@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     54      1 Value::operator [ ]@3435-3440@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     43      1 Value::operator [ ]@3429-3434@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      2     42      2 Value::get@3411-3414@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      2     18      0 Value::asLargestUInt@3128-3134@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      2     18      0 Value::asLargestInt@3120-3126@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     60      0 Value::asCString@2977-2985@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      2     14      0 CommentInfo@2584-2587@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      2     68      4 decodePrefixedString@2501-2512@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      19      2    115      2 duplicateAndPrefixStringValue@2480-2500@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      2     28      3 InRange@2448-2450@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      2     22      3 InRange@2435-2437@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     62      1 ValueIteratorBase::memberName@2310-2318@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      2     31      0 ValueIteratorBase::memberName@2305-2308@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      2     48      0 ValueIteratorBase::name@2297-2303@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     46      0 ValueIteratorBase::index@2290-2295@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      2     30      1 ValueIteratorBase::isEqual@2268-2273@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      2     67      2 operator >>@2174-2186@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     59      4 parse@2063-2071@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      2     99      0 OurReader::getStructuredErrors@1998-2011@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     21      0 OurReader::getNextChar@1937-1941@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      2     72      1 OurReader::decodeString@1784-1793@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     64      1 OurReader::decodeDouble@1738-1746@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     64      1 OurReader::decodeNumber@1688-1696@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      2     66      3 OurReader::addComment@1506-1515@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      2     99      0 Reader::getStructuredErrors@1040-1053@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      2     21      0 Reader::getNextChar@974-978@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      2     72      1 Reader::decodeString@821-830@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     64      1 Reader::decodeDouble@775-783@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      2     64      1 Reader::decodeNumber@725-733@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      2     66      3 Reader::addComment@561-570@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      2     45      2 uintToString@149-155@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      2     16      1 isControlCharacter@133-133@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      2     82      1 HMIProxy::registerTaskRes@222-231@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       8      2     29      0 MainWindow::stopSendingMessages@544-551@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      10      2     69      0 MainWindow::sendInDataFromFile@525-538@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      13      2     83      0 MainWindow::sendMultInData@502-518@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      11      2     59      0 MainWindow::selectInDataParamsFile@425-435@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      10      2     78      0 MainWindow::initLogWatch@228-237@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       8      2     57      0 ArchiveModel::setupModel@49-56@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+      14      2    110      1 LogWatcher::updateLogView@52-68@/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp
+       9      2     47      0 generateEmptyProductMetadata@35-45@/home/jcgonzalez/ws/personal/QPF/qpfhmi/types.cpp
+       7      1     29      1 sigusr1Hdl@80-86@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+       5      1     21      0 waitingForGoAhead@70-74@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+       5      1     26      1 fexists@59-63@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+       2      1     30      0 PeerNodesData@43-44@/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+       4      1      8      0 main@11-15@/home/jcgonzalez/ws/personal/QPF/tests/main.cpp
+       9      1     51      0 LogManager::init@54-65@/home/jcgonzalez/ws/personal/QPF/src/logmng.cpp
+       4      1     16      1 LogManager::LogManager@45-48@/home/jcgonzalez/ws/personal/QPF/src/logmng.cpp
+       4      1     23      1 DataManager::isProductAvailable@364-367@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+       9      1     51      0 DataManager::init@61-72@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+       4      1     16      1 DataManager::DataManager@52-55@/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+      12      1     76      3 MessageHandler::convertTo@227-238@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       9      1     47      2 MessageHandler::setForwardTo@213-221@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+      10      1     44      4 MessageHandler::buildMsgTASKPROC@156-165@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       8      1     32      3 MessageHandler::buildMsgINDATA@143-150@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+      16      1     94      4 MessageHandler::buildMsgHeader@122-137@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       6      1     37      2 MessageHandler::is@59-64@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       3      1      7      0 MessageHandler::MessageHandler@51-53@/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+       9      1     51      0 TaskOrchestrator::init@83-94@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+       4      1     16      1 TaskOrchestrator::TaskOrchestrator@47-50@/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+       6      1     57      4 DBHdlPostgreSQL::updateTable<Json::Value>@247-252@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      1     47      4 DBHdlPostgreSQL::updateTable<std::string>@240-244@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      1     47      4 DBHdlPostgreSQL::updateTable<double>@233-237@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      1     47      4 DBHdlPostgreSQL::updateTable<int>@226-230@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       4      1     13      1 DBHdlPostgreSQL::retrieveTask@175-178@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       4      1     13      1 DBHdlPostgreSQL::updateTask@170-173@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       4      1     19      2 DBHdlPostgreSQL::retrieveProducts@129-132@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       5      1     19      1 DBHdlPostgreSQL::closeConnection@82-86@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       3      1      7      0 DBHdlPostgreSQL::DBHdlPostgreSQL@53-55@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       9      1     79      1 tagToTimestamp@43-51@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       3      1     16      1 quoted@39-41@/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+       1      1      5      0 DBHandler@57-57@/home/jcgonzalez/ws/personal/QPF/src/dbhdl.h
+       1      1     10      0 DBHandler@56-56@/home/jcgonzalez/ws/personal/QPF/src/dbhdl.h
+      13      1     96      2 EventManager::sendTaskRes@231-244@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       8      1     34      0 EventManager::sendStop@193-201@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       8      1     34      0 EventManager::sendStart@179-187@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       9      1     51      0 EventManager::init@63-74@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       3      1     11      0 EventManager::go@54-56@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       4      1     21      1 EventManager::EventManager@46-49@/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+       1      1     15      1 MessageData@384-384@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       5      1     34      0 toData@354-358@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       5      1     36      0 toFields@349-353@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     27      0 toData@333-336@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     25      0 toFields@329-332@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     27      0 toData@320-323@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     25      0 toFields@316-319@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       1      1      5      0 toData@310-310@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       1      1      5      0 toFields@309-309@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      11      1     72      0 toData@294-304@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      11      1    103      0 toFields@282-292@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      12      1     87      0 toData@245-256@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      13      1    118      0 toFields@231-243@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      12      1     75      0 toData@132-143@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+      13      1    126      0 toFields@118-130@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       5      1     22      0 getDataString@93-97@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     12      0 getData@89-92@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       5      1     27      1 setDataString@84-88@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     26      2 setData@80-83@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     18      1 setData@74-79@/home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+       4      1     15      1 Configuration::setConfigFile@231-234@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       6      1     24      1 Configuration::applyNewConfig@220-225@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       4      1     20      0 Configuration::getHMINodeName@211-214@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       8      1     79      4 Configuration::getNodeByName@198-205@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       4      1     20      0 Configuration::getNumNodes@168-171@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       4      1     20      0 Configuration::getNumProcs@138-141@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       4      1     20      0 Configuration::getNumOrchRules@108-111@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       4      1     21      1 Configuration::setLastAccess@86-89@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+       6      1     65      3 Configuration::getGeneralInfo@75-80@/home/jcgonzalez/ws/personal/QPF/src/config.cpp
+      12      1     85      1 TaskAgent::sendTaskResMsg@587-601@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+       9      1     51      0 TaskAgent::init@66-77@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+       4      1     16      1 TaskAgent::TaskAgent@57-60@/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+      13      1     96      2 TaskManager::sendTaskRes@260-273@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+      13      1    101      3 TaskManager::sendTaskAgMsg@241-254@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+       9      1     51      0 TaskManager::init@55-66@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+       4      1     16      1 TaskManager::TaskManager@46-49@/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+       2      1     23      2 Error::Error@57-58@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       2      1     18      1 LogicException::LogicException@54-55@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       2      1     18      1 RuntimeException::RuntimeException@51-52@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       4      1     12      0 Exception::code@46-49@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       4      1     16      0 Exception::what@41-44@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       2      1      6      0 Exception@38-39@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       2      1     21      2 Exception::Exception@35-36@/home/jcgonzalez/ws/personal/QPF/src/except.cpp
+       4      1     23      0 QPF::MainWindow::goToOperational@216-219@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+       7      1     42      4 DlgShowTaskInfo::qt_static_metacall@55-61@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_dlgshowtaskinfo.cpp
+       7      1     44      4 QPF::ProgressBarDelegate::qt_static_metacall@55-61@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_progbardlg.cpp
+      93      1   1207      1 retranslateUi@740-836@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_mainwindow.h
+       5      1     42      1 retranslateUi@82-86@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_dlgshowtaskinfo.h
+       6      1     44      2 operator <<@5121-5126@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     50      2 writeString@5114-5119@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      1     52      1 StreamWriterBuilder::setDefaults@5104-5112@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     19      1 StreamWriterBuilder::operator [ ]@5099-5102@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      1     54      1 getValidWriterKeys@5074-5081@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1      5      0 StreamWriterBuilder@5043-5044@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     13      0 StreamWriterBuilder::StreamWriterBuilder@5039-5042@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1      5      0 Factory@5037-5038@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1      5      0 StreamWriter@5034-5036@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     12      0 StreamWriter::StreamWriter@5030-5033@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     39      0 BuiltStyledStreamWriter::unindent@4985-4988@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 BuiltStyledStreamWriter::indent@4983-4983@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      16      1     79      5 BuiltStyledStreamWriter::BuiltStyledStreamWriter@4793-4808@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     39      0 StyledStreamWriter::unindent@4705-4708@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 StyledStreamWriter::indent@4703-4703@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     14      0 StyledStreamWriter::writeIndent@4689-4695@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     30      1 StyledStreamWriter::StyledStreamWriter@4532-4534@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     34      0 StyledWriter::unindent@4487-4490@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     18      0 StyledWriter::indent@4485-4485@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     21      1 StyledWriter::writeWithIndent@4480-4483@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      1     45      1 StyledWriter::write@4321-4330@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     21      0 StyledWriter::StyledWriter@4318-4319@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 FastWriter::omitEndingLineFeed@4251-4251@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 FastWriter::dropNullPlaceholders@4249-4249@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 FastWriter::enableYAMLCompatibility@4247-4247@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     22      0 FastWriter::FastWriter@4243-4245@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1      5      0 Writer@4238-4238@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      1 valueToString@4051-4053@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      1 valueToString@4047-4049@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      1     38      1 valueToString@4037-4043@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     14      2 Path::invalidPath@3878-3880@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      1     88      6 Path::Path@3819-3832@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     31      1 PathArgument::PathArgument@3813-3814@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     25      1 PathArgument::PathArgument@3810-3811@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     23      1 PathArgument::PathArgument@3807-3808@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     20      0 PathArgument::PathArgument@3805-3805@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      0 Value::toStyledString@3745-3748@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 Value::getOffsetLimit@3743-3743@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 Value::getOffsetStart@3741-3741@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      1 Value::setOffsetLimit@3739-3739@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      1 Value::setOffsetStart@3737-3737@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     33      2 Value::setComment@3723-3725@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     26      2 Value::setComment@3719-3721@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::isObject@3707-3707@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::isArray@3705-3705@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::isString@3703-3703@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::isBool@3619-3619@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::isNull@3617-3617@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     23      1 IsIntegral@3612-3615@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     30      1 Value::isMember@3565-3567@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     36      1 Value::isMember@3559-3562@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     25      1 Value::isMember@3555-3558@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      1     34      2 Value::isMember@3550-3554@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     37      2 Value::get@3544-3547@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     23      1 Value::removeMember@3515-3518@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     41      2 Value::removeMember@3500-3503@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     30      2 Value::removeMember@3496-3499@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     43      2 Value::get@3477-3480@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     32      2 Value::get@3473-3476@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     24      1 Value::append@3466-3466@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     31      1 Value::operator [ ]@3455-3457@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     23      1 Value::operator [ ]@3450-3452@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     37      1 Value::operator [ ]@3446-3448@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     26      1 Value::operator [ ]@3442-3444@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     17      1 Value::isValidIndex@3416-3416@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      1     32      2 Value::initBasic@3351-3357@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     33      1 Value::operator [ ]@3344-3349@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     32      1 Value::operator [ ]@3324-3329@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     14      0 Value::operator !@3262-3262@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      1     41      0 Value::asConstString@3022-3028@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     22      1 Value::operator !=@2975-2975@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     19      1 Value::operator >@2929-2929@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     22      1 Value::operator >=@2927-2927@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     22      1 Value::operator <=@2925-2925@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     11      0 Value::type@2869-2869@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     48      1 Value::swap@2862-2867@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       9      1     55      1 Value::swapPayload@2852-2860@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     19      1 Value::operator =@2847-2850@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2774-2777@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     41      1 Value::Value@2768-2771@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     33      1 Value::Value@2762-2765@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      1     45      1 Value::Value@2756-2760@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      1     42      2 Value::Value@2750-2754@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     38      1 Value::Value@2745-2748@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2740-2743@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2734-2737@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2730-2733@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2725-2728@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     20      1 Value::Value@2720-2723@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     17      0 Value::CZString::isStaticString@2679-2679@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     15      0 Value::CZString::length@2678-2678@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::CZString::data@2677-2677@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      0 Value::CZString::index@2674-2674@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     21      1 Value::CZString::operator =@2645-2648@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     34      1 Value::CZString::swap@2640-2643@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     36      3 Value::CZString::CZString@2615-2621@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     21      1 Value::CZString::CZString@2613-2613@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     14      0 Value::CommentInfo::CommentInfo@2582-2582@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     17      1 throwLogicError@2569-2572@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     17      1 throwRuntimeError@2565-2568@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     18      1 LogicError::LogicError@2562-2564@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     18      1 RuntimeError::RuntimeError@2559-2561@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     18      0 Exception::what@2555-2558@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1      8      0 Exception@2553-2554@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     18      1 Exception::Exception@2550-2552@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     13      1 releaseStringValue@2515-2515@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      1 integerToDouble@2443-2445@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     34      1 integerToDouble@2439-2441@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     21      1 ValueIterator::operator =@2359-2362@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     16      1 ValueIterator::ValueIterator@2356-2357@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     16      1 ValueIterator::ValueIterator@2353-2354@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1     20      1 ValueIterator::ValueIterator@2350-2351@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1      7      0 ValueIterator::ValueIterator@2348-2348@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      1     21      1 ValueConstIterator::operator =@2334-2338@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     20      1 ValueConstIterator::ValueConstIterator@2330-2332@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1      7      0 ValueConstIterator::ValueConstIterator@2328-2328@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     23      1 ValueIteratorBase::copy@2275-2278@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     10      0 ValueIteratorBase::decrement@2236-2238@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     10      0 ValueIteratorBase::increment@2232-2234@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     14      0 ValueIteratorBase::deref@2228-2230@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     25      1 ValueIteratorBase::ValueIteratorBase@2224-2226@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      0 ValueIteratorBase::ValueIteratorBase@2220-2222@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      1    101      4 parseFromStream@2160-2172@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      12      1    102      1 CharReaderBuilder::setDefaults@2142-2155@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      10      1     82      1 CharReaderBuilder::strictMode@2129-2140@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     19      1 CharReaderBuilder::operator [ ]@2124-2127@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      13      1     94      1 getValidReaderKeys@2094-2106@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      14      1    142      0 CharReaderBuilder::newCharReader@2080-2093@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       2      1      5      0 CharReaderBuilder@2078-2079@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     13      0 CharReaderBuilder::CharReaderBuilder@2074-2077@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     22      2 OurCharReader@2057-2062@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      0 OurReader::good@2048-2050@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     17      0 OurReader::currentValue@1935-1935@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     33      3 OurReader::addErrorAndRecover@1928-1933@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      1     51      3 OurReader::addError@1906-1913@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     52      1 OurReader::OurReader@1242-1245@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     12      0 OurFeatures::all@1120-1120@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       7      1     37      0 OurFeatures::OurFeatures@1112-1118@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     16      0 Reader::good@1090-1092@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     13      0 Reader::getFormatedErrorMessages@1020-1022@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     17      0 Reader::currentValue@972-972@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     33      3 Reader::addErrorAndRecover@965-970@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      1     51      3 Reader::addError@943-950@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       5      1     48      3 Reader::parse@277-288@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       6      1     60      3 Reader::parse@270-275@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     52      1 Reader::Reader@264-267@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       4      1     52      0 Reader::Reader@259-262@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       8      1     37      0 Features::strictMode@237-244@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1     12      0 Features::all@235-235@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       3      1     27      0 Features::Features@231-233@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+       1      1      5      0 StyledStreamWriter@1879-1879@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1      5      0 StyledWriter@1817-1817@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1      5      0 FastWriter@1765-1765@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1      5      0 Factory@1466-1466@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1      5      0 CharReader@1442-1442@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     23      2 swap@1171-1171@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     14      0 operator - >@1162-1162@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     12      0 operator *@1160-1160@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       4      1     14      0 operator ++@1155-1158@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       4      1     14      0 operator --@1150-1153@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       5      1     21      1 operator --@1144-1148@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       5      1     21      1 operator ++@1138-1142@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     14      0 operator - >@1111-1111@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     12      0 operator *@1109-1109@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       4      1     14      0 operator ++@1104-1107@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       4      1     14      0 operator --@1099-1102@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       5      1     21      1 operator --@1093-1097@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       5      1     21      1 operator ++@1087-1091@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       3      1     20      1 operator -@1019-1021@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     18      1 operator !=@1017-1017@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     17      1 operator ==@1015-1015@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1      9      0 c_str@464-464@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     12      0 operator const char *@462-462@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       1      1     14      1 StaticString@460-460@/home/jcgonzalez/ws/personal/QPF/json/json/json.h
+       7      1     42      1 HMIProxy::getTaskResInfo@245-251@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       3      1     10      0 HMIProxy::isThereTaskResInfo@237-239@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       8      1     41      0 HMIProxy::requestStop@209-216@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+      14      1     91      1 HMIProxy::sendInData@186-203@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       4      1     12      0 HMIProxy::concurrentRun@81-84@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       4      1     11      0 HMIProxy::getStartSignal@72-75@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       9      1     51      0 HMIProxy::init@55-66@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+       5      1     20      1 HMIProxy::HMIProxy@45-49@/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+      11      1     83      3 MainWindow::dumpTaskInfoToTree@723-733@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      13      1    121      0 MainWindow::displayTaskInfo@705-717@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       9      1    106      0 MainWindow::showWorkDir@691-699@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      21      1    255      0 MainWindow::sendInData@286-317@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       4      1     24      0 MainWindow::handleFinishedHMI@277-280@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      12      1     99      0 MainWindow::init@206-223@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       3      1      7      0 MainWindow::transitToOperational@198-200@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       4      1      8      0 MainWindow@90-93@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+      16      1    196      1 MainWindow::MainWindow@60-85@/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+       4      1     20      1 DlgShowTaskInfo::setTaskInfo@21-24@/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp
+       4      1     13      0 DlgShowTaskInfo::getTreeTaskInfo@16-19@/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp
+       4      1      8      0 DlgShowTaskInfo@11-14@/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp
+       6      1     31      1 DlgShowTaskInfo::DlgShowTaskInfo@4-9@/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp
+       7      1     39      2 main@4-11@/home/jcgonzalez/ws/personal/QPF/qpfhmi/main.cpp
+       3      1      5      0 ProgressBarDelegate@37-39@/home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.cpp
+       4      1     15      1 ProgressBarDelegate::ProgressBarDelegate@32-35@/home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.cpp
+       8      1     51      0 ArchiveModel::setupArchiveWatcher@71-80@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+       9      1     74      0 ArchiveModel::setupView@58-69@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+       6      1     27      1 ArchiveModel::ArchiveModel@42-47@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+       3      1     27      2 randInt@38-40@/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+       4      1     10      0 LogWatcher::getFile@47-50@/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp
+       6      1     26      1 LogWatcher::setFile@40-45@/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp
+       7      1     52      1 LogWatcher::LogWatcher@31-38@/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp
+       2      1     24      2 ProductMetadataField@54-55@/home/jcgonzalez/ws/personal/QPF/qpfhmi/types.h
+ --------------------------------------------------------------
+55 file analyzed.
+==============================================================
+NLOC    Avg.NLOC AvgCCN Avg.ttoken  function_cnt    file
+--------------------------------------------------------------
+    177     15    7.0       155         5     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+    425     58    5.0       329         7     /home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp
+    183     24    4.0       198         7     /home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp
+    239     16    3.0       157        12     /home/jcgonzalez/ws/personal/QPF/qpf/main.cpp
+     69     20    3.0       115         3     /home/jcgonzalez/ws/personal/QPF/src/logmng.cpp
+    243     28    3.0       211         8     /home/jcgonzalez/ws/personal/QPF/src/datamng.cpp
+    149     20    3.0       130         7     /home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp
+     73      9    3.0        71         4     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_archivemodel.cpp
+     73      9    3.0        71         4     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_logwatcher.cpp
+   4128     11    3.0        72       334     /home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+    481     19    3.0       180        23     /home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp
+    152     12    2.0        73        12     /home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp
+    126     14    2.0        87         8     /home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp
+    276     14    2.0       134        18     /home/jcgonzalez/ws/personal/QPF/src/config.cpp
+     56      6    2.0        42         4     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_dlgshowtaskinfo.cpp
+     56      6    2.0        44         4     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_progbardlg.cpp
+     14      9    2.0        47         1     /home/jcgonzalez/ws/personal/QPF/qpfhmi/types.cpp
+      4      4    1.0         8         1     /home/jcgonzalez/ws/personal/QPF/tests/main.cpp
+    201     10    1.0        68        19     /home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp
+     38      1    1.0         7         2     /home/jcgonzalez/ws/personal/QPF/src/dbhdl.h
+    310      6    1.0        47        26     /home/jcgonzalez/ws/personal/QPF/src/msghdl.h
+     21      2    1.0        16         7     /home/jcgonzalez/ws/personal/QPF/src/except.cpp
+    643    248    1.0      2613         2     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_mainwindow.h
+     66     18    1.0       169         2     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/ui_dlgshowtaskinfo.h
+    668      2    1.0        13        24     /home/jcgonzalez/ws/personal/QPF/json/json/json.h
+    124     11    1.0        64        10     /home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp
+     20      4    1.0        18         4     /home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp
+      9      7    1.0        39         1     /home/jcgonzalez/ws/personal/QPF/qpfhmi/main.cpp
+     38     11    1.0        74         3     /home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.cpp
+     72     10    1.0       122         6     /home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp
+     35      7    1.0        49         4     /home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp
+     16      2    1.0        24         1     /home/jcgonzalez/ws/personal/QPF/qpfhmi/types.h
+     43      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/taskorc.h
+     23      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/evtmng.h
+     31      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.h
+     30      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/taskmng.h
+     26      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/taskagent.h
+      2      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/error.h
+     14      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/logmng.h
+      0      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/propdef.h
+      9      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/common.h
+      0      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/version.h
+     25      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/except.h
+     28      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/datamng.h
+     45      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/src/config.h
+      0      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_taskmonmodel.cpp
+     28      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/json/json/json-forwards.h
+     14      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.h
+      7      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/taskmonmodel.h
+      7      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/taskmonmodel.cpp
+     82      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.h
+     16      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.h
+     27      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.h
+     19      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.h
+     24      0    0.0         0         0     /home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.h
+
+======================================
+!!!! Warnings (CCN > 15) !!!!
+========================================
+  NLOC    CCN   token  PARAM  location  
+----------------------------------------
+      32     36    243      1 Value::isConvertibleTo@3198-3229@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      76     27    307      1 OurReader::readToken@1384-1459@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      59     25    393      1 OurReader::readObject@1588-1648@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      70     25    282      1 Reader::readToken@426-495@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      46     24    557      4 QPF::MainWindow::qt_static_metacall@132-177@/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/moc_mainwindow.cpp
+      53     22    336      1 Reader::readObject@631-685@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18     18    175      0 OurReader::readNumber@1542-1562@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      18     18    175      0 Reader::readNumber@597-617@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      45     17    317      1 Value::operator <@2879-2923@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      52     16    321      1 FastWriter::writeValue@4261-4313@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      72     16    400      0 OurReader::readValue@1295-1372@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+      72     16    398      0 Reader::readValue@332-414@/home/jcgonzalez/ws/personal/QPF/json/jsoncpp.cpp
+==========================================================================================
+Total nloc  Avg.nloc  Avg CCN  Avg token  Fun Cnt  Warning cnt   Fun Rt   nloc Rt  
+------------------------------------------------------------------------------------------
+      9685        13     3.18      92.71      573           12      0.02    0.08

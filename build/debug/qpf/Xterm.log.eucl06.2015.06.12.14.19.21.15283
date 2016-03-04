@@ -1,0 +1,82 @@
+QPFHMI started . . .
+qpfhmi: ../nptl/pthread_mutex_lock.c:350: __pthread_mutex_lock_full: Assertion `(-(e)) != 3 || !robust' failed.
+
+Program received signal SIGABRT, Aborted.
+0x00007ffff5b78cc9 in __GI_raise (sig=sig@entry=6)
+    at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+56	../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+#0  0x00007ffff5b78cc9 in __GI_raise (sig=sig@entry=6)
+    at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+#1  0x00007ffff5b7c0d8 in __GI_abort () at abort.c:89
+#2  0x00007ffff5b71b86 in __assert_fail_base (
+    fmt=0x7ffff5cc2830 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", 
+    assertion=assertion@entry=0x7ffff56cfa45 "(-(e)) != 3 || !robust", 
+    file=file@entry=0x7ffff56cfa28 "../nptl/pthread_mutex_lock.c", 
+    line=line@entry=350, 
+    function=function@entry=0x7ffff56cfb40 <__PRETTY_FUNCTION__.8671> "__pthread_mutex_lock_full") at assert.c:92
+#3  0x00007ffff5b71c32 in __GI___assert_fail (
+    assertion=assertion@entry=0x7ffff56cfa45 "(-(e)) != 3 || !robust", 
+    file=file@entry=0x7ffff56cfa28 "../nptl/pthread_mutex_lock.c", 
+    line=line@entry=350, 
+    function=function@entry=0x7ffff56cfb40 <__PRETTY_FUNCTION__.8671> "__pthread_mutex_lock_full") at assert.c:101
+#4  0x00007ffff56c2ce1 in __pthread_mutex_lock_full (mutex=0x870848)
+    at ../nptl/pthread_mutex_lock.c:350
+#5  0x00007ffff7bc73aa in LibComm::Router2RouterPeer::addPeer (this=0x870770, 
+    peer=0x7fffffffc750, isThisPeer=true) at ../../../src/r2rpeer.cpp:99
+#6  0x0000000000407edb in QPF::MainWindow::init (this=0x7fffffffe040)
+    at ../../../qpfhmi/mainwindow.cpp:120
+#7  0x0000000000407ac8 in QPF::MainWindow::sendStartSignal (
+---Type <return> to continue, or q <return> to quit---
+    this=0x7fffffffe040) at ../../../qpfhmi/mainwindow.cpp:77
+#8  0x000000000040e90e in QPF::MainWindow::qt_static_metacall (
+    _o=0x7fffffffe040, _c=QMetaObject::InvokeMetaMethod, _id=1, 
+    _a=0x7fffffffc920) at moc_mainwindow.cpp:80
+#9  0x00007ffff672a01a in QMetaObject::activate(QObject*, int, int, void**) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+#10 0x00007ffff7574a36 in ?? () from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#11 0x00007ffff7574dfa in QAbstractButton::mousePressEvent(QMouseEvent*) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#12 0x00007ffff74b1b82 in QWidget::event(QEvent*) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#13 0x00007ffff74762b4 in QApplicationPrivate::notify_helper(QObject*, QEvent*)
+    () from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#14 0x00007ffff7479a4c in QApplication::notify(QObject*, QEvent*) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#15 0x00007ffff66f7e24 in QCoreApplication::notifyInternal(QObject*, QEvent*)
+    () from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+#16 0x00007ffff7478978 in QApplicationPrivate::sendMouseEvent(QWidget*, QMouseEvent*, QWidget*, QWidget*, QWidget**, QPointer<QWidget>&, bool) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#17 0x00007ffff74ccb57 in ?? () from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#18 0x00007ffff74cf648 in ?? () from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#19 0x00007ffff74762b4 in QApplicationPrivate::notify_helper(QObject*, QEvent*)
+---Type <return> to continue, or q <return> to quit---
+    () from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#20 0x00007ffff7479c86 in QApplication::notify(QObject*, QEvent*) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Widgets.so.5
+#21 0x00007ffff66f7e24 in QCoreApplication::notifyInternal(QObject*, QEvent*)
+    () from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+#22 0x00007ffff6c4afa7 in QGuiApplicationPrivate::processMouseEvent(QWindowSystemInterfacePrivate::MouseEvent*) () from /opt/Qt/5.4/gcc_64/lib/libQt5Gui.so.5
+#23 0x00007ffff6c4ba35 in QGuiApplicationPrivate::processWindowSystemEvent(QWindowSystemInterfacePrivate::WindowSystemEvent*) ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Gui.so.5
+#24 0x00007ffff6c30728 in QWindowSystemInterface::sendWindowSystemEvents(QFlags<QEventLoop::ProcessEventsFlag>) () from /opt/Qt/5.4/gcc_64/lib/libQt5Gui.so.5
+#25 0x00007fffef3a6a10 in ?? ()
+   from /opt/Qt/5.4/gcc_64/plugins/platforms/libqxcb.so
+#26 0x00007ffff51ace04 in g_main_context_dispatch ()
+   from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#27 0x00007ffff51ad048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#28 0x00007ffff51ad0ec in g_main_context_iteration ()
+   from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#29 0x00007ffff67525e4 in QEventDispatcherGlib::processEvents(QFlags<QEventLoop::ProcessEventsFlag>) () from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+#30 0x00007ffff66f604b in QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag>) () from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+---Type <return> to continue, or q <return> to quit--- [K
+#31 0x00007ffff66faf65 in QCoreApplication::exec() ()
+   from /opt/Qt/5.4/gcc_64/lib/libQt5Core.so.5
+#32 0x0000000000407858 in main (argc=1, argv=0x7fffffffe188)
+    at ../../../qpfhmi/main.cpp:10
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 15347] will be killed.
+
+Quit anyway? (y or n) y

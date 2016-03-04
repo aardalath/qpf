@@ -1,0 +1,118 @@
+Format: 1.51
+
+
+# You can add a title and sub-title to your menu like this:
+# Title: [project name]
+# SubTitle: [subtitle]
+
+# You can add a footer to your documentation like this:
+# Footer: [text]
+# If you want to add a copyright notice, this would be the place to do it.
+
+# You can add a timestamp to your documentation like one of these:
+# Timestamp: Generated on month day, year
+# Timestamp: Updated mm/dd/yyyy
+# Timestamp: Last updated mon day
+#
+#   m     - One or two digit month.  January is "1"
+#   mm    - Always two digit month.  January is "01"
+#   mon   - Short month word.  January is "Jan"
+#   month - Long month word.  January is "January"
+#   d     - One or two digit day.  1 is "1"
+#   dd    - Always two digit day.  1 is "01"
+#   day   - Day with letter extension.  1 is "1st"
+#   yy    - Two digit year.  2006 is "06"
+#   yyyy  - Four digit year.  2006 is "2006"
+#   year  - Four digit year.  2006 is "2006"
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# You can use this file on other computers even if they use different
+# directories.  As long as the command line points to the same source files,
+# Natural Docs will be able to correct the locations automatically.
+# 
+# --------------------------------------------------------------------------
+
+
+File: main.cpp  (/home/jcgonzalez/ws/personal/QPF/qpf/main.cpp)
+
+Group: Qpfhmi  {
+
+   File: archivemodel.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.cpp)
+   File: archivemodel.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/archivemodel.h)
+   File: dlgshowtaskinfo.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.cpp)
+   File: dlgshowtaskinfo.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/dlgshowtaskinfo.h)
+   File: hmipxy.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.cpp)
+   File: hmipxy.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/hmipxy.h)
+   File: logwatcher.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.cpp)
+   File: logwatcher.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/logwatcher.h)
+   File: main.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/main.cpp)
+   File: mainwindow.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.cpp)
+   File: mainwindow.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/mainwindow.h)
+   File: progbardlg.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.cpp)
+   File: progbardlg.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/progbardlg.h)
+   File: taskmonmodel.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/taskmonmodel.cpp)
+   File: taskmonmodel.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/taskmonmodel.h)
+   File: types.cpp  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/types.cpp)
+   File: types.h  (/home/jcgonzalez/ws/personal/QPF/qpfhmi/types.h)
+   }  # Group: Qpfhmi
+
+Group: Src  {
+
+   File: common.h  (/home/jcgonzalez/ws/personal/QPF/src/common.h)
+   File: config.cpp  (/home/jcgonzalez/ws/personal/QPF/src/config.cpp)
+   File: config.h  (/home/jcgonzalez/ws/personal/QPF/src/config.h)
+   File: datamng.cpp  (/home/jcgonzalez/ws/personal/QPF/src/datamng.cpp)
+   File: datamng.h  (/home/jcgonzalez/ws/personal/QPF/src/datamng.h)
+   File: dbhdl.h  (/home/jcgonzalez/ws/personal/QPF/src/dbhdl.h)
+   File: dbhdlpostgre.cpp  (/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.cpp)
+   File: dbhdlpostgre.h  (/home/jcgonzalez/ws/personal/QPF/src/dbhdlpostgre.h)
+   File: error.h  (/home/jcgonzalez/ws/personal/QPF/src/error.h)
+   File: evtmng.cpp  (/home/jcgonzalez/ws/personal/QPF/src/evtmng.cpp)
+   File: evtmng.h  (/home/jcgonzalez/ws/personal/QPF/src/evtmng.h)
+   File: except.cpp  (/home/jcgonzalez/ws/personal/QPF/src/except.cpp)
+   File: except.h  (/home/jcgonzalez/ws/personal/QPF/src/except.h)
+   File: logmng.cpp  (/home/jcgonzalez/ws/personal/QPF/src/logmng.cpp)
+   File: logmng.h  (/home/jcgonzalez/ws/personal/QPF/src/logmng.h)
+   File: msghdl.cpp  (/home/jcgonzalez/ws/personal/QPF/src/msghdl.cpp)
+   File: msghdl.h  (/home/jcgonzalez/ws/personal/QPF/src/msghdl.h)
+   File: propdef.h  (/home/jcgonzalez/ws/personal/QPF/src/propdef.h)
+   File: taskagent.cpp  (/home/jcgonzalez/ws/personal/QPF/src/taskagent.cpp)
+   File: taskagent.h  (/home/jcgonzalez/ws/personal/QPF/src/taskagent.h)
+   File: taskmng.cpp  (/home/jcgonzalez/ws/personal/QPF/src/taskmng.cpp)
+   File: taskmng.h  (/home/jcgonzalez/ws/personal/QPF/src/taskmng.h)
+   File: taskorc.cpp  (/home/jcgonzalez/ws/personal/QPF/src/taskorc.cpp)
+   File: taskorc.h  (/home/jcgonzalez/ws/personal/QPF/src/taskorc.h)
+   File: version.h  (/home/jcgonzalez/ws/personal/QPF/src/version.h)
+   }  # Group: Src
+
+Group: Index  {
+
+   Index: Everything
+   Class Index: Classes
+   File Index: Files
+   Function Index: Functions
+   }  # Group: Index
+
+
+
+##### Do not change or remove these lines. #####
+Data: 1(D3333RuEG3l9`u\jpoGj3763IGH6u\po3:gm36H9)
+Data: 1(h3333RuEG3l9`u\jpoGj3763IGH6u\po3:gm3dIc)
+Data: 1(T3333RuEG3l9`u\jpoGj3763IGH6u\po3:gm3dIcRE8)

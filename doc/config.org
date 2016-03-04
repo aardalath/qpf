@@ -1,0 +1,16 @@
+#+TITLE:	Config. file
+#+AUTHOR:	Jose C. Gonzalez
+#+DATE:	Time-stamp: <2015-03-23 14:34:32 jcgg>
+#+EMAIL:	josec.glez@gmail.com
+
+#+STARTUP: content 
+#+STARTUP: hidestars
+#+STARTUP: logdone
+#+STARTUP: indent
+#+TAGS: URGENT(u) IMPORTANT(i) ON-GOING(o) PREPARING(g) EXTRA(e) READING(r) PROJECT(p)
+#+SEQ_TODO: TODO(t) STARTED(s) WAITING(w) FEEDBACK(f) VERIFY(v) | DONE(d) CANCELLED(c) DEFERRED(r) 
+#+LANGUAGE:     en
+#+KEYWORDS:     
+#+TEXT:         
+#+OPTION_S: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t f:t TeX:t ...
+

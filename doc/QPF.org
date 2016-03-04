@@ -1,0 +1,1577 @@
+#////////////////////////////////////////////////////////////////////////////
+#+TITLE:        QPF - QLA Processing Framework
+#+AUTHOR:       Jose C. Gonzalez
+#+EMAIL:        JCGonzalez@sciops.esa.int
+#+DATE:         Time-stamp: <2015-07-07 mar 12:24>
+#////////////////////////////////////////////////////////////////////////////
+
+#+SETUPFILE: ./config.org
+
+* QPF - QLA Processing Framework
+** Euclid SOC Architecture Design
+
+*** Euclid SOC responsibilities
+
+The SOC is the only interface to the MOC during routine operations, and is in charge of the following satellite and payload operations specific tasks:
+- planning the surveys, based on observing guidelines by the EST,
+- scheduling the spacecraft slews and the exposures
+- handling instrument operations/maintenance requests from the EMC,
+- monitoring the survey performance,
+- first-level quality control and monitoring of the instrument health,
+- rescheduling as required in case of anomalies,
+- requesting MOC action via predefined procedures and sequences of telecommands
+
+The SOC receives the housekeeping, pointing, and science data from MOC and archives them. It derives Level 1 products for ingestion into the EAS. They are also used for quick-look analysis and first level quality control of the data.
+
+The SOC is responsible for operating the EAS and populating it with the data and mission products produced by the SDCs. It manages the access rights to the EAS.
+
+The SOC takes the lead in the overall design and engineering of the SGS, and, under scientific supervision of the EST, organizes and manages the end-to-end tests, to validate the SGS data processing pipelines, interfaces, and operational processes.
+
+The SOC is responsible for the development, procurement, integration, validation and maintenance of all the software and hardware systems which it operates.
+
+*** Euclid SOC Subsystems
+
+- QLA :: Quick Look Analysis
+- HMS :: Health Monitoring System
+- ESS :: Euclid Survey System
+- SIS :: SOC Interface System
+- SCS :: SOC Command System
+- SAS :: SOC Ancillary Systems
+- L1P :: Level 1 Processing
+- EAS@S :: Euclid Archive System at SOC
+- SOC Storage :: Storage at SOC
+
+** QLA
+
+*** QLA Capabilities
+
+**** Introduction
+The aim of this page is to present a first draft of the quick-look analysis tool requirements run at the SOC.
+
+Part of the Euclid SOC duties during mission operation is to quickly assess the quality of science data and the associated telemetry. The SOC is responsible to implement in a Quick Look Analysis (QLA) tool capable of:
+
+- Automatically check S/C data, produce and ingest reports in the Euclid Archive System within 48 hours from data retrieval to confirm that the data are correct and eventually quickly react to issues. The IOT (instrument operation team) and EC (Euclid consortium) will investigate the data in further details, but in can take some weeks as the data is foreseen to be reduced once a larger sky patch has been observed
+- Facilitate data inspection by the user (mainly instrument scientists) in case further data inspection is needed, e.g. being capable of accessing detectors data, showing it and/or exporting it to external programs
+
+**** Short Description
+The standard, wide-survey observing sequence for Euclid is defined as:
+
+- Each observing field is observed 4 times, i.e. 4 dither positions. The S/C is moved slightly (50-100 arcsec) from one dither to the next.
+- For each dither position, a long (565s) VIS exposure is taken together with a NISP spectroscopy (NISP-S). This is followed by 3 NISP photometry (NISP-P) exposures taken in 3 different bands (Y, J and H)
+- During one of the 4 dithers, VIS will execute a short exposure contiguously with the second NISP-P one (NdL: what happens in the other dithers? I remember VIS was never idle)
+- Between one dither and the next, shirt calibration exposures may take place (TBD)
+- During the S/C slews to move from one field to the next, both VIS and NISP will run (short) calibration exposures
+
+QLA is foreseen to mainly work on the following type of data:
+
+- Level 0: it is the raw, compressed data as downloaded from the S/C. Analysis is done per exposure, per instrument, per detector and per quadrant (for VIS)
+- Level 1: it is uncompressed, time ordered and with associated pointing) science data. Analysis is done per exposure, per detector and per quadrant (for VIS)
+- Comparison/combination of the 4 dithers (per instrument, per band) will be needed to check relative astrometry and a first assessment of the cosmic ray impact
+- Some checks (e.g. to quickly estimate the PSF) may need light data processing, i.e. to create a level 1.5 on-the-fly eventually using calibration data; in such a scenario, the calibration data to be used is going to be the last delivered by the IOTs
+
+*** QLA Functionalities
+
+**** Pointing QLA checks
+
+- Using VIS data when available and NISP-P otherwise, QLA should check the absolute astrometry of each exposure using an external catalogue as reference.
+- QLA should also check the relative astrometry among dithers using wither an external catalogue and/or catalogues generated from VIS/NISP-P images themselves
+- Most astrometric tools will also give as output an estimation of geometry of the focal plane. This could also be checked (NdL: I don't know, with the light processing we could run in QLA, how much this could be reliable. From the simulations I ran, astrometry should be)
+- An automatic check between adjacent observing fields is not foreseen in QLA, but it would be good to have a manual option to eventually check it
+
+**** VIS QLA checks
+
+The following are a list of QLA checks discussed with the VIS IDT in January 2015:
+
+1) Looks at the header information to identify what type of an exposure (science, bias, flat, CTI, dark, non-linearity), check that this correspond to the expected commanding sequence and adjust QLA threshold checks accordingly
+   - Do pre- and over-scan analysis of all CCDs for every exposure
+   - Derive histograms from imaging area pixel data of all files, but have different interpretation and threshold for different file types.
+2) Pre- and over-scan regions, single exposure:
+   - Charge trailing should be checked from the post-scan, while pre-scan can provide information regarding electronic effects if not settled yet.
+   - The minimum statistics to check are mean and variance.
+     + Need to set thresholds for each of the 144 quadrant.
+     + Hardware requirements should limit the variations to 2ADUs, but there is also noise. The noise should not exceed 4.5 electrons or we are violating the requirement.
+     + However, to work in electrons requires knowledge of the gain, while SOC might work only in DNs. One can of course derive a crude limit in DNs as well.
+   - It was also proposed to compare to previous values, but this might be too involved and related to trending. To be seen...
+3) Imaging area, single exposure:
+   - Look for zeros, should not be any.
+     + Dead pixels are at the ADC offset level.
+     + Comparison with calibrated data (mask of dead and noisy pixels) should be possible.
+   - How many pixels below average ADC offset (derived from e.g. the post-scan)?
+     + Related to the total noise (now including e.g. sky background and scattered light noise).
+   - Histogram of the pixel data.
+     + Standard deviation of a fitted Gaussian is a proxy for the total noise, this is of importance for the weak lensing noise bias.
+   - How many pixels are saturated?
+     + We could derive a average value e.g. from the expected number of bright stars. Clearly the number of saturated pixels in any given quadrant should be fairly small, otherwise indicates a problem.
+   - Fitting Gaussian to bright high SNR stars to derive FWHM to have a proxy for focus.
+     + Or simply 3x3 matrix around bright peak and derive proxy for size and hence focus, also AOCS/FGS performance (e.g. no elliptical Gaussian or profile).
+4) Four images:
+   - Probably not stacking/combining; QLA is not about image processing.
+   - Cosmic ray identification with simple offsets derived from pointing (or other) information.
+   - Difference images; statistics of the difference image.
+   - This might get very involved and CPU intensive, so we should consider it to be of low priority.
+5) Flat fields:
+   - Average level should always be larger than TBD.
+     + Otherwise either the LED has failed or is very faint for some reason.
+     + We can probably derive a minimum level that is independent of the colour of the LED, otherwise we could have several minimum levels.
+   - There should not be more than TBD pixels below e.g. 10ek- (dead pixels and columns).
+   - One could also look at the structure over e.g. the full focal plane, but again, this might be too time consuming.
+   - The noise in the image should be consistent with Poisson (when taking into covariance resulting from electron migration / leakage).
+6) Charge injection lines:
+   - Ratio first line wrt. the others, tells something about the detection system independent of the optical stimulus.
+7) Bias / Dark:
+   - There should never be pixels with more than X counts except the hot pixels. Otherwise there is light leakage coming for example from the scattering from the FGS.
+   - Better understanding of the noise.
+   - One could envision looking at the power spectrum of the pixel data to confirm that there is no structure in the noise for example because of EMC from the FGS etc.
+8) Automatic reporting and error identification.
+9) QLA will not create any intermediate data products, but will only look at the raw images.
+
+**** NISP QLA checks
+
+**** QLA data analysis capabilities
+
+*** QLA Components
+
+**** QLA-VIM - Visualization and MMI
+Set of components supporting data visualization and human analysis routines. It interacts internally with the CAM module for different configurations and runs.
+
+**** QLA-SIF - SOC Interface
+Interface to other SOC components, and to external data received at SOC. It includes the interface with EAS.
+
+**** QLA-SDA - Science Data Analysis
+Set of routines analysing the science images. It deals with pixel data analysis.
+
+**** QLA-REP - Reporting
+Component in charge of automatic report generation.
+
+**** QLA-QAF - Quality Analysis Flagging
+In charge of setting and defining values of predefined flags and fields from the analysis to be used for LE1 product expansion
+
+**** QLA-PDA - PUS Data Analysis
+Set of routines analysing the PUS (HKTM) data
+
+**** QLA-PAR - Parameter Extraction
+Component in charge of extraction of time based parameters from the analysis and export as files to be used by the HMS. It is TBD if this component shall only generate the Science and Auxiliary
+
+**** QLA-CDA - Combined Data Analysis
+Set of routines implementing a combined analysis across science (inter-instrument, multi- dither), and/or across pixel and other type of data: PUS and ancillary data
+
+**** QLA-CAM - Configuration and Monitoring
+Configuration of the subsystem, including specific information related to the data to be analysed (extracted from ESS). Monitor of performance and generation of log data. It also updates system configuration based on external sources (i.e. HMS reports and or limits)
+
+**** QLA-ADA - Auxiliary Data Analysis
+Set of routines analysing the MOC and other ancillary data (ESS, Configuration)
+
+**** QLA-PRO - Processing
+Routines to process raw or LE1 data if required with support of calibrated data to the required level for the analysis
+
+*** QLA User Stories
+
+*[TBD]*
+
+*** QLA Functional Decomposition
+
+The QLA Logical Decomposition shown above in the previous section is a good way to study the entire functionality of the QLA.  In practice, however, we defined two different _Functionality Domains_:
+
+- QLA Algorithmic Functions :: It is formed by the set of libraries and processing elements that perform the different analysis on the input data.
+
+- QLA Processing Framework :: It has an entire set of different functions to provide the infrastructure needed for the QLA processing:
+  + reception and storage of input files and their metadata
+  + orchestration of the different processing tasks according to a set of pre-defined, user-modifiable rules,
+  + scheduling of the processing tasks to be executed upon rule firing
+  + monitoring of the different processing tasks
+  + storage of processing output products
+  + dissemination and reporting of the processing results
+  + incorporation of an interactive graphical user interface for the exploration of the processing results, including the ability to export input/output data for further processing and study to external tools
+
+In the next section, the QLA Processing Framework is further described.
+
+** QPF - QLA Processing Framework
+
+*** Purpose
+
+Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, I will refer to this framework as the QPF (QLA Processing Framework).
+
+The QPF will be composed of a set of components that take the incoming external events and data, check their basic consistency, perform a specific orchestration based on the type of incoming data, and launches the neccessary processing tasks to end up with the set of diagnostics, statistics and output parameters to evaluate the validity and quality of the products.  In section [[QPF Components]] a detailed description of the different components is provided.
+
+*** QPF Overall Architecture
+
+The architecture of the QPF has the following main drivers:
+
+- Independent execution :: Each of the components works independently of the others.
+
+- Message-based communication :: The activities of the different components are synchronised by means of message-based communication.  A single message can be sent by a component to any of the other components, to a group of them, or to the entire set of components.  Components process the messages they receive, and perform their tasks accordingly
+
+- Service oriented :: Each of the components behaves like a service provider element, acting upon request (after a message from another component).
+
+- Encapsulated task execution :: The Orchestration function provides to the Task Manager function the information about the processing task that must be executed on a data set.  The Task Manager function is deveoted to the lunching of the different tasks, that will be encapsulated and isolated from the main host system.  File based input and output is the only interface between the system and the different Processing Elements.
+
+- Database storage :: The configuration configuration, products metadata, task execution information, exchanged messages, alarms, etc. are stored in a dedicated database, to facilitate the system operation as well as the access form external applications to the overall system information.
+
+- System persistence :: The system establishes an strategy to allow it to be persistent upon failures.
+
+The overall architecture of the QPF is shown in the following figure.
+
+#+CAPTION: QPF Overall Architecture
+#+NAME:   fig:QPF-arch
+#+ATTR_HTML: :width 90%
+[[QPF_Prototype_arch_Page_2.png]]
+
+*** QPF Components
+
+**** Event Manager
+
+The Event Manager is in charge of receiving all external input messages and process them.  This processing most of the cases involves the transmission of new messages to other system components, requesting data saving or registration, task orchestration, etc.
+
+A special data channel exists between the HMI and the Event Manager: the HMI shall be able to send messages to the Event Manager requesting some information, and the Event Manager shall asnwer these messages with the appropriate, available information.
+
+**** HMI
+
+The HMI has several functionalities:
+- provide information about the different actions and messages that take place in the system
+- provide feedback to the operator on the processing status of the different processing tasks
+- shows a view of the current status of the Data Manager registration area
+- provides to the operator of the capability of sending fake input messages to the Event Manager (for testing purposes)
+- upon request, provides information from the Event Manager on the current status of the entire system.
+
+**** QPF Data Based
+
+The entire set of data handled by the QPF, from the system configuration to the input/output products metadata, orchestration rules, etc. is stored in a central DB system.  This simplifies the access of the system data to external tools.
+
+**** Data Manager
+
+The Data Manager is devoted to the registration of incoming products metadata.  In this sense, whenever a processing task is delivered, the required input products metadata will be obtained from the Data Manager.
+
+In case a data set (auxiliary files or whatsoever) is needed and has not been registered into the Data Manager, this component will perform a request to the Archive (TBD).
+
+**** Log Manager
+
+The Log Manager is in charge of synchronising the log information from the different system components.
+
+**** Orchestrator
+
+The orchestrator has the information about the processing elements that can be invoked whenever a set of input data products is available.  When this processing can be invoked, a request is sent to the Task Manager with the appropriate information.
+
+**** Task Manager
+
+The Task Manager receives information about processing tasks that can be executed (that is, because its required input products are available).  In turn, it selects one of the configured Task Agents for the purpose of executing and monitoring the requested processing task.
+
+**** Task Agent(s)
+
+The Task Agents are the ultimate responsible for the execution of the different tasks.  They:
+
+- receive all the neccessary information about these tasks,
+- invoke the selected processing element,
+- monitor the execution of the processing elements, and
+- provide feedback on the resulting execution to the Task Manager.
+
+**** Processing Elements
+
+Each of the different processing algorithmic tasks that ultimately execute the final algorithms on the product data, and provide output information to be either disseminated or further processed by the system
+
+In the current approach, the processing elements are tasks that run into Docker containers.
+
+#+BEGIN_SRC PlantUML
+@startuml
+hide footbox
+title Use Case: External Data Injection
+(HMI) --> (EvtMng): System START
+(EvtMng) --> (HMIpxy): START
+(EvtMng) --> (DataMng): START
+(EvtMng) --> (LogMng): START
+(EvtMng) --> (TaskOrc): START
+(EvtMng) --> (TaskMng): START
+(EvtMng) --> (TaskAg): START
+(HMI) -- (HMIpxy) : use
+@enduml
+#+END_SRC
+
+*** Mapping between QPF and QLA components
+
+There is a mapping between the logical decomposition of the QLA shown in [[QLA Components]] and the QPF components shown above.  This mapping is still *[TBD]*.
+
+*** QPF User Stories
+
+For the QPF User Stories, we will follow the well known template:
+
+"/As a _<type of user>_, I want _<some goal>_ so that _<some reason>_. /"
+
+**** QLA-QPF-US-0100                           :Data Providers:
+***** As a/an
+External Data Provider
+***** I want to
+inject data into the system
+***** so that
+they can be processed
+****** Notes
+- IF with external data provider/archive
+
+**** QLA-QPF-US-0200                           :Data Providers:
+***** As a/an
+External Archive
+***** I want to
+provide an communication channel with QPF
+***** so that
+the system can request me data products
+****** Notes
+- IF with external data provider/archive
+
+**** QLA-QPF-US-0300                           :Data Consumers:
+***** As a/an
+External Data User
+***** I want to
+open an interactive session
+***** so that
+I can check produced QLA reports
+****** Notes
+-
+
+**** QLA-QPF-US-0400                           :Data Consumers:
+***** As a/an
+External Data User
+***** I want to
+receive QLA reports
+***** so that
+I'm informed of the QLA results
+****** Notes
+-
+
+**** QLA-QPF-US-0500                           :Data Consumers:
+***** As a/an
+External Archive
+***** I want to
+receive QLA produced data
+***** so that
+I can store them for further use by third parties
+****** Notes
+-
+
+**** QLA-QPF-US-0600                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+have a configuration tool
+***** so that
+I can modify/adjust the configuration of the system
+****** Notes
+-
+
+**** QLA-QPF-US-0700                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+open an interactive session
+***** so that
+I can re-execute some of the processing tasks on stored data
+****** Notes
+-
+
+**** QLA-QPF-US-0800                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be informed by the system of the different actions it take
+***** so that
+I can evaluate the overall system status
+****** Notes
+-
+
+**** QLA-QPF-US-0900                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be informed of any alert produced by the system execution
+***** so that
+I can react and perform any mitigation activity
+****** Notes
+- system alerts
+
+**** QLA-QPF-US-1000                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be informed of any repeating out-of-limits alert produced in the data processing
+***** so that
+I can start an additional evaluation of the data
+****** Notes
+- product alerts
+
+**** QLA-QPF-US-1100                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+know the status of the different processing tasks
+***** so that
+in case of system failure, I know the status of the system
+****** Notes
+-
+
+**** QLA-QPF-US-1200                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be able to restart the system
+***** so that
+in case of system failure, the system returns to its state before the failure
+****** Notes
+- persistence
+
+**** QLA-QPF-US-1300                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be able to modify the running status of the processing tasks
+***** so that
+I can pause/resume/stop a running task
+****** Notes
+-
+
+**** QLA-QPF-US-1400                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+be able to inject data from a used-defined repository (directory)
+***** so that
+the injected data is incorporated to the orchestration
+****** Notes
+-
+
+**** QLA-QPF-US-1500                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+look at the data stored in the local (temporary) archive
+***** so that
+I can process the data with other tools
+****** Notes
+-
+
+**** QLA-QPF-US-1600                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+look at the data stored in the local (temporary) archive
+***** so that
+reprocess some of the data products
+****** Notes
+-
+
+**** QLA-QPF-US-1700                                          :Operations:
+***** As a/an
+Operator
+***** I want to
+have all the information of the system stored in a DB
+***** so that
+I can access all the information from external tools
+****** Notes
+-
+
+*** QPF Use Cases
+
+**** System Launch and Initialisation
+***** Description
+The system application is executed, the HMI is launched, and the entire set of Components start their execution.  The components communications are established, and all of them reach the INITIALISED State.
+
+***** Scope
+Optional
+
+***** Dependencies
+
+***** Preconditions
+- System is switched off.
+- Database with the configuration is ready or new configuration file is provided.
+
+***** Nominal actions sequence
+1.
+
+#+BEGIN_SRC PlantUML
+@startuml
+hide footbox
+title Use Case: System Launch and Initialisation
+participant "HMI" as HMI
+participant "Deployer" as Dply #lightgreen
+participant Components
+participant "Database" as DB #cyan
+create Dply
+HMI -> Dply: create
+Dply ->  DB: requestConfiguration
+Dply <-- DB: configuration
+HMI ->  DB: requestConfiguration
+HMI <-- DB: configuration
+Dply -> Dply: defineComponents
+create Components
+Dply -> Components: create/spawn
+== Synchronisation ==
+Dply -> Components: initialise
+Dply -> Dply: wait for START
+@enduml
+#+END_SRC
+
+***** Postconditions
+-
+-
+-
+***** Exceptions
+
+***** Comments
+
+**** System Start
+
+#+BEGIN_SRC PlantUML
+@startuml
+hide footbox
+title Use Case: System Start
+participant "HMI exec." as HMI
+participant EvtMng
+participant "HMI proxy" as HMIpxy
+participant LogMng
+participant DataMng
+participant TaskOrc
+participant TaskMng
+participant "TaskAg(s)" as TaskAg #pink
+participant "Database" as DB #cyan
+create HMIpxy
+HMI -> HMIpxy: create
+HMI -> EvtMng: START signal
+EvtMng ->> HMIpxy: MSG_START
+HMIpxy -> HMIpxy: init
+EvtMng ->> LogMng: MSG_START
+LogMng -> LogMng: init
+EvtMng ->> DataMng: MSG_START
+DataMng -> DataMng: init
+EvtMng ->> TaskOrc: MSG_START
+TaskOrc -> TaskOrc: init
+EvtMng ->> TaskMng: MSG_START
+TaskMng -> TaskMng: init
+EvtMng ->> TaskAg: MSG_START
+TaskAg -> TaskAg: init
+@enduml
+#+END_SRC
+
+**** External Data Injection
+
+#+BEGIN_SRC PlantUML
+@startuml
+hide footbox
+title Use Case: External Data Injection
+participant EvtMng
+participant DataMng
+participant TaskOrc
+participant "Database" as DB #cyan
+[->> EvtMng: MSG_INDATA
+activate EvtMng
+EvtMng ->> DataMng: MSG_INDATA
+activate DataMng
+EvtMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font>
+deactivate EvtMng
+DataMng -> DB: registerInputs
+DataMng ->> TaskOrc: MSG_INDATA
+activate TaskOrc
+DataMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font>
+deactivate DataMng
+TaskOrc -> TaskOrc: checkRules
+activate TaskOrc
+note left : in case of rule firing,\ncreate processingTask
+deactivate TaskOrc
+deactivate TaskOrc
+@enduml
+#+END_SRC
+
+**** Processing Fired Rule
+
+#+BEGIN_SRC PlantUML
+@startuml
+hide footbox
+title Use Case: Processing Fired Rule
+participant TaskOrc
+participant TaskMng
+participant TaskAg
+participant "Docker\nContainer" as Docker
+participant DataMng
+participant "Database" as DB #cyan
+activate TaskOrc
+TaskOrc -> TaskOrc: checkRules
+note over TaskOrc : rule fired!
+TaskOrc -> TaskOrc: buildProcessingTask
+activate TaskOrc
+deactivate TaskOrc
+TaskOrc ->> TaskMng: MSG_TASK_PROC
+activate TaskMng
+TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
+TaskOrc ->> DataMng: MSG_TASK_PROC
+TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
+deactivate TaskOrc
+TaskMng -> TaskMng: evaluateTask
+activate TaskMng
+deactivate TaskMng
+TaskMng -> TaskMng: selectAgent
+activate TaskMng
+deactivate TaskMng
+TaskMng ->> TaskAg: MSG_TASK_PROC
+TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
+activate TaskAg
+TaskAg -> TaskAg: processTask
+activate TaskAg
+deactivate TaskAg
+TaskAg -> TaskAg: buildDockerOrder
+activate TaskAg
+deactivate TaskAg
+TaskAg -> Docker: runTask
+activate Docker
+group loop until task is finished or error
+TaskAg -> Docker: requestRunningTaskInfo
+TaskAg <-- Docker: provideRunningTaskInfo
+TaskAg ->> TaskMng: MSG_TASK_RES
+deactivate TaskAg
+activate TaskMng
+TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
+TaskMng -> DB: updateTaskInfo
+deactivate TaskMng
+end
+deactivate Docker
+activate TaskMng
+TaskMng -> DB: updateTaskInfo
+TaskMng ->> TaskOrc: MSG_TASK_RES
+deactivate TaskMng
+TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
+TaskOrc ->> DataMng: MSG_TASK_RES
+TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
+DataMng -> DB: registerOutputs
+@enduml
+#+END_SRC
+
+
+
+*** Technologies
+
+For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the following technologies are planned to be used.
+
+- LSST Libraries :: Processing Elements will be LSST based.
+
+- Docker :: Task Agents will be Docker containers, running independently, with an embeded Processing Element included and with file-based interface with the host system and with the Task Manager
+
+- Zabbix :: Zabbix will be used as Monitoring solution for the entire set of components of the system
+
+- 0MQ :: Communications among the different managment components (all but the processing elements) will used Zero-MQ sockets for their communications
+
+- PostgreSQL :: The system configuration, alarms, product metadata, etc. will be stored in a PostgreSQL database.
+
+- Qt :: The HMI component will be based on Qt and coded on C++.  For the Toy Model, the HMI will be responsible also for providing appropriate input events and data to the system via the Event Manager.
+
+- C++ :: All managment components will be coded in C++.
+
+** QPF Internals
+*** QPF Database Specification
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Configuration" #Pearl {
+
+table(config_general)
+config_general : primary_key(parameter) : field_type(char[32])
+config_general : content : field_type(char[256])
+
+table(config_nodes)
+config_nodes : primary_key(name) : field_type(char[20])
+config_nodes : type : field_type(char[20])
+config_nodes : clientAddr : field_type(char[128])
+config_nodes : serverAddr : field_type(char[128])
+
+table(config_orchestration)
+config_orchestration : primary_key(ruleId) : field_type(int)
+config_orchestration : inputs : field_type(char[1024])
+config_orchestration : outputs : field_type(char[1024])
+config_orchestration : primary_key(processorId) : field_type(int)
+
+table(config_processors)
+config_processors : primary_key(processorId) : field_type(int)
+config_processors : processorName : field_type(char[1024])
+config_processors : exePath : field_type(char[1024])
+config_processors : inputPath : field_type(char[1024])
+config_processors : outputPath : field_type(char[1024])
+
+table(config_products)
+config_products : primary_key(productType) : field_type(char[128])
+
+config_orchestration "0..*" -- "1" config_processors
+
+}
+@enduml
+#+end_src
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Products" #Snow {
+
+table(products_info)
+products_info : primary_key(id) : field_type(int)
+products_info : primary_key(productId) : field_type(char[256])
+products_info : primary_key(productType) : field_type(char[128])
+products_info : primary_key(productStatus) : field_type(int)
+products_info : productVersion : field_type(char[128])
+products_info : productSize : field_type(int)
+products_info : primary_key(creatorId) : field_type(int)
+products_info : primary_key(instrumentId) : field_type(int)
+products_info : primary_key(obsMode) : field_type(int)
+products_info : startTime : field_type(timestamp)
+products_info : endTime : field_type(timestamp)
+products_info : registrationTime : field_type(timestamp)
+products_info : url : field_type(char[1024]
+
+table(product_status)
+product_status : primary_key(productStatus) : field_type(int)
+product_status : statusDesc : field_type(char[128])
+
+table(instruments)
+instruments : primary_key(instrumentId) : field_type(int)
+instruments : instrument : field_type(char[128])
+
+table(creators)
+creators : primary_key(creatorId) : field_type(int)
+creators : creatorDesc : field_type(char[128])
+
+table(observation_modes)
+observation_modes : primary_key(obsMode) : field_type(int)
+observation_modes : obsModeDesc : field_type(char[128])
+
+products_info "0..*" -- "1" config_products
+products_info "0..*" -- "1" product_status
+products_info "0..*" -- "1" instruments
+products_info "0..*" -- "1" creators
+products_info "0..*" -- "1" observation_modes
+
+}
+@enduml
+#+end_src
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Tasks" #LightCyan {
+
+table(tasks_info)
+tasks_info : primary_key(id) : field_type(int)
+tasks_info : primary_key(taskId) : field_type(char[128])
+tasks_info : primary_key(taskStatus) : field_type(int)
+tasks_info : taskExitCode : field_type(int)
+tasks_info : taskPath : field_type(char[1024])
+tasks_info : taskSize : field_type(int)
+tasks_info : registrationTime : field_type(timestamp)
+tasks_info : startTime : field_type(timestamp)
+tasks_info : endTime : field_type(timestamp)
+
+table(task_status)
+task_status : primary_key(taskStatus) : field_type(int)
+task_status : statusDesc : field_type(char[128])
+
+table(task_inputs)
+task_inputs : primary_key(taskId) : field_type(char[128])
+task_inputs : primary_key(productId) : field_type(char[256])
+
+table(task_outputs)
+task_outputs : primary_key(taskId) : field_type(char[128])
+task_outputs : primary_key(productId) : field_type(char[256])
+
+tasks_info "0..*" -- "1" task_status
+tasks_info "0..*" -- "1" task_inputs
+tasks_info "0..*" -- "1" task_outputs
+products_info "0..*" -- "1" task_inputs
+products_info "0..*" -- "1" task_outputs
+
+}
+@enduml
+#+end_src
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Messages" #Bisque {
+
+table(messages)
+messages : primary_key(id) : field_type(int)
+messages : primary_key(messageId) : field_type(char[128])
+messages : primary_key(messageType) : field_type(char[128])
+messages : primary_key(source) : field_type(char[128])
+messages : primary_key(destination) : field_type(char[128])
+messages : messageVersion : field_type(int)
+messages : creationTime : field_type(timestamp)
+messages : transmissionTime : field_type(timestamp)
+messages : receptionTime : field_type(timestamp)
+
+table(message_type)
+message_type : primary_key(messageType) : field_type(int)
+message_type : typeDesc : field_type(char[128])
+
+messages "0..*" -- "1" message_type
+messages "0..*" -- "1" config_nodes
+messages "0..*" -- "1" config_nodes
+
+}
+@enduml
+#+end_src
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Alarms" #Ivory {
+
+table(variables)
+variables : primary_key(name) : field_type(char[50])
+variables : type : field_type(int)
+variables : description : field_type(char[200])
+variables : smin : field_type(double)
+variables : smax : field_type(double)
+variables : hmin : field_type(double)
+variables : hmax : field_type(double)
+variables : x : field_type(double)
+
+table(alarms)
+alarms : primary_key(alarmId) : field_type(int)
+alarms : primary_key(name) : field_type(char[50])
+alarms : source : field_type(char[200])
+alarms : severity : field_type(int)
+alarms : status : field_type(int)
+alarms : currSeverity : field_type(int)
+alarms : currStatus : field_type(int)
+alarms : creation : field_type(timestamp)
+alarms : acknowledged : field_type(timestamp)
+alarms : lastUpdate : field_type(timestamp)
+alarms : alarmState : field_type(int)
+
+alarms "0..*" -- "1" variables
+
+}
+@enduml
+#+end_src
+
+Or everything together
+
+#+begin_src plantuml
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+left to right direction
+
+package "Configuration" #Pearl {
+
+table(config_general)
+config_general : primary_key(parameter) : field_type(char[32])
+config_general : content : field_type(char[256])
+
+table(config_nodes)
+config_nodes : primary_key(name) : field_type(char[20])
+config_nodes : type : field_type(char[20])
+config_nodes : clientAddr : field_type(char[128])
+config_nodes : serverAddr : field_type(char[128])
+
+table(config_orchestration)
+config_orchestration : primary_key(ruleId) : field_type(int)
+config_orchestration : inputs : field_type(char[1024])
+config_orchestration : outputs : field_type(char[1024])
+config_orchestration : primary_key(processorId) : field_type(int)
+
+table(config_processors)
+config_processors : primary_key(processorId) : field_type(int)
+config_processors : processorName : field_type(char[1024])
+config_processors : exePath : field_type(char[1024])
+config_processors : inputPath : field_type(char[1024])
+config_processors : outputPath : field_type(char[1024])
+
+table(config_products)
+config_products : primary_key(productType) : field_type(char[128])
+
+config_orchestration "0..*" -- "1" config_processors
+
+}
+
+package "Products" #Snow {
+
+table(products_info)
+products_info : primary_key(id) : field_type(int)
+products_info : primary_key(productId) : field_type(char[256])
+products_info : primary_key(productType) : field_type(char[128])
+products_info : primary_key(productStatus) : field_type(int)
+products_info : productVersion : field_type(char[128])
+products_info : productSize : field_type(int)
+products_info : primary_key(creatorId) : field_type(int)
+products_info : primary_key(instrumentId) : field_type(int)
+products_info : primary_key(obsMode) : field_type(int)
+products_info : startTime : field_type(timestamp)
+products_info : endTime : field_type(timestamp)
+products_info : registrationTime : field_type(timestamp)
+products_info : url : field_type(char[1024]
+
+table(product_status)
+product_status : primary_key(productStatus) : field_type(int)
+product_status : statusDesc : field_type(char[128])
+
+table(instruments)
+instruments : primary_key(instrumentId) : field_type(int)
+instruments : instrument : field_type(char[128])
+
+table(creators)
+creators : primary_key(creatorId) : field_type(int)
+creators : creatorDesc : field_type(char[128])
+
+table(observation_modes)
+observation_modes : primary_key(obsMode) : field_type(int)
+observation_modes : obsModeDesc : field_type(char[128])
+
+products_info "0..*" -- "1" config_products
+products_info "0..*" -- "1" product_status
+products_info "0..*" -- "1" instruments
+products_info "0..*" -- "1" creators
+products_info "0..*" -- "1" observation_modes
+
+}
+
+package "Tasks" #LightCyan {
+
+table(tasks_info)
+tasks_info : primary_key(id) : field_type(int)
+tasks_info : primary_key(taskId) : field_type(char[128])
+tasks_info : primary_key(taskStatus) : field_type(int)
+tasks_info : taskExitCode : field_type(int)
+tasks_info : taskPath : field_type(char[1024])
+tasks_info : taskSize : field_type(int)
+tasks_info : registrationTime : field_type(timestamp)
+tasks_info : startTime : field_type(timestamp)
+tasks_info : endTime : field_type(timestamp)
+
+table(task_status)
+task_status : primary_key(taskStatus) : field_type(int)
+task_status : statusDesc : field_type(char[128])
+
+table(task_inputs)
+task_inputs : primary_key(taskId) : field_type(char[128])
+task_inputs : primary_key(productId) : field_type(char[256])
+
+table(task_outputs)
+task_outputs : primary_key(taskId) : field_type(char[128])
+task_outputs : primary_key(productId) : field_type(char[256])
+
+tasks_info "0..*" -- "1" task_status
+tasks_info "0..*" -- "1" task_inputs
+tasks_info "0..*" -- "1" task_outputs
+products_info "0..*" -- "1" task_inputs
+products_info "0..*" -- "1" task_outputs
+
+}
+
+package "Messages" #Bisque {
+
+table(messages)
+messages : primary_key(id) : field_type(int)
+messages : primary_key(messageId) : field_type(char[128])
+messages : primary_key(messageType) : field_type(char[128])
+messages : primary_key(source) : field_type(char[128])
+messages : primary_key(destination) : field_type(char[128])
+messages : messageVersion : field_type(int)
+messages : creationTime : field_type(timestamp)
+messages : transmissionTime : field_type(timestamp)
+messages : receptionTime : field_type(timestamp)
+
+table(message_type)
+message_type : primary_key(messageType) : field_type(int)
+message_type : typeDesc : field_type(char[128])
+
+messages "0..*" -- "1" message_type
+messages "0..*" -- "1" config_nodes
+messages "0..*" -- "1" config_nodes
+
+}
+
+package "Alarms" #Ivory {
+
+table(variables)
+variables : primary_key(varName) : field_type(char[50])
+variables : type : field_type(int)
+variables : description : field_type(char[200])
+variables : smin : field_type(double)
+variables : smax : field_type(double)
+variables : hmin : field_type(double)
+variables : hmax : field_type(double)
+variables : x : field_type(double)
+
+table(alarms)
+alarms : primary_key(alarmId) : field_type(int)
+alarms : primary_key(varName) : field_type(char[50])
+alarms : source : field_type(char[200])
+alarms : severity : field_type(int)
+alarms : status : field_type(int)
+alarms : currSeverity : field_type(int)
+alarms : currStatus : field_type(int)
+alarms : creation : field_type(timestamp)
+alarms : acknowledged : field_type(timestamp)
+alarms : lastUpdate : field_type(timestamp)
+alarms : alarmState : field_type(int)
+
+table(alarm_status)
+alarm_status : primary_key(status) : field_type(int)
+alarm_status : statusDesc : field_type(char[128])
+
+table(alarm_severity)
+alarm_severity : primary_key(severity) : field_type(int)
+alarm_severity : severityDesc : field_type(char[128])
+
+
+alarms "0..*" -- "1" variables
+alarms "0..*" -- "1" alarm_status
+alarms "0..*" -- "1" alarm_severity
+
+}
+@enduml
+#+end_src
+
+
+This structure can be created with the following code (PostgreSQL):
+
+#+begin_src sql
+CREATE TABLE "config_general" (
+	"parameter" VARCHAR(32) NOT NULL,
+	"content" VARCHAR(256) NOT NULL,
+	CONSTRAINT config_general_pk PRIMARY KEY ("parameter")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_nodes" (
+	"name" VARCHAR(20) NOT NULL,
+	"type" VARCHAR(20) NOT NULL,
+	"clientAddr" VARCHAR(128) NOT NULL,
+	"serverAddr" VARCHAR(128) NOT NULL,
+	CONSTRAINT config_nodes_pk PRIMARY KEY ("name")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_orchestration" (
+	"ruleId" integer NOT NULL,
+	"inputs" VARCHAR(1024) NOT NULL,
+	"outputs" VARCHAR(1024) NOT NULL,
+	"processorId" integer NOT NULL,
+	CONSTRAINT config_orchestration_pk PRIMARY KEY ("ruleId","processorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_processors" (
+	"processorId" integer NOT NULL,
+	"processorName" VARCHAR(1024) NOT NULL,
+	"exePath" VARCHAR(1024) NOT NULL,
+	"inputPath" VARCHAR(1024) NOT NULL,
+	"outputPath" VARCHAR(1024) NOT NULL,
+	CONSTRAINT config_processors_pk PRIMARY KEY ("processorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_products" (
+	"productType" VARCHAR(128) NOT NULL,
+	CONSTRAINT config_products_pk PRIMARY KEY ("productType")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "products_info" (
+	"id" integer NOT NULL,
+	"productId" VARCHAR(256) NOT NULL,
+	"productType" VARCHAR(128) NOT NULL,
+	"productStatus" integer NOT NULL,
+	"productVersion" VARCHAR(128) NOT NULL,
+	"productSize" integer NOT NULL,
+	"creatorId" integer NOT NULL,
+	"instrumentId" integer NOT NULL,
+	"obsMode" integer NOT NULL,
+	"startTime" DATETIME NOT NULL,
+	"endTime" DATETIME NOT NULL,
+	"registrationTime" DATETIME NOT NULL,
+	"url" VARCHAR(1024) NOT NULL,
+	CONSTRAINT products_info_pk PRIMARY KEY ("id","productId","productType","productStatus","creatorId","instrumentId","obsMode")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "product_status" (
+	"productStatus" integer NOT NULL,
+	"statusDesc" integer NOT NULL,
+	CONSTRAINT product_status_pk PRIMARY KEY ("productStatus")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "instruments" (
+	"instrumentId" integer NOT NULL,
+	"instrument" VARCHAR(128) NOT NULL,
+	CONSTRAINT instruments_pk PRIMARY KEY ("instrumentId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "creators" (
+	"creatorId" integer NOT NULL,
+	"creatorDesc" VARCHAR(128) NOT NULL,
+	CONSTRAINT creators_pk PRIMARY KEY ("creatorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "observation_modes" (
+	"obsMode" integer NOT NULL,
+	"obsModeDesc" VARCHAR(128) NOT NULL,
+	CONSTRAINT observation_modes_pk PRIMARY KEY ("obsMode")
+) WITH (
+  OIDS=FALSE
+);
+
+
+ALTER TABLE "config_orchestration" ADD CONSTRAINT config_orchestration_fk0 FOREIGN KEY (processorId) REFERENCES config_processors(processorId);
+
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk0 FOREIGN KEY (productStatus) REFERENCES product_status(productStatus);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk1 FOREIGN KEY (productType) REFERENCES config_products(productType);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk2 FOREIGN KEY (creatorId) REFERENCES creators(creatorId);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk3 FOREIGN KEY (instrumentId) REFERENCES instruments(instrumentId);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk4 FOREIGN KEY (obsMode) REFERENCES observation_modes(obsMode);
+#+end_src
+
+*** Classes Specification
+
+**** Database related
+
+#+begin_src plantuml
+@startuml
+'!define table(x) class x << (T,#FFDDAA) >>
+'!define primary_key(x) #<b>x</b>
+'!define field_type(x) <i>x</i>
+'hide methods
+'hide stereotypes
+left to right direction
+
+package "Database" #Pearl {
+
+class ProductType
+
+class NodeInfo {
+  +nodeName : string
+  +nodeType : string
+  +clientAddr : string
+  +serverAddr : string
+}
+
+class RuleInfo {
+  +ruleId : int
+  +processorId : int
+  +inputs : list<ProductType>
+  +outputs : list<ProductType>
+}
+
+class ProcessorInfo {
+  +processorId : int
+  +processorName : string
+  +exePath : string
+  +inPath : string
+  +outPath : string
+}
+
+class GeneralInfo {
+  +appName : string
+  +appVersion : string
+  +lastAccess : string
+  +hmiNode : string
+}
+
+class Configuration {
+  +gral : GeneralInfo
+  +nodes : list<NodeInfo>
+  +rules : list<RuleInfo>
+  +processors : list<ProcessorInfo>
+  +products : list<ProductType>
+  +rulesMap : map<int,RuleInfo>
+  +processorsMap : map<int,ProcessorInfo>
+}
+
+interface DBHandler {
+  #{abstract} openConnection() : bool
+  #{abstract} openConnection() : bool
+  +{abstract} getConfiguration() : bool
+  +{abstract} storeProduct() : bool
+  #dbName : string
+  #dbUser : string
+  #dbPasswd : string
+  #config : Configuration
+}
+
+class DBPostgreHdl <|-- DBHandler
+@enduml
+#+end_src
+
+*** Current QPF Configuration
+**** JSON
+***** "general":
+****** "app_name": "QPF",
+****** "app_version": "0.1",
+****** "last_access": "20150616T121555"
+***** "nodes":
+****** "node_list":
+******* "DataMng":
+******** "client": "tcp://127.0.0.1:7101",
+******** "server": "tcp://*:7101",
+******** "type": "datamng"
+******* "EvtMng":
+******** "client": "tcp://127.0.0.1:7100",
+******** "server": "tcp://*:7100",
+******** "type": "evtmng"
+******* "LogMng":
+******** "client": "tcp://127.0.0.1:7102",
+******** "server": "tcp://*:7102",
+******** "type": "logmng"
+******* "QPFHMI":
+******** "client": "tcp://127.0.0.1:7999",
+******** "server": "tcp://*:7999",
+******** "type": "hmi"
+******* "TskAge1":
+******** "client": "tcp://127.0.0.1:7111",
+******** "server": "tcp://*:7111",
+******** "type": "taskagent"
+******* "TskAge2":
+******** "client": "tcp://127.0.0.1:7112",
+******** "server": "tcp://*:7112",
+******** "type": "taskagent"
+******* "TskAge3":
+******** "client": "tcp://127.0.0.1:7113",
+******** "server": "tcp://*:7113",
+******** "type": "taskagent"
+******* "TskAge4":
+******** "client": "tcp://127.0.0.1:7114",
+******** "server": "tcp://*:7114",
+******** "type": "taskagent"
+******* "TskAge5":
+******** "client": "tcp://127.0.0.1:7115",
+******** "server": "tcp://*:7115",
+******** "type": "taskagent"
+******* "TskMng":
+******** "client": "tcp://127.0.0.1:7103",
+******** "server": "tcp://*:7103",
+******** "type": "taskmng"
+******* "TskOrc":
+******** "client": "tcp://127.0.0.1:7104",
+******** "server": "tcp://*:7104",
+******** "type": "taskorc"
+****** "hmi_node": "QPFHMI"
+***** "orchestration":
+****** "rules":
+******* "rule1":
+******** "inputs": "NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1",
+******** "outputs": "NISP_P_CAL_1",
+******** "processing": "PE_NISP_P_CAL"
+******* "rule2":
+******** "inputs": "NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1",
+******** "outputs": "NISP_P_QLA",
+******** "processing": "PE_NISP_P"
+******* "rule3":
+******** "inputs": "NISP_S_CAL_1,NISP_S_1",
+******** "outputs": "NISP_S_QLA",
+******** "processing": "PE_NISP_S"
+******* "rule4":
+******** "inputs": "VIS_CAL_1,VIS_1",
+******** "outputs": "VIS_QLA",
+******** "processing": "PE_VIS"
+******* "rule5":
+******** "inputs": "HK_RAW",
+******** "outputs": "HK_QLA",
+******** "processing": "PE_HK"
+***** "processing":
+****** "processors":
+******* "processor1":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_NISP_P_CAL",
+******** "output_path": "/opt/pe/output"
+******* "processor2":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_NISP_P_CAL",
+******** "output_path": "/opt/pe/output"
+******* "processor3":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_NISP_P",
+******** "output_path": "/opt/pe/output"
+******* "processor4":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_NISP_S",
+******** "output_path": "/opt/pe/output"
+******* "processor5":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_VIS",
+******** "output_path": "/opt/pe/output"
+******* "processor6":
+******** "exe_path": "/opt/pe/bin",
+******** "input_path": "/opt/pe/input",
+******** "name": "PE_HK",
+******** "output_path": "/opt/pe/output"
+***** "products":
+****** "product_types": [
+******* "NISP_PY_CAL_1",
+******* "NISP_PH_CAL_1",
+******* "NISP_PJ_CAL_1",
+******* "NISP_P_CAL_1",
+******* "NISP_S_CAL_1",
+******* "VIS_CAL_1",
+******* "NISP_PY_1",
+******* "NISP_PH_1",
+******* "NISP_PJ_1",
+******* "NISP_S_1",
+******* "VIS_1",
+******* "NISP_P_QLA",
+******* "NISP_S_QLA",
+******* "VIS_QLA",
+******* "HK_RAW",
+******* "HK_QLA"]
+
+**** Relational Tables
+***** config_general
+| Parameter   | Content         |
+| [string]    | [string]        |
+|-------------+-----------------|
+| app_name    | QPF             |
+| app_version | 0.1             |
+| last_access | 20150616T121555 |
+| hmi_node    | QPFHMI          |
+***** config_nodes
+| Name     | Type      | Client               | Server       |
+| [string] | [string]  | [string]             | [string]     |
+|----------+-----------+----------------------+--------------|
+| EvtMng   | evtmng    | tcp://127.0.0.1:7100 | tcp://*:7100 |
+| DataMng  | datamng   | tcp://127.0.0.1:7101 | tcp://*:7101 |
+| LogMng   | logmng    | tcp://127.0.0.1:7102 | tcp://*:7102 |
+| TskMng   | taskmng   | tcp://127.0.0.1:7103 | tcp://*:7103 |
+| TskOrc   | taskorc   | tcp://127.0.0.1:7104 | tcp://*:7104 |
+| TskAge1  | taskagent | tcp://127.0.0.1:7111 | tcp://*:7111 |
+| TskAge2  | taskagent | tcp://127.0.0.1:7112 | tcp://*:7112 |
+| TskAge3  | taskagent | tcp://127.0.0.1:7113 | tcp://*:7113 |
+| TskAge4  | taskagent | tcp://127.0.0.1:7114 | tcp://*:7114 |
+| TskAge5  | taskagent | tcp://127.0.0.1:7115 | tcp://*:7115 |
+| QPFHMI   | hmi       | tcp://127.0.0.1:7999 | tcp://*:7999 |
+***** config_orchestration
+ | RuleId   | Inputs                                     | Outputs      | Processor     |
+ | [string] | [string]                                   | [string]     | [string]      |
+ |----------+--------------------------------------------+--------------+---------------|
+ | rule1    | NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1  | NISP_P_CAL_1 | PE_NISP_P_CAL |
+ | rule2    | NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1 | NISP_P_QLA   | PE_NISP_P     |
+ | rule3    | NISP_S_CAL_1,NISP_S_1                      | NISP_S_QLA   | PE_NISP_S     |
+ | rule4    | VIS_CAL_1,VIS_1                            | VIS_QLA      | PE_VIS        |
+ | rule5    | HK_RAW                                     | HK_QLA       | PE_HK         |
+***** config_processors
+| ProcessorId | ProcessorName | ExePath     | InputPath     | OutputPath     |
+| [string]    | [string]      | [string]    | [string]      | [string]       |
+|-------------+---------------+-------------+---------------+----------------|
+| processor1  | PE_NISP_P_CAL | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+| processor2  | PE_NISP_P_CAL | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+| processor3  | PE_NISP_P     | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+| processor4  | PE_NISP_S     | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+| processor5  | PE_VIS        | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+| processor6  | PE_HK         | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
+***** config_products
+| ProductId     |
+| [string]      |
+|---------------|
+| NISP_PY_CAL_1 |
+| NISP_PH_CAL_1 |
+| NISP_PJ_CAL_1 |
+| NISP_P_CAL_1  |
+| NISP_S_CAL_1  |
+| VIS_CAL_1     |
+| NISP_PY_1     |
+| NISP_PH_1     |
+| NISP_PJ_1     |
+| NISP_S_1      |
+| VIS_1         |
+| NISP_P_QLA    |
+| NISP_S_QLA    |
+| VIS_QLA       |
+| HK_RAW        |
+| HK_QLA        |
+
+*** Alarm System
+
+    An addition to provide an Alarm System with the following components:
+
+**** Alarm Database
+The Alarm Database stores:
+     + the values of the registered variables with their validity ranges
+     + the list of alarms and raised, and their current status
+     + In order to create the database with PostgresSQL, the following must be used
+
+#+BEGIN_EXAMPLE
+      $ mkdir db
+      $ pg_ctl initdb -D db
+      $ pg_ctl -D db -l logfile start # postgres -D db
+      $ createdb alarms
+#+END_EXAMPLE
+
+    create the following tables (psql alarms)
+
+#+BEGIN_SRC sql
+      CREATE TABLE variables (
+          name            char(50) primary key, -- Short name
+          type            int,           -- Variable Type
+          description     char(200),     -- Variable description
+          smin            numeric,       -- Soft minimum value
+          smax            numeric,       -- Soft maximum value
+          hmin            numeric,       -- Hard minimum value
+          hmax            numeric,       -- Hard maximum value
+          x               numeric        -- Current value
+      );
+
+      CREATE TABLE alarms (
+          alarmId         serial primary key, -- Alarm identifier
+          name            char(50) references variables,      -- Variable name
+          source          char(200),     -- Location in the code
+          severity        integer,       -- Initial severity
+          status          integer,       -- Initial status
+          currSeverity    integer,       -- Current severity
+          currStatus      integer,       -- Current status
+          creation        timestamp,     -- Creation date
+          acknowledged    timestamp,     -- Acknowledged date
+          lastUpdate      timestamp,     -- Last update
+          alarmState      integer        -- Current state
+      );
+#+END_SRC
+
+**** Database Controller
+A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
+
+*** Notes
+
+** Glossary
+
+*** External Auxiliary Products Provider
+    External Element where the Auxiliary Products can be retrieved from.
+
+*** External Products Provider
+    External Element where the Products can be retrieved from.
+
+*** File Type identifier
+    A string that identifies a file of a given type.  Something similar to the MIME types created for the SMTP protocol.
+
+*** Job Order
+    A set of parameters that define specific behaviour, together with input data, that can be associated to a [[Processing Element]], in order to generate output data.
+
+*** Metadata extractor
+    A plugin based routine to extract (and provide back to the executing application) a set of metadata from the input files given as arguments.  The DSM maintains a table with pairs ([[File type identifier]], [[Metadata extractor]]).
+
+*** Processing Chain
+    A processing chain is an ordered graph where the nodes are pairs ([[Processing Element]], [[Job Order]]), and where to move from one node to the other a set of rules must be satisfied.
+
+*** Processing Element
+    An structure that defines an element that receives input files, parameters files and configuration files, and processes those input data to generate some output (results) files.  Together with the different files, it is the basic element in a [[Processing Chain]].
+
+** Acronyms
+
+|-------------+-------------------------------------------------------------------------|
+| Acronym     | Description                                                             |
+|-------------+-------------------------------------------------------------------------|
+| ADBC        | Alarm DataBase Controller                                               |
+| CDPP        | Captured Data Pre-Processor [PROC, Data Capture]                        |
+| DDSM        | Data Dissemination Service Manager [DATA, Data Dissemination]           |
+| DIM         | Data Import Manager [DATA, Archiving, Storage and Inventory]            |
+| DISM        | Data Ingestion Service Manager [DATA, Archiving, Storage and Inventory] |
+| DPF         | Data/Distributed Processing Framework                                   |
+| DSM         | Data Storage Manager [CTRL, Archiving, Storage and Inventory]           |
+| EME         | External Monitoring Element [MON, System Monitoring]                    |
+| FTP         | File Transfer Protocol                                                  |
+| HMI         | Human-Machine Interface [CTRL, User Interface]                          |
+| HME         | HW Monitoring Element [MON, System Monitoring]                          |
+| IA          | Internal Archive [STOR, Archiving, Storage and Inventory]               |
+| INV         | Inventory [STOR, Archiving, Storage and Inventory]                      |
+| LTA         | Long Term Archive [STOR, Archiving, Storage and Inventory]              |
+| MISP        | Monitoring Information Service Provider, System Monitoring]             |
+| MON         | MONITORING (Components Family)                                          |
+| MSE         | Maintenance & Support Element [CTRL, Configuration and Maintenance]     |
+| NRTAPE      | NRT Acquisition Processing Element [CTRL, Data Capture]                 |
+| NSA         | Node Storage Area [STOR, Archiving, Storage and Inventory]              |
+| ODSP        | Online Data Service Provider [CTRL, Data Dissemination]                 |
+| ORC         | Orchestrator [CTRL, Processing]                                         |
+| PC          | Production Controller [CTRL, Processing]                                |
+| PD          | Product Distributor [CTRL, Archiving, Storage and Inventory]            |
+| PN          | Processing Node [PROC, Processing]                                      |
+| PQC         | Product Quality Controller [CTRL, Quality Control]                      |
+| PQSE        | Product Quality Service Element [MON, Quality Control]                  |
+| PRO         | Processors [PROC, Processing]                                           |
+| PROC        | PROCESSING (Components Family)                                          |
+| SME         | SW Monitoring Element [MON, System Monitoring]                          |
+| SRE         | Statistics & Reporting Element [MON, Statistics & Reporting]            |
+| SRSE        | Statistics & Reporting Service Element [MON, Statistics & Reporting]    |
+| STOR        | STORAGE Related (Components Family)                                     |
+| TDA         | Task Distribution Agent [CTRL, Processing]                              |
+| TDM         | Task Distribution Manager [CTRL, Processing]                            |
+|             |                                                                         |
+| QLA         | Quick Look Analysis                                                     |
+| HMS         | Health Monitoring System                                                |
+| ESS         | Euclid Survey System                                                    |
+| SIS         | SOC Interface System                                                    |
+| SCS         | SOC Command System                                                      |
+| SAS         | SOC Ancillary Systems                                                   |
+| L1P         | Level 1 Processing                                                      |
+| EAS@S       | Euclid Archive System at SOC                                            |
+| SOC Storage | Storage at SOC                                                          |
+|-------------+-------------------------------------------------------------------------|
+
+** TBDs, TBCs and TODO lists
+
+*** TODO TBDs
+| TBD Id | Comment                                | Status |
+|--------+----------------------------------------+--------|
+| TBD1   | Mapping between QPF and QLA components | Open   |
+| TBD2   | QPF User Stories                       | Opes   |
+
+*** TODO TBCs
+| TBC Id | Section | Comment | Status |
+|--------+---------+---------+--------|
+|        |         |         |        |
+|        |         |         |        |
+
+*** TODO TO DOs [0/3]
+
+**** TODO Create QPF User Stories
+
+**** TODO Create complete DB specification
+
+**** TODO Create a matching between QPF Components and [[QLA Components]]
