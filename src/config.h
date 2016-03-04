@@ -210,6 +210,12 @@ private:
     //----------------------------------------------------------------------
     void saveConfigurationToDB();
 
+    //----------------------------------------------------------------------
+    // Method: processConfiguration
+    // Convert data in cfg (Json) to cfgInfo structure
+    //----------------------------------------------------------------------
+    void processConfiguration();
+
 private:
     std::string           cfgFileName;
     Json::Value           cfg;

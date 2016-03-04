@@ -317,7 +317,7 @@ void Configuration::applyNewConfig(std::string fName)
 {
     setConfigFile(fName);
     readConfigurationFromFile();
-    //saveConfigurationToDB();
+    saveConfigurationToDB();
 }
 
 //----------------------------------------------------------------------
@@ -344,6 +344,129 @@ void Configuration::readConfigurationFromFile()
     reader.parse(cfgJsonFile, cfg);
     cfgJsonFile.close();
 
+    processConfiguration();
+}
+
+//----------------------------------------------------------------------
+// Method: readConfigurationFromDB
+// Loads the configuration from the DB into memory
+//----------------------------------------------------------------------
+void Configuration::readConfigurationFromDB()
+{
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    dbHdl->setDbHost(Configuration::DBHost);
+    dbHdl->setDbPort(Configuration::DBPort);
+    dbHdl->setDbName(Configuration::DBName);
+    dbHdl->setDbUser(Configuration::DBUser);
+    dbHdl->setDbPasswd(Configuration::DBPwd);
+
+    // Check that connection with the DB is possible
+    try {
+        dbHdl->openConnection();
+    } catch (RuntimeException & e) {
+        Log::log("SYSTEM", Log::ERROR, e.what());
+        return;
+    }
+
+    // Try to retrieve the configuration from the DB
+    std::vector< std::vector<std::string> > configuration;
+    std::string dateCreated;
+
+    try {
+        dbHdl->getTable("configuration", configuration);
+
+        // Transfer DB config info to JSON value
+        cfg.clear();
+        unsigned int lastConfiguration = configuration.size() - 1;
+        Json::Reader reader;
+        reader.parse(configuration.at(lastConfiguration).at(1), cfg);
+        dateCreated = configuration.at(lastConfiguration).at(0);
+    } catch (RuntimeException & e) {
+        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        return;
+    } catch (...) {
+        LibComm::Log::log("SYSTEM", Log::ERROR,
+                          "Unexpected error accessing "
+                          "database for retrieval of system configuration");
+        return;
+    }
+
+    // Modificar fecha de último accesso
+    std::string now = LibComm::timeTag();
+    std::string cmd("UPDATE configuration SET last_accessed = '" + now + "' "
+                    "WHERE created='" + dateCreated + "'");
+
+    try {
+        dbHdl->runCmd(cmd);
+    } catch (RuntimeException & e) {
+        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        return;
+    } catch (...) {
+        LibComm::Log::log("SYSTEM", Log::ERROR,
+                          "Unexpected error accessing "
+                          "database for retrieval of system configuration");
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+
+    processConfiguration();
+}
+
+//----------------------------------------------------------------------
+// Method: saveConfigurationToDB
+// Store the configuration into the DB
+//----------------------------------------------------------------------
+void Configuration::saveConfigurationToDB()
+{
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    dbHdl->setDbHost(Configuration::DBHost);
+    dbHdl->setDbPort(Configuration::DBPort);
+    dbHdl->setDbName(Configuration::DBName);
+    dbHdl->setDbUser(Configuration::DBUser);
+    dbHdl->setDbPasswd(Configuration::DBPwd);
+
+    // Check that connection with the DB is possible
+    try {
+        dbHdl->openConnection();
+    } catch (RuntimeException & e) {
+        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        return;
+    }
+
+    // Transfer config from JSON value to DB
+    std::string cmd;
+    std::string now = LibComm::timeTag();
+    Json::FastWriter writer;
+    std::string cfgString = writer.write(cfg);
+
+    cmd = "INSERT INTO configuration (created, last_accessed, cfg) VALUES ";
+    cmd += "('" + now + "', '" + now + "', '" + cfgString + "')";
+
+
+    try {
+         dbHdl->runCmd(cmd);
+    } catch (RuntimeException & e) {
+        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        return;
+    } catch (...) {
+        LibComm::Log::log("SYSTEM", Log::ERROR,
+                          "Unexpected error accessing "
+                          "database for storage of system configuration");
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+}
+
+//----------------------------------------------------------------------
+// Method: processConfiguration
+// Loads the configuration file content into memory
+//----------------------------------------------------------------------
+void Configuration::processConfiguration()
+{
     // Now, fill in ConfigurationInfo structure
     reset();
     cfgInfo.clear();
@@ -469,204 +592,6 @@ void Configuration::readConfigurationFromFile()
 
     }
 
-}
-
-//----------------------------------------------------------------------
-// Method: readConfigurationFromDB
-// Loads the configuration from the DB into memory
-//----------------------------------------------------------------------
-void Configuration::readConfigurationFromDB()
-{
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-    dbHdl->setDbHost(Configuration::DBHost);
-    dbHdl->setDbPort(Configuration::DBPort);
-    dbHdl->setDbName(Configuration::DBName);
-    dbHdl->setDbUser(Configuration::DBUser);
-    dbHdl->setDbPasswd(Configuration::DBPwd);
-
-    // Check that connection with the DB is possible
-    try {
-        dbHdl->openConnection();
-    } catch (RuntimeException & e) {
-        Log::log("SYSTEM", Log::ERROR, e.what());
-        return;
-    }
-
-    // Try to retrieve the configuration from the DB
-    std::vector< std::vector<std::string> > config_general;
-    std::vector< std::vector<std::string> > config_products;
-    std::vector< std::vector<std::string> > config_orchestration;
-    std::vector< std::vector<std::string> > config_processors;
-    std::vector< std::vector<std::string> > config_nodes;
-
-    dbHdl->getTable("config_general", config_general);
-    dbHdl->getTable("config_products", config_products);
-    dbHdl->getQuery("select o.rule_name, o.inputs, o.outputs, p.processor_name "
-                    "from config_orchestration as o "
-                    "inner join config_processors as p "
-                    "on o.processor_id = p.processor_id;", config_orchestration);
-    dbHdl->getTable("config_processors", config_processors);
-    dbHdl->getTable("config_nodes", config_nodes);
-
-    // Transfer DB config info to JSON value
-    cfg.clear();
-
-    // 1. config_general
-    for (unsigned int i = 0; i < config_general.size(); ++i) {
-        std::string & name = config_general.at(i).at(0);
-        std::string & content = config_general.at(i).at(1);
-        cfg["general"][name] = content;
-    }
-
-    // 2. config_products
-    for (unsigned int i = 0; i < config_products.size(); ++i) {
-        cfg["products"]["product_types"].append(config_products.at(i).at(0));
-    }
-
-    // 3. config_processors
-    for (unsigned int i = 0; i < config_processors.size(); ++i) {
-        Json::Value proc;
-        proc["name"] = config_processors.at(i).at(1);
-        proc["exe_path"] = config_processors.at(i).at(2);
-        proc["input_path"] = config_processors.at(i).at(3);
-        proc["output_path"] = config_processors.at(i).at(4);
-        cfg["processing"]["processors"][config_processors.at(i).at(1)] = proc;
-    }
-
-    // 4. config_orchestration
-    for (unsigned int i = 0; i < config_orchestration.size(); ++i) {
-        Json::Value rule;
-        rule["inputs"] = config_orchestration.at(i).at(1);
-        rule["outputs"] = config_orchestration.at(i).at(2);
-        rule["processing"] = config_orchestration.at(i).at(3);
-        cfg["orchestration"]["rules"][config_orchestration.at(i).at(0)] = rule;
-    }
-
-    // 5. config_nodes
-    for (unsigned int i = 0; i < config_nodes.size(); ++i) {
-        Json::Value node;
-        node["type"] = config_nodes.at(i).at(1);
-        node["client"] = config_nodes.at(i).at(2);
-        node["server"] = config_nodes.at(i).at(3);
-        cfg["nodes"]["node_list"][config_nodes.at(i).at(0)] = node;
-    }
-    cfg["nodes"]["hmi_node"] = cfg["general"]["hmi_node"];
-
-    // Close connection
-    dbHdl->closeConnection();
-}
-
-//----------------------------------------------------------------------
-// Method: saveConfigurationToDB
-// Store the configuration into the DB
-//----------------------------------------------------------------------
-void Configuration::saveConfigurationToDB()
-{
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-    dbHdl->setDbHost(Configuration::DBHost);
-    dbHdl->setDbPort(Configuration::DBPort);
-    dbHdl->setDbName(Configuration::DBName);
-    dbHdl->setDbUser(Configuration::DBUser);
-    dbHdl->setDbPasswd(Configuration::DBPwd);
-
-    // Check that connection with the DB is possible
-    try {
-        dbHdl->openConnection();
-    } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
-        return;
-    }
-
-    // Try to retrieve the configuration from the DB
-    std::vector< std::vector<std::string> > config_general;
-    std::vector< std::vector<std::string> > config_products;
-    std::vector< std::vector<std::string> > config_orchestration;
-    std::vector< std::vector<std::string> > config_processors;
-    std::vector< std::vector<std::string> > config_nodes;
-
-//    dbHdl->getTable("config_general", config_general);
-//    dbHdl->getTable("config_products", config_products);
-//    dbHdl->getQuery("select o.rulename, o.inputs, o.outputs, p.processorname "
-//                    "from config_orchestration as o "
-//                    "inner join config_processors as p "
-//                    "on o.processorid = p.processorid;", config_orchestration);
-//    dbHdl->getTable("config_processors", config_processors);
-//    dbHdl->getTable("config_nodes", config_nodes);
-
-    // Transfer config from JSON value to DB
-    Json::Value::iterator it;
-    std::string cmd;
-    std::map<std::string, int> procs;
-
-    // 0. clear config tables
-    cmd = "TRUNCATE TABLE config_general, config_products, config_processors, "
-          "config_orchestration, config_nodes CASCADE";
-    dbHdl->runCmd(cmd);
-
-    // 1. config_general
-    Json::Value r = cfg["general"];
-    cmd = "INSERT INTO config_general (param_name, content) VALUES ";
-    for (it = r.begin(); it != r.end(); ++it) {
-        cmd += "('" + it.key().asString() + "','" + (*it).asString() + "'),";
-    }
-    cmd += "('hmi_node','" + cfg["nodes"]["hmi_node"].asString() + "')";
-    dbHdl->runCmd(cmd);
-
-    // 2. config_products
-    r = cfg["products"]["product_types"];
-    cmd = "INSERT INTO config_products (product_type) VALUES ";
-    for (unsigned int i = 0; i < r.size(); ++i) {
-        cmd += "('" + r[i].asString() + "'),";
-    }
-    cmd.erase(cmd.end() - 1);
-    dbHdl->runCmd(cmd);
-
-    // 3. config_processors
-    r = cfg["processing"]["processors"];
-    cmd = "INSERT INTO config_processors (processor_id, processor_name, "
-          "exe_path, input_path, output_path) VALUES ";
-    int k = 0;
-    for (it = r.begin(); it != r.end(); ++it, ++k) {
-        cmd += "(" + LibComm::toStr<int>(k) + ",'" +
-               (*it)["name"].asString() + "','" +
-                (*it)["exe_path"].asString() + "', '" +
-                (*it)["input_path"].asString() + "', '"+
-                (*it)["output_path"].asString() + "'),";
-        procs[(*it)["name"].asString()] = k;
-    }
-    cmd.erase(cmd.end() - 1);
-    dbHdl->runCmd(cmd);
-
-    // 4. config_orchestration
-    r = cfg["orchestration"]["rules"];
-    cmd = "INSERT INTO config_orchestration (rule_id, rule_name, "
-          "inputs, outputs, processor_id) VALUES ";
-    k = 0;
-    for (it = r.begin(); it != r.end(); ++it, ++k) {
-        cmd += "(" + LibComm::toStr<int>(k) + ",'" +
-               it.key().asString() + "','" +
-               (*it)["inputs"].asString() + "', '" +
-                (*it)["outputs"].asString() + "', "+
-                LibComm::toStr<int>(procs[(*it)["processing"].asString()]) + "),";
-    }
-    cmd.erase(cmd.end() - 1);
-    dbHdl->runCmd(cmd);
-
-    // 5. config_nodes
-    r = cfg["nodes"]["node_list"];
-    cmd = "INSERT INTO config_nodes (node_name, node_type, "
-          "client_addr, server_addr) VALUES ";
-    for (it = r.begin(); it != r.end(); ++it) {
-        cmd += "('" + it.key().asString() + "','" +
-                (*it)["type"].asString() + "', '" +
-                (*it)["client"].asString() + "', '"+
-                (*it)["server"].asString() + "'),";
-    }
-    cmd.erase(cmd.end() - 1);
-    dbHdl->runCmd(cmd);
-
-    // Close connection
-    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------
