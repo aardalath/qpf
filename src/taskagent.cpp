@@ -103,7 +103,8 @@ void TaskAgent::processTASK_PROC()
     ++numWaitingTasks;
 
     pe->setAgentName(selfPeer()->name);
-    pe->setWorkingDir(workDir);
+    pe->setSysDir(sysDir);
+    pe->setWorkDir(workDir);
     pe->setTaskInfo(msg->task);
     pe->setNumTask(numTasks);
 

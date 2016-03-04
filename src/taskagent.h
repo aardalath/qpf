@@ -81,6 +81,7 @@ public:
     TaskAgent(const char * name = 0);
 
     Property(TaskAgent, std::string, workDir, WorkDir);
+    Property(TaskAgent, std::string, sysDir,  SysDir);
 
 protected:
 
