@@ -39,26 +39,27 @@
 #include "logwatcher.h"
 
 #include <QDebug>
+#include <memory>
 
 namespace QPF {
 
-LogWatcher::LogWatcher(QPlainTextEdit * txtVw)
-  : textView(txtVw), bytesRead(0)
+LogWatcher::LogWatcher(QPlainTextEdit * txtVw, int lines)
+  : textView(txtVw), bytesRead(0), maxNumLines(lines)
 {
   fsWatcher = new QFileSystemWatcher;
- 
+
   connect(fsWatcher, SIGNAL(fileChanged(const QString &)),
 	  this, SLOT(updateLogView(const QString &)));
 }
 
-void LogWatcher::setFile(QString s) 
+void LogWatcher::setFile(QString s)
 {
   watchedFile = s;
   fsWatcher->addPath(s);
   updateLogView(s);
 }
 
-QString LogWatcher::getFile() 
+QString LogWatcher::getFile()
 {
   return watchedFile;
 }
@@ -68,17 +69,26 @@ void LogWatcher::updateLogView(const QString & path)
   QFile f(path);
   if (!f.open(QIODevice::ReadOnly)) { return; }
 
-  char * c;
   qint64 newBytes = f.size() - bytesRead;
-  c = new char[newBytes + 1];
   f.seek(bytesRead);
-  bytesRead += f.read(c, newBytes);
-  c[newBytes] = 0;
+  QByteArray c;
+  c = f.read(newBytes);
+  bytesRead += c.size();
 
   QTextCursor cursor = textView->textCursor();
+
+  qint64 linesToRemove = textView->blockCount() > maxNumLines;
+  if (linesToRemove > 0) {
+      cursor.movePosition(QTextCursor::Start);
+      cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, linesToRemove);
+      cursor.select(QTextCursor::LineUnderCursor);
+      cursor.removeSelectedText();
+  }
+
+  cursor.movePosition(QTextCursor::End);
   cursor.insertText(QString(c));
+  textView->setTextCursor(cursor);
   textView->ensureCursorVisible();
-  //textView->appendPlainText(QString(c));
 }
 
 }

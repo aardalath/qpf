@@ -49,7 +49,7 @@ class LogWatcher : public QObject
   Q_OBJECT
 
 public:
-  LogWatcher(QPlainTextEdit * txtVw);
+  LogWatcher(QPlainTextEdit * txtVw, int lines = 100);
 
   void setFile(QString s);
   QString getFile();
@@ -62,6 +62,7 @@ private:
   QFileSystemWatcher * fsWatcher;
   QString watchedFile;
   qint64 bytesRead;
+  qint64 maxNumLines;
 };
 
 }
