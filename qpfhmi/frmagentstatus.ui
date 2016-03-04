@@ -649,13 +649,6 @@
    </item>
   </layout>
   <zorder>lblTaskAgentName</zorder>
-  <zorder></zorder>
-  <zorder>layoutWidget</zorder>
-  <zorder>layoutWidget_2</zorder>
-  <zorder>layoutWidget_3</zorder>
-  <zorder>layoutWidget_4</zorder>
-  <zorder>layoutWidget_5</zorder>
-  <zorder>layoutWidget_6</zorder>
  </widget>
  <resources/>
  <connections/>
