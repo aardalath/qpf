@@ -62,6 +62,7 @@ HMIProxy::HMIProxy(const char * name) :
 {
     startSignalFromHMIReceived = false;
     taskResInfo.clear();
+    setHeartBeatPeriod(0, 500000);
 
     canProcessMessage(MSG_TASK_RES_IDX);
 }
@@ -148,18 +149,21 @@ void HMIProxy::requestStop()
 //----------------------------------------------------------------------
 void HMIProxy::registerTaskRes(Json::Value jsonValue)
 {
-    registeringTaskMutex.lock();
     Json::Value & v = jsonValue["task"]["taskData"];
     if (v.isObject()) {
         std::string key = v["NameInternal"].asString();
         if (key.empty()) return;
+        registeringTaskMutex.lock();
         if (taskResInfo.find(key) == taskResInfo.end()) {
             taskResInfo[key] = v;
             thereIsTaskResInfo = true;
-            InfoMsg("There are TaskRes information chunks");
+            InfoMsg("New TaskRes chunk: " +
+                    key + " - " +
+                    v["State"]["Progress"].asString() + " - " +
+                    v["State"]["TaskStatus"].asString());
         }
+        registeringTaskMutex.unlock();
     }
-    registeringTaskMutex.unlock();
 }
 
 //----------------------------------------------------------------------
@@ -178,12 +182,14 @@ bool HMIProxy::isThereTaskResInfo()
 int HMIProxy::getTaskResInfo(TaskResultsInfo & newTaskInfo)
 {
     registeringTaskMutex.lock();
-    newTaskInfo = taskResInfo;
+    newTaskInfo.clear();
+    newTaskInfo.insert(taskResInfo.begin(), taskResInfo.end());
+    int numOfTaskResMsgs = newTaskInfo.size();
     taskResInfo.clear();
     thereIsTaskResInfo = false;
     registeringTaskMutex.unlock();
 
-    return newTaskInfo.size();
+    return numOfTaskResMsgs;
 }
 
 }
