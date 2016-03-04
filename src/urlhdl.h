@@ -36,8 +36,8 @@
  *
  ******************************************************************************/
 
-#ifndef URLHANDLED_H
-#define URLHANDLED_H
+#ifndef URLHANDLER_H
+#define URLHANDLER_H
 
 //============================================================
 // Group: External Dependencies
@@ -150,4 +150,4 @@ public:
 
 }
 
-#endif  /* URLHANDLED_H */
+#endif  /* URLHANDLER_H */
