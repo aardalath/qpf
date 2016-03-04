@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include "taskorc.h"
+#include "urlhdl.h"
 
 #include "log.h"
 using LibComm::Log;
@@ -44,6 +45,7 @@ using LibComm::Log;
 
 #include <sys/time.h>
 #include <iterator>
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -65,7 +67,7 @@ TaskOrchestrator::TaskOrchestrator(const char * name) :
 //----------------------------------------------------------------------
 // Method: defineOrchestrationParams
 //----------------------------------------------------------------------
-void TaskOrchestrator::defineOrchestrationParams(OrchestrationParameters & op)
+void TaskOrchestrator::defineOrchestrationParams(const OrchestrationParameters & op)
 {
     // Take orchestration parameters from parent
     // (obtained from configuration)
@@ -73,7 +75,7 @@ void TaskOrchestrator::defineOrchestrationParams(OrchestrationParameters & op)
     for (unsigned int i = 0; i < op.rules.size(); ++i) {
         orcParams.rules.push_back(new Rule(*(op.rules.at(i))));
     }
-    std::map<std::string, Processor*>::iterator peIt = op.processors.begin();
+    std::map<std::string, Processor*>::const_iterator peIt = op.processors.begin();
     while (peIt != op.processors.end()) {
         orcParams.processors[(*peIt).first] = new Processor(*((*peIt).second));
         ++peIt;
@@ -94,6 +96,9 @@ void TaskOrchestrator::defineOrchestrationParams(OrchestrationParameters & op)
 //----------------------------------------------------------------------
 void TaskOrchestrator::fromRunningToOperational()
 {
+    // Setup orchestration parameters
+    defineOrchestrationParams(getCfgInfo().orcParams);
+
     // Dump rules
     std::stringstream ss;
     for (unsigned int i = 0; i < orcParams.rules.size(); ++i) {
@@ -225,8 +230,11 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
     task.taskExitCode = 0;
     task.taskStatus = TASK_SCHEDULED;
 
+    URLHandler urlh(getCfgInfo());
+
     for (unsigned int i = 0; i < inputs.productList.size(); ++i) {
-        ProductMetadata & m = inputs.productList.at(i);
+        urlh.setProduct(inputs.productList.at(i));
+        ProductMetadata & m = urlh.fromInbox2Local();
         task.inputs.productList[m.productType] = m;
     }
 

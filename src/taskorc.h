@@ -80,7 +80,7 @@ public:
     //----------------------------------------------------------------------
     // Method: defineOrchestrationParams
     //----------------------------------------------------------------------
-    void defineOrchestrationParams(OrchestrationParameters & op);
+    void defineOrchestrationParams(const OrchestrationParameters & op);
 
 protected:
 
