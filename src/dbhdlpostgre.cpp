@@ -341,20 +341,16 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
 
     if (checkTask(task)) {
         std::string filter("task_id=" + quoted(task.taskName));
-        Json::Value & taskData = task.taskData;
+        result &= updateTable<int>("tasks_info", filter,
+                                   "task_status_id", (int)(task.taskStatus));
         result &= updateTable<std::string>("tasks_info", filter,
                                            "start_time", task.taskStart);
-        if (!taskData["Status"]["Running"].asBool()) {
-            result &= updateTable<int>("tasks_info", filter,
-                                       "task_status_id", TASK_RUNNING);
-        } else {
+        if (task.taskStatus == TASK_FINISHED) {
             result &= updateTable<std::string>("tasks_info", filter,
                                                "end_time", task.taskEnd);
-            result &= updateTable<int>("tasks_info", filter,
-                                       "task_status_id", TASK_FINISHED);
         }
         result &= updateTable<Json::Value>("tasks_info", filter,
-                                           "task_data", taskData);
+                                           "task_data", task.taskData);
         PQclear(res);
     } else {
         result = storeTask(task);
