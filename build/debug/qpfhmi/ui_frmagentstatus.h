@@ -32,9 +32,11 @@ public:
     QHBoxLayout *horizontalLayout_8;
     QLabel *label;
     QLabel *lblTotalTasks;
+    QSpacerItem *horizontalSpacer;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_2;
     QLabel *lblRuningTasks;
+    QSpacerItem *horizontalSpacer_5;
     QHBoxLayout *horizontalLayout_5;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_6;
@@ -45,6 +47,7 @@ public:
     QHBoxLayout *horizontalLayout_7;
     QLabel *label_8;
     QLabel *lblMaxTasks;
+    QSpacerItem *horizontalSpacer_4;
     QHBoxLayout *horizontalLayout_6;
     QHBoxLayout *horizontalLayout;
     QLabel *label_7;
@@ -68,7 +71,7 @@ public:
     {
         if (FrmAgentStatus->objectName().isEmpty())
             FrmAgentStatus->setObjectName(QStringLiteral("FrmAgentStatus"));
-        FrmAgentStatus->resize(779, 95);
+        FrmAgentStatus->resize(871, 91);
         FrmAgentStatus->setFrameShape(QFrame::Box);
         FrmAgentStatus->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(FrmAgentStatus);
@@ -84,6 +87,7 @@ public:
 
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setVerticalSpacing(2);
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
         label = new QLabel(FrmAgentStatus);
@@ -96,6 +100,10 @@ public:
         lblTotalTasks->setFont(font);
 
         horizontalLayout_8->addWidget(lblTotalTasks);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer);
 
 
         gridLayout->addLayout(horizontalLayout_8, 0, 0, 1, 1);
@@ -112,6 +120,10 @@ public:
         lblRuningTasks->setFont(font);
 
         horizontalLayout_3->addWidget(lblRuningTasks);
+
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_5);
 
 
         gridLayout->addLayout(horizontalLayout_3, 0, 1, 1, 1);
@@ -164,6 +176,10 @@ public:
         lblMaxTasks->setFont(font);
 
         horizontalLayout_7->addWidget(lblMaxTasks);
+
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_4);
 
 
         gridLayout->addLayout(horizontalLayout_7, 1, 0, 1, 1);
@@ -228,9 +244,14 @@ public:
         horizontalLayout_4 = new QHBoxLayout(frmStatusBar);
         horizontalLayout_4->setSpacing(0);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_4->setContentsMargins(0, 4, 0, 4);
         frmRunning = new QFrame(frmStatusBar);
         frmRunning->setObjectName(QStringLiteral("frmRunning"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(frmRunning->sizePolicy().hasHeightForWidth());
+        frmRunning->setSizePolicy(sizePolicy);
         frmRunning->setStyleSheet(QStringLiteral("background-color: rgb(0, 0, 255);"));
         frmRunning->setFrameShape(QFrame::Panel);
         frmRunning->setFrameShadow(QFrame::Plain);
@@ -240,6 +261,8 @@ public:
 
         frmWaiting = new QFrame(frmStatusBar);
         frmWaiting->setObjectName(QStringLiteral("frmWaiting"));
+        sizePolicy.setHeightForWidth(frmWaiting->sizePolicy().hasHeightForWidth());
+        frmWaiting->setSizePolicy(sizePolicy);
         frmWaiting->setStyleSheet(QStringLiteral("background-color: rgb(14, 170, 204);"));
         frmWaiting->setFrameShape(QFrame::Panel);
         frmWaiting->setFrameShadow(QFrame::Plain);
@@ -249,6 +272,8 @@ public:
 
         frmPaused = new QFrame(frmStatusBar);
         frmPaused->setObjectName(QStringLiteral("frmPaused"));
+        sizePolicy.setHeightForWidth(frmPaused->sizePolicy().hasHeightForWidth());
+        frmPaused->setSizePolicy(sizePolicy);
         frmPaused->setStyleSheet(QStringLiteral("background-color: rgb(255, 254, 0);"));
         frmPaused->setFrameShape(QFrame::Panel);
         frmPaused->setFrameShadow(QFrame::Plain);
@@ -258,6 +283,8 @@ public:
 
         frmStopped = new QFrame(frmStatusBar);
         frmStopped->setObjectName(QStringLiteral("frmStopped"));
+        sizePolicy.setHeightForWidth(frmStopped->sizePolicy().hasHeightForWidth());
+        frmStopped->setSizePolicy(sizePolicy);
         frmStopped->setStyleSheet(QStringLiteral("background-color: rgb(121, 121, 121);"));
         frmStopped->setFrameShape(QFrame::Panel);
         frmStopped->setFrameShadow(QFrame::Plain);
@@ -267,6 +294,8 @@ public:
 
         frmFailed = new QFrame(frmStatusBar);
         frmFailed->setObjectName(QStringLiteral("frmFailed"));
+        sizePolicy.setHeightForWidth(frmFailed->sizePolicy().hasHeightForWidth());
+        frmFailed->setSizePolicy(sizePolicy);
         frmFailed->setStyleSheet(QStringLiteral("background-color: rgb(255, 0, 0);"));
         frmFailed->setFrameShape(QFrame::Panel);
         frmFailed->setFrameShadow(QFrame::Plain);
@@ -276,6 +305,8 @@ public:
 
         frmFinished = new QFrame(frmStatusBar);
         frmFinished->setObjectName(QStringLiteral("frmFinished"));
+        sizePolicy.setHeightForWidth(frmFinished->sizePolicy().hasHeightForWidth());
+        frmFinished->setSizePolicy(sizePolicy);
         frmFinished->setStyleSheet(QStringLiteral("background-color: rgb(0, 240, 0);"));
         frmFinished->setFrameShape(QFrame::Panel);
         frmFinished->setFrameShadow(QFrame::Plain);
@@ -286,9 +317,9 @@ public:
 
         gridLayout->addWidget(frmStatusBar, 1, 1, 1, 1);
 
-        gridLayout->setColumnStretch(0, 2);
-        gridLayout->setColumnStretch(1, 3);
-        gridLayout->setColumnStretch(2, 2);
+        gridLayout->setColumnStretch(0, 1);
+        gridLayout->setColumnStretch(1, 100);
+        gridLayout->setColumnStretch(2, 1);
 
         verticalLayout->addLayout(gridLayout);
 
