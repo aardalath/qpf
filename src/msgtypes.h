@@ -274,9 +274,9 @@ typedef Json::Value                            TaskData;
     T(FAILED,    -1), \
     T(FINISHED,   0), \
     T(RUNNING,    1), \
-    T(WAITING,    2), \
-    T(PAUSED,     3), \
-    T(STOPPED,    4)
+    T(PAUSED,     2), \
+    T(STOPPED,    3), \
+    T(ARCHIVED,   4)
 
 #define T(a,b) TASK_ ## a = b
 enum TaskStatus { TLIST_TASK_STATUS };
@@ -286,6 +286,7 @@ extern std::map<TaskStatus, std::string> TaskStatusName;
 extern std::map<std::string, TaskStatus> TaskStatusValue;
 
 struct TaskInfo : public JsonStruct {
+    TaskInfo() : taskData(Json::nullValue) {}
     TaskName           taskName;
     TaskPath           taskPath;
     DateTime           taskStart;

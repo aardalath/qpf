@@ -271,9 +271,17 @@ protected:
     //----------------------------------------------------------------------
     void writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg);
 
+    //----------------------------------------------------------------------
+    // Method: setHeartBeatPeriod
+    // Sets number of seconds and microseconds for HeartBeat period
+    //----------------------------------------------------------------------
+    void setHeartBeatPeriod(int s = 1, int us = 0);
+
 protected:
     std::set<int> canProcess;
     MessageData   msgData;
+    int hbSecs;
+    int hbMicroSecs;
 };
 
 }

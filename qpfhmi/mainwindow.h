@@ -53,6 +53,7 @@
 #include "config.h"
 #include "archivemodel.h"
 #include "frmagentstatus.h"
+#include "simindata.h"
 
 //INI#include "iniparser.h"
 #include "json/json.h"
@@ -93,10 +94,11 @@ public:
 
         Peer evtMngCfg;
         Peer qpfhmiCfg;
-    };
+    };    
 
 signals:
     void goToOperational();
+    void stopSendingMessages();
 
 public slots:
     void commandSystem();
@@ -106,22 +108,32 @@ protected slots:
     void transitToOperational();
     void sendInData();
     void prepareSendMultInData();
-    void selectInDataParamsFile();
     void prepareSendInDataFromFile();
-    void sendMultInData();
-    void sendInDataFromFile();
+    void selectInDataParamsFile();
     void stopSendingMultInData();
+    void sentInData(int msgsLeft);
+    void endOfInDataMsgs();
+
     void handleFinishedHMI();
 
     void checkForTaskRes();
     void showTaskRes();
 
+    void updateTasksMonitTree(int nCols);
+    void initTasksMonitTree(int nCols);
+    void updateAgentsMonitPanel();
+
     void showTaskMonitContextMenu(const QPoint & p);
     void showWorkDir();
     void displayTaskInfo();
 
-    void dumpTaskInfoToTree(QString taskName, Json::Value & v, QTreeWidget * t);
-    void dumpToTree(Json::Value & v, QTreeWidgetItem * t);
+    void pauseTask();
+    void resumeTask();
+    void stopTask();
+    bool runDockerCmd(QTreeWidgetItem * item, QString cmd);
+
+    void dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t);
+    void dumpToTree(const Json::Value & v, QTreeWidgetItem * t);
 
     void setDebugInfo(bool b);
     void sortTaskViewByColumn(int c);
@@ -148,11 +160,6 @@ protected:
     //----------------------------------------------------------------------
     void setLogWatch();
 
-    //----------------------------------------------------------------------
-    // Method: stopSendingMessages
-    //----------------------------------------------------------------------
-    void stopSendingMessages();
-
 private:
     QVector<double> getLoadAvgs();
     void clearLayout(QLayout *layout);
@@ -166,9 +173,7 @@ private:
     //std::future<int> hmiResult;
     std::thread hmiPxyThread;
 
-    QList<ProductMetadata> multInDataContentValues;
-    QString  fileInDataParams;
-    QTimer * timerMultInData;
+    SimInData * simInData;
 
     //Config::Config * cfg;
     QPFHMIConfig    qpfCfg;
@@ -176,11 +181,18 @@ private:
 
     ArchiveModel * archHdl;
 
+    QString  fileInDataParams;
+
     QTimer * taskMonitTimer;
     QMap<QString, Json::Value> taskResInfo;
+    QMap<QString, QTreeWidgetItem *> taskResItems;
+    QMap<QString, Json::Value> processedTasksInfo;
 
     QAction * acWorkDir;
     QAction * acDisplayTaskInfo;
+    QAction * acPauseTask;
+    QAction * acResumeTask;
+    QAction * acStopTask;
 
     QVBoxLayout * vlyFrmAgents;
     QSpacerItem * spacerFrmAgents;

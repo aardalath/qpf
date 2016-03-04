@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include "app.h"
+#include <QDebug>
 
 App::App(int& argc, char** argv) :
     QApplication(argc, argv), deployer(new Deployer(argc, argv))

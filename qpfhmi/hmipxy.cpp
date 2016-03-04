@@ -142,20 +142,6 @@ void HMIProxy::requestStop()
     setTransmissionToPeer("EvtMng", msg);
 }
 
-//bool checkForCorruption(HMIProxy::TaskResultsInfo & m)
-//{
-//    try {
-//        int sum = 0;
-//        for (auto & kv : m) {
-//            std::string key = kv.first;
-//            sum += (int)(key[0]);
-//        }
-//    } catch(...) {
-//        return false;
-//    }
-//    return true;
-//}
-
 //----------------------------------------------------------------------
 // Method: registerTaskRes
 // Send STOP request to Event Manager
@@ -163,52 +149,7 @@ void HMIProxy::requestStop()
 void HMIProxy::registerTaskRes(Json::Value jsonValue)
 {
     registeringTaskMutex.lock();
-
-//    if (!checkForCorruption(taskResInfo)) {
-//        FatalMsg("taskResInfo got corrupted!!");
-//    }
-
-//#ifdef DUMP_TASK_CONTENT_TO_LOG
-//    InfoMsg("Registering results:\n" + jsonValue.toStyledString());
-//#endif
-//    static int idx = 0;
-//    std::string msgFileName("/tmp/");
-//    char baseName[100];
-//    sprintf(baseName, "v.%04d.json", ++idx);
-//    msgFileName += baseName;
-//    std::ofstream msgOut(msgFileName);
-//    Json::StyledWriter writer;
-//#define K(x) "\"" << #x << "\": " << x
-
-//    msgOut << writer.write(jsonValue) << "\n";
-//    msgOut << "{ "
-//           << K(jsonValue.isNull()) << ",  "
-//           << K(jsonValue.isArray()) << ",  "
-//           << K(jsonValue.isObject()) << " }\n";
     Json::Value & v = jsonValue["task"]["taskData"];
-//    msgOut << writer.write(v) << "\n";
-//    msgOut << "{ "
-//           << K(v.isNull()) << ",  "
-//           << K(v.isArray()) << ",  "
-//           << K(v.isObject()) << " }\n";
-//    if (v.isNull()) {
-//        // Set minimum information
-//        v["TaskAgent"] = "-";
-//        v["Args"][0] = "-";
-//        v["State"]["StartedAt"] = "-";
-//        v["State"]["FinishedAt"] = "-";
-//        v["State"]["Progress"] = "-";
-//        v["State"]["ExitCode"] = 0;
-//        v["State"]["Running"] = false;
-//        v["State"]["Paused"] = true;
-//    }
-//    msgOut << writer.write(v) << "\n";
-//    msgOut << "{ "
-//           << K(v.isNull()) << ",  "
-//           << K(v.isArray()) << ",  "
-//           << K(v.isObject()) << " }";
-//    msgOut.close();
-
     if (v.isObject()) {
         std::string key = v["NameInternal"].asString();
         if (key.empty()) return;
@@ -218,11 +159,6 @@ void HMIProxy::registerTaskRes(Json::Value jsonValue)
             InfoMsg("There are TaskRes information chunks");
         }
     }
-
-//    if (!checkForCorruption(taskResInfo)) {
-//        FatalMsg("taskResInfo got corrupted!!");
-//    }
-
     registeringTaskMutex.unlock();
 }
 

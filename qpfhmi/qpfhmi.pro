@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     dlgshowtaskinfo.cpp \
     app.cpp \
     deployer.cpp \
-    frmagentstatus.cpp
+    frmagentstatus.cpp \
+    simindata.cpp
 
 HEADERS  += mainwindow.h \
          hmipxy.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     dlgshowtaskinfo.h \
     app.h \
     deployer.h \
-    frmagentstatus.h
+    frmagentstatus.h \
+    simindata.h
 
 FORMS    += mainwindow.ui \
     dlgshowtaskinfo.ui \

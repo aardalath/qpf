@@ -82,6 +82,7 @@ const int BadMsgProcessing = -1;
 Component::Component(const char * name) :
     CommNode(name)
 {
+    setHeartBeatPeriod();
 }
 
 //----------------------------------------------------------------------
@@ -227,7 +228,7 @@ int Component::run()
         } else {
 
             // Nothing for the time being
-            LibComm::waitForHeartBeat(1, 0);
+            LibComm::waitForHeartBeat(hbSecs, hbMicroSecs);
             //InfoMsg("Heart Beat!");
 
         }
@@ -504,5 +505,16 @@ void Component::registerMsg(std::string from,
     // Close connection
     db->closeConnection();
 }
+
+//----------------------------------------------------------------------
+// MethoComponent::d: setHeartBeatPeriod
+// Sets number of seconds and microseconds for HeartBeat period
+//----------------------------------------------------------------------
+void Component::setHeartBeatPeriod(int s, int us)
+{
+    hbSecs = s;
+    hbMicroSecs = us;
+}
+
 
 }

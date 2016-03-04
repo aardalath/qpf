@@ -62,6 +62,7 @@
 //------------------------------------------------------------
 
 #include "component.h"
+#include "procelem.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -108,14 +109,10 @@ protected:
 private:
 
     //----------------------------------------------------------------------
-    // Method: executeProcessingElement
+    // Method: checkProcessingElements
+    // Check list of processing elements
     //----------------------------------------------------------------------
-    void executeProcessingElement(TaskInfo t);
-
-    //----------------------------------------------------------------------
-    // Method: executeFakeProcessingElement
-    //----------------------------------------------------------------------
-    void executeFakeProcessingElement(std::string pe);
+    void checkProcessingElements();
 
     //----------------------------------------------------------------------
     // Method: sendTaskResMsg
@@ -127,9 +124,10 @@ private:
     //----------------------------------------------------------------------
     std::string timeTag();
 
-
 private:
     std::vector<std::thread *> procTasks;
+    std::vector<ProcessingElement *> processingElements;
+
     std::atomic<bool> stopTasks;
     std::atomic<int> numTasks;
     std::atomic<int> numRunningTasks;

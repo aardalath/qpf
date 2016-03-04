@@ -429,7 +429,9 @@ bool Deployer::fexists(const char * name)
 bool Deployer::waitingForGoAhead()
 {
     static const char evtmngGoFile[] = "/tmp/EventManager.GO.msg";
-    return !fexists(evtmngGoFile);
+    bool keepWaiting = !fexists(evtmngGoFile);
+    if (!keepWaiting) { unlink(evtmngGoFile); }
+    return keepWaiting;
 }
 
 //----------------------------------------------------------------------

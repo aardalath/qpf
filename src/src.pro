@@ -30,7 +30,8 @@ HEADERS += \
         error.h \
         msgtypes.h \
         propdef.h \
-        version.h
+        version.h \
+    procelem.h
 
 HEADERS += \
         config.h \
@@ -54,4 +55,5 @@ SOURCES +=  \
         logmng.cpp \
         taskagent.cpp \
         taskmng.cpp \
-        taskorc.cpp
+        taskorc.cpp \
+    procelem.cpp

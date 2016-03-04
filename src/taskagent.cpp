@@ -42,20 +42,6 @@
 using LibComm::Log;
 #include "tools.h"
 
-#include <sys/time.h>
-#include <iostream>
-#include <iomanip>
-#include <ctime>
-#include <signal.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <cstdio>
-#include <random>
-#include <dirent.h>
-
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -95,9 +81,11 @@ void TaskAgent::fromRunningToOff()
     flushLog();
 
     stopTasks = true;
+    /*
     for (unsigned int i = 0; i < procTasks.size(); ++i) {
         procTasks.at(i)->join();
     }
+    */
 }
 
 //----------------------------------------------------------------------
@@ -107,12 +95,27 @@ void TaskAgent::processTASK_PROC()
 {
     // Check the product type as input for any rule
     Message_TASK_PROC * msg = dynamic_cast<Message_TASK_PROC *>(msgData.msg);
-    std::string procElem = msg->task.taskPath;
-    InfoMsg("Proc.element to be launched: " + procElem);
+    InfoMsg("Processor to be launched: " + msg->task.taskPath);
 
-    std::thread * t = new std::thread(&TaskAgent::executeProcessingElement,
-                                      this, msg->task);
-    procTasks.push_back(t);
+    // Create new processing element with the task information
+    ProcessingElement * pe = new ProcessingElement();
+
+    ++numTasks;
+    ++numWaitingTasks;
+
+    pe->setAgentName(selfPeer()->name);
+    pe->setTaskInfo(msg->task);
+    pe->setNumTask(numTasks);
+    pe->setWorkingDir(workDir);
+
+    // Store it at the PEs vector
+    processingElements.push_back(pe);
+
+    // Launch the PE
+    pe->exec();
+
+    // Send first TASK_RES message
+    sendTaskResMsg(pe->getTask());
 }
 
 //----------------------------------------------------------------------
@@ -120,285 +123,97 @@ void TaskAgent::processTASK_PROC()
 //----------------------------------------------------------------------
 void TaskAgent::execAdditonalLoopTasks()
 {
+    checkProcessingElements();
 }
 
 //----------------------------------------------------------------------
-// Method: executeProcessingElement
-// Executes a task
+// Method: checkProcessingElements
+// Check list of processing elements
 //----------------------------------------------------------------------
-void TaskAgent::executeProcessingElement(TaskInfo t)
+void TaskAgent::checkProcessingElements()
 {
-    std::string pe = t.taskPath;
+    for (unsigned int i = 0; i < processingElements.size(); ++i) {
 
-    // Update number of tasks managed by this agent
-    numTasks++;
+        bool sendMsg        = false;
+        bool markAsArchived = false;
 
-    // Define task name and exchange dir.
-    std::string internalTaskNameIdx = (selfPeer()->name + "-" +
-                                       LibComm::timeTag() + "-" +
-                                       LibComm::toStr<int>(numTasks));
-    std::string exchangeDir = workDir + internalTaskNameIdx;
+        ProcessingElement * pe = processingElements.at(i);
 
-    //-------------------------------------------------------------------
-    // 1. Send initial Task information (for storage)
-    //-------------------------------------------------------------------
-    TaskStatus status = TASK_WAITING;
+        TaskStatus status = pe->getStatus();
 
-    TaskInfo task;
-    task.setData(t.getData());
-    Json::Value & taskData = task.taskData;
+        switch (status) {
 
-    std::string nameFromOrchestrator = t.taskName;
+        case TASK_ARCHIVED:
+            // Task already finished, and final information was sent to be
+            // registered in the DB, so the pe can be deleted
+            InfoMsg("Removing proc.elem. for task " + pe->getTask().taskName);
 
-    taskData["TaskAgent"] = self.load(std::memory_order_relaxed)->name;
-    taskData["Name"] = "/UNDEFINED";
-    taskData["NameExtended"] = (taskData["TaskAgent"].asString() +
-                                ":/" + taskData["Name"].asString());
-    taskData["NameInternal"] = internalTaskNameIdx;
-    taskData["NameOrc"] = nameFromOrchestrator;
-    taskData["State"]["Dead"] = false;
-    taskData["State"]["Error"] = "";
-    taskData["State"]["ExitCode"] = 0;
-    taskData["State"]["FinishedAt"] = "0001-01-01T00:00:00Z";
-    taskData["State"]["OOMKilled"] = false;
-    taskData["State"]["Paused"] = true;
-    taskData["State"]["Pid"] = 0;
-    taskData["State"]["Progress"] = "0";
-    taskData["State"]["Restarting"] = false;
-    taskData["State"]["Running"] = false;
-    taskData["State"]["StartedAt"] = "0001-01-01T00:00:00Z";
-    task.taskStart = LibComm::timeTag();
-    task.taskEnd = "";
-    task.taskExitCode = 0;
-    task.taskName = internalTaskNameIdx;
-    task.taskPath = t.taskPath;
-    task.taskStatus = status;
+            delete pe;
+            pe = 0;
+            processingElements.erase(processingElements.begin() + i);
+            sendMsg = false;
+            break;
 
-    // Clear outputs (will be filled in at the end of the task)
-    task.outputs.productList.clear();
+        case TASK_FINISHED:
+            // Send latest information for completed task
+            // And decrease the number of tasks running
+            --numRunningTasks;
+            sendMsg = true;
+            break;
 
-    //-------------------------------------------------------------------
-    // 2. Loop waiting for execution slot
-    //-------------------------------------------------------------------
-    if (numRunningTasks >= maxRunningTasks) {
-        sendTaskResMsg(task);
-        // Loop waiting until numTasks is below threshold
-        numWaitingTasks++;
-        while (numRunningTasks >= maxRunningTasks) {
-            LibComm::waitForHeartBeat(0, 200000);
-        }
-        numWaitingTasks--;
-    }
-
-    //-------------------------------------------------------------------
-    // 3. Execute processor
-    //-------------------------------------------------------------------
-
-    // Prepare folders
-    std::string exchgIn     = exchangeDir + "/in";
-    std::string exchgOut    = exchangeDir + "/out";
-
-    std::string taskDriver  = workDir + std::string("runTask.sh");
-    std::string cfgFile     = exchangeDir + std::string("/dummy.cfg");
-
-    // Create exchange area
-    mkdir(exchangeDir.c_str(), 0755);
-    mkdir(exchgIn.c_str(),     0755);
-    mkdir(exchgOut.c_str(),    0755);
-
-    // Create input files
-    int mn = 60;
-    int mx = 180;
-    std::ofstream oInFile1((exchgIn + "/1.in").c_str());
-    if (oInFile1.good()) {
-        oInFile1 << mn << " " << mx << std::endl;
-        oInFile1.close();
-    } else {
-        WarnMsg("Cannot create " + (exchgIn + "/1.in"));
-        return;
-    }
-
-    // Execute task driver
-    pid_t pid = fork();
-
-    if (pid < 0) {
-        // Error, failed to fork()
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        // We are the child
-        char *procTaskCmdLine[] = { (char*)(taskDriver.c_str()),
-                                    (char*)(pe.c_str()),
-                                    (char*)(cfgFile.c_str()), NULL };
-        std::string cmdLine = taskDriver + " " + pe + " " + cfgFile;
-        InfoMsg("CMDLINE: " + cmdLine);
-        execv(procTaskCmdLine[0], procTaskCmdLine);
-        ErrMsg("EXECV: " + std::string(strerror(errno)));
-        exit(EXIT_FAILURE);
-    }
-
-    // Update number of running tasks
-    numRunningTasks++;
-
-    //-------------------------------------------------------------------
-    // Start monitoring
-    //-------------------------------------------------------------------
-
-    // Get dockerId
-    std::string dockerIdFile = exchangeDir + "/docker.id";
-    std::string dockerId("");
-    do {
-        std::ifstream ifDockerId(dockerIdFile, std::ifstream::in);
-        if (ifDockerId.good()) { ifDockerId >> dockerId; }
-        ifDockerId.close();
-    } while (dockerId.empty());
-
-    // Monitor executing task
-    bool childEnded = false;
-
-    Json::Reader jsonReader;
-    std::string inspectInfo;
-
-    float progressValue = 0.;
-    float monitStep = 5.; //seconds
-    float estimatedMonitSteps = 180 / monitStep;
-    float estimatedProgressStep = 100. / estimatedMonitSteps;
-    int sleepPeriod = (int)(monitStep * 1000000.);
-
-    bool running, dead, paused, killed, finished;
-    int excode;
-
-    do {
-
-        // Sleep for some time
-        std::this_thread::sleep_for(std::chrono::microseconds(sleepPeriod));
-
-        // Get monitoring information from docker task
-        std::string cmd = "docker inspect " + dockerId;
-        inspectInfo = "";
-
-        FILE* pipe = popen(cmd.c_str(), "r");
-        if (!pipe) { return; }
-        char buffer[128];
-        while (!feof(pipe)) {
-            if(fgets(buffer, 128, pipe) != NULL) { inspectInfo += buffer; }
-        }
-        pclose(pipe);
-
-        // Parse information
-        if (inspectInfo != "ERROR") {
-            Json::Value td(Json::arrayValue);
-            if  (jsonReader.parse(inspectInfo, td)) {
-                taskData = td[0u];
-            } else {
-                childEnded = true;
+        case TASK_SCHEDULED:
+            // The number of running tasks was equal to or above the threshold
+            // Check if this PE can be brought to life
+            if (numRunningTasks < maxRunningTasks) {
+                pe->start();
+                ++numRunningTasks;
+                --numWaitingTasks;
+                InfoMsg("Starting proc.elem. " + selfPeer()->name +
+                        "-" + LibComm::toStr<int>(i + 1));
             }
-        } else {
-            childEnded = true;
+            // It could be that the task is just starting, se we do not
+            // send message about stated task, but wait until next iteration
+            sendMsg = false;
+            break;
+
+        case TASK_FAILED:
+            // Send latest information for task
+            // ... and set processing element status to ARCHIVED
+            markAsArchived = true;
+            sendMsg = true;
+            break;
+
+        case TASK_PAUSED:
+            // Task is idle, do nothing, just report its state
+
+            break;
+
+        case TASK_STOPPED:
+            // Task has been explicitly stopped
+            // Send latest information for task
+            // ... and set processing element status to ARCHIVED
+            markAsArchived = true;
+            sendMsg = true;
+            break;
+
+        case TASK_RUNNING:
+            // Update information about the processing element
+            // and send it to the managing components
+            sendMsg = true;
+            break;
+
+        default:
+            break;
         }
 
-        running  = taskData["State"]["Running"].asBool();
-        dead     = taskData["State"]["Dead"].asBool();
-        paused   = taskData["State"]["Paused"].asBool();
-        killed   = taskData["State"]["OOMKilled"].asBool();
-        excode   = taskData["State"]["ExitCode"].asInt();
-        finished = (taskData["State"]["FinishedAt"].asString()
-                    != "0001-01-01T00:00:00Z");        
-        task.taskExitCode = excode;
-        if (finished) {
-            status = (excode == 0) ? TASK_FINISHED : TASK_FAILED;
-        } else if (dead || killed) {
-            status = TASK_FAILED;
-        } else if (paused) {
-            status = TASK_WAITING;
-        } else {
-            status = TASK_RUNNING;
-            assert(running);
-        }
-        childEnded = (status == TASK_FAILED) || (status == TASK_FINISHED);
-
-        // Additional info
-        taskData["TaskAgent"] = selfPeer()->name;
-        taskData["NameExtended"] = selfPeer()->name + ":/" + taskData["Name"].asString();
-        taskData["NameInternal"] = internalTaskNameIdx;
-        taskData["NameOrc"] = nameFromOrchestrator;
-
-        // Update progress
-        if (status != TASK_FINISHED) {
-            progressValue += estimatedProgressStep;
-            if (progressValue > 100.) { progressValue = 100.; }
-            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
-        } else {
-            taskData["State"]["Progress"] = "100";
+        if (sendMsg) {
+            sendTaskResMsg(pe->getTask());
         }
 
-        // Incorporate taskData to task data structure
-        task.taskStatus = status;
-
-        // Set actual start time
-        std::string startTime = taskData["State"]["StartedAt"].asString();
-        task.taskStart = (startTime.substr(0,4) + startTime.substr(5,2) +
-                              startTime.substr(8,5) +
-                              startTime.substr(14,2) + startTime.substr(17,2));
-
-        // Send message
-        sendTaskResMsg(task);
-
-    } while ((!childEnded) && (!stopTasks));
-
-    // Set end time
-    std::string endTime = taskData["State"]["FinishedAt"].asString();
-    task.taskEnd = (endTime.substr(0,4) + endTime.substr(5,2) +
-                    endTime.substr(8,5) +
-                    endTime.substr(14,2) + endTime.substr(17,2));
-
-    //-------------------------------------------------------------------
-    // Get output data
-    //-------------------------------------------------------------------
-    std::vector<std::string> outFiles;
-    DIR * dp = NULL;
-    struct dirent * dirp;
-    if ((dp = opendir(exchgOut.c_str())) == NULL) {
-        WarnMsg("Cannot open output directory " + exchgOut);
-    } else {
-        while ((dirp = readdir(dp)) != NULL) {
-            outFiles.push_back(std::string(dirp->d_name));
+        if (markAsArchived) {
+            pe->markAsArchived();
         }
-        closedir(dp);
     }
-
-    task.outputs.productList.clear();
-
-    for (unsigned int i = 0; i < outFiles.size(); ++i) {
-        ProductMetadata m;
-        m.startTime = task.taskStart;
-        m.endTime  = task.taskEnd;
-        m.creator = task.taskPath;
-        m.instrument = "UNKNOWN_INST";
-        m.productType = "UNKNOWN_TYPE";
-        m.productSize = 1234;
-        m.productStatus = "OK";
-        m.productVersion = "1";
-        m.productId = ("EUCL_" +
-                       m.productType + "_" +
-                       m.startTime  + "-" + m.endTime  + "_10");
-        m.regTime = LibComm::timeTag();
-        m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
-
-        task.outputs.productList[m.productType] = m;
-    }
-
-    //-------------------------------------------------------------------
-    // Report end of task
-    //-------------------------------------------------------------------
-
-    // Send message
-    sendTaskResMsg(task);
-
-    //-------------------------------------------------------------------
-    // Task finished
-    //-------------------------------------------------------------------
-    numRunningTasks--;
 }
 
 //----------------------------------------------------------------------

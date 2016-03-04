@@ -61,8 +61,9 @@ EventManager::EventManager(const char * name) :
     Component(name), waitingForGO(true)
 {
     canProcessMessage(MSG_INDATA_IDX);
-    // TODO: Deprecate this channel for EvtMng in favour of DB
-    canProcessMessage(MSG_TASK_RES_IDX);
+    canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this for EvtMng in favour of DB
+
+    setHeartBeatPeriod(0, 10000);
 }
 
 //----------------------------------------------------------------------
@@ -146,6 +147,11 @@ void EventManager::processTASK_RES()
                                            MSG_TASK_RES);
     registerMsg(selfPeer()->name, *msgForHMI);
     setTransmissionToPeer("QPFHMI", msgForHMI);
+
+    if (msg->task.taskData["State"]["Progress"].asString() == "100") {
+        InfoMsg("RECEIVED NOTIFICATION OF TASK " + msg->task.taskName +
+                " FINISHED AT " + msg->task.taskEnd);
+    }
 }
 
 }
