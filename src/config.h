@@ -233,6 +233,7 @@ public:
     static std::string PATHBase;
     static std::string PATHRun;
     static std::string PATHLog;
+    static std::string PATHRlog;
     static std::string PATHTmp;
     static std::string PATHTsk;
     static std::string PATHMsg;

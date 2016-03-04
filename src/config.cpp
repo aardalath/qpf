@@ -112,6 +112,7 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
 
     PATHRun = PATHBase + "/" + LibComm::timeTag();
     PATHLog = PATHRun + "/log";
+    PATHRlog = PATHRun + "/rlog";
     PATHTmp = PATHRun + "/tmp";
     PATHTsk = PATHRun + "/tsk";
     PATHMsg = PATHRun + "/msg";
@@ -678,6 +679,7 @@ std::string Configuration::DBPwd("euclidjcg");
 std::string Configuration::PATHBase("/var/run/qpf");
 std::string Configuration::PATHRun;
 std::string Configuration::PATHLog;
+std::string Configuration::PATHRlog;
 std::string Configuration::PATHTmp;
 std::string Configuration::PATHTsk;
 std::string Configuration::PATHMsg;
