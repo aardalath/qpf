@@ -334,7 +334,7 @@ participant "Deployer" as Dply #lightgreen
 participant "HMI" as HMI
 participant "Cfg" as Cfg
 participant Components
-participant "Database" as DB #cyan
+database "Database" as DB #cyan
 create Dply
 HMI -> Dply: create
 Dply ->  DB: requestConfiguration
@@ -372,7 +372,7 @@ participant DataMng
 participant TaskOrc
 participant TaskMng
 participant "TaskAg(s)" as TaskAg #pink
-participant "Database" as DB #cyan
+database "Database" as DB #cyan
 create HMIpxy
 HMI -> HMIpxy: create
 HMI -> EvtMng: START signal
@@ -400,23 +400,70 @@ title Use Case: External Data Injection
 participant EvtMng
 participant DataMng
 participant TaskOrc
-participant "Database" as DB #cyan
-[->> EvtMng: MSG_INDATA
+participant "Local\nArchive" as LA #cyan
+database "Database" as DB #cyan
+[-> EvtMng: MSG_INDATA
 activate EvtMng
-EvtMng ->> DataMng: MSG_INDATA
+EvtMng -> DataMng: MSG_INDATA
 activate DataMng
-EvtMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font>
+/' EvtMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font> '/
 deactivate EvtMng
-DataMng -> DB: registerInputs
-DataMng ->> TaskOrc: MSG_INDATA
+DataMng -> LA: downloadProducts
+DataMng -> DataMng: changeOrigin(LocalArchive)
+DataMng -> DB: registerProducts
+DataMng -> TaskOrc: MSG_INDATA
 activate TaskOrc
-DataMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font>
+/' DataMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font> '/
 deactivate DataMng
 TaskOrc -> TaskOrc: checkRules
 activate TaskOrc
-note left : in case of rule firing,\ncreate processingTask
+note left : in case of rule firing,\ncreate Processing Task
 deactivate TaskOrc
 deactivate TaskOrc
+@enduml
+#+END_SRC
+
+**** Processing Inbox Data
+
+#+BEGIN_SRC PlantUML
+@startuml
+!include "./config.plu"
+!define SEND(a,b,c)  a -[#blue]> b: c
+!define START1(a) activate a #lightyellow
+!define START2(a) activate a #bisque
+!define STOP(a) deactivate a
+title Use Case: Processing Inbox Data
+actor Operator as Op
+participant HMI
+participant "HMI proxy" as HMIpxy
+participant EvtMng
+participant DataMng
+participant TaskOrc
+participant "Local\nArchive" as LA #cyan
+database "Database" as DB #cyan
+Op -> HMI: select inbox folder
+HMI -> HMI: generate INDATA msgs
+loop for each message/product
+HMI -> HMIpxy: send MSG_INDATA
+SEND(HMIpxy, EvtMng, MSG_INDATA)
+START1(EvtMng)
+SEND(EvtMng, DataMng, MSG_INDATA)
+START1(DataMng)
+/' EvtMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font> '/
+STOP(EvtMng)
+DataMng -> LA: saveProducts
+DataMng -> DataMng: changeOrigin(LocalArchive)
+DataMng -> DB: registerProducts
+SEND(DataMng, TaskOrc, MSG_INDATA)
+START1(TaskOrc)
+/' DataMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_INDATA</b>)</i></size></font> '/
+STOP(DataMng)
+TaskOrc -> TaskOrc: checkRules
+START2(TaskOrc)
+note left : in case of rule firing,\ncreate Processing Task
+STOP(TaskOrc)
+STOP(TaskOrc)
+end loop
 @enduml
 #+END_SRC
 
@@ -431,17 +478,17 @@ participant TaskMng
 participant TaskAg
 participant "Docker\nContainer" as Docker
 participant DataMng
-participant "Database" as DB #cyan
+database "Database" as DB #cyan
 activate TaskOrc
 TaskOrc -> TaskOrc: checkRules
 note over TaskOrc : rule fired!
 TaskOrc -> TaskOrc: buildProcessingTask
 activate TaskOrc
 deactivate TaskOrc
-TaskOrc ->> TaskMng: MSG_TASK_PROC
+TaskOrc -> TaskMng: MSG_TASK_PROC
 activate TaskMng
 TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
-TaskOrc ->> DataMng: MSG_TASK_PROC
+TaskOrc -> DataMng: MSG_TASK_PROC
 TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
 deactivate TaskOrc
 TaskMng -> TaskMng: evaluateTask
@@ -450,7 +497,7 @@ deactivate TaskMng
 TaskMng -> TaskMng: selectAgent
 activate TaskMng
 deactivate TaskMng
-TaskMng ->> TaskAg: MSG_TASK_PROC
+TaskMng -> TaskAg: MSG_TASK_PROC
 TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_PROC</b>)</i></size></font>
 activate TaskAg
 TaskAg -> TaskAg: processTask
@@ -464,7 +511,7 @@ activate Docker
 group loop until task is finished or error
 TaskAg -> Docker: requestRunningTaskInfo
 TaskAg <-- Docker: provideRunningTaskInfo
-TaskAg ->> TaskMng: MSG_TASK_RES
+TaskAg -> TaskMng: MSG_TASK_RES
 deactivate TaskAg
 activate TaskMng
 TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
@@ -474,14 +521,224 @@ end
 deactivate Docker
 activate TaskMng
 TaskMng -> DB: updateTaskInfo
-TaskMng ->> TaskOrc: MSG_TASK_RES
+TaskMng -> TaskOrc: MSG_TASK_RES
 deactivate TaskMng
 TaskMng --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
-TaskOrc ->> DataMng: MSG_TASK_RES
+TaskOrc -> DataMng: MSG_TASK_RES
 TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i></size></font>
 DataMng -> DB: registerOutputs
 @enduml
 #+END_SRC
+
+**** Processing Inbox Products - Complete Sequence
+
+#+BEGIN_SRC PlantUML
+@startuml
+!include "./config.plu"
+show footbox
+!define SEND(a,b,c)  a -[#blue]> b: c
+/'!define REGISTER(a,c)  a -[#gray]-> DB: <font color="grey"><size:10><i>saveToDB(<b> c </b>)</i></size></font>'/
+/'!definelong SEND(a,x,c)
+a -[#blue]> x: c
+a -[#gray]-> DB: <font color="grey"><size:10><i>saveToDB(<b> c </b>)</i></size></font>
+!enddefinelong'/
+!define START1(a) activate a #PapayaWhip
+!define START2(a) activate a #PeachPuff
+!define STOP(a) deactivate a
+!definelong DO(a,x)
+a -> a: x
+START2(a)
+STOP(a)
+!enddefinelong
+
+title Processing Inbox Products - Complete Sequence
+
+actor Operator as Op
+
+box "Main Node" #MintCream
+participant HMI
+participant "HMI proxy" as HMIpxy
+participant EvtMng
+participant DataMng
+participant TaskOrc
+participant TaskMng
+end box
+
+box "Processing Node" #LavenderBlush
+participant TaskAg
+participant ProcElem
+participant "Docker\nContainer" as Docker
+end box
+
+box "Storage and Registration" #azure
+participant "Local\nArchive" as LA #lightcyan
+participant "Shared\nStorage" as SH #lightcyan
+database "Database" as DB #cyan
+end box
+
+Op -> HMI: select inbox folder
+HMI -> HMI: generate INDATA msgs
+loop for each message/product
+HMI -> HMIpxy: send MSG_INDATA
+SEND(HMIpxy, EvtMng, MSG_INDATA)
+START1(EvtMng)
+SEND(EvtMng, DataMng, MSG_INDATA)
+START1(DataMng)
+STOP(EvtMng)
+DataMng -> LA: saveProducts
+DO(DataMng,changeOrigin(LocalArchive))
+DataMng -> DB: registerProducts
+SEND(DataMng, TaskOrc, MSG_INDATA)
+START1(TaskOrc)
+STOP(DataMng)
+DO(TaskOrc, checkRules)
+note left : in case of rule firing,\ncreate Processing Task
+ref over TaskOrc: rule fired
+end loop
+
+group rule fired
+DO(TaskOrc, buildProcessingTask)
+DataMng -> SH: placeProductsAtSharedArea
+DO(TaskOrc, chageOrigin(SharedArea))
+SEND(TaskOrc, TaskMng, MSG_TASK_PROC)
+START1(TaskMng)
+SEND(TaskOrc, DataMng, MSG_TASK_PROC)
+STOP(TaskOrc)
+DO(TaskMng, evaluateTask)
+DO(TaskMng, selectAgent)
+SEND(TaskMng, TaskAg, MSG_TASK_PROC)
+STOP(TaskMng)
+START1(TaskAg)
+DO(TaskAg, processTask)
+create ProcElem
+TaskAg -> ProcElem: provideTaskData
+START1(ProcElem)
+DO(ProcElem, buildDockerOrder)
+create Docker
+ProcElem -> Docker: runTask
+
+
+group loop until task is finished or error
+START1(Docker)
+Docker <- SH: getInputs
+START2(Docker)
+Docker -> Docker: processing
+ProcElem -> Docker: monitorize task
+START2(ProcElem)
+STOP(ProcElem)
+TaskAg -> ProcElem: requestRuningTaskInfo
+START2(TaskAg)
+TaskAg <-- ProcElem: runingTaskInfo
+STOP(TaskAg)
+START1(TaskMng)
+SEND(TaskAg, TaskMng, MSG_TASK_RES)
+note left: <size:8>MSG_TASK_RES would be</size>\n<size:8>sent also to HMIpxy through</size>\n<size:8>EvtMng for display in HMI</size>
+/'group display on HMI
+SEND(TaskMng,EvtMng, MSG_TASK_RES)
+START1(EvtMng)
+SEND(EvtMng,HMIpxy, MSG_TASK_RES)
+START1(HMIpxy)
+STOP(EvtMng)
+HMIpxy -> HMI: provideTaskStatusInfo
+START1(HMI)
+DO(HMI,display updated task info)
+STOP(HMIpxy)
+STOP(HMI)
+end group'/
+end group
+
+Docker -> SH: saveOutputs
+STOP(Docker)
+DO(ProcElem, generateListOfProducts)
+destroy Docker
+TaskAg <-- ProcElem: provideOutputsInfo
+destroy ProcElem
+SEND(TaskAg, TaskMng, MSG_TASK_RES)
+STOP(TaskAg)
+TaskMng -> DB: updateTaskInfo
+
+/'group display on HMI
+SEND(TaskMng,EvtMng, MSG_TASK_RES)
+START1(EvtMng)
+SEND(EvtMng,HMIpxy, MSG_TASK_RES)
+START1(HMIpxy)
+STOP(EvtMng)
+HMIpxy -> HMI: provideTaskStatusInfo
+START1(HMI)
+DO(HMI,display updated task info)
+STOP(HMIpxy)
+STOP(HMI)
+end group'/
+
+START1(DataMng)
+SEND(TaskMng, DataMng, MSG_TASK_RES)
+STOP(TaskMng)
+DataMng -> LA: saveProducts
+DO(DataMng,changeOrigin(LocalArchive))
+DataMng -> DB: registerOutputs
+STOP(DataMng)
+end group
+@enduml
+
+#+END_SRC
+
+**** <tpl>
+***** Description
+The system application is executed in all the hosts that compose the framework network, the HMI is launched, in the main host, and the entire set of Components start their execution.  The components communications are established, and all of them reach the INITIALISED State.
+
+***** Scope
+Optional
+
+***** Dependencies
+
+***** Preconditions
+- System is switched off.
+- Database with the configuration is ready or new configuration file is provided..
+- Main host and processing nodes network connectivity is ready
+
+***** Nominal actions sequence
+On every host in the hosts network:
+1. The Application component is launched, which creates the Deployer object
+2. The Deployer parses the command line and decides whether the configure must be read from the DB or from a provided configuration file
+3. The Deployer processes the configuration
+4. The Deployer creates the components to be delivered at host
+5. Components are configured according to current configuration
+6. The different components created are launched
+7. The components launched are initialized
+8. If the HMI component is foreseen to be deployed in the host, create the HMI component and launch it.
+
+#+BEGIN_SRC PlantUML
+@startuml
+!include "./config.plu"
+title Use Case: System Launch and Initialisation
+participant App
+participant "Deployer" as Dply #lightgreen
+participant "HMI" as HMI
+participant "Cfg" as Cfg
+participant Components
+database "Database" as DB #cyan
+create Dply
+HMI -> Dply: create
+Dply ->  DB: requestConfiguration
+Dply <-- DB: configuration
+HMI ->  DB: requestConfiguration
+HMI <-- DB: configuration
+Dply -> Dply: defineComponents
+create Components
+Dply -> Components: create/spawn
+== Synchronisation ==
+Dply -> Components: initialise
+Dply -> Dply: wait for START
+@enduml
+#+END_SRC
+
+***** Postconditions
+-
+-
+-
+***** Exceptions
+
+***** Comments
 
 *** Technologies
 
@@ -1086,7 +1343,7 @@ class DBPostgreHdl <|-- DBHandler
 #+end_src
 
 **** Current QPF Configuration
-***** JSON
+***** STARTED JSON
 ****** "general":
 ******* "app_name": "QPF",
 ******* "app_version": "0.1",
@@ -1211,7 +1468,8 @@ class DBPostgreHdl <|-- DBHandler
 ******** "HK_RAW",
 ******** "HK_QLA"]
 
-***** Relational Tables
+***** DEFERRED Relational Tables
+CLOSED: [2015-10-09 vie 08:45]
 ****** config_general
 | Parameter   | Content         |
 | [string]    | [string]        |
