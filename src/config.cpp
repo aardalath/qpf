@@ -677,7 +677,7 @@ std::string Configuration::DBName("qpfdb");
 std::string Configuration::DBUser("jcgonzalez");
 std::string Configuration::DBPwd("euclidjcg");
 
-std::string Configuration::PATHBase("/var/run/qpf");
+std::string Configuration::PATHBase("/qpf/run/");
 std::string Configuration::PATHBin;
 std::string Configuration::PATHRun;
 std::string Configuration::PATHLog;
