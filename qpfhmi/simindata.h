@@ -92,6 +92,13 @@ public slots:
     bool sendInDataFromFile(QString fileInDataParams);
 
     //----------------------------------------------------------------------
+    // Method: processInbox
+    // Send INDATA messages into the system, to process all the
+    // products in the Inbox directory selected
+    //----------------------------------------------------------------------
+    bool processInbox(QString folder);
+
+    //----------------------------------------------------------------------
     // Method: actualSendMultInData
     // Send a new InData messages to Event Manager
     //----------------------------------------------------------------------
@@ -109,6 +116,26 @@ public slots:
     // Stop sending messages and clears list of pending ones
     //----------------------------------------------------------------------
     void stopSendingInData();
+
+private:
+    //----------------------------------------------------------------------
+    // Method: readMetaFile
+    // Read metadata file from incoming products folder
+    //----------------------------------------------------------------------
+    void readMetaFile(const QString& metaFile);
+
+    //----------------------------------------------------------------------
+    // Method: generateMetaFile
+    // Generate metafile with metadata from product file names
+    //----------------------------------------------------------------------
+    void generateMetaFile(const QString& folder, const QString& metaFile);
+
+    //----------------------------------------------------------------------
+    // Method: traverseDirectory
+    // Generate (recursive) list of product files (actually .fits files) in
+    // folder
+    //----------------------------------------------------------------------
+    void traverseDirectory(const QString& sDir, QStringList & files);
 
 private:
     HMIProxy * hmiNode;
