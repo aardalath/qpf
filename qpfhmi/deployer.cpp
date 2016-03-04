@@ -205,6 +205,7 @@ void Deployer::readConfig(const char * configFile)
 
     cfg->getGeneralInfo(qpfCfg->appName, qpfCfg->appVersion, qpfCfg->lastAccess);
     cfg->getProductTypes(qpfCfg->orcParams.productTypes);
+    cfg->reset();
 
     for (int i = 0; i < cfg->getNumOrchRules(); ++i) {
         TaskOrchestrator::Rule * rule = new TaskOrchestrator::Rule;
@@ -231,6 +232,7 @@ void Deployer::readConfig(const char * configFile)
                        qpfCfg->qpfhmiCfg.type,
                        qpfCfg->qpfhmiCfg.clientAddr,
                        qpfCfg->qpfhmiCfg.serverAddr);
+    delete cfg;
 }
 
 //----------------------------------------------------------------------
