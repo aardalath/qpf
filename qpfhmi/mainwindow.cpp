@@ -185,17 +185,17 @@ void MainWindow::saveAs()
 #ifndef QT_NO_CLIPBOARD
 void MainWindow::cut()
 {
-    if (activeTextView()) activeTextView()->cut();
+    if (activeTextView()) activeTextView()->getTextEditor()->cut();
 }
 
 void MainWindow::copy()
 {
-    if (activeTextView()) activeTextView()->copy();
+    if (activeTextView()) activeTextView()->getTextEditor()->copy();
 }
 
 void MainWindow::paste()
 {
-    if (activeTextView()) activeTextView()->paste();
+    if (activeTextView()) activeTextView()->getTextEditor()->paste();
 }
 #endif
 
@@ -231,7 +231,7 @@ void MainWindow::updateMenus()
 
 #ifndef QT_NO_CLIPBOARD
     bool hasSelection = (activeTextView() &&
-                         activeTextView()->textCursor().hasSelection());
+                         activeTextView()->getTextEditor()->textCursor().hasSelection());
     cutAct->setEnabled(hasSelection);
     copyAct->setEnabled(hasSelection);
 #endif
@@ -536,7 +536,7 @@ void MainWindow::readConfig()
         ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
-    ui->edInboxPath->setText(QString(cfgInfo.storage.in.exchangeBox.c_str()));
+    ui->edInboxPath->setText(QString(cfgInfo.storage.in.inbox.c_str()));
 }
 
 //----------------------------------------------------------------------
@@ -690,7 +690,10 @@ void MainWindow::setLogWatch()
         LogWatcher * newLog = new LogWatcher(pltxted);
         newLog->setFile(logFileName);
         nodeLogs.append(newLog);
-        ui->mdiArea->addSubWindow(pltxted);
+        QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
+        subw->setWindowFlags(Qt::CustomizeWindowHint |
+                             Qt::WindowTitleHint |
+                             Qt::WindowMinMaxButtonsHint);
         connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
 }

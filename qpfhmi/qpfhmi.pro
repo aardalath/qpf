@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     app.cpp \
     deployer.cpp \
     frmagentstatus.cpp \
-    simindata.cpp
+    simindata.cpp \
+    textview.cpp
 
 HEADERS  += mainwindow.h \
          hmipxy.h \
@@ -38,11 +39,13 @@ HEADERS  += mainwindow.h \
     app.h \
     deployer.h \
     frmagentstatus.h \
-    simindata.h
+    simindata.h \
+    textview.h
 
 FORMS    += mainwindow.ui \
     dlgshowtaskinfo.ui \
-    frmagentstatus.ui
+    frmagentstatus.ui \
+    logframe.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$JSONCPPINC $$PSQLCPPINC
 

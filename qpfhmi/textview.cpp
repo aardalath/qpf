@@ -29,7 +29,7 @@ bool TextView::saveFile(const QString &fileName)
 
     QTextStream out(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << toPlainText();
+    out << getTextEditor()->toPlainText();
     QApplication::restoreOverrideCursor();
 
     return true;
@@ -51,3 +51,4 @@ void TextView::closeEvent(QCloseEvent *event)
 {
     event->accept();
 }
+

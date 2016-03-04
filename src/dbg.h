@@ -75,13 +75,19 @@
 #define DEBUG_BUILD
 
 #ifdef DEBUG_BUILD
+
 #  define DUMPVAR(v) #v << v
 #  define DBG(s) std::cerr						\
   << __FILE__ << ':' << __FUNCTION__ << ':' << __LINE__			\
   << ": " << s << std::endl << std::flush
+
+void showBacktrace();
+
 #else
+
 #  define DUMPVAR(v)
 #  define DBG(s)
+
 #endif
 
 #endif // DBG_H

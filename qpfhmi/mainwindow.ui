@@ -35,11 +35,22 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QMdiArea" name="mdiArea">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="activationOrder">
+           <enum>QMdiArea::ActivationHistoryOrder</enum>
+          </property>
           <property name="viewMode">
            <enum>QMdiArea::TabbedView</enum>
           </property>
           <property name="documentMode">
            <bool>true</bool>
+          </property>
+          <property name="tabsClosable">
+           <bool>false</bool>
           </property>
           <property name="tabsMovable">
            <bool>true</bool>
@@ -952,8 +963,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>839</width>
+             <height>484</height>
             </rect>
            </property>
           </widget>
@@ -1114,8 +1125,8 @@
           <item>
            <widget class="QPushButton" name="btnStopMultInDataEvt">
             <property name="text">
-             <string>Stop sending
-INDATA messages</string>
+             <string>Stop processing
+incoming data</string>
             </property>
            </widget>
           </item>

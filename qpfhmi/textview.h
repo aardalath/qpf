@@ -2,8 +2,10 @@
 #define TEXTVIEW_H
 
 #include <QtWidgets>
+#include "logframe.h"
 
-class TextView : public QPlainTextEdit
+//class TextView : public QPlainTextEdit
+class TextView : public LogFrame
 {
     Q_OBJECT
 

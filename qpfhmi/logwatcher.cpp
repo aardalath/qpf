@@ -75,9 +75,9 @@ void LogWatcher::updateLogView(const QString & path)
   c = f.read(newBytes);
   bytesRead += c.size();
 
-  QTextCursor cursor = textView->textCursor();
+  QTextCursor cursor = textView->getTextEditor()->textCursor();
 
-  qint64 linesToRemove = textView->blockCount() > maxNumLines;
+  qint64 linesToRemove = textView->getTextEditor()->blockCount() > maxNumLines;
   if (linesToRemove > 0) {
       cursor.movePosition(QTextCursor::Start);
       cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, linesToRemove);
@@ -87,8 +87,8 @@ void LogWatcher::updateLogView(const QString & path)
 
   cursor.movePosition(QTextCursor::End);
   cursor.insertText(QString(c));
-  textView->setTextCursor(cursor);
-  textView->ensureCursorVisible();
+  textView->getTextEditor()->setTextCursor(cursor);
+  textView->getTextEditor()->ensureCursorVisible();
 
   emit logUpdated();
 }
