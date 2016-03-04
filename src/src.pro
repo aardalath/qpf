@@ -17,10 +17,11 @@ TARGET = QPF
 
 LIBS += /opt/cots/lib/libzmq.so -lzmq
 
-INCLUDEPATH += . $$LIBCOMMINC $$JSONCPPINC $$PSQLCPPINC
+INCLUDEPATH += . $$LIBCOMMINC $$JSONCPPINC $$SDCINC $$PSQLCPPINC
 
 LIBS += -L$$LIBCOMMLIB -llibcomm \
         -L$$JSONCPPLIB -ljson \
+        -L$$SDCLIB -lsdc \
         -L$$PSQLCPPLIB -l$$PSQLLIB \
         -L/opt/cots/lib -lzmq
 
@@ -35,7 +36,8 @@ HEADERS += \
     cfg.h \
     dbg.h \
     urlhdl.h \
-    cfginfo.h
+    cfginfo.h \
+    filetransfer.h
 
 HEADERS += \
         config.h \
@@ -62,4 +64,5 @@ SOURCES +=  \
         taskorc.cpp \
     procelem.cpp \
     urlhdl.cpp \
-    dbg.cpp
+    dbg.cpp \
+    cfginfo.cpp
