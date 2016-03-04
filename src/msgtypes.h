@@ -273,7 +273,9 @@ typedef Json::Value                            TaskData;
     T(FAILED,  -1), \
     T(FINISHED, 0), \
     T(RUNNING,  1), \
-    T(WAITING,  2)
+    T(WAITING,  2), \
+    T(PAUSED,   3), \
+    T(STOPPED,  4)
 
 #define T(a,b) TASK_ ## a = b
 enum TaskStatus { TLIST_TASK_STATUS };
