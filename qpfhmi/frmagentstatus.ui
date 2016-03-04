@@ -506,7 +506,6 @@
    </item>
   </layout>
   <zorder>lblTaskAgentName</zorder>
-  <zorder></zorder>
  </widget>
  <resources/>
  <connections/>
