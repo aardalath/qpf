@@ -14,10 +14,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 
@@ -28,21 +28,24 @@ class Ui_FrmAgentStatus
 public:
     QVBoxLayout *verticalLayout;
     QLabel *lblTaskAgentName;
-    QHBoxLayout *horizontalLayout_11;
+    QGridLayout *gridLayout;
     QHBoxLayout *horizontalLayout_8;
     QLabel *label;
     QLabel *lblTotalTasks;
-    QSpacerItem *horizontalSpacer_4;
-    QHBoxLayout *horizontalLayout_7;
-    QLabel *label_8;
-    QLabel *lblMaxTasks;
-    QSpacerItem *horizontalSpacer;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_2;
+    QLabel *lblRuningTasks;
+    QHBoxLayout *horizontalLayout_5;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_6;
     QLabel *lblClient;
     QLabel *label_9;
     QLabel *lblServer;
     QSpacerItem *horizontalSpacer_2;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_8;
+    QLabel *lblMaxTasks;
+    QHBoxLayout *horizontalLayout_6;
     QHBoxLayout *horizontalLayout;
     QLabel *label_7;
     QLabel *lblLoadAvg1;
@@ -52,35 +55,24 @@ public:
     QHBoxLayout *horizontalLayout_9;
     QLabel *label_10;
     QLabel *lblUptime;
-    QHBoxLayout *horizontalLayout_10;
-    QHBoxLayout *horizontalLayout_3;
-    QLabel *label_2;
-    QLabel *lblRuningTasks;
-    QProgressBar *pbPercRunning;
+    QFrame *frmStatusBar;
     QHBoxLayout *horizontalLayout_4;
-    QLabel *label_3;
-    QLabel *lblWaitingTasks;
-    QProgressBar *pbPercWaiting;
-    QHBoxLayout *horizontalLayout_5;
-    QLabel *label_4;
-    QLabel *lblFailedTasks;
-    QProgressBar *pbPercFailed;
-    QHBoxLayout *horizontalLayout_6;
-    QLabel *label_5;
-    QLabel *lblFinishedTasks;
-    QProgressBar *pbPercFinished;
+    QFrame *frmRunning;
+    QFrame *frmWaiting;
+    QFrame *frmPaused;
+    QFrame *frmStopped;
+    QFrame *frmFailed;
+    QFrame *frmFinished;
 
     void setupUi(QFrame *FrmAgentStatus)
     {
         if (FrmAgentStatus->objectName().isEmpty())
             FrmAgentStatus->setObjectName(QStringLiteral("FrmAgentStatus"));
-        FrmAgentStatus->resize(888, 80);
+        FrmAgentStatus->resize(779, 95);
         FrmAgentStatus->setFrameShape(QFrame::Box);
         FrmAgentStatus->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(FrmAgentStatus);
-        verticalLayout->setSpacing(2);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(4, 4, 4, 4);
         lblTaskAgentName = new QLabel(FrmAgentStatus);
         lblTaskAgentName->setObjectName(QStringLiteral("lblTaskAgentName"));
         QFont font;
@@ -90,8 +82,8 @@ public:
 
         verticalLayout->addWidget(lblTaskAgentName);
 
-        horizontalLayout_11 = new QHBoxLayout();
-        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
         label = new QLabel(FrmAgentStatus);
@@ -106,32 +98,26 @@ public:
         horizontalLayout_8->addWidget(lblTotalTasks);
 
 
-        horizontalLayout_11->addLayout(horizontalLayout_8);
+        gridLayout->addLayout(horizontalLayout_8, 0, 0, 1, 1);
 
-        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        label_2 = new QLabel(FrmAgentStatus);
+        label_2->setObjectName(QStringLiteral("label_2"));
 
-        horizontalLayout_11->addItem(horizontalSpacer_4);
+        horizontalLayout_3->addWidget(label_2);
 
-        horizontalLayout_7 = new QHBoxLayout();
-        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
-        label_8 = new QLabel(FrmAgentStatus);
-        label_8->setObjectName(QStringLiteral("label_8"));
+        lblRuningTasks = new QLabel(FrmAgentStatus);
+        lblRuningTasks->setObjectName(QStringLiteral("lblRuningTasks"));
+        lblRuningTasks->setFont(font);
 
-        horizontalLayout_7->addWidget(label_8);
-
-        lblMaxTasks = new QLabel(FrmAgentStatus);
-        lblMaxTasks->setObjectName(QStringLiteral("lblMaxTasks"));
-        lblMaxTasks->setFont(font);
-
-        horizontalLayout_7->addWidget(lblMaxTasks);
+        horizontalLayout_3->addWidget(lblRuningTasks);
 
 
-        horizontalLayout_11->addLayout(horizontalLayout_7);
+        gridLayout->addLayout(horizontalLayout_3, 0, 1, 1, 1);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_11->addItem(horizontalSpacer);
-
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         label_6 = new QLabel(FrmAgentStatus);
@@ -157,12 +143,33 @@ public:
         horizontalLayout_2->addWidget(lblServer);
 
 
-        horizontalLayout_11->addLayout(horizontalLayout_2);
+        horizontalLayout_5->addLayout(horizontalLayout_2);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_11->addItem(horizontalSpacer_2);
+        horizontalLayout_5->addItem(horizontalSpacer_2);
 
+
+        gridLayout->addLayout(horizontalLayout_5, 0, 2, 1, 1);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        label_8 = new QLabel(FrmAgentStatus);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        horizontalLayout_7->addWidget(label_8);
+
+        lblMaxTasks = new QLabel(FrmAgentStatus);
+        lblMaxTasks->setObjectName(QStringLiteral("lblMaxTasks"));
+        lblMaxTasks->setFont(font);
+
+        horizontalLayout_7->addWidget(lblMaxTasks);
+
+
+        gridLayout->addLayout(horizontalLayout_7, 1, 0, 1, 1);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         label_7 = new QLabel(FrmAgentStatus);
@@ -189,11 +196,11 @@ public:
         horizontalLayout->addWidget(lblLoadAvg3);
 
 
-        horizontalLayout_11->addLayout(horizontalLayout);
+        horizontalLayout_6->addLayout(horizontalLayout);
 
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_11->addItem(horizontalSpacer_3);
+        horizontalLayout_6->addItem(horizontalSpacer_3);
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
@@ -209,113 +216,83 @@ public:
         horizontalLayout_9->addWidget(lblUptime);
 
 
-        horizontalLayout_11->addLayout(horizontalLayout_9);
-
-        horizontalLayout_11->setStretch(0, 2);
-        horizontalLayout_11->setStretch(1, 1);
-        horizontalLayout_11->setStretch(2, 3);
-        horizontalLayout_11->setStretch(3, 1);
-        horizontalLayout_11->setStretch(4, 4);
-        horizontalLayout_11->setStretch(5, 1);
-        horizontalLayout_11->setStretch(6, 2);
-        horizontalLayout_11->setStretch(7, 1);
-        horizontalLayout_11->setStretch(8, 2);
-
-        verticalLayout->addLayout(horizontalLayout_11);
-
-        horizontalLayout_10 = new QHBoxLayout();
-        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        label_2 = new QLabel(FrmAgentStatus);
-        label_2->setObjectName(QStringLiteral("label_2"));
-
-        horizontalLayout_3->addWidget(label_2);
-
-        lblRuningTasks = new QLabel(FrmAgentStatus);
-        lblRuningTasks->setObjectName(QStringLiteral("lblRuningTasks"));
-        lblRuningTasks->setFont(font);
-
-        horizontalLayout_3->addWidget(lblRuningTasks);
-
-        pbPercRunning = new QProgressBar(FrmAgentStatus);
-        pbPercRunning->setObjectName(QStringLiteral("pbPercRunning"));
-        pbPercRunning->setValue(24);
-
-        horizontalLayout_3->addWidget(pbPercRunning);
+        horizontalLayout_6->addLayout(horizontalLayout_9);
 
 
-        horizontalLayout_10->addLayout(horizontalLayout_3);
+        gridLayout->addLayout(horizontalLayout_6, 1, 2, 1, 1);
 
-        horizontalLayout_4 = new QHBoxLayout();
+        frmStatusBar = new QFrame(FrmAgentStatus);
+        frmStatusBar->setObjectName(QStringLiteral("frmStatusBar"));
+        frmStatusBar->setFrameShape(QFrame::StyledPanel);
+        frmStatusBar->setFrameShadow(QFrame::Raised);
+        horizontalLayout_4 = new QHBoxLayout(frmStatusBar);
+        horizontalLayout_4->setSpacing(0);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        label_3 = new QLabel(FrmAgentStatus);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
+        frmRunning = new QFrame(frmStatusBar);
+        frmRunning->setObjectName(QStringLiteral("frmRunning"));
+        frmRunning->setStyleSheet(QStringLiteral("background-color: rgb(0, 0, 255);"));
+        frmRunning->setFrameShape(QFrame::Panel);
+        frmRunning->setFrameShadow(QFrame::Plain);
+        frmRunning->setLineWidth(0);
 
-        horizontalLayout_4->addWidget(label_3);
+        horizontalLayout_4->addWidget(frmRunning);
 
-        lblWaitingTasks = new QLabel(FrmAgentStatus);
-        lblWaitingTasks->setObjectName(QStringLiteral("lblWaitingTasks"));
-        lblWaitingTasks->setFont(font);
+        frmWaiting = new QFrame(frmStatusBar);
+        frmWaiting->setObjectName(QStringLiteral("frmWaiting"));
+        frmWaiting->setStyleSheet(QStringLiteral("background-color: rgb(14, 170, 204);"));
+        frmWaiting->setFrameShape(QFrame::Panel);
+        frmWaiting->setFrameShadow(QFrame::Plain);
+        frmWaiting->setLineWidth(0);
 
-        horizontalLayout_4->addWidget(lblWaitingTasks);
+        horizontalLayout_4->addWidget(frmWaiting);
 
-        pbPercWaiting = new QProgressBar(FrmAgentStatus);
-        pbPercWaiting->setObjectName(QStringLiteral("pbPercWaiting"));
-        pbPercWaiting->setValue(24);
+        frmPaused = new QFrame(frmStatusBar);
+        frmPaused->setObjectName(QStringLiteral("frmPaused"));
+        frmPaused->setStyleSheet(QStringLiteral("background-color: rgb(255, 254, 0);"));
+        frmPaused->setFrameShape(QFrame::Panel);
+        frmPaused->setFrameShadow(QFrame::Plain);
+        frmPaused->setLineWidth(0);
 
-        horizontalLayout_4->addWidget(pbPercWaiting);
+        horizontalLayout_4->addWidget(frmPaused);
 
+        frmStopped = new QFrame(frmStatusBar);
+        frmStopped->setObjectName(QStringLiteral("frmStopped"));
+        frmStopped->setStyleSheet(QStringLiteral("background-color: rgb(121, 121, 121);"));
+        frmStopped->setFrameShape(QFrame::Panel);
+        frmStopped->setFrameShadow(QFrame::Plain);
+        frmStopped->setLineWidth(0);
 
-        horizontalLayout_10->addLayout(horizontalLayout_4);
+        horizontalLayout_4->addWidget(frmStopped);
 
-        horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
-        label_4 = new QLabel(FrmAgentStatus);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        frmFailed = new QFrame(frmStatusBar);
+        frmFailed->setObjectName(QStringLiteral("frmFailed"));
+        frmFailed->setStyleSheet(QStringLiteral("background-color: rgb(255, 0, 0);"));
+        frmFailed->setFrameShape(QFrame::Panel);
+        frmFailed->setFrameShadow(QFrame::Plain);
+        frmFailed->setLineWidth(0);
 
-        horizontalLayout_5->addWidget(label_4);
+        horizontalLayout_4->addWidget(frmFailed);
 
-        lblFailedTasks = new QLabel(FrmAgentStatus);
-        lblFailedTasks->setObjectName(QStringLiteral("lblFailedTasks"));
-        lblFailedTasks->setFont(font);
+        frmFinished = new QFrame(frmStatusBar);
+        frmFinished->setObjectName(QStringLiteral("frmFinished"));
+        frmFinished->setStyleSheet(QStringLiteral("background-color: rgb(0, 240, 0);"));
+        frmFinished->setFrameShape(QFrame::Panel);
+        frmFinished->setFrameShadow(QFrame::Plain);
+        frmFinished->setLineWidth(0);
 
-        horizontalLayout_5->addWidget(lblFailedTasks);
-
-        pbPercFailed = new QProgressBar(FrmAgentStatus);
-        pbPercFailed->setObjectName(QStringLiteral("pbPercFailed"));
-        pbPercFailed->setValue(24);
-
-        horizontalLayout_5->addWidget(pbPercFailed);
-
-
-        horizontalLayout_10->addLayout(horizontalLayout_5);
-
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
-        label_5 = new QLabel(FrmAgentStatus);
-        label_5->setObjectName(QStringLiteral("label_5"));
-
-        horizontalLayout_6->addWidget(label_5);
-
-        lblFinishedTasks = new QLabel(FrmAgentStatus);
-        lblFinishedTasks->setObjectName(QStringLiteral("lblFinishedTasks"));
-        lblFinishedTasks->setFont(font);
-
-        horizontalLayout_6->addWidget(lblFinishedTasks);
-
-        pbPercFinished = new QProgressBar(FrmAgentStatus);
-        pbPercFinished->setObjectName(QStringLiteral("pbPercFinished"));
-        pbPercFinished->setValue(24);
-
-        horizontalLayout_6->addWidget(pbPercFinished);
+        horizontalLayout_4->addWidget(frmFinished);
 
 
-        horizontalLayout_10->addLayout(horizontalLayout_6);
+        gridLayout->addWidget(frmStatusBar, 1, 1, 1, 1);
 
+        gridLayout->setColumnStretch(0, 2);
+        gridLayout->setColumnStretch(1, 3);
+        gridLayout->setColumnStretch(2, 2);
 
-        verticalLayout->addLayout(horizontalLayout_10);
+        verticalLayout->addLayout(gridLayout);
 
+        lblTaskAgentName->raise();
 
         retranslateUi(FrmAgentStatus);
 
@@ -328,26 +305,20 @@ public:
         lblTaskAgentName->setText(QApplication::translate("FrmAgentStatus", "Task Agent", 0));
         label->setText(QApplication::translate("FrmAgentStatus", "Total tasks:", 0));
         lblTotalTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_8->setText(QApplication::translate("FrmAgentStatus", "Max.Concurrent Tasks:", 0));
-        lblMaxTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
+        label_2->setText(QApplication::translate("FrmAgentStatus", "Run/Wait/Pau/Sto/Fail/Fin:", 0));
+        lblRuningTasks->setText(QApplication::translate("FrmAgentStatus", "0/0/0/0/0/0", 0));
         label_6->setText(QApplication::translate("FrmAgentStatus", "Client/Server:", 0));
         lblClient->setText(QApplication::translate("FrmAgentStatus", "localhost", 0));
         label_9->setText(QApplication::translate("FrmAgentStatus", "/", 0));
         lblServer->setText(QApplication::translate("FrmAgentStatus", "localhost", 0));
+        label_8->setText(QApplication::translate("FrmAgentStatus", "Max.Concurrent Tasks:", 0));
+        lblMaxTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
         label_7->setText(QApplication::translate("FrmAgentStatus", "Load Avgs.:", 0));
         lblLoadAvg1->setText(QApplication::translate("FrmAgentStatus", "0", 0));
         lblLoadAvg2->setText(QApplication::translate("FrmAgentStatus", "0", 0));
         lblLoadAvg3->setText(QApplication::translate("FrmAgentStatus", "0", 0));
         label_10->setText(QApplication::translate("FrmAgentStatus", "Up time:", 0));
         lblUptime->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_2->setText(QApplication::translate("FrmAgentStatus", "Running:", 0));
-        lblRuningTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_3->setText(QApplication::translate("FrmAgentStatus", "Waiting:", 0));
-        lblWaitingTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_4->setText(QApplication::translate("FrmAgentStatus", "Failed:", 0));
-        lblFailedTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_5->setText(QApplication::translate("FrmAgentStatus", "Finished:", 0));
-        lblFinishedTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
     } // retranslateUi
 
 };
