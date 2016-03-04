@@ -126,6 +126,16 @@ private:
 
 };
 
+const std::string ExternalSpace("EXTERNAL");
+const std::string UserSpace("USER");
+const std::string InboxSpace("INBOX");
+const std::string LocalArchSpace("LOCAL_ARCHIVE");
+const std::string SharedSpace("SHARED");
+const std::string ProcessingSpace("PROCESSING");
+
+const std::set<std::string> URLSpaces
+{ ExternalSpace, UserSpace, InboxSpace, LocalArchSpace, SharedSpace, ProcessingSpace };
+
 }
 
 #endif  /* CFGINFO_H */
