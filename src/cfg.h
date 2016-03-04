@@ -49,8 +49,8 @@
 // Topic: Project dependencies
 //------------------------------------------------------------
 #include "msgtypes.h"
+//#include "component.h"
 #include "commnode.h"
-
 using namespace LibComm;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -97,14 +97,14 @@ struct StorageExternal {
     std::string port;
     std::string user;
     std::string passwd;
+    std::string exchangeBox;
 };
 
 struct StorageLocal {
     std::string path;
 };
 
-struct StorageShared
-{
+struct StorageShared {
     std::string local_path;
     std::string external_path;
 };
@@ -115,6 +115,8 @@ struct StorageConfig {
     StorageShared   shared;
     StorageExternal out;
 };
+
+class Component;
 
 struct ConfigurationInfo {
     // Configuration file name
@@ -140,8 +142,8 @@ struct ConfigurationInfo {
     Peer                                evtMngCfg;
 
     // Nodes for current machine
-    std::vector<CommNode *>             peerNodes;
-    std::vector<CommNode *>             peerAgents;
+    std::vector<Component *>            peerNodes;
+    std::vector<Component *>            peerAgents;
 
     // Machine network
     std::vector<std::string>            machines;
