@@ -142,7 +142,7 @@ public:
     // Method: checkTask
     // Returns true if an entry for a task exists in the DB
     //----------------------------------------------------------------------
-    virtual bool checkTask(TaskInfo & task)=0;
+    virtual bool checkTask(std::string taskId = std::string())=0;
 
     //----------------------------------------------------------------------
     // Method: updateTask
