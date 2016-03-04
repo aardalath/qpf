@@ -48,12 +48,10 @@
 //------------------------------------------------------------
 // Topic: Project dependencies
 //------------------------------------------------------------
-#include "evtmng.h"
-#include "datamng.h"
-#include "logmng.h"
-#include "taskmng.h"
-#include "taskagent.h"
-#include "taskorc.h"
+#include "msgtypes.h"
+#include "commnode.h"
+
+using namespace LibComm;
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -63,55 +61,90 @@
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
 
-    typedef LibComm::Router2RouterPeer::Peer           Peer;
-    typedef LibComm::Router2RouterPeer::Frame          Frame;
-    typedef TaskOrchestrator::OrchestrationParameters  OrcParameters;
+typedef LibComm::Router2RouterPeer::Peer           Peer;
+typedef LibComm::Router2RouterPeer::Frame          Frame;
 
-    struct PeerNodesData {
-    PeerNodesData() :
-        evtMng(0), dataMng(0), logMng(0), tskMng(0), tskOrc(0) {}
-        EventManager *                      evtMng;
-        DataManager *                       dataMng;
-        LogManager *                        logMng;
-        TaskManager *                       tskMng;
-        TaskOrchestrator *                  tskOrc;
-        std::vector<TaskAgent *>            tskAgents;
-        std::vector<CommNode *>             nodes;
-        std::map<std::string,
-            std::vector<std::string> >      connections;
-    };
+struct Rule {
+    std::string                         name;
+    std::vector<std::string>            inputs;
+    std::vector<std::string>            outputs;
+    std::string                         processingElement;
+};
 
-    struct ConfigurationInfo {
-        // Configuration file name
-        std::string                         cfgFileName;
+typedef std::map<Rule *, ProductList>  RuleInputs;
 
-        // General
-        std::string                         appName;
-        std::string                         appVersion;
-        std::string                         lastAccess;
+struct Processor {
+    std::string                         name;
+    std::string                         exePath;
+    std::string                         inPath;
+    std::string                         outPath;
+};
 
-        // Orchestration
-        OrcParameters                       orcParams;
+struct OrchestrationParameters {
+    std::vector<std::string>            productTypes;
+    std::vector<Rule *>                 rules;
+    std::map<std::string, Processor *>  processors;
+};
 
-        // Nodes
-        PeerNodesData                       peerNodesData;
-        std::vector<std::string>            peerNames;
-        std::vector<Peer>                   peersCfg;
-        Peer                                qpfhmiCfg;
-        Peer                                evtMngCfg;
+struct OrchestrationMaps {
+    std::multimap<std::string, Rule *>  prodAsInput;
+    std::map<Rule *, std::string>       ruleDesc;
+};
 
-        // Machine network
-        std::vector<std::string>            machines;
-        std::map<std::string,
-            std::vector<std::string> >      machineNodes;
+struct ConfigurationInfo {
+    // Configuration file name
+    std::string                         cfgFileName;
+    std::string                         currentMachine;
+    std::string                         currentUser;
 
-        // Data Base info
-        std::string                         DBHost;
-        std::string                         DBPort;
-        std::string                         DBName;
-        std::string                         DBUser;
-        std::string                         DBPwd;
-    };
+    // General
+    std::string                         appName;
+    std::string                         appVersion;
+    std::string                         lastAccess;
+
+    // Orchestration
+    OrchestrationParameters             orcParams;
+
+    // Nodes
+    std::vector<std::string>            peerNames;
+    std::vector<Peer>                   peersCfg;
+    std::map<std::string, Peer*>        peersCfgByName;
+    std::map<std::string,
+             std::vector<std::string> > connections;
+    Peer                                qpfhmiCfg;
+    Peer                                evtMngCfg;
+
+    // Nodes for current machine
+    std::vector<CommNode *>             peerNodes;
+    std::vector<CommNode *>             peerAgents;
+
+    // Machine network
+    std::vector<std::string>            machines;
+    std::map<std::string,
+             std::vector<std::string> > machineNodes;
+    bool                                hmiPresent;
+
+    // Data Base info
+    std::string                         DBHost;
+    std::string                         DBPort;
+    std::string                         DBName;
+    std::string                         DBUser;
+    std::string                         DBPwd;
+
+    void clear() {
+        orcParams.processors.clear();
+        orcParams.productTypes.clear();
+        orcParams.rules.clear();
+        peerNames.clear();
+        peersCfg.clear();
+        peersCfgByName.clear();
+        connections.clear();
+        peerNodes.clear();
+        peerAgents.clear();
+        machines.clear();
+        machineNodes.clear();
+    }
+};
 
 }
 
