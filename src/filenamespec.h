@@ -1,0 +1,125 @@
+/******************************************************************************
+ * File:    filenamespec.h
+ *          This file is part of QLA Processing Framework
+ *
+ * Domain:  QPF.libQPF.FileNameSpec
+ *
+ * Version: 1.0
+ *
+ * Date:    2015/07/01
+ *
+ * Copyright (C) 2015 J C Gonzalez
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Declare FileNameSpec class
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   Component
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <Changelog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
+#ifndef FILENAMESPEC_H
+#define FILENAMESPEC_H
+
+//============================================================
+// Group: External Dependencies
+//============================================================
+
+//------------------------------------------------------------
+// Topic: System headers
+//  - cstdio
+//------------------------------------------------------------
+//#include <cstdio>
+#include <string>
+#include <set>
+#include <vector>
+#include <regex>
+
+//------------------------------------------------------------
+// Topic: External packages
+//  none
+//------------------------------------------------------------
+
+//------------------------------------------------------------
+// Topic: Project headers
+//  none
+//------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////
+// Namespace: QPF
+// -----------------------
+//
+// Library namespace
+////////////////////////////////////////////////////////////////////////////
+//namespace QPF {
+
+//==========================================================================
+// Class: FileNameSpec
+//==========================================================================
+class FileNameSpec {
+
+public:
+    FileNameSpec();
+    FileNameSpec(std::string regexp, std::string assign);
+
+    struct FileNameComponents {
+        std::string dirName;
+        std::string baseName;
+        std::string suffix;
+        std::string extension;
+        std::string signature;    // %S
+        std::string instrument;   // %I
+        std::string productType;  // %T
+        std::string version;      // %v
+        std::string dateRange;    // %D
+        std::string dateStart;    // %f
+        std::string dateEnd;      // %t
+#ifdef DEBUG_BUILD
+        void dump(std::ostream & os) {
+            os << "dirName     : " << this->dirName << std::endl;
+            os << "baseName    : " << this->baseName << std::endl;
+            os << "suffix      : " << this->suffix << std::endl;
+            os << "extension   : " << this->extension << std::endl;
+            os << "signature   : " << this->signature << std::endl;
+            os << "instrument  : " << this->instrument << std::endl;
+            os << "productType : " << this->productType << std::endl;
+            os << "version     : " << this->version << std::endl;
+            os << "dateRange   : " << this->dateRange << std::endl;
+            os << "dateStart   : " << this->dateStart << std::endl;
+            os << "dateEnd     : " << this->dateEnd << std::endl;
+        }
+#endif
+    };
+
+    void setFileNameSpec(std::string regexp, std::string assign);
+    void setRegEx(std::string regexp);
+    void setAssignations(std::string assign);
+
+    FileNameComponents parseFileName(std::string fileName);
+
+private:
+    std::regex                        re;
+    std::map< char, std::set<int> >   assignations;
+};
+
+//}
+
+#endif  /* FILENAMESPEC_H */
