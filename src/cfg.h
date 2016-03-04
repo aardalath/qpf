@@ -91,6 +91,31 @@ struct OrchestrationMaps {
     std::map<Rule *, std::string>       ruleDesc;
 };
 
+struct StorageExternal {
+    std::string protocol;
+    std::string address;
+    std::string port;
+    std::string user;
+    std::string passwd;
+};
+
+struct StorageLocal {
+    std::string path;
+};
+
+struct StorageShared
+{
+    std::string local_path;
+    std::string external_path;
+};
+
+struct StorageConfig {
+    StorageExternal in;
+    StorageLocal    local;
+    StorageShared   shared;
+    StorageExternal out;
+};
+
 struct ConfigurationInfo {
     // Configuration file name
     std::string                         cfgFileName;
@@ -123,6 +148,9 @@ struct ConfigurationInfo {
     std::map<std::string,
              std::vector<std::string> > machineNodes;
     bool                                hmiPresent;
+
+    // Storage information
+    StorageConfig                       storage;
 
     // Data Base info
     std::string                         DBHost;
