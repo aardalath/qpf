@@ -71,17 +71,19 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0, char * cfgFile = 0);
     ~MainWindow();
 
+    /*
     typedef LibComm::Router2RouterPeer::Peer   Peer;
     typedef LibComm::Router2RouterPeer::Frame  Frame;
 
-    struct ProcessingElement {
+    struct Processor {
         std::string name;
         std::string exePath;
         std::string inPath;
         std::string outPath;
+        std::vector<std::string> connections;
     };
 
     struct QPFHMIConfig {
@@ -89,12 +91,15 @@ public:
         std::string appVersion;
         std::string lastAccess;
 
-        std::vector<std::string>                  productTypes;
-        std::map<std::string, ProcessingElement*> procElems;
+        std::vector<std::string>                         productTypes;
+        std::map<std::string, Processor*>                processors;
+        std::vector<std::string>                         machines;
+        std::map<std::string, std::vector<std::string> > machineNodes;
 
         Peer evtMngCfg;
         Peer qpfhmiCfg;
     };    
+*/
 
 signals:
     void goToOperational();
@@ -167,6 +172,8 @@ private:
 private:
     Ui::MainWindow *ui;
 
+    char * configFile;
+
     QVector<LogWatcher*> nodeLogs;
 
     HMIProxy * hmiNode;
@@ -175,8 +182,6 @@ private:
 
     SimInData * simInData;
 
-    //Config::Config * cfg;
-    QPFHMIConfig    qpfCfg;
     Configuration * cfg;
 
     ArchiveModel * archHdl;

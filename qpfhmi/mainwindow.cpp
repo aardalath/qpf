@@ -71,9 +71,10 @@ static const char * FixedWidthStyle = "font: 7pt \"Droid Sans Mono\";";
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, char * cfgFile) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    configFile(cfgFile)
 {
     // Set-up UI
     ui->setupUi(this);
@@ -116,6 +117,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(stopSendingMessages()), simInData, SLOT(stopSendingInData()));
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
+
+    // Automatic start-up
+    commandSystem();
 }
 
 //----------------------------------------------------------------------
@@ -132,22 +136,13 @@ MainWindow::~MainWindow()
 //----------------------------------------------------------------------
 void MainWindow::readConfig()
 {
-    cfg = new Configuration(0);
-    cfg->getGeneralInfo(qpfCfg.appName, qpfCfg.appVersion, qpfCfg.lastAccess);
-    cfg->getProductTypes(qpfCfg.productTypes);
-    cfg->reset();
-
-    for (int i = 0; i < cfg->getNumProcs(); ++i) {
-        ProcessingElement * pe = new ProcessingElement;
-        cfg->getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
-        qpfCfg.procElems[pe->name] = pe;
-    }
+    cfg = new Configuration(configFile);
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
-    LibComm::Router2RouterPeer::Peer peer;
-    for (int i = 0; i < cfg->getNumNodes(); ++i) {
-        cfg->getNode(peer.name, peer.type, peer.clientAddr, peer.serverAddr);
+    for (unsigned int i = 0; i < cfgInfo.peersCfg.size(); ++i) {
+        const Peer & peer = cfgInfo.peersCfg.at(i);
         if (peer.type == "taskagent") {
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             taInfo->name = peer.name;
@@ -159,35 +154,24 @@ void MainWindow::readConfig()
         }
     }
 
-    for (auto & kv : taskAgentsInfo ) {
-        qDebug() << kv.first.c_str()
-                 << kv.second->name.c_str()
-                 << kv.second->client.c_str()
-                 << kv.second->server.c_str()
-                 << kv.second->total << kv.second->running << kv.second->waiting
-                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
-    }
-
-    // Save HMI & EvtMng Peer configuration
-    qpfCfg.evtMngCfg.name = "EvtMng";
-    cfg->getNodeByName("EvtMng", qpfCfg.evtMngCfg.type,
-                       qpfCfg.evtMngCfg.clientAddr, qpfCfg.evtMngCfg.serverAddr);
-
-    qpfCfg.qpfhmiCfg.name = "QPFHMI";
-    cfg->getNodeByName("QPFHMI", qpfCfg.qpfhmiCfg.type,
-                       qpfCfg.qpfhmiCfg.clientAddr, qpfCfg.qpfhmiCfg.serverAddr);
+//    for (auto & kv : taskAgentsInfo ) {
+//        qDebug() << kv.first.c_str()
+//                 << kv.second->name.c_str()
+//                 << kv.second->client.c_str()
+//                 << kv.second->server.c_str()
+//                 << kv.second->total << kv.second->running << kv.second->waiting
+//                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
+//    }
 
     cfg->setLastAccess(QDateTime::currentDateTime()
                        .toString("yyyyMMddTHHmmss").toStdString());
 
     // Modify HMI with the product types obtained from configuration
     ui->cboxProdType->clear();
-    for (unsigned int i = 0; i < qpfCfg.productTypes.size(); ++i) {
-        ui->cboxProdType->addItem(QString::fromStdString(qpfCfg.productTypes.at(i)));
-    }
     ui->lstProductTypes->clear();
-    for (unsigned int i = 0; i < qpfCfg.productTypes.size(); ++i) {
-        ui->lstProductTypes->addItem(QString::fromStdString(qpfCfg.productTypes.at(i)));
+    for (unsigned int i = 0; i < cfgInfo.orcParams.productTypes.size(); ++i) {
+        ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
+        ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
 }
 
@@ -223,7 +207,6 @@ void MainWindow::commandSystem()
         //pid_t parentPid = getppid();
         //kill(parentPid, SIGUSR1);
         setLogWatch();
-
 
         QString newCSS = ui->btnStart->styleSheet()
                 .append("background-color: lightgreen;");
@@ -267,13 +250,14 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    hmiNode = new HMIProxy(qpfCfg.qpfhmiCfg.name.c_str());
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
+    hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
 
     qDebug() << hmiNode->getCommNodeName().c_str() << "started . . .";
 
     // CommNode connection to Event Manager
-    hmiNode->addPeer(&(qpfCfg.qpfhmiCfg), true);
-    hmiNode->addPeer(&(qpfCfg.evtMngCfg));
+    hmiNode->addPeer(&(cfgInfo.qpfhmiCfg), true);
+    hmiNode->addPeer(&(cfgInfo.evtMngCfg));
 
     // Add log tab
     QString qpfhmiLog = QString::fromStdString(Log::getLogBaseDir() + "/" +
@@ -519,8 +503,6 @@ void MainWindow::checkForTaskRes()
 void MainWindow::showTaskRes()
 {
     static bool firstTime = true;
-    static ProgressBarDelegate * progressBarDisplay = 0;
-    static QStringList hdrLabels;
     int nCols = 8;
 
     // Process pending events from Qt events loop
@@ -542,7 +524,6 @@ void MainWindow::showTaskRes()
     processPendingEvents();
 
     // Now, update information for Task Agents Status Info.
-    // 1. Reset counters
     updateAgentsMonitPanel();
 
     // Activate sorting - we are done
