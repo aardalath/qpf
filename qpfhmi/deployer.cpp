@@ -193,27 +193,6 @@ void Deployer::readConfig(const char * configFile)
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     hmiNeeded = cfgInfo.hmiPresent;
-
-    std::cerr << Configuration::PATHBase << std::endl;
-    std::cerr << Configuration::PATHBin << std::endl;
-
-    // Ensure paths for the execution are available and readu
-    assert(existsDir(Configuration::PATHBase));
-    assert(existsDir(Configuration::PATHBin));
-    std::vector<std::string> runPaths {
-                Configuration::PATHRun,
-                Configuration::PATHLog,
-                Configuration::PATHRlog,
-                Configuration::PATHTmp,
-                Configuration::PATHTsk,
-                Configuration::PATHMsg };
-    for (auto & p : runPaths) {
-        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
-            std::perror(("mkdir " + p).c_str());
-            exit(EXIT_FAILURE);
-        }
-    }
-    LibComm::Log::setLogBaseDir(Configuration::PATHRun);
 }
 
 //----------------------------------------------------------------------
