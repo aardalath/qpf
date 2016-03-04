@@ -340,6 +340,13 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     bool result = true;
 
     if (checkTask(task)) {
+        std::string initialName = task.taskData["NameOrc"].asString();
+        if (initialName.compare(0, 6, "mem://") == 0) {
+            result &= updateTable<std::string>("tasks_info",
+                                               "task_id=" + quoted(initialName.substr(6)),
+                                               "task_id", quoted(task.taskName));
+        }
+
         std::string filter("task_id=" + quoted(task.taskName));
         result &= updateTable<int>("tasks_info", filter,
                                    "task_status_id", (int)(task.taskStatus));

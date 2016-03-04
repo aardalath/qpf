@@ -47,6 +47,7 @@ using LibComm::Log;
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <time.h>
 
 #define WRITE_MESSAGE_FILES
 
@@ -452,6 +453,8 @@ bool Component::convertTo(MessageTypeIdx newIdx,
 //----------------------------------------------------------------------
 void Component::writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg)
 {
+    static clock_t timestamp = clock();
+
     Json::Value root;
     Json::Value content;
     Json::Reader reader;
@@ -464,10 +467,14 @@ void Component::writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg)
         root["content"] = "<<<" + inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT) + ">>>";
     }
 
+    // Sequential number
+    int seq = (int)(clock() - timestamp);
+    std::string seqs = (std::string(10, '0') + LibComm::toStr<int>(seq));
+
     std::string msgFileName("/tmp/");
     msgFileName += (inPeerMsg.at(Router2RouterPeer::FRAME_PEER_ID) + "_" +
                     inPeerMsg.at(Router2RouterPeer::FRAME_MSG_TYPE) + "_" +
-                    LibComm::timeTag() + ".msg");
+                    LibComm::timeTag() + "-" + seqs.substr(seqs.size() - 8, 8) + ".msg");
     std::ofstream msgOut(msgFileName);
     msgOut << writer.write(root);
     msgOut.close();

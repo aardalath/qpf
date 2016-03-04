@@ -749,6 +749,8 @@ void MainWindow::showTaskRes()
 
         ui->treeTaskMonit->addTopLevelItem(treeItem);
     }
+    // Process pending events from Qt events loop
+    qApp->processEvents();
 
     if (firstTime) {
         firstTime = false;
@@ -777,6 +779,8 @@ void MainWindow::showTaskRes()
         taInfo->uptimesecs = 0;
 
     }
+    // Process pending events from Qt events loop
+    qApp->processEvents();
 
     // 2. Count tasks
     for (int i = 0; i < ui->treeTaskMonit->topLevelItemCount(); ++i) {
@@ -807,6 +811,8 @@ void MainWindow::showTaskRes()
             taInfo->total++;
         }
     }
+    // Process pending events from Qt events loop
+    qApp->processEvents();
 
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {
@@ -828,6 +834,8 @@ void MainWindow::showTaskRes()
     // Activate sorting - we are done
     ui->treeTaskMonit->setSortingEnabled(true);
 
+    // Process pending events from Qt events loop
+    qApp->processEvents();
 }
 
 //----------------------------------------------------------------------

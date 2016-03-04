@@ -226,7 +226,7 @@ void DataManager::saveProductsToDB(ProductCollection & productList) //Json::Valu
         dbHdl->openConnection();
 
         // Try to store the data into the DB
-        dbHdl->storeProducts(productList);
+        //dbHdl->storeProducts(productList);
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
         return;

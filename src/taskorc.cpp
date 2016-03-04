@@ -223,7 +223,7 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
     task.taskStart = epoch;
     task.taskEnd = "";
     task.taskExitCode = 0;
-    task.taskStatus = TASK_RUNNING;
+    task.taskStatus = TASK_SCHEDULED;
 
     for (unsigned int i = 0; i < inputs.productList.size(); ++i) {
         ProductMetadata & m = inputs.productList.at(i);

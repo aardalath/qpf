@@ -140,10 +140,14 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     task.setData(t.getData());
     Json::Value & taskData = task.taskData;
 
+    bool firstMsgRes = true;
+    std::string nameFromOrchestrator = t.taskName;
+
     taskData["TaskAgent"] = self.load(std::memory_order_relaxed)->name;
     taskData["Name"] = "/UNDEFINED";
     taskData["NameExtended"] = (taskData["TaskAgent"].asString() +
                                 ":/" + taskData["Name"].asString());
+    taskData["NameOrc"] = "mem://" + nameFromOrchestrator;
     taskData["State"]["Dead"] = false;
     taskData["State"]["Error"] = "";
     taskData["State"]["ExitCode"] = 0;
@@ -155,18 +159,22 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     taskData["State"]["Restarting"] = false;
     taskData["State"]["Running"] = false;
     taskData["State"]["StartedAt"] = "0001-01-01T00:00:00Z";
-    task.taskEnd = "";
+    task.taskStart = "";
+    task.taskEnd = "00010101T000000";
     task.taskExitCode = 0;
     task.taskName = internalTaskNameIdx;
-    task.taskPath = "";
-    task.taskStart = "";
+    task.taskPath = t.taskPath;
     task.taskStatus = status;
+
+    InfoMsg("Name from Orchestrator is >>" + nameFromOrchestrator +
+            "<< while new name is >>" + internalTaskNameIdx + "<<");
 
     //-------------------------------------------------------------------
     // 2. Loop waiting for execution slot
     //-------------------------------------------------------------------
     if (numRunningTasks >= maxRunningTasks) {
         sendTaskResMsg(task);
+        firstMsgRes = false;
         // Loop waiting until numTasks is below threshold
         while (numRunningTasks >= maxRunningTasks) {
             LibComm::waitForHeartBeat(0, 200000);
@@ -304,6 +312,12 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         // Additional info
         taskData["TaskAgent"] = selfPeer()->name;
         taskData["NameExtended"] = selfPeer()->name + ":/" + taskData["Name"].asString();
+        if (firstMsgRes) {
+            taskData["NameOrc"] = "mem://" + nameFromOrchestrator;
+            firstMsgRes = false;
+        } else {
+            taskData["NameOrc"] = nameFromOrchestrator;
+        }
 
         // Update progress
         if (status != TASK_FINISHED) {
@@ -317,6 +331,14 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         // Incorporate taskData to task data structure
         task.taskStatus = status;
 
+        // Set actual start time
+        if (task.taskStart.empty()) {
+            std::string startTime = taskData["State"]["StartedAt"].asString();
+            task.taskStart = (startTime.substr(0,4) + startTime.substr(5,2) +
+                              startTime.substr(8,5) +
+                              startTime.substr(14,2) + startTime.substr(17,2));
+        }
+
         // Send message
         sendTaskResMsg(task);
 
@@ -328,10 +350,9 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
 
     // Set end time
     std::string endTime = taskData["State"]["FinishedAt"].asString();
-    endTime = LibComm::replaceAll(endTime, "-", "");
-    endTime = LibComm::replaceAll(endTime, ":", "");
-    endTime = LibComm::replaceAll(endTime, "Z", "");
-    task.taskEnd = endTime;
+    task.taskEnd = (endTime.substr(0,4) + endTime.substr(5,2) +
+                    endTime.substr(8,5) +
+                    endTime.substr(14,2) + endTime.substr(17,2));
 
     // Send message
     sendTaskResMsg(task);
