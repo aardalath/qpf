@@ -144,6 +144,9 @@ void MainWindow::manualSetupUI()
     connect(simInData, SIGNAL(simInDataSent(int)), this, SLOT(sentInData(int)));
     connect(simInData, SIGNAL(endOfInData()), this, SLOT(endOfInDataMsgs()));
 
+    connect(ui->btnSelectInboxPath, SIGNAL(pressed()), this, SLOT(selectInboxPath()));
+    connect(ui->btnProcessInbox, SIGNAL(pressed()), this, SLOT(processInbox()));
+
     connect(this, SIGNAL(stopSendingMessages()), simInData, SLOT(stopSendingInData()));
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
@@ -533,6 +536,7 @@ void MainWindow::readConfig()
         ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
+    ui->edInboxPath->setText(QString(cfgInfo.storage.in.exchangeBox.c_str()));
 }
 
 //----------------------------------------------------------------------
@@ -779,6 +783,25 @@ void MainWindow::prepareSendInDataFromFile()
     }
 }
 
+//----------------------------------------------------------------------
+// Method: processInbox
+// Generates INDATA messages into the system, to process all the
+// products in the Inbox directory selected
+//----------------------------------------------------------------------
+void MainWindow::processInbox()
+{
+    bool ok = simInData->processInbox(ui->edInboxPath->text());
+
+    if (ok) {
+        ui->tabEventsToInject->setEnabled(false);
+        ui->btnStopMultInDataEvt->show();
+
+        // Activate task monitoring
+        taskMonitTimer = new QTimer(this);
+        connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
+        taskMonitTimer->start(1000);
+    }
+}
 
 //----------------------------------------------------------------------
 // Method: selectInDataParamsFile
@@ -794,6 +817,22 @@ void MainWindow::selectInDataParamsFile()
     if (fileName.isEmpty()) { return; }
     ui->edInDataParamFile->setText(fileName);
     fileInDataParams = fileName;
+}
+
+//----------------------------------------------------------------------
+// Method: selectInboxPath
+// Select directory where the incoming products are being stored
+//----------------------------------------------------------------------
+void MainWindow::selectInboxPath()
+{
+    QString dirName =
+      QFileDialog::getExistingDirectory(this,
+                                        tr("Select incoming products folder"),
+                                        getenv("HOME"),
+                                        QFileDialog::ShowDirsOnly);
+    if (dirName.isEmpty()) { return; }
+    ui->edInboxPath->setText(dirName);
+    inboxDirName = dirName;
 }
 
 //----------------------------------------------------------------------

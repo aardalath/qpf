@@ -90,7 +90,9 @@ protected slots:
     void sendInData();
     void prepareSendMultInData();
     void prepareSendInDataFromFile();
+    void processInbox();
     void selectInDataParamsFile();
+    void selectInboxPath();
     void stopSendingMultInData();
     void sentInData(int msgsLeft);
     void endOfInDataMsgs();
@@ -210,6 +212,8 @@ private:
     ArchiveModel * archHdl;
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
+
+    QString inboxDirName;
 
     QMap<QString, Json::Value> taskResInfo;
     QMap<QString, QTreeWidgetItem *> taskResItems;
