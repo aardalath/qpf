@@ -13,10 +13,12 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -26,6 +28,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -138,6 +141,10 @@ public:
     QWidget *tabpgMonit;
     QVBoxLayout *verticalLayout_12;
     QTreeWidget *treeTaskMonit;
+    QWidget *tabAgents;
+    QVBoxLayout *vlyAgents;
+    QScrollArea *scrollAreaAgents;
+    QWidget *scrollAreaWidgetContents;
     QWidget *tabpgArchive;
     QVBoxLayout *verticalLayout_13;
     QTableView *tblvwArchive;
@@ -158,6 +165,9 @@ public:
     QPushButton *btnStopMultInDataEvt;
     QSpacerItem *horizontalSpacer_4;
     QSpacerItem *verticalSpacer;
+    QGroupBox *groupBox;
+    QVBoxLayout *verticalLayout_4;
+    QCheckBox *chkDebugInfo;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -667,6 +677,23 @@ public:
         verticalLayout_12->addWidget(treeTaskMonit);
 
         tabMainWgd->addTab(tabpgMonit, QString());
+        tabAgents = new QWidget();
+        tabAgents->setObjectName(QStringLiteral("tabAgents"));
+        vlyAgents = new QVBoxLayout(tabAgents);
+        vlyAgents->setSpacing(6);
+        vlyAgents->setContentsMargins(11, 11, 11, 11);
+        vlyAgents->setObjectName(QStringLiteral("vlyAgents"));
+        scrollAreaAgents = new QScrollArea(tabAgents);
+        scrollAreaAgents->setObjectName(QStringLiteral("scrollAreaAgents"));
+        scrollAreaAgents->setWidgetResizable(true);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 843, 484));
+        scrollAreaAgents->setWidget(scrollAreaWidgetContents);
+
+        vlyAgents->addWidget(scrollAreaAgents);
+
+        tabMainWgd->addTab(tabAgents, QString());
         tabpgArchive = new QWidget();
         tabpgArchive->setObjectName(QStringLiteral("tabpgArchive"));
         verticalLayout_13 = new QVBoxLayout(tabpgArchive);
@@ -756,6 +783,21 @@ public:
 
         verticalLayout_2->addItem(verticalSpacer);
 
+        groupBox = new QGroupBox(dockWidgetContents);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        verticalLayout_4 = new QVBoxLayout(groupBox);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        chkDebugInfo = new QCheckBox(groupBox);
+        chkDebugInfo->setObjectName(QStringLiteral("chkDebugInfo"));
+        chkDebugInfo->setChecked(true);
+
+        verticalLayout_4->addWidget(chkDebugInfo);
+
+
+        verticalLayout_2->addWidget(groupBox);
+
         dockMainControl->setWidget(dockWidgetContents);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockMainControl);
 
@@ -768,6 +810,8 @@ public:
         QObject::connect(actionQuit, SIGNAL(triggered()), MainWindow, SLOT(close()));
         QObject::connect(dtStartMult, SIGNAL(dateTimeChanged(QDateTime)), dtEndMult, SLOT(setDateTime(QDateTime)));
         QObject::connect(actionActivate_Debug_Info, SIGNAL(toggled(bool)), MainWindow, SLOT(setDebugInfo(bool)));
+        QObject::connect(actionActivate_Debug_Info, SIGNAL(toggled(bool)), chkDebugInfo, SLOT(setChecked(bool)));
+        QObject::connect(chkDebugInfo, SIGNAL(toggled(bool)), actionActivate_Debug_Info, SLOT(setChecked(bool)));
 
         tabMainWgd->setCurrentIndex(0);
         tabEventsToInject->setCurrentIndex(1);
@@ -869,6 +913,7 @@ public:
         tabEventsToInject->setTabText(tabEventsToInject->indexOf(tabpgInDataFromFile), QApplication::translate("MainWindow", "Take In. Data Parameters from file", 0));
         tabMainWgd->setTabText(tabMainWgd->indexOf(tabpgEvtInj), QApplication::translate("MainWindow", "Event Injection", 0));
         tabMainWgd->setTabText(tabMainWgd->indexOf(tabpgMonit), QApplication::translate("MainWindow", "Monitoring", 0));
+        tabMainWgd->setTabText(tabMainWgd->indexOf(tabAgents), QApplication::translate("MainWindow", "Agents Status", 0));
         tabMainWgd->setTabText(tabMainWgd->indexOf(tabpgArchive), QApplication::translate("MainWindow", "Archive", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
@@ -876,6 +921,8 @@ public:
         btnStart->setText(QApplication::translate("MainWindow", "START SYSTEM", 0));
         btnStopMultInDataEvt->setText(QApplication::translate("MainWindow", "Stop sending\n"
 "INDATA messages", 0));
+        groupBox->setTitle(QApplication::translate("MainWindow", "Setup", 0));
+        chkDebugInfo->setText(QApplication::translate("MainWindow", "Debug Info", 0));
     } // retranslateUi
 
 };

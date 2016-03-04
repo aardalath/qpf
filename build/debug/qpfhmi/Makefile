@@ -58,12 +58,14 @@ SOURCES       = ../../../qpfhmi/main.cpp \
 		../../../qpfhmi/progbardlg.cpp \
 		../../../qpfhmi/dlgshowtaskinfo.cpp \
 		../../../qpfhmi/app.cpp \
-		../../../qpfhmi/deployer.cpp moc_mainwindow.cpp \
+		../../../qpfhmi/deployer.cpp \
+		../../../qpfhmi/frmagentstatus.cpp moc_mainwindow.cpp \
 		moc_logwatcher.cpp \
 		moc_archivemodel.cpp \
 		moc_progbardlg.cpp \
 		moc_dlgshowtaskinfo.cpp \
-		moc_app.cpp
+		moc_app.cpp \
+		moc_frmagentstatus.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		hmipxy.o \
@@ -75,12 +77,14 @@ OBJECTS       = main.o \
 		dlgshowtaskinfo.o \
 		app.o \
 		deployer.o \
+		frmagentstatus.o \
 		moc_mainwindow.o \
 		moc_logwatcher.o \
 		moc_archivemodel.o \
 		moc_progbardlg.o \
 		moc_dlgshowtaskinfo.o \
-		moc_app.o
+		moc_app.o \
+		moc_frmagentstatus.o
 DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt/5.4/gcc_64/mkspecs/common/shell-unix.conf \
 		/opt/Qt/5.4/gcc_64/mkspecs/common/unix.conf \
@@ -210,7 +214,8 @@ DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../qpfhmi/progbardlg.h \
 		../../../qpfhmi/dlgshowtaskinfo.h \
 		../../../qpfhmi/app.h \
-		../../../qpfhmi/deployer.h ../../../qpfhmi/main.cpp \
+		../../../qpfhmi/deployer.h \
+		../../../qpfhmi/frmagentstatus.h ../../../qpfhmi/main.cpp \
 		../../../qpfhmi/mainwindow.cpp \
 		../../../qpfhmi/hmipxy.cpp \
 		../../../qpfhmi/logwatcher.cpp \
@@ -220,7 +225,8 @@ DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../qpfhmi/progbardlg.cpp \
 		../../../qpfhmi/dlgshowtaskinfo.cpp \
 		../../../qpfhmi/app.cpp \
-		../../../qpfhmi/deployer.cpp
+		../../../qpfhmi/deployer.cpp \
+		../../../qpfhmi/frmagentstatus.cpp
 QMAKE_TARGET  = qpfhmi
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = qpfhmi
@@ -248,7 +254,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): ui_mainwindow.h ui_dlgshowtaskinfo.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h ui_dlgshowtaskinfo.h ui_frmagentstatus.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../../../qpfhmi/qpfhmi.pro /opt/Qt/5.4/gcc_64/mkspecs/linux-g++/qmake.conf /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
@@ -514,9 +520,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../../qpfhmi/mainwindow.h ../../../qpfhmi/hmipxy.h ../../../qpfhmi/logwatcher.h ../../../qpfhmi/archivemodel.h ../../../qpfhmi/taskmonmodel.h ../../../qpfhmi/types.h ../../../qpfhmi/progbardlg.h ../../../qpfhmi/dlgshowtaskinfo.h ../../../qpfhmi/app.h ../../../qpfhmi/deployer.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../../qpfhmi/main.cpp ../../../qpfhmi/mainwindow.cpp ../../../qpfhmi/hmipxy.cpp ../../../qpfhmi/logwatcher.cpp ../../../qpfhmi/archivemodel.cpp ../../../qpfhmi/taskmonmodel.cpp ../../../qpfhmi/types.cpp ../../../qpfhmi/progbardlg.cpp ../../../qpfhmi/dlgshowtaskinfo.cpp ../../../qpfhmi/app.cpp ../../../qpfhmi/deployer.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../../qpfhmi/mainwindow.ui ../../../qpfhmi/dlgshowtaskinfo.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../qpfhmi/mainwindow.h ../../../qpfhmi/hmipxy.h ../../../qpfhmi/logwatcher.h ../../../qpfhmi/archivemodel.h ../../../qpfhmi/taskmonmodel.h ../../../qpfhmi/types.h ../../../qpfhmi/progbardlg.h ../../../qpfhmi/dlgshowtaskinfo.h ../../../qpfhmi/app.h ../../../qpfhmi/deployer.h ../../../qpfhmi/frmagentstatus.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../qpfhmi/main.cpp ../../../qpfhmi/mainwindow.cpp ../../../qpfhmi/hmipxy.cpp ../../../qpfhmi/logwatcher.cpp ../../../qpfhmi/archivemodel.cpp ../../../qpfhmi/taskmonmodel.cpp ../../../qpfhmi/types.cpp ../../../qpfhmi/progbardlg.cpp ../../../qpfhmi/dlgshowtaskinfo.cpp ../../../qpfhmi/app.cpp ../../../qpfhmi/deployer.cpp ../../../qpfhmi/frmagentstatus.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../qpfhmi/mainwindow.ui ../../../qpfhmi/dlgshowtaskinfo.ui ../../../qpfhmi/frmagentstatus.ui $(DISTDIR)/
 
 
 clean:compiler_clean 
@@ -539,9 +545,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_logwatcher.cpp moc_archivemodel.cpp moc_progbardlg.cpp moc_dlgshowtaskinfo.cpp moc_app.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_logwatcher.cpp moc_archivemodel.cpp moc_progbardlg.cpp moc_dlgshowtaskinfo.cpp moc_app.cpp moc_frmagentstatus.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_logwatcher.cpp moc_archivemodel.cpp moc_progbardlg.cpp moc_dlgshowtaskinfo.cpp moc_app.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_logwatcher.cpp moc_archivemodel.cpp moc_progbardlg.cpp moc_dlgshowtaskinfo.cpp moc_app.cpp moc_frmagentstatus.cpp
 moc_mainwindow.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		/opt/Qt/5.4/gcc_64/include/QtWidgets/qmainwindow.h \
 		/opt/Qt/5.4/gcc_64/include/QtWidgets/qwidget.h \
@@ -1327,16 +1333,125 @@ moc_app.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QApplication \
 		../../../qpfhmi/app.h
 	/opt/Qt/5.4/gcc_64/bin/moc $(DEFINES) -I/opt/Qt/5.4/gcc_64/mkspecs/linux-g++ -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/opt/cots/include -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/home/jcgonzalez/ws/personal/libcomm/src -I/home/jcgonzalez/ws/personal/QPF/json -I/opt/PostgreSQL/9.4/include -I/opt/Qt/5.4/gcc_64/include -I/opt/Qt/5.4/gcc_64/include/QtWidgets -I/opt/Qt/5.4/gcc_64/include/QtGui -I/opt/Qt/5.4/gcc_64/include/QtCore -I. ../../../qpfhmi/app.h -o moc_app.cpp
 
+moc_frmagentstatus.cpp: /opt/Qt/5.4/gcc_64/include/QtWidgets/QFrame \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qframe.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfeatures.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qisenum.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmargins.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qrect.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsize.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qpoint.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpalette.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qcolor.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qrgb.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qbrush.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvector.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qmatrix.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpolygon.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qregion.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qline.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qtransform.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qimage.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpixmap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qhash.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfont.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qcursor.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qevent.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvariant.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qdebug.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlocale.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qset.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qurl.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfile.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qvector2d.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../qpfhmi/frmagentstatus.h
+	/opt/Qt/5.4/gcc_64/bin/moc $(DEFINES) -I/opt/Qt/5.4/gcc_64/mkspecs/linux-g++ -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/opt/cots/include -I/home/jcgonzalez/ws/personal/QPF/qpfhmi -I/home/jcgonzalez/ws/personal/QPF/src -I/home/jcgonzalez/ws/personal/libcomm/src -I/home/jcgonzalez/ws/personal/QPF/json -I/opt/PostgreSQL/9.4/include -I/opt/Qt/5.4/gcc_64/include -I/opt/Qt/5.4/gcc_64/include/QtWidgets -I/opt/Qt/5.4/gcc_64/include/QtGui -I/opt/Qt/5.4/gcc_64/include/QtCore -I. ../../../qpfhmi/frmagentstatus.h -o moc_frmagentstatus.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_mainwindow.h ui_dlgshowtaskinfo.h
+compiler_uic_make_all: ui_mainwindow.h ui_dlgshowtaskinfo.h ui_frmagentstatus.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_mainwindow.h ui_dlgshowtaskinfo.h
+	-$(DEL_FILE) ui_mainwindow.h ui_dlgshowtaskinfo.h ui_frmagentstatus.h
 ui_mainwindow.h: ../../../qpfhmi/mainwindow.ui
 	/opt/Qt/5.4/gcc_64/bin/uic ../../../qpfhmi/mainwindow.ui -o ui_mainwindow.h
 
 ui_dlgshowtaskinfo.h: ../../../qpfhmi/dlgshowtaskinfo.ui
 	/opt/Qt/5.4/gcc_64/bin/uic ../../../qpfhmi/dlgshowtaskinfo.ui -o ui_dlgshowtaskinfo.h
+
+ui_frmagentstatus.h: ../../../qpfhmi/frmagentstatus.ui
+	/opt/Qt/5.4/gcc_64/bin/uic ../../../qpfhmi/frmagentstatus.ui -o ui_frmagentstatus.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -2652,6 +2767,138 @@ deployer.o: ../../../qpfhmi/deployer.cpp ../../../qpfhmi/deployer.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o deployer.o ../../../qpfhmi/deployer.cpp
 
+frmagentstatus.o: ../../../qpfhmi/frmagentstatus.cpp ../../../qpfhmi/frmagentstatus.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/QFrame \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qframe.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfeatures.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qisenum.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmargins.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qrect.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsize.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qpoint.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpalette.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qcolor.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qrgb.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qbrush.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvector.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qmatrix.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpolygon.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qregion.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qline.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qtransform.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qimage.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qpixmap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qhash.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfont.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qcursor.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qevent.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qvariant.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qmap.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qdebug.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qlocale.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qset.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qurl.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfile.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qvector2d.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		ui_frmagentstatus.h \
+		../../../src/msgtypes.h \
+		../../../../libcomm/src/propdef.h \
+		../../../json/json/json.h \
+		../../../src/config.h \
+		../../../../libcomm/src/r2rpeer.h \
+		/opt/cots/include/zmq.hpp \
+		/opt/cots/include/zmq.h \
+		../../../qpfhmi/progbardlg.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/QItemDelegate \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qitemdelegate.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qvalidator.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		/opt/Qt/5.4/gcc_64/include/QtGui/qicon.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qslider.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		/opt/Qt/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/QProgressBar \
+		/opt/Qt/5.4/gcc_64/include/QtWidgets/qprogressbar.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o frmagentstatus.o ../../../qpfhmi/frmagentstatus.cpp
+
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
 
@@ -2669,6 +2916,9 @@ moc_dlgshowtaskinfo.o: moc_dlgshowtaskinfo.cpp
 
 moc_app.o: moc_app.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_app.o moc_app.cpp
+
+moc_frmagentstatus.o: moc_frmagentstatus.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_frmagentstatus.o moc_frmagentstatus.cpp
 
 ####### Install
 
