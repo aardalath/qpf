@@ -72,32 +72,40 @@
 //   - DBG(s)      - Shows a debug message on StdErr
 //------------------------------------------------------------
 
-//#define DEBUG_BUILD
+#define DEBUG_BUILD
+//#define DEBUG_CHECKINOUT
 
 #ifdef DEBUG_BUILD
 
 #  define DUMPVAR(v) #v << ": " << v << ' '
 
-#  define DBG(s) std::cerr						\
-  << __FILE__ << ':' << __FUNCTION__ << ':' << __LINE__			\
-  << ": " << s << std::endl << std::flush
-#  define CHKIN do { \
-    chkLevel++; \
-    std::cerr << __FILE__ << ':' << __LINE__	\
-              << ": " << spaces.substr(0, chkLevel * 2) \
-              << "Entering " << __FUNCTION__ << std::endl << std::flush; \
-  } while(0)
-#  define CHKOUT do { \
-    std::cerr << __FILE__ << ':' << __LINE__	\
-            << ": " << spaces.substr(0, chkLevel * 2) \
-            << "Exiting " << __FUNCTION__ << std::endl << std::flush; \
-    chkLevel--; \
-  } while(0)
+#  define DBG(s) std::cerr << clock() << ":" \
+    << __FILE__ << ':' << __FUNCTION__ << ':' << __LINE__			\
+    << ": " << s << std::endl << std::flush
+
+#  ifdef DEBUG_CHECKINOUT
+#    define CHKIN do { \
+        chkLevel++; \
+        std::cerr << __FILE__ << ':' << __LINE__	\
+                  << ": " << spaces.substr(0, chkLevel * 2) \
+                  << "Entering " << __FUNCTION__ << std::endl << std::flush; \
+      } while(0)
+#    define CHKOUT do { \
+        std::cerr << __FILE__ << ':' << __LINE__	\
+                << ": " << spaces.substr(0, chkLevel * 2) \
+                << "Exiting " << __FUNCTION__ << std::endl << std::flush; \
+        chkLevel--; \
+      } while(0)
 
 static std::string spaces("                                                "
                           "                                                "
                           "                                                "
                           "                                             ...");
+#else
+#    define CHKIN
+#    define CHKOUT
+#endif
+
 void showBacktrace();
 
 #else

@@ -68,7 +68,7 @@ void showBacktrace(void)
 {
     int j, nptrs;
 #define SIZE 100
-    void *buffer[100];
+    void *buffer[SIZE];
     char **strings;
 
     nptrs = backtrace(buffer, SIZE);
