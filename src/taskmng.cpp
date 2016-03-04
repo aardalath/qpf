@@ -132,8 +132,8 @@ void TaskManager::processMONIT_INFO()
         if (p->name == senderName) {
             AgentInfo & ag = agentInfo[p];
             ag.load = load;
-            std::cerr << p->name << " info updated to : "
-                      << ag.runningTasks << " tasks, load = " << ag.load << "\n";
+//            std::cerr << p->name << " info updated to : "
+//                      << ag.runningTasks << " tasks, load = " << ag.load << "\n";
         }
     }
 
@@ -238,7 +238,7 @@ bool TaskManager::sendTaskRes(Message_TASK_RES * msg)
         PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
                                                  msgToRecip.msg->getDataString(),
                                                  MSG_TASK_RES);
-        registerMsg(selfPeer()->name, *msgForRecip);
+        //registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
     return true;
@@ -260,7 +260,7 @@ bool TaskManager::sendMonitInfo(Message_MONIT_INFO * msg)
         PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
                                                  msgToRecip.msg->getDataString(),
                                                  MSG_MONIT_INFO);
-        registerMsg(selfPeer()->name, *msgForRecip);
+        //registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
     return true;
