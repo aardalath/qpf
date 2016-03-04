@@ -33,7 +33,8 @@ HEADERS += \
         version.h \
     procelem.h \
     cfg.h \
-    dbg.h
+    dbg.h \
+    urlhdl.h
 
 HEADERS += \
         config.h \
@@ -58,4 +59,5 @@ SOURCES +=  \
         taskagent.cpp \
         taskmng.cpp \
         taskorc.cpp \
-    procelem.cpp
+    procelem.cpp \
+    urlhdl.cpp
