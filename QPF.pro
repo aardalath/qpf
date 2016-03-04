@@ -1,5 +1,5 @@
 #======================================================================
-# QPF - small toy QLA Processing Framework
+# QPF - Prototype of QLA Processing Framework
 #======================================================================
 # Project file
 # Author: J C Gonzalez - 2015
@@ -8,17 +8,20 @@
 TEMPLATE = subdirs
 CONFIG  += ordered
 SUBDIRS  = \
-    src \
+    libcomm \
     json \
+    sdc \
+    infix \
+    src \
     tests \
-    qpf \
+#    qpf \
     qpfhmi
 
-tests.depends = src
-qpf.depends = src json
-qpfhmi.depends = src json
+tests.depends = libcomm sdc infix src
+# qpf.depends = src json sdc
+sdc.depends = json
+qpfhmi.depends = libcomm json sdc infix src
+tests.depends = libcomm sdc infix src
 
 OTHER_FILES += \
     defaults.pri
-
-    

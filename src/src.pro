@@ -15,31 +15,34 @@ TEMPLATE = lib
 
 TARGET = QPF
 
-LIBS += /opt/cots/lib/libzmq.so -lzmq
+LIBS += -lzmq
 
-INCLUDEPATH += . $$LIBCOMMINC $$JSONCPPINC $$SDCINC $$PSQLCPPINC
+INCLUDEPATH += . $$LIBCOMMINC $$JSONCPPINC $$INFIXINC $$SDCINC $$PSQLCPPINC
 
 LIBS += -L$$LIBCOMMLIB -llibcomm \
         -L$$JSONCPPLIB -ljson \
         -L$$SDCLIB -lsdc \
+        -L$$INFIXLIB -linfix \
         -L$$PSQLCPPLIB -l$$PSQLLIB \
-        -L/opt/cots/lib -lzmq
+        -L/opt/cots/lib -lzmq \
+        -lcurl -luuid
 
-HEADERS += \
+HEADERS +=  \
         common.h \
         dbhdl.h \
         error.h \
-        msgtypes.h \
         propdef.h \
         version.h \
-    procelem.h \
-    cfg.h \
-    dbg.h \
-    urlhdl.h \
-    cfginfo.h \
-    filetransfer.h
-
-HEADERS += \
+        procelem.h \
+        cfg.h \
+        dbg.h \
+        urlhdl.h \
+        cfginfo.h \
+        filetransfer.h \
+        uuid.h \
+        filenamespec.h \
+        str.h \
+        datatypes.h \
         config.h \
         component.h \
         dbhdlpostgre.h \
@@ -62,7 +65,12 @@ SOURCES +=  \
         taskagent.cpp \
         taskmng.cpp \
         taskorc.cpp \
-    procelem.cpp \
-    urlhdl.cpp \
-    dbg.cpp \
-    cfginfo.cpp
+        procelem.cpp \
+        urlhdl.cpp \
+        dbg.cpp \
+        cfginfo.cpp \
+        filetransfer.cpp \
+        uuid.cpp \
+        filenamespec.cpp \
+        str.cpp \
+        datatypes.cpp

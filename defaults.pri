@@ -1,32 +1,57 @@
-QMAKE_CXXFLAGS += -g3 -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI=0
-INCLUDEPATH += $$PWD/src $$(HOME)/opt/zmq/include $$(HOME)/opt/curl/include $$(HOME)/opt/uuid/include
-SRC_DIR = $$PWD
+#===== Projec dir. =======
+PRJ_ROOT_DIR = $$PWD
 
+BUILDROOT = build/debug
+
+#===== External libraries =======
+COTSDIR = /opt/cots
+
+exists(/home/eucops) {
+ZMQDIR = $$(HOME)/opt/zmq
+CURLDIR = $$(HOME)/opt/curl
+UUIDDIR = $$(HOME)/opt/uuid
 GTESTDIR = $$(HOME)/ws/jcgg/cots/gtest-1.7.0
+PSQLDIR = $$(HOME)/opt/pgsql
+}
 
-OLD_LIBDIR = $$QMAKE_LIBDIR
-QMAKE_LIBDIR = $$(HOME)/opt/zmq/lib $$(HOME)/opt/curl/lib $$(HOME)/opt/uuid/lib /usr/lib64 $$OLD_LIBDIR
+exists(/home/jcgonzalez) {
+ZMQDIR = $$COTSDIR
+CURLDIR = $$COTSDIR
+UUIDDIR = $$COTSDIR
+GTESTDIR = $$(HOME)/ws/cots/gtest-1.7.0
+PSQLDIR = /opt/pgsql
+}
 
-BUILDROOT=build
+PSQLLIB = pq
 
-LIBCOMMPATH = $$PWD
+#===== Project sections/libraries =======
+LIBCOMMPATH = $$PRJ_ROOT_DIR
 LIBCOMMLIB = $$LIBCOMMPATH/$$BUILDROOT/libcomm
 LIBCOMMINC = $$LIBCOMMPATH/libcomm
 
-JSONCPPPATH = $$PWD
+JSONCPPPATH = $$PRJ_ROOT_DIR
 JSONCPPLIB = $$JSONCPPPATH/$$BUILDROOT/json
 JSONCPPINC = $$JSONCPPPATH/json
 
-INFIXPATH = $$PWD
+INFIXPATH = $$PRJ_ROOT_DIR
 INFIXLIB = $$INFIXPATH/$$BUILDROOT/infix
 INFIXINC = $$INFIXPATH/infix
 
-SDCPATH = $$PWD
+SDCPATH = $$PRJ_ROOT_DIR
 SDCLIB = $$SDCPATH/$$BUILDROOT/sdc
 SDCINC = $$SDCPATH/sdc
 
-PSQLCPPPATH = $$(HOME)/opt/pgsql
-PSQLCPPLIB = $$PSQLCPPPATH/lib
-PSQLCPPINC = $$PSQLCPPPATH/include
-PSQLLIB = pq
+#===== Compilation/Linkage variables =====
+QMAKE_CXXFLAGS += -g3 -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI=0
+
+INCLUDEPATH += . $$PRJ_ROOT_DIR/src
+INCLUDEPATH += $$LIBCOMMINC $$JSONCPPINC $$INFIXINC $$SDCINC
+INCLUDEPATH += $$ZMQDIR/include $$CURLDIR/include $$UUIDDIR/include $$PSQLDIR/include
+
+OLD_LIBDIR = $$QMAKE_LIBDIR
+QMAKE_LIBDIR += $$LIBCOMMLIB $$JSONCPPLIB $$INFIXLIB $$SDCLIB
+QMAKE_LIBDIR += $$ZMQDIR/lib $$CURLDIR/lib $$UUIDDIR/lib $$PSQLDIR/lib 
+QMAKE_LIBDIR += /usr/lib64 $$OLD_LIBDIR
+
+
 
