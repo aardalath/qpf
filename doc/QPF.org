@@ -8,6 +8,7 @@
 #+SETUPFILE: ./config.org
 
 * QPF - QLA Processing Framework
+
 ** Euclid SOC Architecture Design
 
 *** Euclid SOC responsibilities
@@ -191,10 +192,9 @@ In the next section, the QLA Processing Framework is further described.
 
 *** Purpose
 
-Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, I will refer to this framework as the QPF (QLA Processing Framework).
+Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, I will refer to this framework as the QPF (/QLA Processing Framework/).
 
 The QPF will be composed of a set of components that take the incoming external events and data, check their basic consistency, perform a specific orchestration based on the type of incoming data, and launches the neccessary processing tasks to end up with the set of diagnostics, statistics and output parameters to evaluate the validity and quality of the products.  In section [[QPF Components]] a detailed description of the different components is provided.
-
 
 *** QPF Overall Architecture
 
@@ -218,7 +218,6 @@ The overall architecture of the QPF is shown in the following figure.
 #+NAME:   fig:QPF-arch
 #+ATTR_HTML: :width 90%
 [[QPF_Prototype_arch_Page_2.png]]
-
 
 *** QPF Components
 
@@ -289,11 +288,9 @@ title Use Case: External Data Injection
 @enduml
 #+END_SRC
 
-
 *** Mapping between QPF and QLA components
 
 There is a mapping between the logical decomposition of the QLA shown in [[QLA Components]] and the QPF components shown above.  This mapping is still *[TBD]*.
-
 
 *** QPF User Stories
 
@@ -301,12 +298,11 @@ For the QPF User Stories, we will follow the well known template:
 
 "/As a _<type of user>_, I want _<some goal>_ so that _<some reason>_. /"
 
-
 *** QPF Use Cases
 
 **** System Launch and Initialisation
 ***** Description
-The system application is executed, the HMI is launched, and the entire set of Components start their execution.  The components communications are established, and all of them reach the INITIALISED State.
+The system application is executed in all the hosts that compose the framework network, the HMI is launched, in the main host, and the entire set of Components start their execution.  The components communications are established, and all of them reach the OPERATIONAL State.
 
 ***** Scope
 Optional
@@ -315,14 +311,16 @@ Optional
 
 ***** Preconditions
 - System is switched off.
-- Database with the configuration is ready or new configuration file is provided.
+- Database with the configuration is ready or new configuration file is provided..
+- Main host and processing nodes connectivity is ready
+-
 
 ***** Nominal actions sequence
 1.
 
 #+BEGIN_SRC PlantUML
 @startuml
-hide footbox
+!include "./config.plu"
 title Use Case: System Launch and Initialisation
 participant "HMI" as HMI
 participant "Deployer" as Dply #lightgreen
@@ -355,7 +353,7 @@ Dply -> Dply: wait for START
 
 #+BEGIN_SRC PlantUML
 @startuml
-hide footbox
+!include "./config.plu"
 title Use Case: System Start
 participant "HMI exec." as HMI
 participant EvtMng
@@ -388,7 +386,7 @@ TaskAg -> TaskAg: init
 
 #+BEGIN_SRC PlantUML
 @startuml
-hide footbox
+!include "./config.plu"
 title Use Case: External Data Injection
 participant EvtMng
 participant DataMng
@@ -417,7 +415,7 @@ deactivate TaskOrc
 
 #+BEGIN_SRC PlantUML
 @startuml
-hide footbox
+!include "./config.plu"
 title Use Case: Processing Fired Rule
 participant TaskOrc
 participant TaskMng
@@ -476,7 +474,6 @@ DataMng -> DB: registerOutputs
 @enduml
 #+END_SRC
 
-
 *** Technologies
 
 For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the following technologies are planned to be used.
@@ -498,7 +495,9 @@ For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the fo
 
 
 ** QPF Internals
-*** QPF Database Specification
+
+*** Specification
+**** QPF Database Specification
 
 #+begin_src plantuml
 @startuml
@@ -1006,9 +1005,9 @@ ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk3 FOREIGN KEY (instru
 ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk4 FOREIGN KEY (obsMode) REFERENCES observation_modes(obsMode);
 #+end_src
 
-*** Classes Specification
+**** Classes Specification
 
-**** Database related
+***** Database related
 
 #+begin_src plantuml
 @startuml
@@ -1077,134 +1076,134 @@ class DBPostgreHdl <|-- DBHandler
 @enduml
 #+end_src
 
-*** Current QPF Configuration
-**** JSON
-***** "general":
-****** "app_name": "QPF",
-****** "app_version": "0.1",
-****** "last_access": "20150616T121555"
-***** "nodes":
-****** "node_list":
-******* "DataMng":
-******** "client": "tcp://127.0.0.1:7101",
-******** "server": "tcp://*:7101",
-******** "type": "datamng"
-******* "EvtMng":
-******** "client": "tcp://127.0.0.1:7100",
-******** "server": "tcp://*:7100",
-******** "type": "evtmng"
-******* "LogMng":
-******** "client": "tcp://127.0.0.1:7102",
-******** "server": "tcp://*:7102",
-******** "type": "logmng"
-******* "QPFHMI":
-******** "client": "tcp://127.0.0.1:7999",
-******** "server": "tcp://*:7999",
-******** "type": "hmi"
-******* "TskAge1":
-******** "client": "tcp://127.0.0.1:7111",
-******** "server": "tcp://*:7111",
-******** "type": "taskagent"
-******* "TskAge2":
-******** "client": "tcp://127.0.0.1:7112",
-******** "server": "tcp://*:7112",
-******** "type": "taskagent"
-******* "TskAge3":
-******** "client": "tcp://127.0.0.1:7113",
-******** "server": "tcp://*:7113",
-******** "type": "taskagent"
-******* "TskAge4":
-******** "client": "tcp://127.0.0.1:7114",
-******** "server": "tcp://*:7114",
-******** "type": "taskagent"
-******* "TskAge5":
-******** "client": "tcp://127.0.0.1:7115",
-******** "server": "tcp://*:7115",
-******** "type": "taskagent"
-******* "TskMng":
-******** "client": "tcp://127.0.0.1:7103",
-******** "server": "tcp://*:7103",
-******** "type": "taskmng"
-******* "TskOrc":
-******** "client": "tcp://127.0.0.1:7104",
-******** "server": "tcp://*:7104",
-******** "type": "taskorc"
-****** "hmi_node": "QPFHMI"
-***** "orchestration":
-****** "rules":
-******* "rule1":
-******** "inputs": "NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1",
-******** "outputs": "NISP_P_CAL_1",
-******** "processing": "PE_NISP_P_CAL"
-******* "rule2":
-******** "inputs": "NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1",
-******** "outputs": "NISP_P_QLA",
-******** "processing": "PE_NISP_P"
-******* "rule3":
-******** "inputs": "NISP_S_CAL_1,NISP_S_1",
-******** "outputs": "NISP_S_QLA",
-******** "processing": "PE_NISP_S"
-******* "rule4":
-******** "inputs": "VIS_CAL_1,VIS_1",
-******** "outputs": "VIS_QLA",
-******** "processing": "PE_VIS"
-******* "rule5":
-******** "inputs": "HK_RAW",
-******** "outputs": "HK_QLA",
-******** "processing": "PE_HK"
-***** "processing":
-****** "processors":
-******* "processor1":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_NISP_P_CAL",
-******** "output_path": "/opt/pe/output"
-******* "processor2":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_NISP_P_CAL",
-******** "output_path": "/opt/pe/output"
-******* "processor3":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_NISP_P",
-******** "output_path": "/opt/pe/output"
-******* "processor4":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_NISP_S",
-******** "output_path": "/opt/pe/output"
-******* "processor5":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_VIS",
-******** "output_path": "/opt/pe/output"
-******* "processor6":
-******** "exe_path": "/opt/pe/bin",
-******** "input_path": "/opt/pe/input",
-******** "name": "PE_HK",
-******** "output_path": "/opt/pe/output"
-***** "products":
-****** "product_types": [
-******* "NISP_PY_CAL_1",
-******* "NISP_PH_CAL_1",
-******* "NISP_PJ_CAL_1",
-******* "NISP_P_CAL_1",
-******* "NISP_S_CAL_1",
-******* "VIS_CAL_1",
-******* "NISP_PY_1",
-******* "NISP_PH_1",
-******* "NISP_PJ_1",
-******* "NISP_S_1",
-******* "VIS_1",
-******* "NISP_P_QLA",
-******* "NISP_S_QLA",
-******* "VIS_QLA",
-******* "HK_RAW",
-******* "HK_QLA"]
+**** Current QPF Configuration
+***** JSON
+****** "general":
+******* "app_name": "QPF",
+******* "app_version": "0.1",
+******* "last_access": "20150616T121555"
+****** "nodes":
+******* "node_list":
+******** "DataMng":
+********* "client": "tcp://127.0.0.1:7101",
+********* "server": "tcp://*:7101",
+********* "type": "datamng"
+******** "EvtMng":
+********* "client": "tcp://127.0.0.1:7100",
+********* "server": "tcp://*:7100",
+********* "type": "evtmng"
+******** "LogMng":
+********* "client": "tcp://127.0.0.1:7102",
+********* "server": "tcp://*:7102",
+********* "type": "logmng"
+******** "QPFHMI":
+********* "client": "tcp://127.0.0.1:7999",
+********* "server": "tcp://*:7999",
+********* "type": "hmi"
+******** "TskAge1":
+********* "client": "tcp://127.0.0.1:7111",
+********* "server": "tcp://*:7111",
+********* "type": "taskagent"
+******** "TskAge2":
+********* "client": "tcp://127.0.0.1:7112",
+********* "server": "tcp://*:7112",
+********* "type": "taskagent"
+******** "TskAge3":
+********* "client": "tcp://127.0.0.1:7113",
+********* "server": "tcp://*:7113",
+********* "type": "taskagent"
+******** "TskAge4":
+********* "client": "tcp://127.0.0.1:7114",
+********* "server": "tcp://*:7114",
+********* "type": "taskagent"
+******** "TskAge5":
+********* "client": "tcp://127.0.0.1:7115",
+********* "server": "tcp://*:7115",
+********* "type": "taskagent"
+******** "TskMng":
+********* "client": "tcp://127.0.0.1:7103",
+********* "server": "tcp://*:7103",
+********* "type": "taskmng"
+******** "TskOrc":
+********* "client": "tcp://127.0.0.1:7104",
+********* "server": "tcp://*:7104",
+********* "type": "taskorc"
+******* "hmi_node": "QPFHMI"
+****** "orchestration":
+******* "rules":
+******** "rule1":
+********* "inputs": "NISP_PY_CAL_1,NISP_PH_CAL_1,NISP_PJ_CAL_1",
+********* "outputs": "NISP_P_CAL_1",
+********* "processing": "PE_NISP_P_CAL"
+******** "rule2":
+********* "inputs": "NISP_P_CAL_1,NISP_PY_1,NISP_PH_1,NISP_PJ_1",
+********* "outputs": "NISP_P_QLA",
+********* "processing": "PE_NISP_P"
+******** "rule3":
+********* "inputs": "NISP_S_CAL_1,NISP_S_1",
+********* "outputs": "NISP_S_QLA",
+********* "processing": "PE_NISP_S"
+******** "rule4":
+********* "inputs": "VIS_CAL_1,VIS_1",
+********* "outputs": "VIS_QLA",
+********* "processing": "PE_VIS"
+******** "rule5":
+********* "inputs": "HK_RAW",
+********* "outputs": "HK_QLA",
+********* "processing": "PE_HK"
+****** "processing":
+******* "processors":
+******** "processor1":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_NISP_P_CAL",
+********* "output_path": "/opt/pe/output"
+******** "processor2":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_NISP_P_CAL",
+********* "output_path": "/opt/pe/output"
+******** "processor3":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_NISP_P",
+********* "output_path": "/opt/pe/output"
+******** "processor4":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_NISP_S",
+********* "output_path": "/opt/pe/output"
+******** "processor5":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_VIS",
+********* "output_path": "/opt/pe/output"
+******** "processor6":
+********* "exe_path": "/opt/pe/bin",
+********* "input_path": "/opt/pe/input",
+********* "name": "PE_HK",
+********* "output_path": "/opt/pe/output"
+****** "products":
+******* "product_types": [
+******** "NISP_PY_CAL_1",
+******** "NISP_PH_CAL_1",
+******** "NISP_PJ_CAL_1",
+******** "NISP_P_CAL_1",
+******** "NISP_S_CAL_1",
+******** "VIS_CAL_1",
+******** "NISP_PY_1",
+******** "NISP_PH_1",
+******** "NISP_PJ_1",
+******** "NISP_S_1",
+******** "VIS_1",
+******** "NISP_P_QLA",
+******** "NISP_S_QLA",
+******** "VIS_QLA",
+******** "HK_RAW",
+******** "HK_QLA"]
 
-**** Relational Tables
-***** config_general
+***** Relational Tables
+****** config_general
 | Parameter   | Content         |
 | [string]    | [string]        |
 |-------------+-----------------|
@@ -1212,7 +1211,7 @@ class DBPostgreHdl <|-- DBHandler
 | app_version | 0.1             |
 | last_access | 20150616T121555 |
 | hmi_node    | QPFHMI          |
-***** config_nodes
+****** config_nodes
 | Name     | Type      | Client               | Server       |
 | [string] | [string]  | [string]             | [string]     |
 |----------+-----------+----------------------+--------------|
@@ -1227,7 +1226,7 @@ class DBPostgreHdl <|-- DBHandler
 | TskAge4  | taskagent | tcp://127.0.0.1:7114 | tcp://*:7114 |
 | TskAge5  | taskagent | tcp://127.0.0.1:7115 | tcp://*:7115 |
 | QPFHMI   | hmi       | tcp://127.0.0.1:7999 | tcp://*:7999 |
-***** config_orchestration
+****** config_orchestration
  | RuleId   | Inputs                                     | Outputs      | Processor     |
  | [string] | [string]                                   | [string]     | [string]      |
  |----------+--------------------------------------------+--------------+---------------|
@@ -1236,7 +1235,7 @@ class DBPostgreHdl <|-- DBHandler
  | rule3    | NISP_S_CAL_1,NISP_S_1                      | NISP_S_QLA   | PE_NISP_S     |
  | rule4    | VIS_CAL_1,VIS_1                            | VIS_QLA      | PE_VIS        |
  | rule5    | HK_RAW                                     | HK_QLA       | PE_HK         |
-***** config_processors
+****** config_processors
 | ProcessorId | ProcessorName | ExePath     | InputPath     | OutputPath     |
 | [string]    | [string]      | [string]    | [string]      | [string]       |
 |-------------+---------------+-------------+---------------+----------------|
@@ -1246,7 +1245,7 @@ class DBPostgreHdl <|-- DBHandler
 | processor4  | PE_NISP_S     | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
 | processor5  | PE_VIS        | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
 | processor6  | PE_HK         | /opt/pe/bin | /opt/pe/input | /opt/pe/output |
-***** config_products
+****** config_products
 | ProductId     |
 | [string]      |
 |---------------|
@@ -1267,11 +1266,11 @@ class DBPostgreHdl <|-- DBHandler
 | HK_RAW        |
 | HK_QLA        |
 
-*** Alarm System
+**** Alarm System
 
     An addition to provide an Alarm System with the following components:
 
-**** Alarm Database
+***** Alarm Database
 The Alarm Database stores:
      + the values of the registered variables with their validity ranges
      + the list of alarms and raised, and their current status
@@ -1313,19 +1312,34 @@ The Alarm Database stores:
       );
 #+END_SRC
 
-**** Database Controller
+***** Database Controller
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
 
-*** TODO Functionalities to be included [0/7]
-**** STARTED [#A] Registration of tasks status
-**** TODO [#A] Checking of last execution tasks status
-**** TODO [#A] Allow deployment of components in different hosts
+*** TODO Issues [0/2]
+**** TODO [#A] Remote log chunks are received in DATA_INFO messages, but they are not saved to disk
+**** TODO [#A] Database structure is obsolete, so INSERTs and other operations fail
+
+
+*** TODO Functionalities to be included [4/14]
+**** TODO [#A] Correct DB structure so the incoming data and overall information can be stored
+**** TODO [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
+**** TODO [#A] Ensure the HMI monitors the remote log directory and they are shown in the HMI
+**** TODO [#B] Prepare an infrastructure for product downloading
+**** TODO [#B] Implement MONIT_RQST and MONIT_INFO messages
+**** TODO [#B] Implement Commanding messages to handle running processors
+**** TODO [#B] Implement output products registering and archival
 **** TODO [#B] Pause/Resume/Stop of tasks
-**** TODO [#B] Output files registration
 **** TODO [#B] Implement preferences for HMI
 **** TODO [#C] Tasks History Report
-
+**** DONE [#A] Registration of tasks status
+CLOSED: [2015-09-30 mié 13:23]
+**** DONE [#A] Checking of last execution tasks status
+CLOSED: [2015-09-30 mié 13:23]
+**** DONE [#A] Allow deployment of components in different hosts
+CLOSED: [2015-09-30 mié 13:23]
+**** DONE [#B] Output files registration
+CLOSED: [2015-09-30 mié 13:23]
 
 
 *** Notes
