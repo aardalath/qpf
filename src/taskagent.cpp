@@ -54,6 +54,7 @@ using LibComm::Log;
 #include <unistd.h>
 #include <cstdio>
 #include <random>
+#include <dirent.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -82,6 +83,7 @@ void TaskAgent::fromRunningToOperational()
     numTasks = 0;
     numRunningTasks = 0;
     maxRunningTasks = 3;
+    numWaitingTasks = 0;
 }
 
 //----------------------------------------------------------------------
@@ -114,6 +116,13 @@ void TaskAgent::processTASK_PROC()
 }
 
 //----------------------------------------------------------------------
+// Method: execAdditonalLoopTasks
+//----------------------------------------------------------------------
+void TaskAgent::execAdditonalLoopTasks()
+{
+}
+
+//----------------------------------------------------------------------
 // Method: executeProcessingElement
 // Executes a task
 //----------------------------------------------------------------------
@@ -126,8 +135,7 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
 
     // Define task name and exchange dir.
     std::string internalTaskNameIdx = (selfPeer()->name + "-" +
-                                       LibComm::timeTag() +
-                                       "-" +
+                                       LibComm::timeTag() + "-" +
                                        LibComm::toStr<int>(numTasks));
     std::string exchangeDir = workDir + internalTaskNameIdx;
 
@@ -140,14 +148,14 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     task.setData(t.getData());
     Json::Value & taskData = task.taskData;
 
-    bool firstMsgRes = true;
     std::string nameFromOrchestrator = t.taskName;
 
     taskData["TaskAgent"] = self.load(std::memory_order_relaxed)->name;
     taskData["Name"] = "/UNDEFINED";
     taskData["NameExtended"] = (taskData["TaskAgent"].asString() +
                                 ":/" + taskData["Name"].asString());
-    taskData["NameOrc"] = "mem://" + nameFromOrchestrator;
+    taskData["NameInternal"] = internalTaskNameIdx;
+    taskData["NameOrc"] = nameFromOrchestrator;
     taskData["State"]["Dead"] = false;
     taskData["State"]["Error"] = "";
     taskData["State"]["ExitCode"] = 0;
@@ -166,19 +174,20 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     task.taskPath = t.taskPath;
     task.taskStatus = status;
 
-    InfoMsg("Name from Orchestrator is >>" + nameFromOrchestrator +
-            "<< while new name is >>" + internalTaskNameIdx + "<<");
+    // Clear outputs (will be filled in at the end of the task)
+    task.outputs.productList.clear();
 
     //-------------------------------------------------------------------
     // 2. Loop waiting for execution slot
     //-------------------------------------------------------------------
     if (numRunningTasks >= maxRunningTasks) {
         sendTaskResMsg(task);
-        firstMsgRes = false;
         // Loop waiting until numTasks is below threshold
+        numWaitingTasks++;
         while (numRunningTasks >= maxRunningTasks) {
             LibComm::waitForHeartBeat(0, 200000);
         }
+        numWaitingTasks--;
     }
 
     //-------------------------------------------------------------------
@@ -194,8 +203,8 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
 
     // Create exchange area
     mkdir(exchangeDir.c_str(), 0755);
-    mkdir(exchgIn.c_str(), 0755);
-    mkdir(exchgOut.c_str(), 0755);
+    mkdir(exchgIn.c_str(),     0755);
+    mkdir(exchgOut.c_str(),    0755);
 
     // Create input files
     int mn = 60;
@@ -221,8 +230,7 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         char *procTaskCmdLine[] = { (char*)(taskDriver.c_str()),
                                     (char*)(pe.c_str()),
                                     (char*)(cfgFile.c_str()), NULL };
-        std::string cmdLine =
-                taskDriver + " " + pe + " " + cfgFile;
+        std::string cmdLine = taskDriver + " " + pe + " " + cfgFile;
         InfoMsg("CMDLINE: " + cmdLine);
         execv(procTaskCmdLine[0], procTaskCmdLine);
         ErrMsg("EXECV: " + std::string(strerror(errno)));
@@ -312,12 +320,8 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         // Additional info
         taskData["TaskAgent"] = selfPeer()->name;
         taskData["NameExtended"] = selfPeer()->name + ":/" + taskData["Name"].asString();
-        if (firstMsgRes) {
-            taskData["NameOrc"] = "mem://" + nameFromOrchestrator;
-            firstMsgRes = false;
-        } else {
-            taskData["NameOrc"] = nameFromOrchestrator;
-        }
+        taskData["NameInternal"] = internalTaskNameIdx;
+        taskData["NameOrc"] = nameFromOrchestrator;
 
         // Update progress
         if (status != TASK_FINISHED) {
@@ -345,6 +349,42 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     } while ((!childEnded) && (!stopTasks));
 
     //-------------------------------------------------------------------
+    // Get output data
+    //-------------------------------------------------------------------
+    std::vector<std::string> outFiles;
+    DIR * dp = NULL;
+    struct dirent * dirp;
+    if ((dp = opendir(exchgOut.c_str())) == NULL) {
+        WarnMsg("Cannot open output directory " + exchgOut);
+    } else {
+        while ((dirp = readdir(dp)) != NULL) {
+            outFiles.push_back(std::string(dirp->d_name));
+        }
+        closedir(dp);
+    }
+
+    task.outputs.productList.clear();
+
+    for (unsigned int i = 0; i < outFiles.size(); ++i) {
+        ProductMetadata m;
+        m.startTime = task.taskStart;
+        m.endTime  = task.taskEnd;
+        m.creator = task.taskPath;
+        m.instrument = "UNKNOWN_INST";
+        m.productType = "UNKNOWN_TYPE";
+        m.productSize = 1234;
+        m.productStatus = "OK";
+        m.productVersion = "1";
+        m.productId = ("EUCL_" +
+                       m.productType + "_" +
+                       m.startTime  + "-" + m.endTime  + "_10");
+        m.regTime = LibComm::timeTag();
+        m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
+
+        task.outputs.productList[m.productType] = m;
+    }
+
+    //-------------------------------------------------------------------
     // Report end of task
     //-------------------------------------------------------------------
 
@@ -356,9 +396,6 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
 
     // Send message
     sendTaskResMsg(task);
-
-    std::cerr << "After end: "
-              << task.taskName << " - " << task.taskStatus << "\n";
 
     //-------------------------------------------------------------------
     // Task finished

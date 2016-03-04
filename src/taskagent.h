@@ -100,6 +100,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void processTASK_PROC();
 
+    //----------------------------------------------------------------------
+    // Method: execAdditonalLoopTasks
+    //----------------------------------------------------------------------
+    virtual void execAdditonalLoopTasks();
+
 private:
 
     //----------------------------------------------------------------------
@@ -128,6 +133,7 @@ private:
     std::atomic<bool> stopTasks;
     std::atomic<int> numTasks;
     std::atomic<int> numRunningTasks;
+    std::atomic<int> numWaitingTasks;
     std::atomic<int> maxRunningTasks;
     std::mutex sendMsgsMutex;
 };
