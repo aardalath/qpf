@@ -167,7 +167,7 @@ void DataManager::initializeDB()
 //----------------------------------------------------------------------
 void DataManager::saveToDB(Message_INDATA * msg)
 {
-    InfoMsg("Saving inputs...");
+    //InfoMsg("Saving inputs...");
     saveProductsToDB(msg->productsMetadata);
 }
 
@@ -199,8 +199,8 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
     dbHdl->closeConnection();
 
     // In case the task has finished, save output products metadata
-    if (!msg->task.taskEnd.empty()) {
-        InfoMsg("Saving outputs...");
+    if (msg->task.taskStatus == TASK_FINISHED) {
+        //InfoMsg("Saving outputs...");
         saveProductsToDB(msg->task.outputs);
     }
 }
