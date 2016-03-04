@@ -194,7 +194,6 @@ private:
     QAction *aboutQtAct;
 
 private:
-    QVector<double> getLoadAvgs();
     void clearLayout(QLayout *layout);
 
 private:

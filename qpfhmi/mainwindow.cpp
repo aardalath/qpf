@@ -43,6 +43,7 @@
 
 #include "log.h"
 using LibComm::Log;
+#include "tools.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -1093,7 +1094,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
 //----------------------------------------------------------------------
 void MainWindow::updateAgentsMonitPanel()
 {
-    QVector<double> loadAvgs(getLoadAvgs());
+    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
 
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
@@ -1338,23 +1339,6 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 void MainWindow::setDebugInfo(bool b)
 {
     hmiNode->setDebugInfo(b);
-}
-
-//----------------------------------------------------------------------
-// Method: getLoadAvgs
-// Obtain load averages for host
-//----------------------------------------------------------------------
-QVector<double> MainWindow::getLoadAvgs()
-{
-    double loadAvg[3];
-
-    if (getloadavg(loadAvg, 3) < 0) {
-        return QVector<double>(3, 0);
-    } else {
-        QVector<double> loadValues(0);
-        loadValues << loadAvg[0] << loadAvg[1] << loadAvg[2];
-        return loadValues;
-    }
 }
 
 //----------------------------------------------------------------------
