@@ -38,6 +38,8 @@ bool TextView::saveFile(const QString &fileName)
 void TextView::setLogName(QString n)
 {
     name = n;
+    setWindowTitle(n);
+
 }
 
 QString TextView::logName()
