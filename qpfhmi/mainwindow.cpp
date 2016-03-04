@@ -400,7 +400,7 @@ void MainWindow::prepareSendMultInData()
         // Activate task monitoring
         taskMonitTimer = new QTimer(this);
         connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
-        taskMonitTimer->start(2000);
+        taskMonitTimer->start(1000);
     }
 }
 
