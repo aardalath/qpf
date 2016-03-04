@@ -217,14 +217,15 @@ void ProcessingElement::initTaskInfo()
 //----------------------------------------------------------------------
 void ProcessingElement::configureProcElem()
 {
+    int mn = 60;
+    int mx = 180;
+
     // Prepare folders
     exchangeDir = workDir + "/" + internalTaskNameIdx;
     exchgIn     = exchangeDir + "/in";
     exchgOut    = exchangeDir + "/out";
 
     std::string sysBinDir = sysDir + "/bin";
-//    std::string taskDriverDir = workDir + "/bin";
-//    taskDriver  = taskDriverDir + "/runTask.sh";
     taskDriver  = sysDir + "/bin/runTask.sh";
     cfgFile     = exchangeDir + "/dummy.cfg";
 
@@ -234,15 +235,24 @@ void ProcessingElement::configureProcElem()
     mkdir(exchgOut.c_str(),    0755);
 
     // Create input files
-    int mn = 60;
-    int mx = 180;
-    std::ofstream oInFile1((exchgIn + "/1.in").c_str());
-    if (oInFile1.good()) {
-        oInFile1 << mn << " " << mx << std::endl;
-        oInFile1.close();
+    if (task.taskPath == "QLA_VIS") {
+        std::string sourceImg("/qpf/data/mef.fits");
+        std::map<ProductType, ProductMetadata>::iterator it = task.inputs.productList.begin();
+        ProductMetadata & m = it->second;
+        std::string inputProduct = exchgIn + "/" + m.productId + ".fits";
+        if (link(sourceImg.c_str(), inputProduct.c_str()) != 0) {
+            perror("symlink input product");
+            status = TASK_FAILED;
+        }
     } else {
-        std::cerr << "Cannot create " << exchgIn  << "/1.in\n";
-        status = TASK_FAILED;
+        std::ofstream oInFile1((exchgIn + "/1.in").c_str());
+        if (oInFile1.good()) {
+            oInFile1 << mn << " " << mx << std::endl;
+            oInFile1.close();
+        } else {
+            std::cerr << "Cannot create " << exchgIn  << "/1.in\n";
+            status = TASK_FAILED;
+        }
     }
 }
 

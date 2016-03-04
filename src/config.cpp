@@ -59,6 +59,8 @@ using namespace LibComm;
 
 #define WRITE_MESSAGE_FILES
 
+static const std::string QPFExecutionsBase("/qpf/run/");
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -110,13 +112,14 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
     appVer  = cfg["general"]["app_version"].asString();
     last    = cfg["general"]["last_access"].asString();
 
-    PATHBin = PATHBase + "/bin";
-    PATHRun = PATHBase + "/" + LibComm::timeTag();
-    PATHLog = PATHRun + "/log";
+    PATHBase = QPFExecutionsBase;
+    PATHBin  = PATHBase + "/bin";
+    PATHRun  = PATHBase + "/" + LibComm::timeTag();
+    PATHLog  = PATHRun + "/log";
     PATHRlog = PATHRun + "/rlog";
-    PATHTmp = PATHRun + "/tmp";
-    PATHTsk = PATHRun + "/tsk";
-    PATHMsg = PATHRun + "/msg";
+    PATHTmp  = PATHRun + "/tmp";
+    PATHTsk  = PATHRun + "/tsk";
+    PATHMsg  = PATHRun + "/msg";
 }
     
 //----------------------------------------------------------------------
@@ -677,7 +680,7 @@ std::string Configuration::DBName("qpfdb");
 std::string Configuration::DBUser("jcgonzalez");
 std::string Configuration::DBPwd("euclidjcg");
 
-std::string Configuration::PATHBase("/qpf/run/");
+std::string Configuration::PATHBase;
 std::string Configuration::PATHBin;
 std::string Configuration::PATHRun;
 std::string Configuration::PATHLog;
