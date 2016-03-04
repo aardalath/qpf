@@ -52,6 +52,38 @@ namespace QPF {
 LogManager::LogManager(const char * name) :
     Component(name)
 {
+<<<<<<< 55e181e35c81a71088fafdb04ee357ac6c9eee72
+=======
+    canProcessMessage(MSG_DATA_INFO_IDX);
+    Log::defineSizeOfLogBuffer(name, 0);
+}
+
+//----------------------------------------------------------------------
+// Method: processDATA_INFO
+//----------------------------------------------------------------------
+void LogManager::processDATA_INFO()
+{
+    // Check the product type as input for any rule
+    Message_DATA_INFO * msg = dynamic_cast<Message_DATA_INFO *>(msgData.msg);
+    msg->toFields();
+    std::string & logChunk = msg->variables.paramList["content"];
+    std::string logFileName(Log::getLogBaseDir() + "/rlog/" +
+                            msg->header.source + ".log");
+    std::ofstream logOut;
+    logOut.open(logFileName, std::ofstream::out | std::ofstream::app);
+    if (logOut) {
+        logOut << logChunk;
+        logOut.close();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: execAdditonalLoopTasks
+//----------------------------------------------------------------------
+void LogManager::execAdditonalLoopTasks()
+{
+
+>>>>>>> Completed processDATA_INFO to append log chunk to rlog file
 }
 
 }
