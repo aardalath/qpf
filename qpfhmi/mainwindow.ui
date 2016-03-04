@@ -34,19 +34,14 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QMdiArea" name="mdiArea">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
+         <widget class="QTabWidget" name="tabLogs">
+          <property name="tabPosition">
+           <enum>QTabWidget::South</enum>
           </property>
-          <property name="activationOrder">
-           <enum>QMdiArea::ActivationHistoryOrder</enum>
+          <property name="tabShape">
+           <enum>QTabWidget::Triangular</enum>
           </property>
-          <property name="viewMode">
-           <enum>QMdiArea::TabbedView</enum>
-          </property>
-          <property name="documentMode">
+          <property name="movable">
            <bool>true</bool>
           </property>
           <property name="tabsClosable">
