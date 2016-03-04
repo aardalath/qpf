@@ -102,6 +102,7 @@ bool DBHdlPostgreSQL::openConnection(const char * data)
                                   " dbname=" + getDbName() +
                                   " user=" + getDbUser() +
                                   " password=" + getDbPasswd());
+            connectionParamsSet = true;
         }
         connStr = getDbConnectionParams().c_str();
     }
