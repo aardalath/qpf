@@ -272,11 +272,11 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 // Method: checkTask
 // Returns true if an entry for a task exists in the DB
 //----------------------------------------------------------------------
-bool DBHdlPostgreSQL::checkTask(TaskInfo & task)
+bool DBHdlPostgreSQL::checkTask(std::string taskId)
 {
     bool result;
     std::string cmd("SELECT t.task_id FROM tasks_info AS t "
-                    "WHERE t.task_id=" + quoted(task.taskName) + ";");
+                    "WHERE t.task_id=" + quoted(taskId) + ";");
 
     try { result = runCmd(cmd); } catch(...) { throw; }
 
@@ -338,15 +338,29 @@ bool DBHdlPostgreSQL::updateTable<Json::Value>(std::string table, std::string co
 bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
 {
     bool result = true;
+    bool mustUpdate = true;
 
-    if (checkTask(task)) {
+    if (!checkTask(task.taskName)) {
+        // Check if name provided by Orc is present
         std::string initialName = task.taskData["NameOrc"].asString();
-        if (initialName.compare(0, 6, "mem://") == 0) {
-            result &= updateTable<std::string>("tasks_info",
-                                               "task_id=" + quoted(initialName.substr(6)),
-                                               "task_id", quoted(task.taskName));
-        }
 
+        if (!checkTask(initialName)) {
+            // not present, must be first time this tast is requested to be
+            // updated -> store it
+            result = storeTask(task);
+            // Since it is stored for the first time, no update is done
+            mustUpdate = false;
+        } else {
+            // Present, so this is task registered with old name,
+            // that must change its name
+            result = updateTable<std::string>("tasks_info",
+                                              "task_id=" + quoted(initialName),
+                                              "task_id", task.taskName);
+            // Once changed the task_id, the update must still be done
+        }
+    }
+
+    if (mustUpdate) {
         std::string filter("task_id=" + quoted(task.taskName));
         result &= updateTable<int>("tasks_info", filter,
                                    "task_status_id", (int)(task.taskStatus));
@@ -359,8 +373,6 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
         result &= updateTable<Json::Value>("tasks_info", filter,
                                            "task_data", task.taskData);
         PQclear(res);
-    } else {
-        result = storeTask(task);
     }
 
     return result;
@@ -414,10 +426,9 @@ bool DBHdlPostgreSQL::retrieveMsgs(std::vector<std::pair<std::string,
 {
     bool result = true;
 
-    std::string cmd(
-                "SELECT m.msg_date, m.msg_to, m.msg_type, m.msg_content "
-                "FROM transmissions as m "
-                "ORDER BY m.msg_date ");
+    std::string cmd("SELECT m.msg_date, m.msg_to, m.msg_type, m.msg_content "
+                    "FROM transmissions as m "
+                    "ORDER BY m.msg_date ");
     cmd += criteria + ";";
 
     try { result = runCmd(cmd); } catch(...) { throw; }
