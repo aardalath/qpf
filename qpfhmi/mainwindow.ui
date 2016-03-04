@@ -810,6 +810,30 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabAgents">
+       <attribute name="title">
+        <string>Agents Status</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="vlyAgents">
+        <item>
+         <widget class="QScrollArea" name="scrollAreaAgents">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>843</width>
+             <height>484</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabpgArchive">
        <attribute name="title">
         <string>Archive</string>
@@ -969,6 +993,25 @@ INDATA messages</string>
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Setup</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QCheckBox" name="chkDebugInfo">
+          <property name="text">
+           <string>Debug Info</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -1015,12 +1058,12 @@ INDATA messages</string>
    <slot>setDateTime(QDateTime)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>355</x>
-     <y>122</y>
+     <x>712</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>355</x>
-     <y>122</y>
+     <x>712</x>
+     <y>179</y>
     </hint>
    </hints>
   </connection>
@@ -1037,6 +1080,38 @@ INDATA messages</string>
     <hint type="destinationlabel">
      <x>555</x>
      <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionActivate_Debug_Info</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>chkDebugInfo</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>557</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDebugInfo</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionActivate_Debug_Info</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>112</x>
+     <y>557</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>

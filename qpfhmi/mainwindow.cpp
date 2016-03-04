@@ -84,12 +84,22 @@ MainWindow::MainWindow(QWidget *parent) :
     multInDataContentValues.clear();
 
     ui->actionActivate_Debug_Info->setEnabled(false);
+    ui->chkDebugInfo->setEnabled(false);
 
     // Read QPF Configuration
     readConfig();
 
     // Launch HMI Proxy
     //init();
+
+    QFrame * frm = new QFrame(0);
+    vlyFrmAgents = new QVBoxLayout;
+    frm->setLayout(vlyFrmAgents);
+    ui->scrollAreaAgents->setWidget(frm);
+    spacerFrmAgents = new QSpacerItem(10, 10,
+                                      QSizePolicy::Minimum,
+                                      QSizePolicy::Expanding);
+    vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
     // Create additional connections
     connect(ui->btnStart, SIGNAL(pressed()), this, SLOT(commandSystem()));
@@ -120,11 +130,37 @@ void MainWindow::readConfig()
     cfg = new Configuration(0);
     cfg->getGeneralInfo(qpfCfg.appName, qpfCfg.appVersion, qpfCfg.lastAccess);
     cfg->getProductTypes(qpfCfg.productTypes);
+    cfg->reset();
 
     for (int i = 0; i < cfg->getNumProcs(); ++i) {
         ProcessingElement * pe = new ProcessingElement;
         cfg->getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
         qpfCfg.procElems[pe->name] = pe;
+    }
+
+    // Get the name of the different Task Agents
+    taskAgentsInfo.clear();
+    LibComm::Router2RouterPeer::Peer peer;
+    for (int i = 0; i < cfg->getNumNodes(); ++i) {
+        cfg->getNode(peer.name, peer.type, peer.clientAddr, peer.serverAddr);
+        if (peer.type == "taskagent") {
+            TaskAgentInfo * taInfo = new TaskAgentInfo;
+            taInfo->name = peer.name;
+            taInfo->client = peer.clientAddr;
+            taInfo->server = peer.serverAddr;
+
+            // Create task info structure for agent
+            taskAgentsInfo[peer.name] = taInfo;
+        }
+    }
+
+    for (auto & kv : taskAgentsInfo ) {
+        qDebug() << kv.first.c_str()
+                 << kv.second->name.c_str()
+                 << kv.second->client.c_str()
+                 << kv.second->server.c_str()
+                 << kv.second->total << kv.second->running << kv.second->waiting
+                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
     }
 
     // Save HMI & EvtMng Peer configuration
@@ -174,6 +210,8 @@ void MainWindow::commandSystem()
             exit(0);
         }
 
+        init();
+
         // System START signal
         std::ofstream fEvtMngGoAhead(evtmngGoFile);
         fEvtMngGoAhead.close();
@@ -181,7 +219,6 @@ void MainWindow::commandSystem()
         //kill(parentPid, SIGUSR1);
         setLogWatch();
 
-        init();
 
         QString newCSS = ui->btnStart->styleSheet()
                 .append("background-color: lightgreen;");
@@ -232,14 +269,6 @@ void MainWindow::init()
     hmiNode->addPeer(&(qpfCfg.qpfhmiCfg), true);
     hmiNode->addPeer(&(qpfCfg.evtMngCfg));
 
-    // Initialize and create node part as a separate thread
-    qDebug() << "Initializing QPFHMI...";
-    hmiNode->initialize();
-    qDebug() << "Trying to concurrentRun QPFHMI...";
-    hmiPxyThread = std::thread(&HMIProxy::concurrentRun, hmiNode);
-    //hmiResult = std::async(&HMIProxy::concurrentRun, hmiNode);
-    qDebug() << "QPFHMI should be concurrentRunning...";
-
     // Add log tab
     QString qpfhmiLog = QString::fromStdString(Log::getLogBaseDir() + "/" +
                                                hmiNode->getCommNodeName() + ".log");
@@ -251,7 +280,16 @@ void MainWindow::init()
     ui->tabLogs->insertTab(0, pltxted,
                            QString::fromStdString(hmiNode->getCommNodeName()));
 
+    // Initialize and create node part as a separate thread
+    qDebug() << "Initializing QPFHMI...";
+    hmiNode->initialize();
+    qDebug() << "Trying to concurrentRun QPFHMI...";
+    hmiPxyThread = std::thread(&HMIProxy::concurrentRun, hmiNode);
+    //hmiResult = std::async(&HMIProxy::concurrentRun, hmiNode);
+    qDebug() << "QPFHMI should be concurrentRunning...";
+
     ui->actionActivate_Debug_Info->setEnabled(true);
+    ui->chkDebugInfo->setEnabled(true);
     ui->actionActivate_Debug_Info->setChecked(hmiNode->getDebugInfo());
 }
 
@@ -611,10 +649,17 @@ void MainWindow::checkForTaskRes()
 void MainWindow::showTaskRes()
 {
     static bool firstTime = true;
+    static ProgressBarDelegate * progressBarDisplay = 0;
+    static QStringList hdrLabels;
 
     if (firstTime) {
         // Set up context menu
         ui->treeTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
+
+        hdrLabels << "Started at" << "Finished at"
+                  << "Task Name" << "Agent" << "Proc.Element" << "Status"
+                  << "Progress" << "Exit Code";
+        progressBarDisplay = new ProgressBarDelegate(this);
 
         acWorkDir = new QAction(tr("Open task working directory..."), ui->treeTaskMonit);
         acDisplayTaskInfo = new QAction(tr("Display task information"), ui->treeTaskMonit);
@@ -635,12 +680,9 @@ void MainWindow::showTaskRes()
         connect(ui->treeTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
                 this, SLOT(showTaskMonitContextMenu(const QPoint &)));
 
-        QHeaderView * hdrView = ui->treeTaskMonit->header();
-        hdrView->setSectionsClickable(true);
-        connect(hdrView, SIGNAL(sectionClicked(int)),
+        connect(ui->treeTaskMonit->header(), SIGNAL(sectionClicked(int)),
                 this, SLOT(sortTaskViewByColumn(int)));
-        ui->treeTaskMonit->setSortingEnabled(false);
-
+        ui->treeTaskMonit->header()->setSectionsClickable(true);
     }
 
     int nCols = 8;
@@ -648,13 +690,8 @@ void MainWindow::showTaskRes()
     ui->treeTaskMonit->clear();
     ui->treeTaskMonit->setSortingEnabled(false);
     ui->treeTaskMonit->setColumnCount(nCols);
-    QStringList hdrLabels;
-    hdrLabels << "Started at" << "Finished at"
-              << "Task Name" << "Agent" << "Proc.Element" << "Status"
-              << "Progress" << "Exit Code";
     ui->treeTaskMonit->setHeaderLabels(hdrLabels);
-
-    ui->treeTaskMonit->setItemDelegateForColumn(6, new ProgressBarDelegate(this));
+    ui->treeTaskMonit->setItemDelegateForColumn(6, progressBarDisplay);
 
     foreach (Json::Value v, taskResInfo) {
         Json::Value & v0 = v;
@@ -666,9 +703,10 @@ void MainWindow::showTaskRes()
         QString finish   = QString::fromStdString(v0["State"]["FinishedAt"].asString());
         QString progress = QString::fromStdString(v0["State"]["Progress"].asString());
         QString exitCode = QString::fromStdString(v0["State"]["ExitCode"].asString());
+
         bool running = v0["State"]["Running"].asBool();
         bool paused = v0["State"]["Paused"].asBool();
-        TaskStatus st = (paused ? TASK_PAUSED :
+        TaskStatus st = (paused ? TASK_WAITING :
                                   (running ? TASK_RUNNING : TASK_FINISHED));
         if (exitCode.toInt() > 0) { st = TASK_FAILED; }
         QString status   = QString::fromStdString(TaskStatusName[st]);
@@ -700,7 +738,7 @@ void MainWindow::showTaskRes()
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::red));
             }
             break;
-        case TASK_PAUSED:
+        case TASK_WAITING:
             for (int col = 0; col < nCols; ++col) {
                 treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::gray));
             }
@@ -719,6 +757,82 @@ void MainWindow::showTaskRes()
         }
     }
 
+    // Now, update information for Task Agents Status Info.
+    // 1. Reset counters
+    QVector<double> loadAvgs(getLoadAvgs());
+
+    for (auto & kv : taskAgentsInfo) {
+        TaskAgentInfo * taInfo = kv.second;
+        taInfo->total = 0;
+        taInfo->maxnum = 3;
+        taInfo->running = 0;
+        taInfo->waiting = 0;
+        taInfo->failed = 0;
+        taInfo->finished = 0;
+        taInfo->load1min = loadAvgs.at(0) * 100;
+        taInfo->load5min = loadAvgs.at(1) * 100;
+        taInfo->load15min = loadAvgs.at(2) * 100;
+        taInfo->uptimesecs = 0;
+
+    }
+
+    for (auto & kv : taskAgentsInfo ) {
+        qDebug() << kv.first.c_str()
+                 << kv.second->name.c_str()
+                 << kv.second->client.c_str()
+                 << kv.second->server.c_str()
+                 << kv.second->total << kv.second->running << kv.second->waiting
+                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
+    }
+
+    // 2. Count tasks
+    for (int i = 0; i < ui->treeTaskMonit->topLevelItemCount(); ++i) {
+        QTreeWidgetItem * treeItem = ui->treeTaskMonit->topLevelItem(i);
+
+        std::string agent = treeItem->text(3).toStdString();
+
+        if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
+            TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;
+
+            TaskStatus st = TaskStatusValue[treeItem->text(5).toStdString()];
+            switch (st) {
+            case TASK_RUNNING:
+                taInfo->running++;
+                break;
+            case TASK_FINISHED:
+                taInfo->finished++;
+                break;
+            case TASK_FAILED:
+                taInfo->failed++;
+                break;
+            case TASK_WAITING:
+                taInfo->waiting++;
+                break;
+            default:
+                break;
+            }
+            taInfo->total++;
+        }
+    }
+
+    // 3. Update view
+    for (auto & kv : taskAgentsInfo) {
+        TaskAgentInfo * taInfo = kv.second;
+        FrmAgentStatus * panel = 0;
+        std::map<std::string, FrmAgentStatus*>::iterator it = taskAgentsInfoPanel.find(kv.first);
+        if (it == taskAgentsInfoPanel.end()) {
+             panel = new FrmAgentStatus(0);
+             taskAgentsInfoPanel[kv.first] = panel;
+             vlyFrmAgents->removeItem(spacerFrmAgents);
+             vlyFrmAgents->addWidget(panel);
+             vlyFrmAgents->addSpacerItem(spacerFrmAgents);
+        } else {
+             panel = it->second;
+        }
+        panel->updateInfo(*taInfo);
+    }
+
+    // Activate sorting - we are done
     ui->treeTaskMonit->setSortingEnabled(true);
 
 }
@@ -844,5 +958,42 @@ void MainWindow::setDebugInfo(bool b)
     hmiNode->setDebugInfo(b);
 }
 
+//----------------------------------------------------------------------
+// Method: getLoadAvgs
+// Obtain load averages for host
+//----------------------------------------------------------------------
+QVector<double> MainWindow::getLoadAvgs()
+{
+    double loadAvg[3];
+
+    if (getloadavg(loadAvg, 3) < 0) {
+        return QVector<double>(3, 0);
+    } else {
+        QVector<double> loadValues(0);
+        loadValues << loadAvg[0] << loadAvg[1] << loadAvg[2];
+        return loadValues;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: clearLayout
+// Delete (recursively) all items in a layout
+//----------------------------------------------------------------------
+void MainWindow::clearLayout(QLayout *layout)
+{
+    if (layout->count() < 1) { return; }
+
+    QLayoutItem *item;
+    while ((item = layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        if (item->widget()) {
+            delete item->widget();
+        }
+        delete item;
+    }
+}
 
 }

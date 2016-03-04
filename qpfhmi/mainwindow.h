@@ -43,6 +43,8 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QTreeWidget>
+#include <QVBoxLayout>
+#include <QSpacerItem>
 
 #include <future>
 
@@ -50,6 +52,7 @@
 #include "msgtypes.h"
 #include "config.h"
 #include "archivemodel.h"
+#include "frmagentstatus.h"
 
 //INI#include "iniparser.h"
 #include "json/json.h"
@@ -149,6 +152,9 @@ protected:
     //----------------------------------------------------------------------
     void stopSendingMessages();
 
+private:
+    QVector<double> getLoadAvgs();
+    void clearLayout(QLayout *layout);
 
 private:
     Ui::MainWindow *ui;
@@ -174,6 +180,12 @@ private:
 
     QAction * acWorkDir;
     QAction * acDisplayTaskInfo;
+
+    QVBoxLayout * vlyFrmAgents;
+    QSpacerItem * spacerFrmAgents;
+
+    std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
+    std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
 };
 
 }
