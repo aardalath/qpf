@@ -576,6 +576,40 @@ void Component::registerMsg(std::string from,
 }
 
 //----------------------------------------------------------------------
+<<<<<<< 404d81f9b9d799ba68419a5b5874643e2c884dc3
+=======
+// Method: sendLogPacketAsDataInfoMsg
+//----------------------------------------------------------------------
+void Component::sendLogPacketAsDataInfoMsg()
+{
+    if (selfPeer()->name == "LogMng") { return; }
+
+    Message_DATA_INFO msg;
+    buildMsgHeader(MSG_DATA_INFO_IDX, selfPeer()->name, "LogMng", msg.header);
+
+    // Get file content
+    std::ifstream fileToSendStrm(fileToSend);
+    if (!fileToSendStrm) {
+        WarnMsg("Could not send Data Info msg with content of file " + fileToSend);
+        fileToSend = "";
+        return;
+    }
+
+    std::stringstream bufferStrm;
+    bufferStrm << fileToSendStrm.rdbuf();
+    fileToSendStrm.close();
+    unlink(fileToSend.c_str());
+    fileToSend = "";
+
+    msg.variables.paramList["contents"] = bufferStrm.str();
+    PeerMessage * dataInfoMsg = buildPeerMsg("LogMng", msg.getDataString(), MSG_DATA_INFO);
+    // DataInfo messages are not registered
+    // registerMsg(selfPeer()->name, *dataInfoMsg);
+    setTransmissionToPeer("LogMng", dataInfoMsg);
+}
+
+//----------------------------------------------------------------------
+>>>>>>> DataInfo messages will not be registered in DB
 // MethoComponent::d: setHeartBeatPeriod
 // Sets number of seconds and microseconds for HeartBeat period
 //----------------------------------------------------------------------

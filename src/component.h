@@ -304,7 +304,11 @@ protected:
     // Method: setHeartBeatPeriod
     // Sets number of seconds and microseconds for HeartBeat period
     //----------------------------------------------------------------------
+<<<<<<< 404d81f9b9d799ba68419a5b5874643e2c884dc3
     void setHeartBeatPeriod(int s = 1, int us = 0);
+=======
+    void setHeartBeatPeriod(int s = 2, int us = 0);
+>>>>>>> DataInfo messages will not be registered in DB
 
 protected:
     std::set<int> canProcess;
