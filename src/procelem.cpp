@@ -508,8 +508,8 @@ void ProcessingElement::cleanup()
 std::string ProcessingElement::getMonitoringInfo(std::string id)
 {
     std::string cmd("docker inspect " + id);
+/*
     std::string info("");
-
     FILE* pipe = popen(cmd.c_str(), "r");
     if (pipe) {
         char buffer[128];
@@ -517,6 +517,15 @@ std::string ProcessingElement::getMonitoringInfo(std::string id)
             if(fgets(buffer, 128, pipe) != NULL) { info += buffer; }
         }
         pclose(pipe);
+    }
+*/
+    std::string info("");
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (pipe) {
+        char buffer[10240];
+        fread(buffer, 1, sizeof(buffer), pipe);
+        pclose(pipe);
+        info = std::string(buffer);
     }
     return info;
 }
@@ -529,10 +538,11 @@ float ProcessingElement::updateProgress(float f)
 {
     float p = f;
 
-    if (status != TASK_FINISHED) {
+    if ((status != TASK_FINISHED) && (status != TASK_ARCHIVED)){
         p = f + 2;
         if (p > 99.) { p = 99.; }
     }
+    if (status == TASK_ARCHIVED) { p = 100.0; }
 
     return p;
 }
