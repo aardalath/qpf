@@ -1325,14 +1325,18 @@ The Alarm Database stores:
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
 
-*** TODO Issues [0/2]
-**** TODO [#A] Remote log chunks are received in DATA_INFO messages, but they are not saved to disk
-**** TODO [#A] Database structure is obsolete, so INSERTs and other operations fail
+*** DONE Issues [2/2]
+**** DONE [#A] Remote log chunks are received in DATA_INFO messages, but they are not saved to disk
+CLOSED: [2015-10-05 lun 11:44]
+**** DONE [#A] Database structure is obsolete, so INSERTs and other operations fail
+CLOSED: [2015-10-05 lun 11:44]
 
 
-*** TODO Functionalities to be included [4/14]
-**** TODO [#A] Correct DB structure so the incoming data and overall information can be stored
-**** TODO [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
+*** TODO Functionalities to be included [6/14]
+**** DONE [#A] Correct DB structure so the incoming data and overall information can be stored
+CLOSED: [2015-10-05 lun 11:43]
+**** DONE [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
+CLOSED: [2015-10-05 lun 11:43]
 **** TODO [#A] Ensure the HMI monitors the remote log directory and they are shown in the HMI
 **** TODO [#B] Prepare an infrastructure for product downloading
 **** TODO [#B] Implement MONIT_RQST and MONIT_INFO messages
