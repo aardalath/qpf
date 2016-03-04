@@ -60,13 +60,13 @@ namespace QPF {
 // Constructor
 //----------------------------------------------------------------------
 ProcessingElement::ProcessingElement() :
-    status(TASK_SCHEDULED),
     numTask(1),
+    status(TASK_SCHEDULED),
     peThread(0),
     startProc(false),
     endProc(false),
     checkStartSleepPeriod( 500000), // microseconds
-    threadLoopSleepPeriod(1200000) // microseconds
+    threadLoopSleepPeriod(2000000) // microseconds
 {
 }
 
@@ -79,33 +79,6 @@ void ProcessingElement::setTaskInfo(TaskInfo & t)
     mutexTask.lock();
     task.setData(t.getData());
     mutexTask.unlock();
-}
-
-//----------------------------------------------------------------------
-// Method: setAgentName
-// Sets the name of the agent owner of this processing element
-//----------------------------------------------------------------------
-void ProcessingElement::setAgentName(std::string name)
-{
-    agentName = name;
-}
-
-//----------------------------------------------------------------------
-// Method: setWorkingDir
-// Sets the location where all the processing elements will be placed
-//----------------------------------------------------------------------
-void ProcessingElement::setWorkingDir(std::string wd)
-{
-    workDir = wd;
-}
-
-//----------------------------------------------------------------------
-// Method: setNumTask
-// Sets the task index for a given TaskAgent
-//----------------------------------------------------------------------
-void ProcessingElement::setNumTask(int n)
-{
-    numTask = n;
 }
 
 //----------------------------------------------------------------------
@@ -194,8 +167,6 @@ void ProcessingElement::initTaskInfo()
     internalTaskNameIdx = (agentName + "-" +
                            LibComm::timeTag() + "-" +
                            LibComm::toStr<int>(numTask));
-    exchangeDir = workDir + "/" + internalTaskNameIdx;
-
     status = TASK_SCHEDULED;
 
     mutexTask.lock();
@@ -208,7 +179,8 @@ void ProcessingElement::initTaskInfo()
     task.taskName     = internalTaskNameIdx;
     task.taskStatus   = status;
 
-    originalRegKey = getExpandedDateTime(task.taskStart);
+    originalRegKey = (getExpandedDateTime(task.taskStart) + "-" +
+                      LibComm::toStr<int>(numTask));
 
     taskData["TaskAgent"]    = agentName;
     taskData["Name"]         = "/Name-not-yet-provided";
@@ -246,10 +218,14 @@ void ProcessingElement::initTaskInfo()
 void ProcessingElement::configureProcElem()
 {
     // Prepare folders
+    exchangeDir = workDir + "/" + internalTaskNameIdx;
     exchgIn     = exchangeDir + "/in";
     exchgOut    = exchangeDir + "/out";
 
-    taskDriver  = workDir + "/bin/runTask.sh";
+    std::string sysBinDir = sysDir + "/bin";
+//    std::string taskDriverDir = workDir + "/bin";
+//    taskDriver  = taskDriverDir + "/runTask.sh";
+    taskDriver  = sysDir + "/bin/runTask.sh";
     cfgFile     = exchangeDir + "/dummy.cfg";
 
     // Create exchange area
@@ -326,6 +302,7 @@ void ProcessingElement::forkProcess()
                                     (char*)(pe.c_str()),
                                     (char*)(cfgFile.c_str()), NULL };
         std::string cmdLine = taskDriver + " " + pe + " " + cfgFile;
+        std::cerr << "Trying to execute: '" << cmdLine << "'\n";
         execv(procTaskCmdLine[0], procTaskCmdLine);
         exit(EXIT_FAILURE);
     }
@@ -363,7 +340,6 @@ void ProcessingElement::monitorProcElemLoop()
 
     Json::Value & taskData = task.taskData;
     taskData["Key"] = dockerId;
-
 
     do {
         // Sleep for some time
@@ -429,21 +405,21 @@ void ProcessingElement::monitorProcElemLoop()
         // Set actual start time
         task.taskStart = getSimplifiedDateTime(taskData["State"]["StartedAt"]);
 
-        std::cerr << LibComm::timeTag() << ": "
-                  << "Task: " << originalRegKey
-                  << "  Name: " << taskData["NameExtended"].asString()
-                  << " Status: " << TaskStatusName[status]
-                  << " Progress: " << progressValue
-                  << " Finished: " << taskData["State"]["FinishedAt"].asString()
-                  << std::endl;
+//        std::cerr << LibComm::timeTag() << ": "
+//                  << "Task: " << originalRegKey
+//                  << "  Name: " << taskData["NameExtended"].asString()
+//                  << " Status: " << TaskStatusName[status]
+//                  << " Progress: " << progressValue
+//                  << " Finished: " << taskData["State"]["FinishedAt"].asString()
+//                  << std::endl;
 
         mutexTask.unlock();
 
     } while ((!childEnded) && (!endProc));
 
-    std::cerr << "Task " << originalRegKey
-              << "  Name: " << taskData["NameExtended"].asString()
-              << "  FINISHED!!\n";
+//    std::cerr << "Task " << originalRegKey
+//              << "  Name: " << taskData["NameExtended"].asString()
+//              << "  FINISHED!!\n";
 
     // Set actual end time
     mutexTask.lock();

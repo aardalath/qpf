@@ -52,30 +52,17 @@ class ProcessingElement
 public:
     ProcessingElement();
 
+    Property(ProcessingElement, std::string, agentName, AgentName);
+    Property(ProcessingElement, std::string, workDir,   WorkDir);
+    Property(ProcessingElement, std::string, sysDir,    SysDir);
+    Property(ProcessingElement, int,         numTask,   NumTask);
+
 public:
     //----------------------------------------------------------------------
     // Method: setTaskInfo
     // Sets the task information for the processing element execution
     //----------------------------------------------------------------------
     void setTaskInfo(TaskInfo & t);
-
-    //----------------------------------------------------------------------
-    // Method: setAgentName
-    // Sets the name of the agent owner of this processing element
-    //----------------------------------------------------------------------
-    void setAgentName(std::string name);
-
-    //----------------------------------------------------------------------
-    // Method: setWorkingDir
-    // Sets the location where all the processing elements will be placed
-    //----------------------------------------------------------------------
-    void setWorkingDir(std::string wd);
-
-    //----------------------------------------------------------------------
-    // Method: setNumTask
-    // Sets the task index for a given TaskAgent
-    //----------------------------------------------------------------------
-    void setNumTask(int n);
 
     //----------------------------------------------------------------------
     // Method: getStatus
@@ -198,11 +185,7 @@ private:
 
     TaskStatus status;
 
-    int numTask;
-
-    std::string agentName;
     std::string pe;
-    std::string workDir;
 
     std::string exchangeDir;
     std::string internalTaskNameIdx;
