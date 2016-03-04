@@ -38,6 +38,8 @@
 #include "procelem.h"
 #include "tools.h"
 
+#include "dbg.h"
+
 #include <sys/time.h>
 #include <iostream>
 #include <fstream>
@@ -312,7 +314,7 @@ void ProcessingElement::forkProcess()
                                     (char*)(pe.c_str()),
                                     (char*)(cfgFile.c_str()), NULL };
         std::string cmdLine = taskDriver + " " + pe + " " + cfgFile;
-        std::cerr << "Trying to execute: '" << cmdLine << "'\n";
+        DBG("Trying to execute: '" << cmdLine << "'");
         execv(procTaskCmdLine[0], procTaskCmdLine);
         exit(EXIT_FAILURE);
     }
@@ -432,7 +434,7 @@ void ProcessingElement::monitorProcElemLoop()
 //----------------------------------------------------------------------
 void ProcessingElement::retrieveOutputProducts()
 {
-    std::cerr << "Retrieving output products for task: " << originalRegKey << std::endl;
+    DBG("Retrieving output products for task: " << originalRegKey);
 
     //-------------------------------------------------------------------
     // Get output data
@@ -484,7 +486,7 @@ void ProcessingElement::retrieveOutputProducts()
             m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
         }
 
-        std::cerr << "output product: " << outFileName << " => " << m.productId << "\n";
+        DBG("  output product: " << outFileName << " => " << m.productId);
         task.outputs.productList[m.productType] = m;
     }
 
