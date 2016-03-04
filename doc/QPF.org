@@ -1317,13 +1317,15 @@ The Alarm Database stores:
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
 
-*** TODO Functionalities to be included [0/6]
+*** TODO Functionalities to be included [0/7]
 **** STARTED [#A] Registration of tasks status
-**** TODO [#B] Pause/Resume/Stop of tasks
 **** TODO [#A] Checking of last execution tasks status
-**** TODO [#C] Tasks History Report
-**** TODO [#B] Output files registration
 **** TODO [#A] Allow deployment of components in different hosts
+**** TODO [#B] Pause/Resume/Stop of tasks
+**** TODO [#B] Output files registration
+**** TODO [#B] Implement preferences for HMI
+**** TODO [#C] Tasks History Report
+
 
 
 *** Notes
