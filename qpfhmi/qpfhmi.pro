@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     progbardlg.cpp \
     dlgshowtaskinfo.cpp \
     app.cpp \
-    deployer.cpp
+    deployer.cpp \
+    frmagentstatus.cpp
 
 HEADERS  += mainwindow.h \
          hmipxy.h \
@@ -34,10 +35,12 @@ HEADERS  += mainwindow.h \
     progbardlg.h \
     dlgshowtaskinfo.h \
     app.h \
-    deployer.h
+    deployer.h \
+    frmagentstatus.h
 
 FORMS    += mainwindow.ui \
-    dlgshowtaskinfo.ui
+    dlgshowtaskinfo.ui \
+    frmagentstatus.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$JSONCPPINC $$PSQLCPPINC
 
