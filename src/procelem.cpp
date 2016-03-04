@@ -238,12 +238,13 @@ void ProcessingElement::configureProcElem()
 
     // Create input files
     if (task.taskPath == "QLA_VIS") {
-        std::string sourceImg("/qpf/data/mef.fits");
+        //std::string sourceImg("/qpf/data/mef.fits");
         std::map<ProductType, ProductMetadata>::iterator it = task.inputs.productList.begin();
         ProductMetadata & m = it->second;
+        std::string sourceImg = m.url.substr(7,1000);
         std::string inputProduct = exchgIn + "/" + m.productId + ".fits";
         if (link(sourceImg.c_str(), inputProduct.c_str()) != 0) {
-            perror("symlink input product");
+            perror("hardlink input product");
             status = TASK_FAILED;
         }
     } else {
