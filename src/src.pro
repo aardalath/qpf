@@ -31,7 +31,8 @@ HEADERS += \
         msgtypes.h \
         propdef.h \
         version.h \
-    procelem.h
+    procelem.h \
+    cfg.h
 
 HEADERS += \
         config.h \
