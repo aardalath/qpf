@@ -73,9 +73,9 @@ void TaskOrchestrator::defineOrchestrationParams(OrchestrationParameters & op)
     for (unsigned int i = 0; i < op.rules.size(); ++i) {
         orcParams.rules.push_back(new Rule(*(op.rules.at(i))));
     }
-    std::map<std::string, ProcElem*>::iterator peIt = op.procElems.begin();
-    while (peIt != op.procElems.end()) {
-        orcParams.procElems[(*peIt).first] = new ProcElem(*((*peIt).second));
+    std::map<std::string, Processor*>::iterator peIt = op.processors.begin();
+    while (peIt != op.processors.end()) {
+        orcParams.processors[(*peIt).first] = new Processor(*((*peIt).second));
         ++peIt;
     }
 

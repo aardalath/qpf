@@ -59,6 +59,7 @@
 //------------------------------------------------------------
 
 #include "component.h"
+#include "cfg.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -75,33 +76,6 @@ class TaskOrchestrator : public Component {
 
 public:
     TaskOrchestrator(const char * name = 0);
-
-    struct Rule {
-        std::string              name;
-        std::vector<std::string> inputs;
-        std::vector<std::string> outputs;
-        std::string              processingElement;
-    };
-
-    struct ProcElem {
-        std::string name;
-        std::string exePath;
-        std::string inPath;
-        std::string outPath;
-    };
-
-    struct OrchestrationParameters {
-        std::vector<std::string>           productTypes;
-        std::vector<Rule *>                rules;
-        std::map<std::string, ProcElem *>  procElems;
-    };
-
-    struct OrchestrationMaps {
-        std::multimap<std::string, Rule *>  prodAsInput;
-        std::map<Rule *, std::string>       ruleDesc;
-    };
-
-    typedef std::map<Rule *, ProductList>   RuleInputs;
 
     //----------------------------------------------------------------------
     // Method: defineOrchestrationParams
