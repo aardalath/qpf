@@ -83,6 +83,15 @@ public:
 
 public:
 
+    //----------------------------------------------------------------------
+    // Method: fromExternal2Inbox
+    //----------------------------------------------------------------------
+    ProductMetadata & fromExternal2Inbox();
+
+    //----------------------------------------------------------------------
+    // Method: fromFolder2Inbox
+    //----------------------------------------------------------------------
+    ProductMetadata & fromFolder2Inbox();
 
     //----------------------------------------------------------------------
     // Method: fromInbox2Local
@@ -118,6 +127,17 @@ public:
     // Method: fromArchive2Local
     //----------------------------------------------------------------------
     ProductMetadata & fromArchive2Local();
+
+    //----------------------------------------------------------------------
+    // Method: relocate
+    //----------------------------------------------------------------------
+    int relocate(std::string & sFrom, std::string & sTo,
+                 int msTimeOut = 0, LocalArchiveMethod method = LINK);
+
+    //----------------------------------------------------------------------
+    // Method: copyfile
+    //----------------------------------------------------------------------
+    int copyfile(std::string & sFrom, std::string & sTo);
 
     inline ProductMetadata & i2l() { return fromInbox2Local(); }
     inline ProductMetadata & l2s() { return fromLocal2Shared(); }
