@@ -231,6 +231,7 @@ public:
     static std::string    DBPwd;
 
     static std::string PATHBase;
+    static std::string PATHBin;
     static std::string PATHRun;
     static std::string PATHLog;
     static std::string PATHRlog;

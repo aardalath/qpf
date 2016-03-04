@@ -110,6 +110,7 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
     appVer  = cfg["general"]["app_version"].asString();
     last    = cfg["general"]["last_access"].asString();
 
+    PATHBin = PATHBase + "/bin";
     PATHRun = PATHBase + "/" + LibComm::timeTag();
     PATHLog = PATHRun + "/log";
     PATHRlog = PATHRun + "/rlog";
@@ -677,6 +678,7 @@ std::string Configuration::DBUser("jcgonzalez");
 std::string Configuration::DBPwd("euclidjcg");
 
 std::string Configuration::PATHBase("/var/run/qpf");
+std::string Configuration::PATHBin;
 std::string Configuration::PATHRun;
 std::string Configuration::PATHLog;
 std::string Configuration::PATHRlog;
