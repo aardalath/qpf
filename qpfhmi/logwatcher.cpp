@@ -43,7 +43,7 @@
 
 namespace QPF {
 
-LogWatcher::LogWatcher(QPlainTextEdit * txtVw, int lines)
+LogWatcher::LogWatcher(TextView * txtVw, int lines)
   : textView(txtVw), bytesRead(0), maxNumLines(lines)
 {
   fsWatcher = new QFileSystemWatcher;

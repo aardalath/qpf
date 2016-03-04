@@ -40,7 +40,8 @@
 #define LOGWATCHER_H
 
 #include <QFileSystemWatcher>
-#include <QPlainTextEdit>
+
+#include "textview.h"
 
 namespace QPF {
 
@@ -49,7 +50,7 @@ class LogWatcher : public QObject
   Q_OBJECT
 
 public:
-  LogWatcher(QPlainTextEdit * txtVw, int lines = 100);
+  LogWatcher(TextView * txtVw, int lines = 100);
 
   void setFile(QString s);
   QString getFile();
@@ -61,7 +62,7 @@ signals:
   void logUpdated();
 
 private:
-  QPlainTextEdit * textView;
+  TextView * textView;
   QFileSystemWatcher * fsWatcher;
   QString watchedFile;
   qint64 bytesRead;
