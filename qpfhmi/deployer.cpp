@@ -190,9 +190,26 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 void Deployer::readConfig(const char * configFile)
 {
     cfg   = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
     hmiNeeded = cfgInfo.hmiPresent;
+
+    // Ensure paths for the execution are available and readu
+    assert(existsDir(Configuration::PATHBase));
+    assert(existsDir(Configuration::PATHBin));
+    std::vector<std::string> runPaths {
+        Configuration::PATHRun,
+            Configuration::PATHLog,
+            Configuration::PATHRlog,
+            Configuration::PATHTmp,
+            Configuration::PATHTsk,
+            Configuration::PATHMsg };
+    for (auto & p : runPaths) {
+        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
+            std::perror(("mkdir " + p).c_str());
+            exit(EXIT_FAILURE);
+        }
+    }
+    LibComm::Log::setLogBaseDir(Configuration::PATHRun);
 }
 
 //----------------------------------------------------------------------
@@ -202,7 +219,7 @@ void Deployer::readConfig(const char * configFile)
 //----------------------------------------------------------------------
 void Deployer::launchPeerNodes()
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
 
     L("Running as " << cfgInfo.currentUser << " @ " << cfgInfo.currentMachine);
 
@@ -210,7 +227,7 @@ void Deployer::launchPeerNodes()
     // Event Manager launched always as a thread
     L("Launching nodes . . .");
     for (unsigned int k = 0; k < cfgInfo.peerNodes.size(); ++k) {
-        Component * node = cfgInfo.peerNodes.at(k);
+        CommNode * node = cfgInfo.peerNodes.at(k);
         node->initialize();
         L("   ====> Initialising " << node->selfPeer()->name);
         usleep(usec);
@@ -219,6 +236,10 @@ void Deployer::launchPeerNodes()
             evtMng = dynamic_cast<EventManager*>(node);
             L("   ====> Creating " << node->selfPeer()->name);
         } else {
+            if (node->selfPeer()->type == "taskorc") {
+                TaskOrchestrator * taskOrc = dynamic_cast<TaskOrchestrator*>(node);
+                taskOrc->defineOrchestrationParams(cfgInfo.orcParams);
+            }
             if (spawnPeerProcesses) {
                 childrenPids.push_back(node->spawn(node));
                 L("   ====> Spawning " << node->selfPeer()->name);
@@ -244,7 +265,6 @@ void Deployer::start()
         L("Waiting for START signal . . .");
         while (waitingForGoAhead()) { usleep(10000); }
         L("GO!");
-        usleep(500000);
         evtMng->go();
     } else {
         L("Starting...");

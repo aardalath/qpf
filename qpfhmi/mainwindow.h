@@ -48,8 +48,6 @@
 #include <QMdiSubWindow>
 #include <QSignalMapper>
 
-#include <future>
-
 #include "hmipxy.h"
 #include "msgtypes.h"
 #include "config.h"
@@ -58,7 +56,6 @@
 #include "simindata.h"
 #include "textview.h"
 
-//INI#include "iniparser.h"
 #include "json/json.h"
 
 namespace Ui {
@@ -74,7 +71,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0, char * cfgFile = 0);
+    explicit MainWindow(QWidget *parent = 0, Configuration * cfgHdl = 0);
     ~MainWindow();
 
 signals:
@@ -203,15 +200,14 @@ private:
 private:
     Ui::MainWindow *ui;
 
-    char * configFile;
+    Configuration * cfg;
+
     QVector<LogWatcher*> nodeLogs;
 
     HMIProxy * hmiNode;
-    //std::future<int> hmiResult;
     std::thread hmiPxyThread;
 
     SimInData * simInData;
-    Configuration * cfg;
     ArchiveModel * archHdl;
     QString  fileInDataParams;
     QTimer * taskMonitTimer;

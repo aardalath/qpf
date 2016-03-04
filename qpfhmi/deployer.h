@@ -51,8 +51,6 @@
 //------------------------------------------------------------
 
 #include <iostream>
-//#include <thread>
-//#include <future>
 #include <atomic>
 
 //------------------------------------------------------------
@@ -128,6 +126,12 @@ public:
     // Returns the name of the configuration file name used
     //----------------------------------------------------------------------
     char * getConfigFileName();
+
+    //----------------------------------------------------------------------
+    // Method: getConfigHandler
+    // Returns the configuration handler
+    //----------------------------------------------------------------------
+    Configuration * getConfigHandler();
 
 private:
 
@@ -250,6 +254,12 @@ private:
     // Set to TRUE when the machine is the one hosting the HMI
     //----------------------------------------------------------------------
     bool hmiNeeded;
+
+    //----------------------------------------------------------------------
+    // Variable: deploymentCompleted
+    // Set to TRUE when the deployment (launch of nodes) is finished
+    //----------------------------------------------------------------------
+    bool deploymentCompleted;
 };
 
 }

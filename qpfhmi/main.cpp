@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     QPF::App app(argc, argv);
 
     if (app.mustLaunchHMI()) {
-        QPF::MainWindow * w = new QPF::MainWindow(0, app.getConfigFileName());
+        QPF::MainWindow * w = new QPF::MainWindow(0, app.getConfigHandler());
         w->show();
     }
 

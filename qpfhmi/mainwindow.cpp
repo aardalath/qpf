@@ -43,7 +43,6 @@
 
 #include "log.h"
 using LibComm::Log;
-#include "tools.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -62,8 +61,6 @@ using LibComm::Log;
 #include "logwatcher.h"
 #include "progbardlg.h"
 #include "dlgshowtaskinfo.h"
-#include "configtool.h"
-
 #include <QProcess>
 namespace QPF {
 
@@ -146,20 +143,19 @@ void MainWindow::manualSetupUI()
     connect(simInData, SIGNAL(simInDataSent(int)), this, SLOT(sentInData(int)));
     connect(simInData, SIGNAL(endOfInData()), this, SLOT(endOfInDataMsgs()));
 
-    connect(ui->btnSelectInboxPath, SIGNAL(pressed()), this, SLOT(selectInboxPath()));
-    connect(ui->btnProcessInbox, SIGNAL(pressed()), this, SLOT(processInbox()));
-
     connect(this, SIGNAL(stopSendingMessages()), simInData, SLOT(stopSendingInData()));
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
-    // Automatic start-up
-    commandSystem();
+    // Read settings and set title
+    readSettings();
+    setWindowTitle(tr("QLA Processing Framework"));
+    setUnifiedTitleAndToolBarOnMac(true);
 }
 
 //----------------------------------------------------------------------
 // Method: closeEvent
-// Reads configuration file
+// Handles close events
 //----------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -170,6 +166,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
         writeSettings();
         event->accept();
     }
+}
+
+//----------------------------------------------------------------------
+// Method: saveAs
+// Saves log text to file
+//----------------------------------------------------------------------
+void MainWindow::saveAs()
+{
+    if (activeTextView() && activeTextView()->saveAs())
+        statusBar()->showMessage(tr("File saved"), MessageDelay);
 }
 
 #ifndef QT_NO_CLIPBOARD
@@ -222,9 +228,7 @@ void MainWindow::updateMenus()
 #ifndef QT_NO_CLIPBOARD
     bool hasSelection = (activeTextView() &&
                          activeTextView()->textCursor().hasSelection());
-    cutAct->setEnabled(hasSelection);    fileMenu->addAction(saveAsAct);
-    fileMenu->addSeparator();
-
+    cutAct->setEnabled(hasSelection);
     copyAct->setEnabled(hasSelection);
 #endif
 }
@@ -415,7 +419,7 @@ void MainWindow::createToolBars()
 //#ifndef QT_NO_CLIPBOARD
 //    editToolBar = addToolBar(tr("Edit"));
 //    editToolBar->addAction(cutAct);
-//    editToolBar->addAction(copyAct);
+//    editToolBar->addAction(copyAct);2000
 //    editToolBar->addAction(pasteAct);
 //#endif
 }
@@ -491,7 +495,8 @@ void MainWindow::setActiveSubWindow(QWidget *window)
 //----------------------------------------------------------------------
 void MainWindow::readConfig()
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    cfg = new Configuration(configFile);
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
@@ -520,26 +525,13 @@ void MainWindow::readConfig()
     cfg->setLastAccess(QDateTime::currentDateTime()
                        .toString("yyyyMMddTHHmmss").toStdString());
 
-    // Modify HMI with the product datatypes obtained from configuration
+    // Modify HMI with the product types obtained from configuration
     ui->cboxProdType->clear();
     ui->lstProductTypes->clear();
     for (unsigned int i = 0; i < cfgInfo.orcParams.productTypes.size(); ++i) {
         ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
-    ui->edInboxPath->setText(QString(cfgInfo.storage.in.inbox.c_str()));
-}
-
-//----------------------------------------------------------------------
-// Method: showConfigTool
-// Shows configuration tool window
-//----------------------------------------------------------------------
-void MainWindow::showConfigTool()
-{
-    ConfigTool cfgTool;
-
-    cfgTool.readConfig();
-    cfgTool.exec();
 }
 
 //----------------------------------------------------------------------
@@ -617,7 +609,7 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
     hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
     hmiNode->setSizeOfLogBuffer(0);
 
@@ -693,11 +685,7 @@ void MainWindow::setLogWatch()
         LogWatcher * newLog = new LogWatcher(pltxted);
         newLog->setFile(logFileName);
         nodeLogs.append(newLog);
-        if ((fs.baseName() == "EvtMng") || ((fs.baseName() == "QPFHMI"))) {
-            ui->tabLogs->insertTab(0, pltxted, fs.baseName());
-        } else {
-            ui->tabLogs->addTab(pltxted, fs.baseName());
-        }
+        ui->mdiArea->addSubWindow(pltxted);
         connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
 }
@@ -756,7 +744,7 @@ void MainWindow::prepareSendMultInData()
 
     bool ok = simInData->sendMultInData(ui->dtStartMult->dateTime(), // start
                                         ui->dtEndMult->dateTime(), // end
-                                        prodTypes, prodStat, // datatypes and status
+                                        prodTypes, prodStat, // types and status
                                         ui->cboxStep->currentText().toInt(), // step in h
                                         ui->cboxFreq->currentText().toInt()); // freq in s
 
@@ -790,29 +778,6 @@ void MainWindow::prepareSendInDataFromFile()
     }
 }
 
-//----------------------------------------------------------------------
-// Method: processInbox
-// Generates INDATA messages into the system, to process all the
-// products in the Inbox directory selected
-//----------------------------------------------------------------------
-void MainWindow::processInbox()
-{
-    QString metadata;
-    simInData->setInjectionFrequency(ui->spbxInjFreq->value());
-    bool ok = simInData->processInbox(ui->edInboxPath->text(), metadata);
-
-    if (ok) {
-        ui->tabEventsToInject->setEnabled(false);
-        ui->btnStopMultInDataEvt->show();
-
-        ui->pltxtInboxProducts->setPlainText(metadata);
-
-        // Activate task monitoring
-        taskMonitTimer = new QTimer(this);
-        connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
-        taskMonitTimer->start(1000);
-    }
-}
 
 //----------------------------------------------------------------------
 // Method: selectInDataParamsFile
@@ -828,26 +793,6 @@ void MainWindow::selectInDataParamsFile()
     if (fileName.isEmpty()) { return; }
     ui->edInDataParamFile->setText(fileName);
     fileInDataParams = fileName;
-}
-
-//----------------------------------------------------------------------
-// Method: selectInboxPath
-// Select directory where the incoming products are being stored
-//----------------------------------------------------------------------
-void MainWindow::selectInboxPath()
-{
-    QString currText = ui->edInboxPath->text();
-    if (currText.isEmpty()) {
-        currText = "/";
-    }
-    QString dirName =
-            QFileDialog::getExistingDirectory(this,
-                                              tr("Select incoming products folder"),
-                                              currText,
-                                              QFileDialog::ShowDirsOnly);
-    if (dirName.isEmpty()) { return; }
-    ui->edInboxPath->setText(dirName);
-    inboxDirName = dirName;
 }
 
 //----------------------------------------------------------------------
@@ -895,13 +840,12 @@ void MainWindow::checkForTaskRes()
         statusBar()->showMessage(QString("Received information from %1 tasks")
                                  .arg(numOfTaskResMsgs),
                                  MessageDelay);
-        // Transform to Qt datatypes
+        // Transform to Qt types
         std::map<std::string, Json::Value>::const_iterator i = newTaskResInfo.begin();
         while (i != newTaskResInfo.end()) {
             QString key = QString::fromStdString(i->first);
             Json::Value v = i->second;
             v["ZUpdatable"] = true;
-            //qDebug() << "Adding TaskRes with key " << key;
             taskResInfo[key] = v;
             ++i;
         }
@@ -1104,14 +1048,12 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_FINISHED: // BG: green
             for (int col = 0; col < nCols; ++col) {
-                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::darkGreen));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::green));
             }
             v["ZUpdatable"] = false;
             break;
         case TASK_FAILED: // BG: red
             for (int col = 0; col < nCols; ++col) {
-                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::white));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::red));
             }
             v["ZUpdatable"] = false;
@@ -1123,7 +1065,6 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_STOPPED: // BG: gray
             for (int col = 0; col < nCols; ++col) {
-                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::black));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::darkGray));
             }
             v["ZUpdatable"] = false;
@@ -1141,7 +1082,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
             ui->treeTaskMonit->addTopLevelItem(treeItem);
         }
 
-//        SDC::FastWriter w;
+//        Json::FastWriter w;
 //        qDebug() << progress << st << status << QString::fromStdString(w.write(v));
     }
 
@@ -1152,7 +1093,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
 //----------------------------------------------------------------------
 void MainWindow::updateAgentsMonitPanel()
 {
-    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
+    QVector<double> loadAvgs(getLoadAvgs());
 
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
@@ -1397,6 +1338,23 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 void MainWindow::setDebugInfo(bool b)
 {
     hmiNode->setDebugInfo(b);
+}
+
+//----------------------------------------------------------------------
+// Method: getLoadAvgs
+// Obtain load averages for host
+//----------------------------------------------------------------------
+QVector<double> MainWindow::getLoadAvgs()
+{
+    double loadAvg[3];
+
+    if (getloadavg(loadAvg, 3) < 0) {
+        return QVector<double>(3, 0);
+    } else {
+        QVector<double> loadValues(0);
+        loadValues << loadAvg[0] << loadAvg[1] << loadAvg[2];
+        return loadValues;
+    }
 }
 
 //----------------------------------------------------------------------

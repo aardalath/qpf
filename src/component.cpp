@@ -136,6 +136,8 @@ void Component::init()
                          Log::getLogBaseDir() + "/log/" +
                          getCommNodeName() + ".log");
 
+    isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
+
     // Define valid state transitions
     defineValidTransitions();
     transitTo(INITIALISED);
@@ -230,9 +232,7 @@ int Component::run()
         }
 
         // Send log info to LogMng in case there is something to send
-        if (!fileToSend.empty()) {
-            sendLogPacketAsDataInfoMsg();
-        }
+        if (!logChunk.empty()) { sendLogPacketAsDataInfoMsg(); }
 
         // Additional loop tasks (entry for additional functionality
         //to be exectued every loop step)
@@ -580,8 +580,6 @@ void Component::registerMsg(std::string from,
 //----------------------------------------------------------------------
 void Component::sendLogPacketAsDataInfoMsg()
 {
-    if (selfPeer()->name == "LogMng") { return; }
-
     Message_DATA_INFO msg;
     buildMsgHeader(MSG_DATA_INFO_IDX, selfPeer()->name, "LogMng", msg.header);
     msg.variables.paramList["contents"] = logChunk;

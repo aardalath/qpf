@@ -41,21 +41,45 @@
 
 namespace QPF {
 
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 App::App(int& argc, char** argv) :
     QApplication(argc, argv), deployer(new Deployer(argc, argv))
 {
 }
 
+//----------------------------------------------------------------------
+// Method: mustLaunchHMI
+// Returns TRUE is the host is the main host
+//----------------------------------------------------------------------
 bool App::mustLaunchHMI()
 {
     return deployer->mustLaunchHMI();
 }
 
+//----------------------------------------------------------------------
+// Method: getConfigFileName
+// Returns the name of the configuration file used
+//----------------------------------------------------------------------
 char * App::getConfigFileName()
 {
     return deployer->getConfigFileName();
 }
 
+//----------------------------------------------------------------------
+// Method: getConfigHandler
+// Returns the configuration handler
+//----------------------------------------------------------------------
+Configuration * App::getConfigHandler()
+{
+    return deployer->getConfigHandler();
+}
+
+//----------------------------------------------------------------------
+// Method: getConfigHandler
+// Re-implements the notify virtual method from QApplication
+//----------------------------------------------------------------------
 bool App::notify(QObject *receiver, QEvent *event)
 {
     try {

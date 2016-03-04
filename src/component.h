@@ -315,6 +315,7 @@ protected:
     MessageData   msgData;
     int hbSecs;
     int hbMicroSecs;
+    bool isPeerLogMng;
 };
 
 }

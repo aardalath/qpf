@@ -60,6 +60,7 @@ public:
     virtual bool notify(QObject *receiver, QEvent *event) Q_DECL_OVERRIDE;
     virtual bool mustLaunchHMI();
     virtual char * getConfigFileName();
+    virtual Configuration * getConfigHandler();
 private:
     Deployer * deployer;
 };
