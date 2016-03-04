@@ -317,7 +317,7 @@ public:
         frmFinished->setObjectName(QStringLiteral("frmFinished"));
         sizePolicy.setHeightForWidth(frmFinished->sizePolicy().hasHeightForWidth());
         frmFinished->setSizePolicy(sizePolicy);
-        frmFinished->setStyleSheet(QStringLiteral("background-color: rgb(0, 240, 0);"));
+        frmFinished->setStyleSheet(QStringLiteral("background-color: rgb(33, 202, 33);"));
         frmFinished->setFrameShape(QFrame::Panel);
         frmFinished->setFrameShadow(QFrame::Plain);
         frmFinished->setLineWidth(0);
@@ -346,7 +346,7 @@ public:
         lblTaskAgentName->setText(QApplication::translate("FrmAgentStatus", "Task Agent", 0));
         label->setText(QApplication::translate("FrmAgentStatus", "Total tasks:", 0));
         lblTotalTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_2->setText(QApplication::translate("FrmAgentStatus", "<html><head/><body><p><span style=\" font-weight:600; color:#0000ff;\">Run</span>/<span style=\" font-weight:600; color:#008b8b;\">Wait</span>/<span style=\" font-weight:600; color:#ffa500;\">Pau</span>/<span style=\" font-weight:600; color:#808080;\">Sto</span>/<span style=\" font-weight:600; color:#ff0000;\">Fail</span>/<span style=\" font-weight:600; color:#00ff00;\">Fin</span>:</p></body></html>", 0));
+        label_2->setText(QApplication::translate("FrmAgentStatus", "<html><head/><body><p><span style=\" font-weight:600; color:#0000ff;\">Run</span>/<span style=\" font-weight:600; color:#008b8b;\">Wait</span>/<span style=\" font-weight:600; color:#ffa500;\">Pau</span>/<span style=\" font-weight:600; color:#808080;\">Sto</span>/<span style=\" font-weight:600; color:#ff0000;\">Fail</span>/<span style=\" font-weight:600; color:#21ca21;\">Fin</span>:</p></body></html>", 0));
         lblRuningTasks->setText(QApplication::translate("FrmAgentStatus", "0/0/0/0/0/0", 0));
         label_6->setText(QApplication::translate("FrmAgentStatus", "Client/Server:", 0));
         lblClient->setText(QApplication::translate("FrmAgentStatus", "localhost", 0));
