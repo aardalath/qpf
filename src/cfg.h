@@ -91,17 +91,20 @@ struct OrchestrationMaps {
     std::map<Rule *, std::string>       ruleDesc;
 };
 
+enum LocalArchiveMethod { LINK, MOVE, COPY };
+
 struct StorageExternal {
     std::string protocol;
     std::string address;
     std::string port;
     std::string user;
     std::string passwd;
-    std::string exchangeBox;
+    std::string inbox;
 };
 
 struct StorageLocal {
     std::string path;
+    LocalArchiveMethod method;
 };
 
 struct StorageShared {

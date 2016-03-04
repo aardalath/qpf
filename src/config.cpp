@@ -547,13 +547,13 @@ void Configuration::processConfiguration()
     cfgInfo.storage.in.port              = stgeIn["port"].asString();
     cfgInfo.storage.in.user              = stgeIn["user"].asString();
     cfgInfo.storage.in.passwd            = stgeIn["password"].asString();
-    cfgInfo.storage.in.exchangeBox       = stgeIn["inbox"].asString();
+    cfgInfo.storage.in.inbox       = stgeIn["inbox"].asString();
     cfgInfo.storage.out.protocol         = stgeOut["protocol"].asString();
     cfgInfo.storage.out.address          = stgeOut["address"].asString();
     cfgInfo.storage.out.port             = stgeOut["port"].asString();
     cfgInfo.storage.out.user             = stgeOut["user"].asString();
     cfgInfo.storage.out.passwd           = stgeOut["password"].asString();
-    cfgInfo.storage.out.exchangeBox      = "";
+    cfgInfo.storage.out.inbox      = "";
     cfgInfo.storage.local.path           = stgeLocal["path"].asString();
     cfgInfo.storage.shared.local_path    = stgeShared["external_path"].asString();
     cfgInfo.storage.shared.external_path = stgeShared["local_path"].asString();
