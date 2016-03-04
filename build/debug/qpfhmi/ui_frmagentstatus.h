@@ -71,13 +71,13 @@ public:
     {
         if (FrmAgentStatus->objectName().isEmpty())
             FrmAgentStatus->setObjectName(QStringLiteral("FrmAgentStatus"));
-        FrmAgentStatus->resize(873, 85);
+        FrmAgentStatus->resize(883, 79);
         FrmAgentStatus->setFrameShape(QFrame::Box);
         FrmAgentStatus->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(FrmAgentStatus);
-        verticalLayout->setSpacing(2);
+        verticalLayout->setSpacing(1);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(4, 4, 4, 4);
+        verticalLayout->setContentsMargins(4, 2, 4, 2);
         lblTaskAgentName = new QLabel(FrmAgentStatus);
         lblTaskAgentName->setObjectName(QStringLiteral("lblTaskAgentName"));
         QFont font;
@@ -89,7 +89,7 @@ public:
 
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        gridLayout->setVerticalSpacing(2);
+        gridLayout->setVerticalSpacing(1);
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
         label = new QLabel(FrmAgentStatus);
@@ -248,6 +248,7 @@ public:
 
         frmStatusBar = new QFrame(FrmAgentStatus);
         frmStatusBar->setObjectName(QStringLiteral("frmStatusBar"));
+        frmStatusBar->setMaximumSize(QSize(16777215, 28));
         frmStatusBar->setFrameShape(QFrame::StyledPanel);
         frmStatusBar->setFrameShadow(QFrame::Raised);
         horizontalLayout_4 = new QHBoxLayout(frmStatusBar);
@@ -283,7 +284,7 @@ public:
         frmPaused->setObjectName(QStringLiteral("frmPaused"));
         sizePolicy.setHeightForWidth(frmPaused->sizePolicy().hasHeightForWidth());
         frmPaused->setSizePolicy(sizePolicy);
-        frmPaused->setStyleSheet(QStringLiteral("background-color: rgb(255, 254, 0);"));
+        frmPaused->setStyleSheet(QStringLiteral("background-color:rgb(255, 165, 0);"));
         frmPaused->setFrameShape(QFrame::Panel);
         frmPaused->setFrameShadow(QFrame::Plain);
         frmPaused->setLineWidth(0);
@@ -345,7 +346,7 @@ public:
         lblTaskAgentName->setText(QApplication::translate("FrmAgentStatus", "Task Agent", 0));
         label->setText(QApplication::translate("FrmAgentStatus", "Total tasks:", 0));
         lblTotalTasks->setText(QApplication::translate("FrmAgentStatus", "0", 0));
-        label_2->setText(QApplication::translate("FrmAgentStatus", "Run/Wait/Pau/Sto/Fail/Fin:", 0));
+        label_2->setText(QApplication::translate("FrmAgentStatus", "<html><head/><body><p><span style=\" font-weight:600; color:#0000ff;\">Run</span>/<span style=\" font-weight:600; color:#008b8b;\">Wait</span>/<span style=\" font-weight:600; color:#ffa500;\">Pau</span>/<span style=\" font-weight:600; color:#808080;\">Sto</span>/<span style=\" font-weight:600; color:#ff0000;\">Fail</span>/<span style=\" font-weight:600; color:#00ff00;\">Fin</span>:</p></body></html>", 0));
         lblRuningTasks->setText(QApplication::translate("FrmAgentStatus", "0/0/0/0/0/0", 0));
         label_6->setText(QApplication::translate("FrmAgentStatus", "Client/Server:", 0));
         lblClient->setText(QApplication::translate("FrmAgentStatus", "localhost", 0));
