@@ -342,6 +342,21 @@ struct TaskAgentInfo : public JsonStruct {
     std::string client;
     std::string server;
 
+    TaskAgentInfo() :
+        total(0),
+        maxnum(0),
+        running(0),
+        waiting(0),
+        paused(0),
+        stopped(0),
+        failed(0),
+        finished(0),
+        load1min(0),
+        load5min(0),
+        load15min(0),
+        uptimesecs(0) {}
+
+
     virtual void toFields() {
         total      = data["total"].asInt();
         maxnum     = data["maxnum"].asInt();
