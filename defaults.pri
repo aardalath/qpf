@@ -1,19 +1,32 @@
-QMAKE_CXXFLAGS += -std=c++11 -Wextra
-INCLUDEPATH += $$PWD/src /opt/cots/include
+QMAKE_CXXFLAGS += -g3 -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI=0
+INCLUDEPATH += $$PWD/src $$(HOME)/opt/zmq/include $$(HOME)/opt/curl/include $$(HOME)/opt/uuid/include
 SRC_DIR = $$PWD
 
-OLD_LIBDIR = $$QMAKE_LIBDIR
-QMAKE_LIBDIR = /opt/cots/lib $$OLD_LIBDIR
+GTESTDIR = $$(HOME)/ws/jcgg/cots/gtest-1.7.0
 
-LIBCOMMPATH = /home/jcgonzalez/ws/personal/libcomm
-LIBCOMMLIB = $$LIBCOMMPATH/build/debug/src
-LIBCOMMINC = $$LIBCOMMPATH/src
+OLD_LIBDIR = $$QMAKE_LIBDIR
+QMAKE_LIBDIR = $$(HOME)/opt/zmq/lib $$(HOME)/opt/curl/lib $$(HOME)/opt/uuid/lib /usr/lib64 $$OLD_LIBDIR
+
+BUILDROOT=build
+
+LIBCOMMPATH = $$PWD
+LIBCOMMLIB = $$LIBCOMMPATH/$$BUILDROOT/libcomm
+LIBCOMMINC = $$LIBCOMMPATH/libcomm
 
 JSONCPPPATH = $$PWD
-JSONCPPLIB = $$JSONCPPPATH/build/debug/json
+JSONCPPLIB = $$JSONCPPPATH/$$BUILDROOT/json
 JSONCPPINC = $$JSONCPPPATH/json
 
-PSQLCPPPATH = /opt/PostgreSQL/9.4
+INFIXPATH = $$PWD
+INFIXLIB = $$INFIXPATH/$$BUILDROOT/infix
+INFIXINC = $$INFIXPATH/infix
+
+SDCPATH = $$PWD
+SDCLIB = $$SDCPATH/$$BUILDROOT/sdc
+SDCINC = $$SDCPATH/sdc
+
+PSQLCPPPATH = $$(HOME)/opt/pgsql
 PSQLCPPLIB = $$PSQLCPPPATH/lib
 PSQLCPPINC = $$PSQLCPPPATH/include
 PSQLLIB = pq
+
