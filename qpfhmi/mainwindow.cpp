@@ -201,8 +201,8 @@ void MainWindow::commandSystem()
     if (isStart) {
         if (firstTime) {
             // Non-GUI (communications) Initializations
-//            init();
-//            hmiNode->getStartSignal();
+            //            init();
+            //            hmiNode->getStartSignal();
             firstTime = false;
         } else {
             this->close();
@@ -377,6 +377,8 @@ void MainWindow::sendInData()
     qDebug() << " >> back from hmiNode->sendInData";
     statusBar()->showMessage(tr("Message INDATA sent to Event Manager..."),
                              MessageDelay);
+
+    qApp->processEvents();
 }
 
 //----------------------------------------------------------------------
@@ -571,6 +573,7 @@ void MainWindow::sendMultInData()
         delete timerMultInData;
         timerMultInData = 0;
         ui->tabEventsToInject->setEnabled(true);
+        ui->btnStopMultInDataEvt->hide();
     }
 }
 
@@ -591,6 +594,7 @@ void MainWindow::sendInDataFromFile()
     // If the list is empty, stop the timer abreaknd delete it
     if (multInDataContentValues.isEmpty()) {
         ui->tabEventsToInject->setEnabled(true);
+        ui->btnStopMultInDataEvt->hide();
     }
 }
 
@@ -651,6 +655,8 @@ void MainWindow::showTaskRes()
     static bool firstTime = true;
     static ProgressBarDelegate * progressBarDisplay = 0;
     static QStringList hdrLabels;
+
+    setUpdatesEnabled(false);
 
     if (firstTime) {
         // Set up context menu
@@ -749,8 +755,6 @@ void MainWindow::showTaskRes()
 
         ui->treeTaskMonit->addTopLevelItem(treeItem);
     }
-    // Process pending events from Qt events loop
-    qApp->processEvents();
 
     if (firstTime) {
         firstTime = false;
@@ -779,8 +783,6 @@ void MainWindow::showTaskRes()
         taInfo->uptimesecs = 0;
 
     }
-    // Process pending events from Qt events loop
-    qApp->processEvents();
 
     // 2. Count tasks
     for (int i = 0; i < ui->treeTaskMonit->topLevelItemCount(); ++i) {
@@ -811,8 +813,6 @@ void MainWindow::showTaskRes()
             taInfo->total++;
         }
     }
-    // Process pending events from Qt events loop
-    qApp->processEvents();
 
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {
@@ -833,6 +833,8 @@ void MainWindow::showTaskRes()
 
     // Activate sorting - we are done
     ui->treeTaskMonit->setSortingEnabled(true);
+
+    setUpdatesEnabled(true);
 
     // Process pending events from Qt events loop
     qApp->processEvents();
