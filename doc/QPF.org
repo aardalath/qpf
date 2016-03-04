@@ -1316,6 +1316,16 @@ The Alarm Database stores:
 **** Database Controller
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
+
+*** TODO Functionalities to be included [0/6]
+**** STARTED [#A] Registration of tasks status
+**** TODO [#B] Pause/Resume/Stop of tasks
+**** TODO [#A] Checking of last execution tasks status
+**** TODO [#C] Tasks History Report
+**** TODO [#B] Output files registration
+**** TODO [#A] Allow deployment of components in different hosts
+
+
 *** Notes
 
 
@@ -1398,10 +1408,14 @@ A Database Controller (DBController), that allows variable registration and prov
 ** TBDs, TBCs and TODO lists
 
 *** TODO TBDs
-| TBD Id | Comment                                | Status |
-|--------+----------------------------------------+--------|
-| TBD1   | Mapping between QPF and QLA components | Open   |
-| TBD2   | QPF User Stories                       | Opes   |
+| TBD Id | Comment                                    | Status |
+|--------+--------------------------------------------+--------|
+| TBD1   | Mapping between QPF and QLA components     | Open   |
+| TBD2   | QPF User Stories                           | Open   |
+| TBD3   | Definir tipos de producto para caso real   | Open   |
+| TBD4   | Crear la especificación completa de la DB  | Open   |
+| TBD5   | Establecer un procedimiento de instalación | Open   |
+|        |                                            |        |
 
 *** TODO TBCs
 | TBC Id | Section | Comment | Status |
