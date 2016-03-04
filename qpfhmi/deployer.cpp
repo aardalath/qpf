@@ -210,6 +210,7 @@ void Deployer::readConfig(const char * configFile)
     // Ensure paths for the execution are available and readu
     std::vector<std::string> runPaths { Configuration::PATHRun,
                                         Configuration::PATHLog,
+                                        Configuration::PATHRlog,
                                         Configuration::PATHTmp,
                                         Configuration::PATHTsk,
                                         Configuration::PATHMsg };

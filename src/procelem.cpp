@@ -194,7 +194,7 @@ void ProcessingElement::initTaskInfo()
     internalTaskNameIdx = (agentName + "-" +
                            LibComm::timeTag() + "-" +
                            LibComm::toStr<int>(numTask));
-    exchangeDir = workDir + internalTaskNameIdx;
+    exchangeDir = workDir + "/" + internalTaskNameIdx;
 
     status = TASK_SCHEDULED;
 
@@ -249,8 +249,8 @@ void ProcessingElement::configureProcElem()
     exchgIn     = exchangeDir + "/in";
     exchgOut    = exchangeDir + "/out";
 
-    taskDriver  = workDir + std::string("runTask.sh");
-    cfgFile     = exchangeDir + std::string("/dummy.cfg");
+    taskDriver  = workDir + "/bin/runTask.sh";
+    cfgFile     = exchangeDir + "/dummy.cfg";
 
     // Create exchange area
     mkdir(exchangeDir.c_str(), 0755);

@@ -54,8 +54,7 @@ namespace QPF {
 // Constructor
 //----------------------------------------------------------------------
 TaskAgent::TaskAgent(const char * name) :
-    Component(name), workDir("/home/jcgonzalez/ws/docker-data/tools/")
-
+    Component(name), workDir("")
 {
     canProcessMessage(MSG_TASK_PROC_IDX);
 }
@@ -104,9 +103,9 @@ void TaskAgent::processTASK_PROC()
     ++numWaitingTasks;
 
     pe->setAgentName(selfPeer()->name);
+    pe->setWorkingDir(workDir);
     pe->setTaskInfo(msg->task);
     pe->setNumTask(numTasks);
-    pe->setWorkingDir(workDir);
 
     // Store it at the PEs vector
     processingElements.push_back(pe);
