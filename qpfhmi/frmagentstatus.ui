@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>779</width>
-    <height>95</height>
+    <width>871</width>
+    <height>91</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,10 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="2,3,2">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="1,100,1">
+     <property name="verticalSpacing">
+      <number>2</number>
+     </property>
      <item row="0" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_8">
        <item>
@@ -56,6 +59,19 @@
           <string>0</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -80,6 +96,19 @@
           <string>0/0/0/0/0/0</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -165,6 +194,19 @@
           <string>0</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -275,16 +317,22 @@
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <item>
          <widget class="QFrame" name="frmRunning">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 0, 255);</string>
           </property>
@@ -301,6 +349,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frmWaiting">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(14, 170, 204);</string>
           </property>
@@ -317,6 +371,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frmPaused">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 254, 0);</string>
           </property>
@@ -333,6 +393,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frmStopped">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(121, 121, 121);</string>
           </property>
@@ -349,6 +415,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frmFailed">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 0, 0);</string>
           </property>
@@ -365,6 +437,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frmFinished">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 240, 0);</string>
           </property>
