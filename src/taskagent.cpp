@@ -56,7 +56,7 @@ namespace QPF {
 TaskAgent::TaskAgent(const char * name) :
     Component(name), workDir("")
 {
-    setHeartBeatPeriod(5, 0);
+    setHeartBeatPeriod(0, 500000);
 
     canProcessMessage(MSG_TASK_PROC_IDX);
     canProcessMessage(MSG_CMD_IDX);
@@ -83,11 +83,6 @@ void TaskAgent::fromRunningToOff()
     flushLog();
 
     stopTasks = true;
-    /*
-    for (unsigned int i = 0; i < procTasks.size(); ++i) {
-        procTasks.at(i)->join();
-    }
-    */
 }
 
 //----------------------------------------------------------------------
@@ -155,89 +150,104 @@ void TaskAgent::execAdditonalLoopTasks()
 //----------------------------------------------------------------------
 void TaskAgent::checkProcessingElements()
 {
-    for (unsigned int i = 0; i < processingElements.size(); ++i) {
+    static unsigned int numOfProcElems = 0;
+    static unsigned int idxProcElemToCheck = 0;
 
-        bool sendMsg        = false;
-        bool markAsArchived = false;
+    // Check num of processing elements in list
+    numOfProcElems = processingElements.size();
+    if (numOfProcElems < 1) return;
 
-        ProcessingElement * pe = processingElements.at(i);
+    // Check idx of proc elem to be checked
+    if (idxProcElemToCheck >= numOfProcElems) return;
 
-        TaskStatus status = pe->getStatus();
+    // Start checking process
+    unsigned int & i = idxProcElemToCheck;
 
-        switch (status) {
+    bool sendMsg        = false;
+    bool markAsArchived = false;
 
-        case TASK_ARCHIVED:
-            // Task already finished, and final information was sent to be
-            // registered in the DB, so the pe can be deleted
-            InfoMsg("Removing proc.elem. for task " + pe->getTask().taskName);
+    ProcessingElement * pe = processingElements.at(i);
 
-            delete pe;
-            pe = 0;
-            processingElements.erase(processingElements.begin() + i);
-            sendMsg = false;
-            break;
+    TaskStatus status = pe->getStatus();
 
-        case TASK_FINISHED:
-            // Send latest information for completed task
-            // And decrease the number of tasks running
-            --numRunningTasks;
-            markAsArchived = true;
-            sendMsg = true;
-            break;
+    switch (status) {
 
-        case TASK_SCHEDULED:
-            // The number of running tasks was equal to or above the threshold
-            // Check if this PE can be brought to life
-            if (numRunningTasks < maxRunningTasks) {
-                pe->start();
-                ++numRunningTasks;
-                --numWaitingTasks;
-                InfoMsg("Starting proc.elem. " + selfPeer()->name +
-                        "-" + LibComm::toStr<int>(i + 1));
-            }
-            // It could be that the task is just starting, se we do not
-            // send message about stated task, but wait until next iteration
-            sendMsg = false;
-            break;
+    case TASK_ARCHIVED:
+        // Task already finished, and final information was sent to be
+        // registered in the DB, so the pe can be deleted
+        InfoMsg("Removing proc.elem. for task " + pe->getTask().taskName);
 
-        case TASK_FAILED:
-            // Send latest information for task
-            // ... and set processing element status to ARCHIVED
-            markAsArchived = true;
-            sendMsg = true;
-            break;
+        delete pe;
+        pe = 0;
+        processingElements.erase(processingElements.begin() + i);
+        numOfProcElems = processingElements.size();
+        sendMsg = false;
+        break;
 
-        case TASK_PAUSED:
-            // Task is idle, do nothing, just report its state
+    case TASK_FINISHED:
+        // Send latest information for completed task
+        // And decrease the number of tasks running
+        --numRunningTasks;
+        markAsArchived = true;
+        sendMsg = true;
+        break;
 
-            break;
-
-        case TASK_STOPPED:
-            // Task has been explicitly stopped
-            // Send latest information for task
-            // ... and set processing element status to ARCHIVED
-            markAsArchived = true;
-            sendMsg = true;
-            break;
-
-        case TASK_RUNNING:
-            // Update information about the processing element
-            // and send it to the managing components
-            sendMsg = true;
-            break;
-
-        default:
-            break;
+    case TASK_SCHEDULED:
+        // The number of running tasks was equal to or above the threshold
+        // Check if this PE can be brought to life
+        if (numRunningTasks < maxRunningTasks) {
+            pe->start();
+            ++numRunningTasks;
+            --numWaitingTasks;
+            InfoMsg("Starting proc.elem. " + selfPeer()->name +
+                    "-" + LibComm::toStr<int>(i + 1));
         }
+        // It could be that the task is just starting, se we do not
+        // send message about stated task, but wait until next iteration
+        sendMsg = false;
+        break;
 
-        if (sendMsg) {
-            sendTaskResMsg(pe->getTask());
-        }
+    case TASK_FAILED:
+        // Send latest information for task
+        // ... and set processing element status to ARCHIVED
+        markAsArchived = true;
+        sendMsg = true;
+        break;
 
-        if (markAsArchived) {
-            pe->markAsArchived();
-        }
+    case TASK_PAUSED:
+        // Task is idle, do nothing, just report its state
+
+        break;
+
+    case TASK_STOPPED:
+        // Task has been explicitly stopped
+        // Send latest information for task
+        // ... and set processing element status to ARCHIVED
+        markAsArchived = true;
+        sendMsg = true;
+        break;
+
+    case TASK_RUNNING:
+        // Update information about the processing element
+        // and send it to the managing components
+        sendMsg = true;
+        break;
+
+    default:
+        break;
     }
+
+    if (sendMsg) {
+        sendTaskResMsg(pe->getTask());
+    }
+
+    if (markAsArchived) {
+        pe->markAsArchived();
+    }
+
+    // Update idx of proc. elem. for next iteration
+    idxProcElemToCheck++;
+    if (idxProcElemToCheck >= numOfProcElems) { idxProcElemToCheck = 0; }
 }
 
 //----------------------------------------------------------------------
@@ -252,7 +262,7 @@ bool TaskAgent::sendTaskResMsg(TaskInfo & task)
     buildMsgHeader(MSG_TASK_RES_IDX, selfPeer()->name, "TskMng", msg.header);
     msg.task.setData(task.getData());
     PeerMessage * taskResMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_TASK_RES);
-    registerMsg(selfPeer()->name, *taskResMsg);
+    //registerMsg(selfPeer()->name, *taskResMsg);
     setTransmissionToPeer("TskMng", taskResMsg);
     sendMsgsMutex.unlock();
 
@@ -278,11 +288,11 @@ bool TaskAgent::sendMonitInfo()
     Message_MONIT_INFO msg;
     buildMsgHeader(MSG_MONIT_INFO_IDX, selfPeer()->name, "TskMng", msg.header);
 
-    msg.variables.paramList["load1m"]  = LibComm::toStr<double>(sysInfo.loadAvgs.at(0));
-    msg.variables.paramList["load5m"]  = LibComm::toStr<double>(sysInfo.loadAvgs.at(1));
-    msg.variables.paramList["load15m"] = LibComm::toStr<double>(sysInfo.loadAvgs.at(2));
+    msg.variables.paramList["load1m"]     = LibComm::toStr<double>(sysInfo.loadAvgs.at(0));
+    msg.variables.paramList["load5m"]     = LibComm::toStr<double>(sysInfo.loadAvgs.at(1));
+    msg.variables.paramList["load15m"]    = LibComm::toStr<double>(sysInfo.loadAvgs.at(2));
 
-    msg.variables.paramList["uptime"]  = LibComm::toStr<int>(sysInfo.upTime);
+    msg.variables.paramList["uptime"]     = LibComm::toStr<int>(sysInfo.upTime);
 
     msg.variables.paramList["totalMem"]   = dbl2IntStr(sysInfo.memStat.total);
     msg.variables.paramList["usedMem"]    = dbl2IntStr(sysInfo.memStat.values.at(0));
@@ -296,12 +306,13 @@ bool TaskAgent::sendMonitInfo()
         std::string cpu = "cpu" + LibComm::toStr<int>(i);
         msg.variables.paramList[cpu] = LibComm::toStr<double>(sysInfo.cpuPercent.at(i));
     }
-
+/*
     std::cerr << "== Monit. Info. - " << selfPeer()->name << " ======================" << std::endl;
     for (auto & kv : msg.variables.paramList) {
         std::cerr << kv.first << ": " << kv.second << std::endl;
     }
     std::cerr << std::endl;
+*/
     PeerMessage * monitInfoMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_MONIT_INFO);
     // MonitInfo messages are not registered
     //registerMsg(selfPeer()->name, *monitInfoMsg);
