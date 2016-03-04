@@ -51,6 +51,8 @@ using LibComm::Log;
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include <utility>
 
@@ -108,7 +110,7 @@ void DataManager::processINDATA()
     Message_INDATA * msg = dynamic_cast<Message_INDATA *>(msgData.msg);
     saveToDB(msg);
 
-    URLHandler urlh(getCfgInfo());
+    URLHandler urlh;
 
     // Synthetic INDATA messages, that means reading products from folder
     for (auto & md : msg->productsMetadata.productList) {
@@ -220,8 +222,24 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
             md.second = urlh.fromShared2Local();
         }
 
-        //InfoMsg("Saving outputs...");
+        InfoMsg("Saving outputs...");
         saveProductsToDB(msg->task.outputs);
+
+        InfoMsg("Sending message to register outputs at Orchestrator catalogue");
+
+        MessageHeader hdr;
+        buildMsgHeader(MSG_INDATA_IDX, "DataMng", "TskOrc", hdr);
+        Message_INDATA msgIn;
+        buildMsgINDATA(hdr, msg->task.outputs, msgIn);
+
+        // Send message
+        PeerMessage * pmsgIn = buildPeerMsg(hdr.destination, msgIn.getDataString(), MSG_INDATA);
+        registerMsg(selfPeer()->name, *pmsgIn);
+        setTransmissionToPeer(hdr.destination, pmsgIn);
+
+        InfoMsg("Archiving/Registering data at DSS/EAS");
+        //std::thread(&DataManager::archiveDSSnEAS, this, std::ref(msg->task.outputs)).detach();
+        archiveDSSnEAS(msg->task.outputs);
     }
 }
 
@@ -230,7 +248,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 // Save the information of a new (incoming) product to the DB
 // (currently just an INI text file)
 //----------------------------------------------------------------------
-void DataManager::saveProductsToDB(ProductCollection & productList) //Json::Value & prodMetadata)
+void DataManager::saveProductsToDB(ProductCollection & productList)
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
@@ -248,6 +266,83 @@ void DataManager::saveProductsToDB(ProductCollection & productList) //Json::Valu
 
     // Close connection
     dbHdl->closeConnection();
+}
+
+//----------------------------------------------------------------------
+// Method: archiveDSSnEAS
+// Sends the information to the area where the corresponding daemon is
+// looking for data to be sent to DSS/EAS
+//----------------------------------------------------------------------
+void DataManager::archiveDSSnEAS(ProductCollection & productList)
+{
+    static std::string proxyUser("eucops");
+    static std::string proxyHost("eucdev.n1data.lan");
+    static std::string proxyDropbox("ws/jcgg/DSS_EAS_Proxy/incoming");
+    static std::string proxyUrl = proxyUser + "@" + proxyHost + ":" + proxyDropbox + "/";
+
+    for (auto & kv : productList.productList) {
+        ProductType & prodType = const_cast<ProductType&>(kv.first);
+        ProductMetadata & md = kv.second;
+
+        // Execute task driver
+        pid_t pid = fork();
+        switch (pid) {
+        case -1:
+            // Error, failed to fork()
+            perror("fork");
+            exit(EXIT_FAILURE);
+        case 0: {
+            // We are the child
+            std::cerr << md.url << std::endl;
+            std::string fileName(md.url.substr(7, md.url.length()-7));
+            std::string subBox;
+            if      (isLE1Product(prodType)) { subBox = "data/"; }
+            else if (isLE1Metadata(prodType)) { subBox = "meta/"; }
+            proxyUrl += subBox;
+
+            // Hack to send small files instead of actual products
+            std::string source(fileName);
+            std::string target(proxyUrl);
+//            if ((md.productType == "VIS_RAW") || (md.productType == "VIS_LE1")) {
+//                source = "/tmp/dummy_zeros";
+//                target = proxyUrl + md.productId + ".fits";
+//            }
+            char *procTaskCmdLine[] = { (char*)("/usr/bin/scp"),
+                                        (char*)(source.c_str()),
+                                        (char*)(target.c_str()), NULL };
+            std::string cmdLine = "scp " + source + " " + target;
+            DBG("Trying to execute: '" << cmdLine << "'");
+            char *env[] = { (char*)("LD_LIBRARY_PATH="),
+                            (char*)("PATH=/usr/bin:/bin:/opt/bin"),
+                            NULL };
+            execve(procTaskCmdLine[0], procTaskCmdLine, env);
+            perror("scp");
+            exit(EXIT_FAILURE);
+        }
+        default: {
+            // We are the parent process
+            int status;
+            if (waitpid(pid, &status, 0) < 0 ) {
+                perror("wait");
+                exit(254);
+            }
+            if (WIFEXITED(status)) {
+                status = WEXITSTATUS(status);
+                if (status == 0) {
+                    InfoMsg("Successful arrival at DSS/EAS proxy host");
+                } else {
+                    InfoMsg("Problems with arrival of data to DSS/EAS proxy host");
+                }
+            }
+            if (WIFSIGNALED(status)) {
+                printf("Process %d killed: signal %d%s\n",
+                       pid, WTERMSIG(status),
+                       WCOREDUMP(status) ? " - core dumped" : "");
+                exit(1);
+            }
+        }
+        }
+    }
 }
 
 //----------------------------------------------------------------------

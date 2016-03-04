@@ -70,7 +70,7 @@ using namespace LibComm;
 //   - msghdl.h
 //------------------------------------------------------------
 #include "propdef.h"
-#include "msgtypes.h"
+#include "datatypes.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF

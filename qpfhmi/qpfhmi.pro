@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     frmagentstatus.cpp \
     simindata.cpp \
     textview.cpp \
-    logframe.cpp
+    logframe.cpp \
+    configtool.cpp
 
 HEADERS  += mainwindow.h \
          hmipxy.h \
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
     frmagentstatus.h \
     simindata.h \
     textview.h \
-    logframe.h
+    logframe.h \
+    configtool.h
 
 FORMS    += mainwindow.ui \
     dlgshowtaskinfo.ui \
@@ -50,13 +52,15 @@ FORMS    += mainwindow.ui \
     logframe.ui \
     configtool.ui
 
-INCLUDEPATH += . ../src $$LIBCOMMINC $$JSONCPPINC $$PSQLCPPINC
+INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
 LIBS += -L../src -lQPF \
         -L$$LIBCOMMLIB -llibcomm \
         -L$$JSONCPPLIB -ljson \
+        -L$$SDCLIB -lsdc \
+        -L$$INFIXLIB -linfix \
         -L$$PSQLCPPLIB -l$$PSQLLIB \
-        -L/opt/cots/lib -lzmq -liniparser
+        -L/opt/cots/lib -lzmq -lcurl -luuid
 
 RESOURCES += \
     configtool.qrc

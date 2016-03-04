@@ -36,9 +36,12 @@
  *
  ******************************************************************************/
 #include "procelem.h"
-#include "tools.h"
 #include "taskagent.h"
 #include "urlhdl.h"
+#include "str.h"
+#include "filenamespec.h"
+
+#include "tools.h"
 
 #include <sys/time.h>
 #include <iostream>
@@ -211,7 +214,8 @@ void ProcessingElement::initTaskInfo()
     nameFromOrchestrator = task.taskName;
     internalTaskNameIdx = (agentName + "-" +
                            LibComm::timeTag() + "-" +
-                           LibComm::toStr<int>(numTask));
+                           str::toStr<int>(numTask));
+    // internalTaskNameIdx := TskAgent1-yyyymmddTHHMMSS-n
 
     mutexTask.lock();
 
@@ -224,7 +228,7 @@ void ProcessingElement::initTaskInfo()
     task.taskStatus   = status;
 
     originalRegKey = (getExpandedDateTime(task.taskStart) + "-" +
-                      LibComm::toStr<int>(numTask));
+                      str::toStr<int>(numTask));
 
     taskData["TaskAgent"]    = agentName;
     taskData["Name"]         = "/Name-not-yet-provided";
@@ -266,10 +270,14 @@ void ProcessingElement::configureProcElem()
     int mn = 60;
     int mx = 180;
 
-    // Prepare folders
+    // Prepare folders:
+    // * workDir      := /qpf/run/yymmddTHHMMSS/tsk
+    // * exchangeDir  := workDir + / + TskAgent1-yyyymmddTHHMMSS-n
+
     exchangeDir = workDir + "/" + internalTaskNameIdx;
     exchgIn     = exchangeDir + "/in";
     exchgOut    = exchangeDir + "/out";
+    exchgLog    = exchangeDir + "/log";
 
     std::string sysBinDir = sysDir + "/bin";
     taskDriver  = sysDir + "/bin/runTask.sh";
@@ -279,16 +287,29 @@ void ProcessingElement::configureProcElem()
     mkdir(exchangeDir.c_str(), 0755);
     mkdir(exchgIn.c_str(),     0755);
     mkdir(exchgOut.c_str(),    0755);
+    mkdir(exchgLog.c_str(),    0755);
+
+    //FIXME:  * * * * NOTE * * * *
+    // The following section contains the transference of
+    // the input files from the intermediate storage area
+    // to the Docker-visible paths.
+    // This must be still modified for an automatic,
+    // product&rule agnostic algorithm, but for the time
+    // being this will be used in the tests.
+    //FIXME:  * * * * NOTE * * * *
+
+    URLHandler urlh;
+    urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
 
     // Create input files
     if (task.taskPath == "QLA_VIS") {
+
         //std::string sourceImg("/qpf/data/mef.fits");
         std::map<ProductType, ProductMetadata>::iterator it =
                 task.inputs.productList.begin();
         ProductMetadata & m = it->second;
         std::string sourceImg = m.url.substr(7,1000);
         std::string inputProduct = exchgIn + "/" + m.productId + ".fits";
-        URLHandler urlh;
         // Next, we place the data to be analyzed in the task inputs folder
         // With the Host+2 VM Proc.Nodes the symlink version freezes the VMs
         // and the copyfile version eats too much disk space, and is terribly
@@ -310,6 +331,43 @@ void ProcessingElement::configureProcElem()
                                " to " + inputProduct).c_str());
             status = TASK_FAILED;
         }
+
+    } else if (std::string("LE1_VIS_Processor|"
+                           "LE1_VIS_MetadataCollector|"
+                           "LE1_VIS_Ingestor|").find(task.taskPath + "|") != std::string::npos) {
+
+        std::map<ProductType,
+                ProductMetadata>::iterator it = task.inputs.productList.begin();
+        while (it != task.inputs.productList.end()) {
+            ProductMetadata & m = it->second;
+            urlh.setProduct(m);
+            m = urlh.fromShared2Processing();
+            ++it;
+        }
+/*
+        while (it != task.inputs.productList.end()) {
+            ProductMetadata & m = it->second;
+            std::string sourceFile = m.url.substr(7,1000);
+            std::string ext = (m.url.substr(m.url.length()-4,4) == "fits" ? "fits" :
+                               (m.url.substr(m.url.length()-3,3) == "xml" ? "xml" :
+                                                                            "bin"));
+            std::string inputFile = exchgIn + "/" + m.productId + "." + ext;
+            if (ext == "xml") {
+                if (urlh.copyfile(sourceFile, inputFile) != 0) {
+                    perror(std::string("copy input product: from " + sourceFile +
+                                       " to " + inputFile).c_str());
+                    status = TASK_FAILED;
+                }
+            } else {
+                if (link("/qpf/data/EUC_VIS_2014_09_23T17_04_21.076387.fits", inputFile.c_str()) != 0) {
+                    perror(std::string("link input product: from " + sourceFile +
+                                       " to " + inputFile).c_str());
+                    status = TASK_FAILED;
+                }
+            }
+            ++it;
+        }
+ */
     } else {
         std::ofstream oInFile1((exchgIn + "/1.in").c_str());
         if (oInFile1.good()) {
@@ -437,7 +495,7 @@ void ProcessingElement::monitorProcElemLoop()
             task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
         } else {
             progressValue = updateProgress(progressValue);
-            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
+            taskData["State"]["Progress"] = str::toStr<int>(floor(progressValue));
         }
 
         // Additional info
@@ -484,47 +542,106 @@ void ProcessingElement::retrieveOutputProducts()
     std::vector<std::string> outFiles;
     DIR * dp = NULL;
     struct dirent * dirp;
-    if ((dp = opendir(exchgOut.c_str())) == NULL) {
-        std::cerr << "Cannot open output directory " << exchgOut << std::endl;
-    } else {
-        while ((dirp = readdir(dp)) != NULL) {
-            if (dirp->d_name[0] != '.') {
-                outFiles.push_back(std::string(dirp->d_name));
+    for (auto & vd : {exchgOut, exchgLog}) {
+        DBG("Dir: " << vd);
+        if ((dp = opendir(vd.c_str())) == NULL) {
+            std::cerr << "Cannot open output directory " << vd << std::endl;
+        } else {
+            while ((dirp = readdir(dp)) != NULL) {
+                if (dirp->d_name[0] != '.') {
+                    std::string dname(dirp->d_name);
+                    std::string fullName = vd + "/" + dname;
+                    /*
+                    DBG("Output file: " << fullName);
+                    // Check that it is not a link to a internal (Docker)
+                    // file, in which case change the target
+                    if (dirp->d_type == DT_LNK) {                        
+                        char cLink[2048];
+                        int lenBuf = 0;
+                        if ((lenBuf = readlink(fullName.c_str(), cLink, 2048)) < 0) {
+                            perror((std::string("readlink: ") + strerror(errno)).c_str());
+                        } else {
+                            cLink[lenBuf] = 0;
+                            std::string sLink(cLink);
+                            DBG("    is a link to " << sLink);
+                            if (sLink.substr(0, 9) == "/var/run/") {
+                                std::string newLink(workDir + "/" + sLink.substr(9));
+                                DBG("    the file " << fullName);
+                                DBG("    will be converted to link to " << newLink);
+                                unlink(fullName.c_str());
+                                symlink(newLink.c_str(), fullName.c_str());
+                            }
+                        }
+                    }
+*/
+                    DBG("Saving outfile " << fullName);
+                    outFiles.push_back(fullName);
+                }
             }
+            closedir(dp);
         }
-        closedir(dp);
     }
 
     task.outputs.productList.clear();
 
     URLHandler urlh;
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
+
+    FileNameSpec fs;
 
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
         ProductMetadata m;
         std::string & outFileName = outFiles.at(i);
-        if (outFileName.substr(0, 5).compare("EUCL_") == 0) {
+        FileNameSpec::FileNameComponents c = fs.parseFileName(outFileName);
+        if (c.mission == "EUC") {
+
             // Set metadata for output product
-            m.startTime = task.taskStart;
-            m.endTime  = task.taskEnd;
-            m.creator = task.taskPath;
-            m.instrument = "VIS";
-            m.productType = outFileName.substr(5,7);
-            m.productSize = 1234;
-            m.productStatus = "OK";
-            m.productVersion = "1";
-            m.productId = outFileName.substr(0, 47);
-            m.regTime = LibComm::timeTag();
-            m.url = ("file://" +
-                     cfgInfo.storage.shared.external_path + "/out/" +
-                     outFileName);
+            m.startTime      = c.dateStart;
+            m.endTime        = c.dateEnd;
+            m.creator        = task.taskPath;
+            m.instrument     = c.instrument;
+            m.productType    = c.productType;
+            m.productSize    = 1234;
+            m.productStatus  = "OK";
+            m.productVersion = c.version;
+            m.productId      = c.productId;
+            m.signature      = c.signature;
+            m.regTime        = LibComm::timeTag();
+            m.url            = "file://" + outFileName;
+            m.urlSpace       = ProcessingSpace;
 
             // Place output product at external (output) shared area
+            DBG(" >> " << m);
             urlh.setProduct(m);
-            std::string relFileName = cfgInfo.storage.shared.external_path + "/out/" +
-                                      outFileName;
-            urlh.relocate(outFileName, relFileName, 0, COPY);
+            m = urlh.fromProcessing2Shared();
+            DBG(" << " << m);
+ /*
+            std::string relFileName = cfgInfo.storage.shared.local_path + "/out/" +
+                                      c.baseName + "." + c.extension;
+            m.url = ("file://" + relFileName);
+            m.urlSpace = SharedSpace;
+
+            if (c.extension != "fits") {
+                urlh.relocate(outFileName, relFileName, 0, COPY);
+            } else {
+                std::string inFileName = relFileName;
+                str::replaceAll(inFileName, "/out/", "/in/");
+                str::replaceAll(inFileName, "_LE1_", "_RAW_");
+                DBG("FITS file, trying to point to orig.:"
+                    << inFileName << " => " << relFileName);
+                unlink(relFileName.c_str());
+                symlink(inFileName.c_str(), relFileName.c_str());
+            }
+
+            DBG("** Output file   " << outFileName);
+            DBG("**  relocated to " << relFileName);
+            DBG(m);
+*/
         } else {
+
+            continue;
+
+            /*
             // Set metadata for output product
             m.startTime = task.taskStart;
             m.endTime  = task.taskEnd;
@@ -539,11 +656,14 @@ void ProcessingElement::retrieveOutputProducts()
                            m.startTime  + "-" + m.endTime  + "_10");
             m.regTime = LibComm::timeTag();
             m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
+            */
         }
 
-        DBG("  output product: " << outFileName << " => " << m.productId);
+        DBG("  output product: " << outFileName << " => " << m.url);
         task.outputs.productList[m.productType] = m;
     }
+
+    sendUpdatedInfo();
 
     CHKOUT;
 }
@@ -564,7 +684,13 @@ void ProcessingElement::sendUpdatedInfo()
                     ((status == TASK_RUNNING) &&
                      (progressValue != lastProgress)));
 
-    if (sendMsg) { super->sendTaskResMsg(task); }
+    if (sendMsg) {
+        if (status == TASK_FINISHED) {
+            Json::StyledWriter w;
+            DBG("Task FINISHED:!!\n"); // << w.write(task.getData()));
+        }
+        super->sendTaskResMsg(task);
+    }
     CHKOUT;
 }
 
@@ -638,9 +764,13 @@ float ProcessingElement::updateProgress(float f)
 std::string ProcessingElement::getSimplifiedDateTime(Json::Value v)
 {
     std::string s = v.asString();
+
     return (s.substr(0,4) + s.substr(5,2) +
             s.substr(8,5) +
             s.substr(14,2) + s.substr(17,2));
+//    return (s.substr(0,4) + s.substr(5,2) +
+//            s.substr(8,5) +
+//            s.substr(14,2) + s.substr(17,2));
 }
 
 //----------------------------------------------------------------------
@@ -652,9 +782,11 @@ std::string ProcessingElement::getExpandedDateTime(std::string s)
     return (s.substr(0,4) + "-" + s.substr(4,2) + "-" +
             s.substr(6,5) + ":" + s.substr(11,2) + ":" + s.substr(13,2) +
             "Z");
+//    return (s.substr(0,4) + "-" + s.substr(4,2) + "-" +
+//            s.substr(6,5) + ":" + s.substr(11,2) + ":" + s.substr(13,2) +
+//            "Z");
 }
 
-//----------------------------------------------------------------------
 //----------------------------------------------------------------------
 // Method: goIdle
 // Sleep running thread for a number of microseconds

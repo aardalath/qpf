@@ -66,7 +66,7 @@ EventManager::EventManager(const char * name) :
     canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this for EvtMng in favour of DB
     canProcessMessage(MSG_MONIT_INFO_IDX);
 
-    setHeartBeatPeriod(0, 100000);
+    setHeartBeatPeriod(0, 200000);
 }
 
 //----------------------------------------------------------------------
@@ -128,7 +128,7 @@ void EventManager::processINDATA()
     ProductMetadata & m = it->second;
     bool syntheticMsg = (m.url.substr(0,6) == "file:/");
 
-    URLHandler urlh(getCfgInfo());
+    URLHandler urlh;
 
     if (syntheticMsg) {
         // Synthetic INDATA messages, that means reading products from folder

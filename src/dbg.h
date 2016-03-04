@@ -117,5 +117,19 @@ void showBacktrace();
 
 #endif
 
+#include <string>
+
+inline std::string mid(std::string s, size_t from, size_t howmany = 1000) {
+    try {
+        return s.substr(from, howmany);
+    } catch (...) {
+        std::cerr << "ERROR: Trying to extract from '" << s
+                  << "' string " << howmany
+                  << " chars, starting at pos " << from << std::endl;
+        abort();
+    }
+}
+
+
 #endif // DBG_H
 

@@ -233,7 +233,7 @@ int Component::run()
         }
 
         // Send log info to LogMng in case there is something to send
-        if (!logChunk.empty()) { sendLogPacketAsDataInfoMsg(); }
+        if ((!logChunk.empty()) && isPeerLogMng) { sendLogPacketAsDataInfoMsg(); }
 
         // Additional loop tasks (entry for additional functionality
         //to be exectued every loop step)
@@ -314,6 +314,8 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
 #endif
 
     // Otherwise, process it accordingly
+    bool result = true;
+
     switch (idx) {
     case MSG_START_IDX:
         break;
@@ -322,40 +324,42 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
         break;
 
     case MSG_INDATA_IDX:
-        if (!procInData(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_INDATA>(inPeerMsg);
         break;
 
     case MSG_DATA_RQST_IDX:
-        if (!procDataRqst(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_DATA_RQST>(inPeerMsg);
         break;
 
     case MSG_DATA_INFO_IDX:
-        if (!procDataInfo(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_DATA_INFO>(inPeerMsg);
         break;
 
     case MSG_MONIT_RQST_IDX:
-        if (!procMonitRqst(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_MONIT_RQST>(inPeerMsg);
         break;
 
     case MSG_MONIT_INFO_IDX:
-        if (!procMonitInfo(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_MONIT_INFO>(inPeerMsg);
         break;
 
     case MSG_TASK_PROC_IDX:
-        if (!procTaskProc(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_TASK_PROC>(inPeerMsg);
         break;
 
     case MSG_TASK_RES_IDX:
-        if (!procTaskRes(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_TASK_RES>(inPeerMsg);
         break;
 
     case MSG_CMD_IDX:
-        if (!procCmd(inPeerMsg)) { return BadMsgProcessing; }
+        result = procMsg<Message_CMD>(inPeerMsg);
         break;
 
     default:
         break;
     }
+
+    if (!result) { return BadMsgProcessing; }
 
     return idx;
 }
@@ -410,89 +414,12 @@ bool Component::buildMsgTASKPROC(MessageHeader & hdr,
 }
 
 //----------------------------------------------------------------------
-// Method: procInData
-// Process a new MSG_INDATA message
+// Method: procMsg
 //----------------------------------------------------------------------
-bool Component::procInData(Router2RouterPeer::PeerMessage & inPeerMsg)
+template<class T>
+bool Component::procMsg(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
-    msgData.assign(new Message_INDATA);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procDataRqst
-// Process a new MSG_DATA_RQST message
-//----------------------------------------------------------------------
-bool Component::procDataRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_DATA_RQST);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procDataInfo
-// Infoess a new MSG_DATA_INFO message
-//----------------------------------------------------------------------
-bool Component::procDataInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_DATA_INFO);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procMonitRqst
-// Process a new MSG_MONIT_RQST message
-//----------------------------------------------------------------------
-bool Component::procMonitRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_MONIT_RQST);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procMonitInfo
-// Infoess a new MSG_MONIT_INFO message
-//----------------------------------------------------------------------
-bool Component::procMonitInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_MONIT_INFO);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procTaskProc
-// Process a new MSG_TASK_PROC message
-//----------------------------------------------------------------------
-bool Component::procTaskProc(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_TASK_PROC);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procTaskRes
-// Process a new MSG_TASK_RES message
-//----------------------------------------------------------------------
-bool Component::procTaskRes(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_TASK_RES);
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: procCmd
-// Process a new MSG_CMD message
-//----------------------------------------------------------------------
-bool Component::procCmd(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.assign(new Message_CMD);
+    msgData.assign(new T);
     msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
@@ -592,8 +519,8 @@ void Component::sendLogPacketAsDataInfoMsg()
     msg.variables.paramList["contents"] = logChunk;
     PeerMessage * dataInfoMsg = buildPeerMsg("LogMng", msg.getDataString(), MSG_DATA_INFO);
     // DataInfo messages are not registered
-    // registerMsg(selfPeer()->name, *dataInfoMsg);
-    setTransmissionToPeer("LogMng", dataInfoMsg);
+    registerMsg(selfPeer()->name, *dataInfoMsg);
+    //setTransmissionToPeer("LogMng", dataInfoMsg);
     logChunk = "";
 }
 

@@ -15,12 +15,7 @@ TEMPLATE = lib
 
 TARGET = libcomm
 
-INCLUDEPATH += . /opt/cots/include
-
-OLD_LIBDIR = $$QMAKE_LIBDIR
-QMAKE_LIBDIR = /opt/cots/lib $$OLD_LIBDIR
-
-LIBS += /opt/cots/lib/libzmq.so -lzmq
+LIBS += -lzmq
 
 HEADERS += \
         commnode.h \
@@ -42,5 +37,3 @@ SOURCES += \
         thread.cpp \
         tools.cpp \
     counter.cpp
-        
-        

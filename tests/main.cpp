@@ -1,15 +1,7 @@
-/*
-#include <unittest++/UnitTest++.h>
-#include <myclass.h>
-
-TEST(MyMath) {
-    MyClass my;
-    CHECK(my.addition(3,4) == 7);
-}
-*/
-
-int main()
+#include "gtest/gtest.h"
+#
+int main(int argc, char **argv)
 {
-  //return UnitTest::RunAllTests();
-  return 0;
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

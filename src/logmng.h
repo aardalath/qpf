@@ -76,6 +76,18 @@ class LogManager : public Component {
 public:
     LogManager(const char * name = 0);
 
+protected:
+
+    //----------------------------------------------------------------------
+    // Method: processDATA_INFO
+    //----------------------------------------------------------------------
+    virtual void processDATA_INFO();
+
+    //----------------------------------------------------------------------
+    // Method: execAdditonalLoopTasks
+    //----------------------------------------------------------------------
+    virtual void execAdditonalLoopTasks();
+
 };
 
 }

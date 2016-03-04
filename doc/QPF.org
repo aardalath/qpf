@@ -7,6 +7,10 @@
 
 #+SETUPFILE: ./config.org
 
+http://easdps01.esac.esa.int:8000/DbView
+https://euclidsoc.esac.esa.int:8300/{status,jobs,files}
+http://archives.esac.esa.int/esasky-beta
+
 * QPF - QLA Processing Framework
 
 ** Euclid Operations Main Entities
@@ -775,7 +779,7 @@ Dply -> Dply: wait for START
 
 For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the following technologies are planned to be used.
 
-- LSST Libraries :: Processing Elements will be LSST based.
+- +LSST Libraries :: Processing Elements will be LSST based.+
 
 - Docker :: Task Agents will be Docker containers, running independently, with an embeded Processing Element included and with file-based interface with the host system and with the Task Manager
 
@@ -1621,18 +1625,19 @@ CLOSED: [2015-10-05 lun 11:44]
 CLOSED: [2015-10-05 lun 11:44]
 
 
-*** TODO Functionalities to be included [6/14]
+*** TODO Functionalities to be included [7/14]
 **** DONE [#A] Correct DB structure so the incoming data and overall information can be stored
 CLOSED: [2015-10-05 lun 11:43]
 **** DONE [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
 CLOSED: [2015-10-05 lun 11:43]
 **** TODO [#A] Ensure the HMI monitors the remote log directory and they are shown in the HMI
-**** TODO [#B] Prepare an infrastructure for product downloading
+**** STARTED [#B] Prepare an infrastructure for product downloading
 **** TODO [#B] Implement MONIT_RQST and MONIT_INFO messages
 **** TODO [#B] Implement Commanding messages to handle running processors
-**** TODO [#B] Implement output products registering and archival
+**** DONE [#B] Implement output products registering and archival
+CLOSED: [2016-01-29 vie 08:48]
 **** TODO [#B] Pause/Resume/Stop of tasks
-**** TODO [#B] Implement preferences for HMI
+**** STARTED [#B] Implement preferences for HMI
 **** TODO [#C] Tasks History Report
 **** DONE [#A] Registration of tasks status
 CLOSED: [2015-09-30 mié 13:23]

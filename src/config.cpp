@@ -41,6 +41,7 @@
 #include "config.h"
 
 #include "dbg.h"
+#include "str.h"
 
 #include "evtmng.h"
 #include "datamng.h"
@@ -48,6 +49,8 @@
 #include "taskmng.h"
 #include "taskorc.h"
 #include "taskagent.h"
+#include "filenamespec.h"
+
 #include "tools.h"
 
 #include "dbhdlpostgre.h"
@@ -58,6 +61,7 @@ using namespace LibComm;
 #include <sys/time.h>
 #include <fstream>
 #include <iostream>
+#include <libgen.h>
 
 #define WRITE_MESSAGE_FILES
 
@@ -130,7 +134,7 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
     PATHTsk  = PATHRun + "/tsk";
     PATHMsg  = PATHRun + "/msg";
 }
-    
+
 //----------------------------------------------------------------------
 // Method: setLastAccess
 // Updates the date of last access to the configuration
@@ -159,7 +163,7 @@ void Configuration::reset()
 void Configuration::getProductTypes(std::vector<std::string> & vec)
 {
     vec.clear();
-    Json::Value pTypes = cfg["products"]["product_types"];
+    Json::Value pTypes = cfg["products"]["product_datatypes"];
     for (unsigned int i = 0; i < pTypes.size(); ++i) {
         vec.push_back(pTypes[i].asString());
     }
@@ -179,13 +183,15 @@ int Configuration::getNumOrchRules()
 // Return orchestration rule parameters
 //----------------------------------------------------------------------
 void Configuration::getOrchRule(std::string & name, std::vector<std::string> & in,
-                                std::vector<std::string> & out, std::string & pElem)
+                                std::vector<std::string> & out, std::string & pElem,
+                                std::string & condition)
 {
     Json::Value const & v = (*ruleIt);
     name  = ruleIt.key().asString();
-    in    = LibComm::split(v["inputs"].asString(), ',');
-    out   = LibComm::split(v["outputs"].asString(), ',');
+    in    = str::split(v["inputs"].asString(), ',');
+    out   = str::split(v["outputs"].asString(), ',');
     pElem = v["processing"].asString();
+    condition = v["condition"].asString();
 
     ruleIt++;
     if (ruleIt == cfg["orchestration"]["rules"].end()) {
@@ -220,7 +226,7 @@ void Configuration::getProc(std::string & name, std::string & exe,
         procIt = cfg["processing"]["processors"].begin();
     }
 }
-    
+
 //----------------------------------------------------------------------
 // Method: getNumNodes
 // Return number of nodes
@@ -248,7 +254,7 @@ void Configuration::getNode(std::string & name, std::string & type,
         nodeIt = cfg["nodes"]["node_list"].begin();
     }
 }
-    
+
 //----------------------------------------------------------------------
 // Method: getNodeByName
 // Return node parameters for a node with the name specified
@@ -261,7 +267,7 @@ void Configuration::getNodeByName(std::string name, std::string & type,
     cAddr = v["client"].asString();
     sAddr = v["server"].asString();
 }
-    
+
 //----------------------------------------------------------------------
 // Method: getHMINodeName
 // Return HMI node name
@@ -271,7 +277,7 @@ std::string Configuration::getHMINodeName()
     return cfg["nodes"]["hmi_node"].asString();
 }
 
-//----------------------------------------------------------------------
+//-------------------------------------------------------readConfigurationFromDB---------------
 // Method: getNumMachines
 // Return number of machines in the network
 //----------------------------------------------------------------------
@@ -334,6 +340,7 @@ void Configuration::applyNewConfig(std::string fName)
 void Configuration::setConfigFile(std::string fName)
 {
     cfgFileName = fName;
+    cfgFilePath = std::string(dirname(strdup(fName.c_str())));
 }
 
 //----------------------------------------------------------------------
@@ -475,6 +482,8 @@ void Configuration::processConfiguration()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
+    Json::StyledWriter w;
+
     // Now, fill in ConfigurationInfo structure
     reset();
     cfgInfo.clear();
@@ -488,14 +497,40 @@ void Configuration::processConfiguration()
     // General
     getGeneralInfo(cfgInfo.appName, cfgInfo.appVersion, cfgInfo.lastAccess);
 
-    // Product types
+    // Product datatypes
     getProductTypes(cfgInfo.orcParams.productTypes);
 
-    // Orchestration rulesfile
+    // File name convention parameters
+    const Json::Value & prds = cfg["products"];
+    cfgInfo.parsing_assign   = prds["parsing_assign"].asString();
+    cfgInfo.product_id_tpl   = prds["product_id_tpl"].asString();
+    cfgInfo.data_ext         = prds["data_ext"].asString();
+    cfgInfo.meta_ext         = prds["meta_ext"].asString();
+    cfgInfo.log_ext          = prds["log_ext"].asString();
+    // Regex for parsing file names might be in a separate file pointed by
+    // parsing_regex parameter if the first character is '@'
+    std::string parsing_regex_str = prds["parsing_regex"].asString();
+    if (parsing_regex_str.at(0) == '@') {
+        std::ifstream parsingReFile;
+        parsingReFile.open(cfgFilePath + "/" + parsing_regex_str.substr(1),
+                std::ifstream::in);
+        if (parsingReFile.good()) {
+            std::getline(parsingReFile, cfgInfo.parsing_regex);
+            parsingReFile.close();
+        }
+    } else {
+        cfgInfo.parsing_regex = parsing_regex_str;
+    }
+
+    FileNameSpec fs(cfgInfo.parsing_regex, cfgInfo.parsing_assign);
+    fs.setProductIdTpl(cfgInfo.product_id_tpl);
+
+    // Orchestration rules file
     for (int i = 0; i < getNumOrchRules(); ++i) {
         Rule * rule = new Rule;
         getOrchRule(rule->name, rule->inputs,
-                    rule->outputs, rule->processingElement);
+                    rule->outputs, rule->processingElement,
+                    rule->condition);
         cfgInfo.orcParams.rules.push_back(rule);
     }
 
@@ -639,6 +674,39 @@ std::string Configuration::getEnvVar(std::string const & key) const
     return val == NULL ? std::string("") : std::string(val);
 }
 
+//----------------------------------------------------------------------
+// Method: isLE1Product
+// Returns TRUE if the product type corresponds to a LE1 product file
+//----------------------------------------------------------------------
+bool isLE1Product(std::string const & p)
+{
+    return ((p == "VIS_LE1") ||
+            (p == "NIR_LE1") ||
+            (p == "SIR_LE1"));
+}
+
+//----------------------------------------------------------------------
+// Method: isLE1Metadata
+// Returns TRUE if the product type corresponds to a LE1 metadata file
+//----------------------------------------------------------------------
+bool isLE1Metadata(std::string const & p)
+{
+    return ((p == "VIS_LE1_META") ||
+            (p == "NIR_LE1_META") ||
+            (p == "SIR_LE1_META"));
+}
+
+//----------------------------------------------------------------------
+// Method: isValidExtension
+// Returns TRUE if the file extension provided is one of the valid ones
+//----------------------------------------------------------------------
+bool isValidExtension(std::string const & e)
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    return ((e == cfgInfo.data_ext) || (e == cfgInfo.meta_ext));
+}
+
 std::string Configuration::DBHost;
 std::string Configuration::DBPort;
 std::string Configuration::DBName;
@@ -657,5 +725,3 @@ std::string Configuration::PATHMsg;
 mode_t Configuration::PATHMode = 0755;
 
 }
-
-

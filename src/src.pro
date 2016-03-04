@@ -15,19 +15,10 @@ TEMPLATE = lib
 
 TARGET = QPF
 
-LIBS += -lzmq
+LIBS += -llibcomm -ljson -lsdc -linfix \
+        -L$$PSQLDIR -l$$PSQLLIB -lzmq -lcurl -luuid
 
-INCLUDEPATH += . $$LIBCOMMINC $$JSONCPPINC $$INFIXINC $$SDCINC $$PSQLCPPINC
-
-LIBS += -L$$LIBCOMMLIB -llibcomm \
-        -L$$JSONCPPLIB -ljson \
-        -L$$SDCLIB -lsdc \
-        -L$$INFIXLIB -linfix \
-        -L$$PSQLCPPLIB -l$$PSQLLIB \
-        -L/opt/cots/lib -lzmq \
-        -lcurl -luuid
-
-HEADERS +=  \
+HEADERS += \
         common.h \
         dbhdl.h \
         error.h \

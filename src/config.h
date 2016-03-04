@@ -50,7 +50,6 @@
 // Topic: Project dependencies
 //------------------------------------------------------------
 #include "cfginfo.h"
-#include "sdc.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -59,7 +58,7 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
-  
+
 //==========================================================================
 // Class: Configuration
 //==========================================================================
@@ -82,7 +81,7 @@ public:
     // Get general parameters from the configuration
     //----------------------------------------------------------------------
     void getGeneralInfo(std::string & appName, std::string appVer, std::string & last);
-    
+
     //----------------------------------------------------------------------
     // Method: setLastAccess
     // Updates the date of last access to the configuration
@@ -112,8 +111,9 @@ public:
     // Return orchestration rule parameters
     //----------------------------------------------------------------------
     void getOrchRule(std::string & name, std::vector<std::string> & in,
-                     std::vector<std::string> & out, std::string & pElem);
-    
+                     std::vector<std::string> & out, std::string & pElem,
+                     std::string & condition);
+
     //----------------------------------------------------------------------
     // Method: getNumProcs
     // Return number of processors
@@ -126,7 +126,7 @@ public:
     //----------------------------------------------------------------------
     void getProc(std::string & name, std::string & exe,
                  std::string & in, std::string & out);
-    
+
     //----------------------------------------------------------------------
     // Method: getNumNodes
     // Return number of nodes
@@ -198,7 +198,7 @@ private:
     // Loads the configuration file content into memory
     //----------------------------------------------------------------------
     void readConfigurationFromFile();
-    
+
     //----------------------------------------------------------------------
     // Method: readConfigurationFromDB
     // Loads the configuration from the DB into memory
@@ -219,6 +219,7 @@ private:
 
 private:
     std::string           cfgFileName;
+    std::string           cfgFilePath;
     Json::Value           cfg;
 
     Json::Value::iterator ruleIt;
@@ -229,11 +230,11 @@ private:
     bool hmiPresent;
 
 public:
-    static std::string    DBHost;
-    static std::string    DBPort;
-    static std::string    DBName;
-    static std::string    DBUser;
-    static std::string    DBPwd;
+    static std::string DBHost;
+    static std::string DBPort;
+    static std::string DBName;
+    static std::string DBUser;
+    static std::string DBPwd;
 
     static std::string PATHBase;
     static std::string PATHBin;
@@ -248,7 +249,24 @@ public:
 
 };
 
+//----------------------------------------------------------------------
+// Method: isLE1Product
+// Returns TRUE if the product type corresponds to a LE1 product file
+//----------------------------------------------------------------------
+bool isLE1Product(std::string const & p);
+
+//----------------------------------------------------------------------
+// Method: isLE1Metadata
+// Returns TRUE if the product type corresponds to a LE1 metadata file
+//----------------------------------------------------------------------
+bool isLE1Metadata(std::string const & p);
+
+//----------------------------------------------------------------------
+// Method: isValidExtension
+// Returns TRUE if the file extension provided is one of the valid ones
+//----------------------------------------------------------------------
+bool isValidExtension(std::string const & e);
+
 }
 
 #endif  /* CONFIG_H */
-

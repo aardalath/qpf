@@ -31,7 +31,8 @@ public:
         DICT,
     };
 
-    Value();
+    Value(ValueType t = defaultDataType);
+
     Value(bool x);
     Value(int x);
     Value(double x);
@@ -44,7 +45,7 @@ public:
     ~Value();
 
     typedef unsigned char     byte;
-    typedef unsigned char *   bytePtr;
+    typedef unsigned char *   BytePtr;
 
     typedef map<string, Value>::iterator  iterator;
 
@@ -60,7 +61,8 @@ public:
     void set(const Value & rhs);
 
     ValueType type() const;
-    bytePtr getData() const;
+    void setType(Value::ValueType t);
+    BytePtr getData() const;
     int getSizeOfData() const;
 
     Value & operator=(bool rhs);
@@ -79,14 +81,14 @@ public:
     Value & operator<<(std::pair<string, Value> & rhs);
     Value & operator<<(const std::pair<string, Value> & rhs);
 
-    const bool     asBool() const;
-    const int      asInt() const;
-    const double   asDbl() const;
-    const string & asStr() const;
+    bool     asBool() const;
+    int      asInt() const;
+    double   asDbl() const;
+    const string & asString() const;
     const Array  & asArray() const;
     const Dict   & asDict() const;
 
-    string & asStr();
+    string & asString();
     Array  & asArray();
     Dict   & asDict();
 
@@ -124,12 +126,13 @@ public:
     Value::iterator begin();
     Value::iterator end();
 
+    static void setDefaultType(ValueType d);
+
 protected:
-    bytePtr    data;
-    Dict *     d;
-    Array *    a;
-    string *   s;
+    BytePtr    data;
     ValueType  dataType;
+
+    static ValueType  defaultDataType;
 };
 
 bool operator!=(const Value& lhs, const bool& rhs);

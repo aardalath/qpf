@@ -537,7 +537,7 @@ void MainWindow::readConfig()
     cfg->setLastAccess(QDateTime::currentDateTime()
                        .toString("yyyyMMddTHHmmss").toStdString());
 
-    // Modify HMI with the product types obtained from configuration
+    // Modify HMI with the product datatypes obtained from configuration
     ui->cboxProdType->clear();
     ui->lstProductTypes->clear();
     for (unsigned int i = 0; i < cfgInfo.orcParams.productTypes.size(); ++i) {
@@ -772,7 +772,7 @@ void MainWindow::prepareSendMultInData()
 
     bool ok = simInData->sendMultInData(ui->dtStartMult->dateTime(), // start
                                         ui->dtEndMult->dateTime(), // end
-                                        prodTypes, prodStat, // types and status
+                                        prodTypes, prodStat, // datatypes and status
                                         ui->cboxStep->currentText().toInt(), // step in h
                                         ui->cboxFreq->currentText().toInt()); // freq in s
 
@@ -813,11 +813,15 @@ void MainWindow::prepareSendInDataFromFile()
 //----------------------------------------------------------------------
 void MainWindow::processInbox()
 {
-    bool ok = simInData->processInbox(ui->edInboxPath->text());
+    QString metadata;
+    simInData->setInjectionFrequency(ui->spbxInjFreq->value());
+    bool ok = simInData->processInbox(ui->edInboxPath->text(), metadata);
 
     if (ok) {
         ui->tabEventsToInject->setEnabled(false);
         ui->btnStopMultInDataEvt->show();
+
+        ui->pltxtInboxProducts->setPlainText(metadata);
 
         // Activate task monitoring
         taskMonitTimer = new QTimer(this);
@@ -848,11 +852,15 @@ void MainWindow::selectInDataParamsFile()
 //----------------------------------------------------------------------
 void MainWindow::selectInboxPath()
 {
+    QString currText = ui->edInboxPath->text();
+    if (currText.isEmpty()) {
+        currText = "/";
+    }
     QString dirName =
-      QFileDialog::getExistingDirectory(this,
-                                        tr("Select incoming products folder"),
-                                        getenv("HOME"),
-                                        QFileDialog::ShowDirsOnly);
+            QFileDialog::getExistingDirectory(this,
+                                              tr("Select incoming products folder"),
+                                              currText,
+                                              QFileDialog::ShowDirsOnly);
     if (dirName.isEmpty()) { return; }
     ui->edInboxPath->setText(dirName);
     inboxDirName = dirName;
@@ -903,7 +911,7 @@ void MainWindow::checkForTaskRes()
         statusBar()->showMessage(QString("Received information from %1 tasks")
                                  .arg(numOfTaskResMsgs),
                                  MessageDelay);
-        // Transform to Qt types
+        // Transform to Qt datatypes
         std::map<std::string, Json::Value>::const_iterator i = newTaskResInfo.begin();
         while (i != newTaskResInfo.end()) {
             QString key = QString::fromStdString(i->first);
@@ -1112,12 +1120,14 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_FINISHED: // BG: green
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::darkGreen));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::green));
             }
             v["ZUpdatable"] = false;
             break;
         case TASK_FAILED: // BG: red
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::white));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::red));
             }
             v["ZUpdatable"] = false;
@@ -1129,6 +1139,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
             break;
         case TASK_STOPPED: // BG: gray
             for (int col = 0; col < nCols; ++col) {
+                treeItem->setData(col, Qt::ForegroundRole, QColor(Qt::black));
                 treeItem->setData(col, Qt::BackgroundRole, QColor(Qt::darkGray));
             }
             v["ZUpdatable"] = false;
@@ -1146,7 +1157,7 @@ void MainWindow::updateTasksMonitTree(int nCols)
             ui->treeTaskMonit->addTopLevelItem(treeItem);
         }
 
-//        Json::FastWriter w;
+//        SDC::FastWriter w;
 //        qDebug() << progress << st << status << QString::fromStdString(w.write(v));
     }
 

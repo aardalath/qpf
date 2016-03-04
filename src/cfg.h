@@ -14,7 +14,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare configuration related types
+ *   Declare configuration related datatypes
  *
  * Created by:
  *   J C Gonzalez
@@ -48,7 +48,7 @@
 //------------------------------------------------------------
 // Topic: Project dependencies
 //------------------------------------------------------------
-#include "msgtypes.h"
+#include "datatypes.h"
 //#include "component.h"
 #include "commnode.h"
 using namespace LibComm;
@@ -69,6 +69,7 @@ struct Rule {
     std::vector<std::string>            inputs;
     std::vector<std::string>            outputs;
     std::string                         processingElement;
+    std::string                         condition;
 };
 
 typedef std::map<Rule *, ProductList>  RuleInputs;

@@ -172,6 +172,29 @@ std::string join(const std::vector<std::string>& vec, const char* sep);
 //----------------------------------------------------------------------
 std::string replaceAll(std::string & s, std::string a, std::string b);
 
+//----------------------------------------------------------------------
+// Function: mid
+// Warpper for substr
+//----------------------------------------------------------------------
+std::string mid(std::string & s, int from, int howmany);
+
+//----------------------------------------------------------------------
+// Function: mid
+// Warpper for substr
+//----------------------------------------------------------------------
+std::string mid(std::string & s, int from);
+
+//----------------------------------------------------------------------
+// Function: quoted
+// Single-quotes its argument
+//----------------------------------------------------------------------
+std::string quoted(std::string s, char q = '\'');
+
+//----------------------------------------------------------------------
+// Function: tagToTimestamp
+// Get date and time components from time tag
+//----------------------------------------------------------------------
+std::string tagToTimestamp(std::string tag, bool withDecimals = true);
 
 }
 

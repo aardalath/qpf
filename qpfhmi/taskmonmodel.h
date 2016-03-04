@@ -44,8 +44,6 @@
 #include <QTableView>
 #include <QFileSystemWatcher>
 
-//INI#include "iniparser.h"
-
 namespace QPF {
 /*
 class TaskMonModel : public QObject

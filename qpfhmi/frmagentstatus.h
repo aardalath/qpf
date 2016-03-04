@@ -2,7 +2,7 @@
 #define FRMAGENTSTATUS_H
 
 #include <QFrame>
-#include "msgtypes.h"
+#include "datatypes.h"
 
 namespace Ui {
 class FrmAgentStatus;

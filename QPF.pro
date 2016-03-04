@@ -17,8 +17,7 @@ SUBDIRS  = \
 #    qpf \
     qpfhmi
 
-tests.depends = libcomm sdc infix src
-# qpf.depends = src json sdc
+libcomm.depends = json
 sdc.depends = json
 qpfhmi.depends = libcomm json sdc infix src
 tests.depends = libcomm sdc infix src

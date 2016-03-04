@@ -156,6 +156,13 @@ protected:
     //----------------------------------------------------------------------
     void saveProductsToDB(ProductCollection & productList); //Json::Value & prodMetadata);
 
+    //----------------------------------------------------------------------
+    // Method: archiveDSSnEAS
+    // Sends the information to the area where the corresponding daemon is
+    // looking for data to be sent to DSS/EAS
+    //----------------------------------------------------------------------
+    void archiveDSSnEAS(ProductCollection & productList);
+
 private:
     std::string dbFileName;
 

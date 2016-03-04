@@ -57,9 +57,9 @@
 //------------------------------------------------------------
 // Topic: Project headers
 //   - cfg.h
-//   - msgtypes.h
+//   - datatypes.h
 //------------------------------------------------------------
-#include "msgtypes.h"
+#include "datatypes.h"
 #include "cfginfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -103,14 +103,14 @@ public:
     ProductMetadata & fromLocal2Shared();
 
      //----------------------------------------------------------------------
-    // Method: fromShared2InternalInput
+    // Method: fromShared2Processing
     //----------------------------------------------------------------------
-    ProductMetadata & fromShared2InternalInput();
+    ProductMetadata & fromShared2Processing();
 
     //----------------------------------------------------------------------
-    // Method: fromInternalOutput2Shared
+    // Method: fromProcessing2Shared
     //----------------------------------------------------------------------
-    ProductMetadata & fromInternalOutput2Shared();
+    ProductMetadata & fromProcessing2Shared();
 
      //----------------------------------------------------------------------
     // Method: fromShared2Local
@@ -138,14 +138,23 @@ public:
     //----------------------------------------------------------------------
     int copyfile(std::string & sFrom, std::string & sTo);
 
+    //----------------------------------------------------------------------
+    // Method: setProcElemRunDir
+    //----------------------------------------------------------------------
+    void setProcElemRunDir(std::string wkDir, std::string tskDir);
+
     inline ProductMetadata & i2l() { return fromInbox2Local(); }
     inline ProductMetadata & l2s() { return fromLocal2Shared(); }
-    inline ProductMetadata & s2i() { return fromShared2InternalInput(); }
-    inline ProductMetadata & o2e() { return fromInternalOutput2Shared(); }
+    inline ProductMetadata & s2p() { return fromShared2Processing(); }
+    inline ProductMetadata & p2s() { return fromProcessing2Shared(); }
     inline ProductMetadata & s2l() { return fromShared2Local(); }
     inline ProductMetadata & i2a() { return fromLocal2Archive(); }
     inline ProductMetadata & a2l() { return fromArchive2Local(); }
 
+private:
+    std::string workDir;
+    std::string intTaskDir;
+    std::string taskExchgDir;
 };
 
 }

@@ -49,7 +49,7 @@
 #include <QSignalMapper>
 
 #include "hmipxy.h"
-#include "msgtypes.h"
+#include "datatypes.h"
 #include "config.h"
 #include "archivemodel.h"
 #include "frmagentstatus.h"

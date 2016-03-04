@@ -39,7 +39,7 @@
 #ifndef PROCESSINGELEMENT_H
 #define PROCESSINGELEMENT_H
 
-#include "msgtypes.h"
+#include "datatypes.h"
 #include "cfg.h"
 
 #include "dbg.h"
@@ -200,6 +200,7 @@ private:
     std::string nameFromOrchestrator;
     std::string exchgIn;
     std::string exchgOut;
+    std::string exchgLog;
 
     std::string taskDriver;
     std::string cfgFile;

@@ -38,6 +38,9 @@
 
 #include "logmng.h"
 
+#include "log.h"
+using LibComm::Log;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -52,8 +55,6 @@ namespace QPF {
 LogManager::LogManager(const char * name) :
     Component(name)
 {
-<<<<<<< 55e181e35c81a71088fafdb04ee357ac6c9eee72
-=======
     canProcessMessage(MSG_DATA_INFO_IDX);
     Log::defineSizeOfLogBuffer(name, 0);
 }
@@ -83,7 +84,6 @@ void LogManager::processDATA_INFO()
 void LogManager::execAdditonalLoopTasks()
 {
 
->>>>>>> Completed processDATA_INFO to append log chunk to rlog file
 }
 
 }

@@ -55,7 +55,7 @@
 
 //------------------------------------------------------------
 // Topic: Project headers
-//   - msgtypes.h
+//   - datatypes.h
 //   - cfg.h
 //------------------------------------------------------------
 #include "propdef.h"
@@ -249,52 +249,11 @@ protected:
                      bool isBroadcast = false);
 
     //----------------------------------------------------------------------
-    // Method: procInData
-    // Process a new MSG_INDATA message
+    // Method: procMsg
+    // Process a new T message
     //----------------------------------------------------------------------
-    bool procInData(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procDataRqst
-    // Process a new MSG_DATA_RQST message
-    //----------------------------------------------------------------------
-    bool procDataRqst(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procDataInfo
-    // Infoess a new MSG_DATA_INFO message
-    //----------------------------------------------------------------------
-    bool procDataInfo(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procMonitRqst
-    // Process a new MSG_MONIT_RQST message
-    //----------------------------------------------------------------------
-    bool procMonitRqst(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procMonitInfo
-    // Infoess a new MSG_MONIT_INFO message
-    //----------------------------------------------------------------------
-    bool procMonitInfo(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procTaskProc
-    // Process a new MSG_TASK_PROC message
-    //----------------------------------------------------------------------
-    bool procTaskProc(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procTaskRes
-    // Process a new MSG_TASK_RES message
-    //----------------------------------------------------------------------
-    bool procTaskRes(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: procCmd
-    // Process a new MSG_CMD message
-    //----------------------------------------------------------------------
-    bool procCmd(Router2RouterPeer::PeerMessage & inPeerMsg);
+    template<class T>
+    bool procMsg(Router2RouterPeer::PeerMessage & inPeerMsg);
 
     //----------------------------------------------------------------------
     // Method: writeToFile
@@ -303,14 +262,15 @@ protected:
     void writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg);
 
     //----------------------------------------------------------------------
+    // Method: sendLogPacketAsDataInfoMsg
+    //----------------------------------------------------------------------
+    void sendLogPacketAsDataInfoMsg();
+
+    //----------------------------------------------------------------------
     // Method: setHeartBeatPeriod
     // Sets number of seconds and microseconds for HeartBeat period
     //----------------------------------------------------------------------
-<<<<<<< 404d81f9b9d799ba68419a5b5874643e2c884dc3
-    void setHeartBeatPeriod(int s = 1, int us = 0);
-=======
     void setHeartBeatPeriod(int s = 2, int us = 0);
->>>>>>> DataInfo messages will not be registered in DB
 
 protected:
     std::set<int> canProcess;

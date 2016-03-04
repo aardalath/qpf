@@ -38,6 +38,8 @@
 
 #include "taskorc.h"
 #include "urlhdl.h"
+#include "str.h"
+#include "infixeval.h"
 
 #include "log.h"
 using LibComm::Log;
@@ -107,10 +109,10 @@ void TaskOrchestrator::fromRunningToOperational()
         ss << rule->processingElement << " :: ";
         std::copy(rule->inputs.begin(), rule->inputs.end(),
                   std::ostream_iterator<std::string>(ss," "));
-        ss << " => ";
+        ss << " ==[" + rule->condition + "]==> ";
         std::copy(rule->outputs.begin(), rule->outputs.end(),
                   std::ostream_iterator<std::string>(ss," "));
-        InfoMsg("Orc.Rule#" + LibComm::toStr<int>(i + 1) + ":  " + ss.str());
+        InfoMsg("Orc.Rule#" + str::toStr<int>(i + 1) + ":  " + ss.str());
         orcMaps.ruleDesc[rule] = ss.str();
     }
 
@@ -160,9 +162,15 @@ void TaskOrchestrator::processINDATA()
 bool TaskOrchestrator::checkRulesForProductType(std::string prodType,
                                                 RuleInputs & ruleInputs)
 {
-    bool areThereRulesToFire = false;
+    bool atLeastOneRuleFired = false;
 
     ruleInputs.clear();
+
+    DbgMsg("Current catalogue contents:");
+    for (auto & kv : catalogue.productList) {
+        ProductMetadata & m = kv.second;
+        DbgMsg("  - " + kv.first + " : " + m.productId + " [" + m.url + "]");
+    }
 
     // Select all the rules that involve prodType as input
     std::pair<std::multimap<std::string, Rule *>::iterator,
@@ -172,11 +180,27 @@ bool TaskOrchestrator::checkRulesForProductType(std::string prodType,
     // If no rule found for that product type, no rule can be fired
     if (range.first == range.second) { return false; }
 
+#define EVAL_CONDITION
+
+#ifdef EVAL_CONDITION
+    // Condition evaluator
+    InFix::Evaluator<int> ev;
+#else
+#endif
+
     // Loop on selected rules
     std::multimap<std::string, Rule *>::iterator it = range.first;
     for (; it != range.second; ++it) {
 
+#ifdef EVAL_CONDITION
+        // Rule condition
+        std::string condStr("");
+#else
+#endif
         Rule * rule = (*it).second;
+        std::set<ProductType> requiredInputs(rule->inputs.begin(),
+                                             rule->inputs.end());
+        std::set<ProductType> availableInputs;
         ProductList inputs;
 
         // Check if all the inputs for this rule are available in the DB
@@ -200,17 +224,66 @@ bool TaskOrchestrator::checkRulesForProductType(std::string prodType,
             // list for the current rule
             std::multimap<std::string, ProductMetadata>::iterator itt = rangeProd.second;
             itt--;
-            inputs.productList.push_back((*itt).second);
+            ProductMetadata & m = (*itt).second;
+            std::string & pt = m.productType;
+            inputs.productList.push_back(m);
+            availableInputs.insert(pt);
+
+#ifdef EVAL_CONDITION
+            // Store also its metadata fields for rule conditions in the
+            // condition string
+            int date1 = str::strTo<int>(m.startTime.substr(0, 8));
+            int time1 = str::strTo<int>(m.startTime.substr(9, 6));
+//            int date2 = str::strTo<int>(m.endTime.substr(0, 8));
+//            int time2 = str::strTo<int>(m.endTime.substr(9, 6));
+            condStr += pt + ".date = " + str::toStr<int>(date1) + ";" +
+                       pt + ".time = " + str::toStr<int>(time1) + ";" /*+
+                       pt + ".date_end = " + str::toStr<int>(date2) + ";" +
+                       pt + ".time_end = " + str::toStr<int>(time2) + ";"*/;
+#else
+#endif
         }
 
-        if (inputs.productList.size() > 0) {
+        std::ostream_iterator<ProductType> out_it (std::cerr, ", ");
+
+        std::cerr << "requiredInputs :> ";
+        std::copy(requiredInputs.begin(), requiredInputs.end(), out_it);
+        std::cerr << "availableInputs :> ";
+        std::copy(availableInputs.begin(), availableInputs.end(), out_it);
+        std::cerr << std::endl;
+
+        if (availableInputs == requiredInputs) {
+#ifdef EVAL_CONDITION
+            // Evaluate the rule condition:
+            int result = 0;
+            if (! rule->condition.empty()) {
+                // a. Include the condition in the condition string
+                condStr += rule->condition;
+                // b. Evaluate condition
+                std::cerr << "Evaluating condition: " << condStr << std::endl;
+                ev.clear();
+                ev.set(condStr);
+                try {
+                    result = ev.getValue();
+                } catch (...) {
+                    result = 1;
+                }
+            } else {
+                result = 1;
+            }
+            if (result > 0) {
+                ruleInputs[rule] = inputs;
+                atLeastOneRuleFired = true;
+            }
+#else
             ruleInputs[rule] = inputs;
-            areThereRulesToFire = true;
+            atLeastOneRuleFired = true;
+#endif
         }
 
-    }
+    } // check for each rule with provided product type
 
-    return areThereRulesToFire;
+    return atLeastOneRuleFired;
 }
 
 //----------------------------------------------------------------------
@@ -236,7 +309,7 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
 
     for (unsigned int i = 0; i < inputs.productList.size(); ++i) {
         urlh.setProduct(inputs.productList.at(i));
-        ProductMetadata & m = urlh.fromInbox2Local();
+        ProductMetadata & m = urlh.fromLocal2Shared();
         task.inputs.productList[m.productType] = m;
     }
 

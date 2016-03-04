@@ -37,62 +37,10 @@
  ******************************************************************************/
 
 #include "filenamespec.h"
-
 #include "dbg.h"
+#include "str.h"
 #include <libgen.h>
-
-//----------------------------------------------------------------------
-// Function: split
-// Splits a string into tokens separated by a delimites, and stores
-// them in a vector of strings
-//----------------------------------------------------------------------
-std::vector<std::string> &split(const std::string &s, char delim,
-                                std::vector<std::string> &elems)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
-}
-
-//----------------------------------------------------------------------
-// Function: split
-// Splits a string into tokens separated by a delimites, and stores
-// them in a vector of strings
-//----------------------------------------------------------------------
-std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, elems);
-    return elems;
-}
-
-//----------------------------------------------------------------------
-// Function: join
-// Joins a series of strings in a vector into a single string, with
-// a separator in between two strings
-//----------------------------------------------------------------------
-std::string join(const std::vector<std::string>& vec, const char* sep)
-{
-    switch (vec.size()) {
-    case 0:
-        return std::string("");
-        break;
-    case 1:
-        return vec.at(0);
-        break;
-    default: {
-        std::stringstream res;
-
-        std::copy(vec.begin(), vec.end() - 1,
-                  std::ostream_iterator<std::string>(res, sep));
-        res << *vec.rbegin();
-        return res.str();
-    } break;
-    }
-}
+#include <cstring>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -100,7 +48,7 @@ std::string join(const std::vector<std::string>& vec, const char* sep)
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
+namespace QPF {
 
 //----------------------------------------------------------------------
 // Method: Constructor
@@ -118,10 +66,12 @@ void FileNameSpec::setFileNameSpec(std::string regexp, std::string assign)
 {
     setRegEx(regexp);
     setAssignations(assign);
+    initialized = true;
 }
 
 void FileNameSpec::setRegEx(std::string regexp)
 {
+    reStr = regexp;
     re = std::regex(regexp);
 }
 
@@ -131,6 +81,7 @@ void FileNameSpec::setAssignations(std::string assign)
     // Assignation string is in the form:
     // %x=n:m;%y=l;...
     // where x, y, ... is one of:
+    //   %M :  mission
     //   %S :  signature
     //   %I :  instrument
     //   %T :  productType
@@ -141,6 +92,7 @@ void FileNameSpec::setAssignations(std::string assign)
     // and n, m, l is the number of the sub-expression in the regular expression
     // pattern, n+m means concatenation of subexpressions n and m
 
+    assignationsStr = assign;
     std::stringstream ss(assign);
     std::string a;
     int n;
@@ -160,10 +112,16 @@ void FileNameSpec::setAssignations(std::string assign)
     }
 }
 
+void FileNameSpec::setProductIdTpl(std::string tpl)
+{
+    productIdTpl = tpl;
+}
+
 FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileName)
 {
-    FileNameComponents c;
+    if (! initialized) { setFileNameSpec(reStr, assignationsStr); }
 
+    FileNameComponents c;
     // First, get path name out of the name
     char *dirc, *basec, *bname, *dname;
 
@@ -180,14 +138,15 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
     std::regex_match(baseName.c_str(), m, re);
 
     std::vector<std::string> baseExt;
-    split(baseName, '.', baseExt);
+    str::split(baseName, '.', baseExt);
 
     baseName = baseExt.at(0);
     baseExt.erase(baseExt.begin());
 
     c.dirName   = dirName;
     c.baseName  = baseName;
-    c.suffix    = join(baseExt, ".");
+    c.mission   = baseName.substr(0, 3);
+    c.suffix    = str::join(baseExt, ".");
     c.extension = baseExt.at(baseExt.size() - 1);
 
     // Extract fields according to assignations
@@ -223,7 +182,51 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
         }
     }
 
+    c.productId = buildProductId(c);
+
     return c;
 }
 
-//}
+std::string FileNameSpec::buildProductId(FileNameSpec::FileNameComponents c)
+{
+    return buildProductId(c.mission,
+                          c.dateStart, c.dateEnd,
+                          c.productType, c.signature,
+                          c.version);
+}
+
+std::string FileNameSpec::buildProductId(std::string mission,
+                                         std::string sDate, std::string eDate,
+                                         std::string prodType, std::string sign,
+                                         std::string ver)
+{
+    std::string id(productIdTpl);
+
+    //   %M :  mission
+    //   %S :  signature
+    //   %I :  instrument
+    //   %T :  productType
+    //   %v :  version
+    //   %D :  dateRange
+    //   %f :  dateStart (from)
+    //   %t :  dateEnd   (to)
+
+    str::replaceAll(id, "%M", mission);
+    str::replaceAll(id, "%T", prodType);
+    str::replaceAll(id, "%S", sign);
+    str::replaceAll(id, "%f", sDate);
+    str::replaceAll(id, "%t", eDate);
+    str::replaceAll(id, "%v", ver);
+
+    return id;
+}
+
+std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+\.[0-9]Z)[_]*([0-9\.]*)";
+std::regex                        FileNameSpec::re;
+std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
+std::map< char, std::set<int> >   FileNameSpec::assignations;
+std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";
+
+bool                              FileNameSpec::initialized = false;
+
+}

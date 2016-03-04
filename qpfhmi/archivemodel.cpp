@@ -37,8 +37,8 @@
  ******************************************************************************/
 
 #include "archivemodel.h"
+#include "datatypes.h"
 #include "types.h"
-#include "msgtypes.h"
 #include "dbhdlpostgre.h"
 #include "except.h"
 
@@ -154,7 +154,7 @@ void ArchiveModel::updateView()
         model->setData(model->index(k, 4, QModelIndex()), QString("%1").arg(m.productSize));
         model->setData(model->index(k, 5, QModelIndex()), QString::fromStdString(m.creator));
         model->setData(model->index(k, 6, QModelIndex()), QString::fromStdString(m.instrument));
-        model->setData(model->index(k, 7, QModelIndex()), QString::fromStdString(m.obsMode));
+        model->setData(model->index(k, 7, QModelIndex()), QString::fromStdString(m.signature));
         model->setData(model->index(k, 8, QModelIndex()), QString::fromStdString(m.startTime));
         model->setData(model->index(k, 9, QModelIndex()), QString::fromStdString(m.endTime));
         model->setData(model->index(k, 10, QModelIndex()), QString::fromStdString(m.regTime));

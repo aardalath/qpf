@@ -37,8 +37,10 @@
  ******************************************************************************/
 
 #include "str.h"
+#include "dbg.h"
 
 #include <iterator>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -118,6 +120,66 @@ std::string replaceAll(std::string & s, std::string a, std::string b)
         idx = s.find(a, idx + b.length());
     }
     return s;
+}
+
+//----------------------------------------------------------------------
+// Function: mid
+// Warpper for substr
+//----------------------------------------------------------------------
+std::string mid(std::string & s, int from, int howmany)
+{
+    try {
+        return s.substr(from, howmany);
+    } catch (...) {
+        std::cerr << "ERROR: s:'" << s << "', from:" << from
+                  << ", howmany:" << howmany << std::endl;
+        showBacktrace();
+        throw;
+    }
+}
+
+//----------------------------------------------------------------------
+// Function: mid
+// Warpper for substr
+//----------------------------------------------------------------------
+std::string mid(std::string & s, int from)
+{
+    try {
+        return s.substr(from);
+    } catch (...) {
+        std::cerr << "ERROR: s:'" << s << "', from:" << from
+                  << std::endl;
+        showBacktrace();
+        throw;
+    }
+}
+
+//----------------------------------------------------------------------
+// Function: quoted
+// Single-quotes its argument
+//----------------------------------------------------------------------
+std::string quoted(std::string s, char q)
+{
+    return q + s + q;
+}
+
+//----------------------------------------------------------------------
+// Function: tagToTimestamp
+// Get date and time components from time tag
+//----------------------------------------------------------------------
+std::string tagToTimestamp(std::string tag, bool withDecimals)
+{
+    if (tag.empty()) {
+        tag = "20010101T000000";
+        if (withDecimals) { tag += ".0"; }
+    }
+    return std::string(tag.substr(0,4) + "-" +
+                       tag.substr(4,2) + "-" +
+                       tag.substr(6,2) + " " +
+                       tag.substr(9,2) + ":" +
+                       tag.substr(11,2) + ":" +
+                       tag.substr(13,2) +
+                       (withDecimals ? tag.substr(15,2) : ""));
 }
 
 }

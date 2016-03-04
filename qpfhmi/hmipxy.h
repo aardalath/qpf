@@ -152,4 +152,3 @@ private:
 }
 
 #endif  /* HMIPXY_H */
-

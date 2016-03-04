@@ -38,7 +38,7 @@
 #ifndef SIMINDATA_H
 #define SIMINDATA_H
 
-#include "msgtypes.h"
+#include "datatypes.h"
 
 #include <QObject>
 #include <QTimer>
@@ -96,7 +96,7 @@ public slots:
     // Send INDATA messages into the system, to process all the
     // products in the Inbox directory selected
     //----------------------------------------------------------------------
-    bool processInbox(QString folder);
+    bool processInbox(QString folder, QString & metadata);
 
     //----------------------------------------------------------------------
     // Method: actualSendMultInData
@@ -117,12 +117,18 @@ public slots:
     //----------------------------------------------------------------------
     void stopSendingInData();
 
+    //----------------------------------------------------------------------
+    // Method: setInjectionFrequency
+    // Set the frequency of injection of INDATA messages
+    //----------------------------------------------------------------------
+    void setInjectionFrequency(int f);
+
 private:
     //----------------------------------------------------------------------
     // Method: readMetaFile
     // Read metadata file from incoming products folder
     //----------------------------------------------------------------------
-    void readMetaFile(const QString& metaFile);
+    QString readMetaFile(const QString& metaFile);
 
     //----------------------------------------------------------------------
     // Method: generateMetaFile
@@ -139,7 +145,7 @@ private:
 
 private:
     HMIProxy * hmiNode;
-
+    int freq;
     QList<ProductMetadata> multInDataContentValues;
     QTimer * timerMultInData;
 

@@ -90,6 +90,14 @@ public:
     // Orchestration
     OrchestrationParameters             orcParams;
 
+    // File naming
+    std::string                         parsing_regex;
+    std::string                         parsing_assign;
+    std::string                         product_id_tpl;
+    std::string                         data_ext;
+    std::string                         meta_ext;
+    std::string                         log_ext;
+
     // Nodes
     std::vector<std::string>            peerNames;
     std::vector<Peer>                   peersCfg;

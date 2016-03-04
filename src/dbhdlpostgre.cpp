@@ -42,6 +42,8 @@
 #include "tools.h"
 #include "json/json.h"
 #include "config.h"
+#include "dbg.h"
+#include "str.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -50,29 +52,6 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
-
-//----------------------------------------------------------------------
-// Function: quoted
-// Single-quotes its argument
-//----------------------------------------------------------------------
-inline std::string quoted(std::string s) {
-    return "'" + s + "'";
-}
-
-//----------------------------------------------------------------------
-// Function: tagToTimestamp
-// Get date and time components from time tag
-//----------------------------------------------------------------------
-inline std::string tagToTimestamp(std::string tag)
-{
-    if (tag.empty()) { tag = "20010101T000000"; }
-    return std::string(tag.substr(0,4) + "-" +
-                       tag.substr(4,2) + "-" +
-                       tag.substr(6,2) + " " +
-                       tag.substr(9,2) + ":" +
-                       tag.substr(11,2) + ":" +
-                       tag.substr(13,2));
-}
 
 //----------------------------------------------------------------------
 // Constructor: DBHdlPostgreSQL
@@ -148,25 +127,26 @@ int  DBHdlPostgreSQL::storeProducts(ProductCollection & prodList)
     std::stringstream ss;
 
     for (auto & kv : prodList.productList) {
-        ProductMetadata & p = kv.second;
+        ProductMetadata & m = kv.second;
 
         ss.str("");
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
-           << "instrument_id, obsmode_id, start_time, end_time, registration_time, url) "
+           << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
            << "VALUES ("
-           << quoted(p.productId) << ", "
-           << quoted(p.productType) << ", "
+           << str::quoted(m.productId) << ", "
+           << str::quoted(m.productType) << ", "
            << 0 << ", "
-           << quoted(p.productVersion) << ", "
-           << p.productSize << ", "
+           << str::quoted(m.productVersion) << ", "
+           << m.productSize << ", "
            << 1 << ", "
            << 1 << ", "
-           << 1 << ", "
-           << quoted(tagToTimestamp(p.startTime)) << ", "
-           << quoted(tagToTimestamp(p.endTime)) << ", "
-           << quoted(tagToTimestamp(LibComm::timeTag())) << ", "
-           << quoted(p.url) << ")";
+           << 2 << ", "
+           << str::quoted(m.signature) << ", "
+           << str::quoted(str::tagToTimestamp(m.startTime)) << ", "
+           << str::quoted(str::tagToTimestamp(m.endTime)) << ", "
+           << str::quoted(str::tagToTimestamp(LibComm::timeTag())) << ", "
+           << str::quoted(m.url) << ")";
 
         try { result = runCmd(ss.str()); } catch(...) { throw; }
 
@@ -218,7 +198,7 @@ int  DBHdlPostgreSQL::retrieveProducts(ProductList & prodList,
         m.productSize    =    *((int*)(PQgetvalue(res, i, 4)));
         m.creator        = std::string(PQgetvalue(res, i, 5));
         m.instrument     = std::string(PQgetvalue(res, i, 6));
-        m.obsMode        = std::string(PQgetvalue(res, i, 7));
+        m.signature      = std::string(PQgetvalue(res, i, 7));
         m.startTime      = std::string(PQgetvalue(res, i, 8));
         m.endTime        = std::string(PQgetvalue(res, i, 9));
         m.regTime        = std::string(PQgetvalue(res, i, 10));
@@ -254,13 +234,13 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << "(task_id, task_status_id, task_exitcode, task_path, "
        << "task_size, registration_time, task_data) "
        << "VALUES ("
-       << quoted(task.taskName) << ", "
+       << str::quoted(task.taskName) << ", "
        << task.taskStatus << ", "
        << task.taskExitCode << ", "
-       << quoted(taskPath) << ", "
+       << str::quoted(taskPath) << ", "
        << 0 << ", "
-       << quoted(registrationTime) << ", "
-       << quoted(taskData) << ")";
+       << str::quoted(registrationTime) << ", "
+       << str::quoted(taskData) << ")";
 
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 
@@ -277,7 +257,7 @@ bool DBHdlPostgreSQL::checkTask(std::string taskId)
 {
     bool result;
     std::string cmd("SELECT t.task_id FROM tasks_info AS t "
-                    "WHERE t.task_id=" + quoted(taskId) + ";");
+                    "WHERE t.task_id=" + str::quoted(taskId) + ";");
 
     try { result = runCmd(cmd); } catch(...) { throw; }
 
@@ -295,7 +275,7 @@ template<>
 bool DBHdlPostgreSQL::updateTable<int>(std::string table, std::string cond,
                                        std::string field, int value)
 {
-    return updTable(table, cond, field, LibComm::toStr<int>(value));
+    return updTable(table, cond, field, str::toStr<int>(value));
 }
 
 //----------------------------------------------------------------------
@@ -306,7 +286,7 @@ template<>
 bool DBHdlPostgreSQL::updateTable<double>(std::string table, std::string cond,
                                           std::string field, double value)
 {
-    return updTable(table, cond, field, LibComm::toStr<double>(value));
+    return updTable(table, cond, field, str::toStr<double>(value));
 }
 
 //----------------------------------------------------------------------
@@ -317,7 +297,7 @@ template<>
 bool DBHdlPostgreSQL::updateTable<std::string>(std::string table, std::string cond,
                                                std::string field, std::string value)
 {
-    return updTable(table, cond, field, quoted(value));
+    return updTable(table, cond, field, str::quoted(value));
 }
 
 //----------------------------------------------------------------------
@@ -329,7 +309,7 @@ bool DBHdlPostgreSQL::updateTable<Json::Value>(std::string table, std::string co
                                                std::string field, Json::Value value)
 {
     Json::StyledWriter writer;
-    return updTable(table, cond, field, quoted(writer.write(value)));
+    return updTable(table, cond, field, str::quoted(writer.write(value)));
 }
 
 //----------------------------------------------------------------------
@@ -355,14 +335,14 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
             // Present, so this is task registered with old name,
             // that must change its name
             result = updateTable<std::string>("tasks_info",
-                                              "task_id=" + quoted(initialName),
+                                              "task_id=" + str::quoted(initialName),
                                               "task_id", task.taskName);
             // Once changed the task_id, the update must still be done
         }
     }
 
     if (mustUpdate) {
-        std::string filter("task_id=" + quoted(task.taskName));
+        std::string filter("task_id=" + str::quoted(task.taskName));
         result &= updateTable<int>("tasks_info", filter,
                                    "task_status_id", (int)(task.taskStatus));
         result &= updateTable<std::string>("tasks_info", filter,
@@ -404,12 +384,12 @@ bool DBHdlPostgreSQL::storeMsg(std::string from,
     std::string cmd("INSERT INTO transmissions "
                     "(msg_date, msg_from, msg_to, msg_type, msg_bcast, msg_content) "
                     "VALUES (" +
-                    quoted(tagToTimestamp(LibComm::timeTag())) + ", " +
-                    quoted(from) + ", " +
-                    quoted(msg.at(Router2RouterPeer::FRAME_PEER_ID)) + ", " +
-                    quoted(msg.at(Router2RouterPeer::FRAME_MSG_TYPE)) + ", " +
-                    quoted(isBroadcast ? "Y" : "N") + ", " +
-                    quoted(msg.at(Router2RouterPeer::FRAME_MSG_CONTENT)) + ")");
+                    str::quoted(str::tagToTimestamp(LibComm::timeTag())) + ", " +
+                    str::quoted(from) + ", " +
+                    str::quoted(msg.at(Router2RouterPeer::FRAME_PEER_ID)) + ", " +
+                    str::quoted(msg.at(Router2RouterPeer::FRAME_MSG_TYPE)) + ", " +
+                    str::quoted(isBroadcast ? "Y" : "N") + ", " +
+                    str::quoted(msg.at(Router2RouterPeer::FRAME_MSG_CONTENT)) + ")");
 
     try { result = runCmd(cmd); } catch(...) { throw; }
 

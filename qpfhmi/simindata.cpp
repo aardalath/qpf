@@ -38,6 +38,8 @@
 
 #include "simindata.h"
 #include "hmipxy.h"
+#include "config.h"
+#include "filenamespec.h"
 
 #include <QDebug>
 #include <QDir>
@@ -81,6 +83,7 @@ void SimInData::sendInData(QString start, QString end,
     m.productVersion = prodVer.toStdString();
     m.productStatus  = status.toStdString();
     m.productSize    = 12345678;
+    m.signature      = "XXXXXX";
     m.url            = url.toStdString();
     m.urlSpace       = ExternalSpace;
 
@@ -108,6 +111,9 @@ bool SimInData::sendMultInData(QDateTime start, QDateTime end,
     multInDataContentValues.clear();
     bool stillInPeriod = true;
 
+    FileNameSpec fs;
+    std::string prodIdStd;
+
     while (startDateTime < lastDateTime) {
 
         // Loop on Product Types
@@ -127,10 +133,15 @@ bool SimInData::sendMultInData(QDateTime start, QDateTime end,
                     // Build product id.
                     QString sDateTime(startDateTime.toString("yyyyMMddTHHmmss"));
                     QString eDateTime(endDateTime.toString("yyyyMMddTHHmmss"));
-                    QString prodId = QString("%1_%2_%3-%4_%5")
-                            .arg("EUCL").arg(prodType)
-                            .arg(sDateTime).arg(eDateTime).arg("10");
                     QString instrument = prodType.left(prodType.indexOf("_"));
+
+                    prodIdStd = fs.buildProductId("EUC",
+                                                  sDateTime.toStdString(),
+                                                  eDateTime.toStdString(),
+                                                  prodType.toStdString(),
+                                                  "",
+                                                  "01.00");
+                    QString prodId = QString::fromStdString(prodIdStd);
 
                     // Set new content for InData Message
                     ProductMetadata m;
@@ -138,12 +149,13 @@ bool SimInData::sendMultInData(QDateTime start, QDateTime end,
                     m.startTime      = sDateTime.toStdString();
                     m.endTime        = eDateTime.toStdString();
                     m.instrument     = instrument.toStdString();
-                    m.productId      = prodId.toStdString();
+                    m.productId      = prodIdStd;
                     m.productType    = prodType.toStdString();
                     m.productVersion = "1";
                     m.productStatus  = prodStatus.toStdString();
                     m.productSize    = 12345678;
-                    m.url            = "http://euclid.esa.int/data/" + prodId.toStdString() + ".zip";
+                    m.signature      = "XXXXXXXXXXX";
+                    m.url            = "http://euclid.esa.int/data/" + prodIdStd + ".zip";
                     m.urlSpace       = ExternalSpace;
 
                     // Append to InData message list
@@ -190,6 +202,9 @@ bool SimInData::sendInDataFromFile(QString fileInDataParams)
     QFile file(fileInDataParams);
     if(!file.open(QIODevice::ReadOnly)) { return false; }
 
+    FileNameSpec fs;
+    std::string prodIdStd;
+
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -200,11 +215,15 @@ bool SimInData::sendInDataFromFile(QString fileInDataParams)
         QString sDateTime = fields.at(1);
         QString eDateTime = fields.at(1);
         QString prodType  = fields.at(3);
-        QString productStatus = fields.at(4);;
-        QString prodId    = QString("%1_%2_%3-%4_%5")
-                            .arg("EUCL").arg(prodType)
-                            .arg(sDateTime).arg(eDateTime).arg("10");
         QString instrument = prodType.left(prodType.indexOf("_"));
+        QString productStatus = fields.at(4);;
+        prodIdStd = fs.buildProductId("EUC",
+                                      sDateTime.toStdString(),
+                                      eDateTime.toStdString(),
+                                      prodType.toStdString(),
+                                      "",
+                                      "01.00");
+        QString prodId = QString::fromStdString(prodIdStd);
 
         // Set new content for InData Message
         ProductMetadata m;
@@ -212,12 +231,13 @@ bool SimInData::sendInDataFromFile(QString fileInDataParams)
         m.startTime      = sDateTime.toStdString();
         m.endTime        = eDateTime.toStdString();
         m.instrument     = instrument.toStdString();
-        m.productId      = prodId.toStdString();
+        m.productId      = prodIdStd;
         m.productType    = prodType.toStdString();
         m.productVersion = "1.0";
         m.productStatus  = productStatus.toStdString();
         m.productSize    = 12345678;
-        m.url            = ("http://euclid-data.esa.int/data/" + prodId + ".bin").toStdString();
+        m.signature      = "XXXXXXXXXXXXX";
+        m.url            = "http://euclid-data.esa.int/data/" + prodIdStd + ".bin";
         m.urlSpace       = ExternalSpace;
 
         // Append to InData message list
@@ -242,9 +262,9 @@ bool SimInData::sendInDataFromFile(QString fileInDataParams)
 // Send INDATA messages into the system, to process all the
 // products in the Inbox directory selected
 //----------------------------------------------------------------------
-bool SimInData::processInbox(QString folder)
+bool SimInData::processInbox(QString folder, QString & metadata)
 {
-    const QString MetaFile("METADATA.json");
+    const QString MetaFile("METADATA.SDC");
 
     // Get metadata for images in inbox, or generate them
     QString fullMetaFile = folder + "/" + MetaFile;
@@ -253,11 +273,14 @@ bool SimInData::processInbox(QString folder)
     multInDataContentValues.clear();
     if (!fsMeta.exists()) { generateMetaFile(folder, fullMetaFile); }
 
+    metadata = "";
+
     // Process entries in metafile
-    if (multInDataContentValues.size() < 1) { readMetaFile(fullMetaFile); }
+    if (multInDataContentValues.size() < 1) {
+        metadata = readMetaFile(fullMetaFile);
+    }
 
     // Send messages, every 10 s
-    int freq = 120;
     if (multInDataContentValues.size() > 0) {
         // Prepare sending timer
         timerMultInData = new QTimer(this);
@@ -274,13 +297,13 @@ bool SimInData::processInbox(QString folder)
 // Method: readMetaFile
 // Read metadata file from incoming products folder
 //----------------------------------------------------------------------
-void SimInData::readMetaFile(const QString& metaFile)
+QString SimInData::readMetaFile(const QString& metaFile)
 {
     // Parse metafile
     std::ifstream metaJsonFile(metaFile.toStdString());
     if (!metaJsonFile.good()) {
         metaJsonFile.close();
-        return;
+        return QString();
     }
     Json::Reader reader;
     Json::Value v;
@@ -288,7 +311,8 @@ void SimInData::readMetaFile(const QString& metaFile)
     metaJsonFile.close();
 
     Json::StyledWriter w;
-    qDebug() << w.write(v).c_str() << v.size();
+    std::string mdStdStr = w.write(v);
+    qDebug() << mdStdStr.c_str() << v.size();
     // Map into ProductList structure
     ProductList metadata;
     metadata.setData(v["metadata"]);
@@ -297,6 +321,8 @@ void SimInData::readMetaFile(const QString& metaFile)
     for (ProductMetadata & m : metadata.productList) {
         multInDataContentValues.append(m);
     }
+
+    return QString::fromStdString(mdStdStr);
 }
 
 //----------------------------------------------------------------------
@@ -310,42 +336,25 @@ void SimInData::generateMetaFile(const QString& folder, const QString& metaFile)
     traverseDirectory(folder, productList);
 
     // Now, parse filenames and generate metadata
+    FileNameSpec fs;
     ProductList metadata;
     for (QString & file : productList) {
 
-        QFileInfo fs(file);
-
-        QStringList fields = fs.baseName().split(QRegExp("[_\\.]"));
-        int n = fields.count();
-
-        QString productMission = fields.at(0);
-        QString dateRange = fields.at(n-2);
-        QString productVersion = fields.at(n-1).left(1) + "." + fields.at(4).right(1);
-
-        fields.removeAt(n-1);
-        fields.removeAt(n-2);
-        fields.removeAt(0);
-        QString prodType  = fields.join("_");
-
-        QStringList timeStamps = dateRange.split("-");
-
-        QString sDateTime = timeStamps.at(0);
-        QString eDateTime = timeStamps.at(1);
-
-        QString instrument = prodType.left(prodType.indexOf("_"));
+        FileNameSpec::FileNameComponents c = fs.parseFileName(file.toStdString());
+        QFileInfo fi(file);
 
         // Set new content for InData Message
         ProductMetadata m;
-
-        m.startTime      = sDateTime.toStdString();
-        m.endTime        = eDateTime.toStdString();
+        m.startTime      = c.dateStart;
+        m.endTime        = c.dateEnd;
         m.creator        = "UNKNOWN";
-        m.instrument     = instrument.toStdString();
-        m.productId      = fs.baseName().toStdString();
-        m.productType    = prodType.toStdString();
-        m.productVersion = productVersion.toStdString();
+        m.instrument     = c.instrument;
+        m.productId      = c.productId;
+        m.productType    = c.productType;
+        m.productVersion = c.version;
         m.productStatus  = "OK";
-        m.productSize    = fs.size();
+        m.productSize    = fi.size();
+        m.signature      = c.signature;
         m.url            = "file://" + file.toStdString();
         m.urlSpace       = UserSpace;
 
@@ -374,6 +383,7 @@ void SimInData::generateMetaFile(const QString& folder, const QString& metaFile)
 void SimInData::traverseDirectory(const QString& sDir, QStringList & files)
 {
     QDir dir(sDir);
+    FileNameSpec fs;
     for (QFileInfo & info : dir.entryInfoList()) {
         QString filePath = info.filePath();
         if (info.isDir()) {
@@ -383,7 +393,7 @@ void SimInData::traverseDirectory(const QString& sDir, QStringList & files)
             }
         } else {
             // do something with the file here
-            if (info.suffix().toLower() == "fits") {
+            if (isValidExtension(info.suffix().toLower().toStdString())) {
                 files << filePath;
             }
         }
@@ -457,6 +467,15 @@ void SimInData::stopSendingInData()
         delete timerMultInData;
         timerMultInData = 0;
     }
+}
+
+//----------------------------------------------------------------------
+// Method: setInjectionFrequency
+// Set the frequency of injection of INDATA messages
+//----------------------------------------------------------------------
+void SimInData::setInjectionFrequency(int f)
+{
+    freq = f;
 }
 
 }

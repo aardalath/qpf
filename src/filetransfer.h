@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    filetransfer.h
+ * File:    urlhdl.h
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.FileTransfer
@@ -23,7 +23,7 @@
  *   Prototype
  *
  * Dependencies:
- *   libCurl
+ *   Component
  *
  * Files read / modified:
  *   none
@@ -47,8 +47,10 @@
 // Topic: System headers
 //  - cstdio
 //------------------------------------------------------------
-#include <cstdio>
+//#include <cstdio>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -77,17 +79,29 @@ public:
     FileTransfer();
 
 public:
+    enum Mode {
+        RETRIEVAL_AS_FILE,
+        RETRIEVAL_AS_STRING,
+    };
+
     bool download(std::string url, std::string localFileName);
     bool download(std::string protocol,
                   std::string user, std::string passwd,
                   std::string addr, int port,
                   std::string remoteFileName, std::string localFileName);
+    std::string str();
+
+    Mode mode();
+    void setMode(Mode m);
+
 private:
-    static size_t writeData(char * data, size_t size, size_t nmemb, void * obj);
-    size_t writeDataImpl(char * data, size_t size, size_t nmemb);
+    static std::streampos writeData(char * data, size_t size, size_t nmemb, void * obj);
+    std::streampos writeDataImpl(char * data, size_t size, size_t nmemb);
 
-    FILE *fileStream;
-
+private:
+    std::ofstream       fileStream;
+    std::stringstream   strStream;
+    Mode                retrievalMode;
 };
 
 }

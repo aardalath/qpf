@@ -14,7 +14,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declaration of several types for QPF HMI
+ *   Declaration of several datatypes for QPF HMI
  *
  * Created by:
  *   J C Gonzalez

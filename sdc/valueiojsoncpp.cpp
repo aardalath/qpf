@@ -101,7 +101,7 @@ void ValueIOJsonCpp::importData(Json::Value & in, Value & out)
 void ValueIOJsonCpp::exportData(Value & in, Json::Value & out)
 {
     if (in.isStr()) {
-        out = in.asStr();
+        out = in.asString();
     } else if (in.isBool()) {
         out = (bool)(in.asBool());
     } else if (in.isInt()) {

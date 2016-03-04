@@ -16,7 +16,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////
 namespace SDC {
 
-Value::Value()                : data(nullptr), dataType(UNDEFINED) {}
+Value::Value(Value::ValueType t) : data(nullptr) { setType(t); }
+
 Value::Value(bool x)          : data(nullptr) { (*this) = x; }
 Value::Value(int x)           : data(nullptr) { (*this) = x; }
 Value::Value(double x)        : data(nullptr) { (*this) = x; }
@@ -31,7 +32,10 @@ Value::~Value() { clear(); }
 void Value::clear()
 {
     try {
-        if (data != nullptr) { delete data; }
+        if (data != nullptr) {
+            delete data;
+            data = nullptr;
+        }
     } catch(...) {
         exit(1);
     }
@@ -40,37 +44,37 @@ void Value::clear()
 void Value::set(bool rhs)
 {
     clear();
-    data = (bytePtr)(new bool(rhs));
+    data = (BytePtr)(new bool(rhs));
     dataType = BOOL;
 }
 void Value::set(int rhs)
 {
     clear();
-    data = (bytePtr)(new int(rhs));
+    data = (BytePtr)(new int(rhs));
     dataType = INT;
 }
 void Value::set(double rhs)
 {
     clear();
-    data = (bytePtr)(new double(rhs));
+    data = (BytePtr)(new double(rhs));
     dataType = REAL;
 }
 void Value::set(string rhs)
 {
     clear();
-    data = (bytePtr)(new string(rhs));
+    data = (BytePtr)(new string(rhs));
     dataType = STRING;
 }
 void Value::set(Array & rhs)
 {
     clear();
-    data = (bytePtr)(new Array(rhs));
+    data = (BytePtr)(new Array(rhs));
     dataType = ARRAY;
 }
 void Value::set(Dict & rhs)
 {
     clear();
-    data = (bytePtr)(new Dict(rhs));
+    data = (BytePtr)(new Dict(rhs));
     dataType = DICT;
 }
 void Value::set(Value & rhs)
@@ -78,22 +82,22 @@ void Value::set(Value & rhs)
     clear();
     switch (rhs.type()) {
     case BOOL:
-        data = (bytePtr)(new bool(rhs.asBool()));
+        data = (BytePtr)(new bool(rhs.asBool()));
         break;
     case INT:
-        data = (bytePtr)(new int(rhs.asInt()));
+        data = (BytePtr)(new int(rhs.asInt()));
         break;
     case REAL:
-        data = (bytePtr)(new double(rhs.asDbl()));
+        data = (BytePtr)(new double(rhs.asDbl()));
         break;
     case STRING:
-        data = (bytePtr)(new string(rhs.asStr()));
+        data = (BytePtr)(new string(rhs.asString()));
         break;
     case ARRAY:
-        data = (bytePtr)(new Array(rhs.asArray()));
+        data = (BytePtr)(new Array(rhs.asArray()));
         break;
     case DICT:
-        data = (bytePtr)(new Dict(rhs.asDict()));
+        data = (BytePtr)(new Dict(rhs.asDict()));
         break;
     default:
         break;
@@ -107,8 +111,36 @@ void Value::set(const Value & rhs)
 }
 
 Value::ValueType Value::type() const { return dataType; }
+void Value::setType(Value::ValueType t)
+{
+    dataType = t;
+    if (data != 0) { return; }
+    switch (dataType) {
+    case BOOL:
+        data = (Value::BytePtr)(new bool);
+        break;
+    case INT:
+        data = (Value::BytePtr)(new int);
+        break;
+    case REAL:
+        data = (Value::BytePtr)(new double);
+        break;
+    case STRING:
+        data = (Value::BytePtr)(new string);
+        break;
+    case ARRAY:
+        data = (Value::BytePtr)(new Array);
+        break;
+    case DICT:
+        data = (Value::BytePtr)(new Dict);
+        break;
+    default:
+        data = 0;
+        break;
+    }
+}
 
-Value::bytePtr Value::getData() const { return data; }
+Value::BytePtr Value::getData() const { return data; }
 
 int Value::getSizeOfData() const
 {
@@ -166,19 +198,16 @@ Value & Value::operator=(double rhs)
 Value & Value::operator=(string rhs)
 {
     set(rhs);
-    s = (string*)(data);
     return *this;
 }
 Value & Value::operator=(Array & rhs)
 {
     set(rhs);
-    a = (Array*)(data);
     return *this;
 }
 Value & Value::operator=(Dict & rhs)
 {
     set(rhs);
-    d = (Dict*)(data);
     return *this;
 }
 Value & Value::operator=(Value & rhs)
@@ -222,14 +251,14 @@ Value & Value::operator<<(const std::pair<string, Value> & rhs)
 
 //=== Dereference
 
-const bool     Value::asBool()  const { return *(bool*)(data); }
-const int      Value::asInt()   const { return *(int*)(data); }
-const double   Value::asDbl()   const { return *(double*)(data); }
-const string & Value::asStr()   const { return *(string*)(data); }
+bool     Value::asBool()  const { return *(bool*)(data); }
+int      Value::asInt()   const { return *(int*)(data); }
+double   Value::asDbl()   const { return *(double*)(data); }
+const string & Value::asString()   const { return *(string*)(data); }
 const Array &  Value::asArray() const { return *(Array*)(data); }
 const Dict &   Value::asDict()  const { return *(Dict*)(data); }
 
-string & Value::asStr()   { return *(string*)(data); }
+string & Value::asString()   { return *(string*)(data); }
 Array &  Value::asArray() { return *(Array*)(data); }
 Dict &   Value::asDict()  { return *(Dict*)(data); }
 
@@ -242,26 +271,31 @@ bool Value::isDict()  { return dataType == DICT; }
 
 bool Value::isNull() { return (data != nullptr) || (dataType == UNDEFINED); }
 
-Value &Value::operator[](string &key)
+Value & Value::operator[](string &key)
 {
-    assert(dataType == DICT);
+    if (dataType != DICT) { setType(DICT); }
     Dict & dic = const_cast<Dict&>(asDict());
+    if (!dic.has(key)) { dic.insert(pair<string,Value>(key, Value(string()))); }
     return dic[key];
 }
 
-Value &Value::operator[](const char *ckey)
+Value & Value::operator[](const char *ckey)
 {
-    assert(dataType == DICT);
     string key(ckey);
-    return (*this)[key];
+    return this->operator[](key);
 }
 
-Value &Value::operator[](int i)
+Value & Value::operator[](int i)
 {
-    assert(dataType == ARRAY);
-    Array & arr = const_cast<Array&>(asArray());
-    if (i > arr.size()) { arr.reserve(i + 1); }
-    return arr[i];
+    if (dataType != ARRAY) { setType(ARRAY); }
+    Array & array = const_cast<Array&>(asArray());
+    int sz = array.size();
+    if (i > sz - 1) {
+        for (int k = sz; k < (i + 1); ++k) {
+            array.push_back(Value(""));
+        }
+    }
+    return array[i];
 }
 
 unsigned int Value::size()
@@ -302,7 +336,7 @@ void Value::dump(ostream & out)
         out << asDbl() << flush;
         break;
     case STRING:
-        out << "\"" << asStr() << "\"" << flush;
+        out << "\"" << asString() << "\"" << flush;
         break;
     case ARRAY:
         const_cast<Array&>(asArray()).dump(out);
@@ -413,7 +447,7 @@ bool operator==(const Value& lhs, const double& rhs)
 bool operator!=(const Value& lhs, const string& rhs) { return !(lhs == rhs); }
 bool operator==(const Value& lhs, const string& rhs)
 {
-    return lhs.asStr() == rhs;
+    return lhs.asString() == rhs;
 }
 
 bool operator!=(const Value& lhs, const Array& rhs) { return !(lhs == rhs); }
@@ -447,7 +481,7 @@ bool operator==(const Value& lhs, const Value& rhs)
         return (lhs == rhs.asDbl());
         break;
     case Value::STRING:
-        return (lhs == rhs.asStr());
+        return (lhs == rhs.asString());
         break;
     case Value::ARRAY:
         return (lhs == rhs.asArray());
@@ -460,6 +494,13 @@ bool operator==(const Value& lhs, const Value& rhs)
     }
     return false;
 }
+
+void Value::setDefaultType(ValueType d)
+{
+    defaultDataType = d;
+}
+
+Value::ValueType Value::defaultDataType = Value::UNDEFINED;
 
 } // end-of: namespace SDC
 

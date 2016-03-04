@@ -140,6 +140,7 @@
             "VIS_LE1",
             "VIS_LE1_LOG",
             "VIS_LE1_META",
+            "VIS_LE1_INGLOG",
             "NISP_P_RAW",
             "NISP_P_INFO",
             "NISP_P_LE1",
@@ -156,41 +157,41 @@
     },
     "orchestration": {
         "rules": {
-            "VIS_Processing": {
+            "VIS_LE1_Processing": {
                 "inputs": "VIS_RAW",
                 "outputs": "VIS_LE1,VIS_LE1_LOG",
-                "processing": "LE1_Processor_VIS"
+                "processing": "LE1_VIS_Processor"
             },
-            "NISP_P_Processing": {
-                "inputs": "NISP_P_RAW",
-                "outputs": "NISP_P_LE1,NISP_P_LE1_LOG",
-                "processing": "LE1_Processor_NISP-P"
+            "VIS_LE1_MetadataCollection": {
+                "inputs": "VIS_INFO",
+                "outputs": "VIS_LE1_META",
+                "processing": "LE1_VIS_MetadataCollector"
             },
-            "NISP_S_Processing": {
-                "inputs": "NISP_S_RAW",
-                "outputs": "NISP_S_LE1,NISP_S_LE1_LOG",
-                "processing": "LE1_Processor_NISP-S"
-            },
+            "VIS_LE1_Ingestion": {
+                "inputs": "VIS_LE1,VIS_LE1_META",
+                "outputs": "VIS_LE1_INGLOG",
+                "processing": "LE1_VIS_Ingestor"
+            }
         }
     },
     "processing": {
         "processors": {
-            "LE1_Processor_VIS": {
+            "LE1_VIS_Processor": {
                 "exe_path": "/opt/pe/bin",
                 "input_path": "/opt/pe/input",
-                "name": "LE1_Processor_VIS",
+                "name": "LE1_VIS_Processor",
                 "output_path": "/opt/pe/output"
             },
-            "LE1_Processor_NISP": {
+            "LE1_VIS_MetadataCollector": {
                 "exe_path": "/opt/pe/bin",
                 "input_path": "/opt/pe/input",
-                "name": "LE1_Processor_NISP",
+                "name": "LE1_VIS_MetadataCollector",
                 "output_path": "/opt/pe/output"
             },
-            "LE1_Processor_NISP": {
+            "LE1_VIS_Ingestor": {
                 "exe_path": "/opt/pe/bin",
                 "input_path": "/opt/pe/input",
-                "name": "LE1_Processor_NISP",
+                "name": "LE1_VIS_Ingestor",
                 "output_path": "/opt/pe/output"
             }
         }

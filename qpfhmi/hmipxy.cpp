@@ -50,7 +50,7 @@ using LibComm::Log;
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {   
+namespace QPF {
 
 //#define DUMP_TASK_CONTENT_TO_LOG
 
@@ -193,5 +193,3 @@ int HMIProxy::getTaskResInfo(TaskResultsInfo & newTaskInfo)
 }
 
 }
-
-

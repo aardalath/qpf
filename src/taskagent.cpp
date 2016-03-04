@@ -38,6 +38,7 @@
 
 #include "taskagent.h"
 #include "procelem.h"
+#include "str.h"
 
 #include "log.h"
 using LibComm::Log;
@@ -133,6 +134,23 @@ void TaskAgent::processCMD()
 //----------------------------------------------------------------------
 void TaskAgent::execAdditonalLoopTasks()
 {
+#ifdef DEBUG_BUILD
+    std::stringstream ss;
+    ss << "numTasks: " << numTasks << "  "
+       << "numRunningTasks: " << numRunningTasks << "  "
+       << "maxRunningTasks: " << maxRunningTasks << "  "
+       << "numWaitingTasks: " << numWaitingTasks << "  ";
+    ss << " R: ";
+    for (unsigned int i = 0; (i < processingElements.size()); ++i) {
+        ss << processingElements.at(i) << ' ';
+    }
+    ss << "   F: ";
+    for (unsigned int i = 0; i < finishedProcessingElements.size(); ++i) {
+        ss << finishedProcessingElements.at(i) << ' ';
+    }
+#endif
+    DbgMsg(ss.str());
+
     // Check status of child processing elements
     checkProcessingElements();
 }
@@ -144,7 +162,7 @@ void TaskAgent::execAdditonalLoopTasks()
 void TaskAgent::procElemFinished(ProcessingElement * p)
 {
     InfoMsg("Ending proc.elem. " + selfPeer()->name + "-" +
-            LibComm::toStr<int>(p->getNumTask()));
+            str::toStr<int>(p->getNumTask()));
     finishedProcessingElements.push_back(p);
 }
 
@@ -189,10 +207,9 @@ void TaskAgent::checkProcessingElements()
             ++numRunningTasks;
             --numWaitingTasks;
             InfoMsg("Starting proc.elem. " + selfPeer()->name + "-" +
-                    LibComm::toStr<int>(p->getNumTask()));
+                    str::toStr<int>(p->getNumTask()));
         }
 
-        ++i;
     }
 }
 
@@ -208,7 +225,7 @@ bool TaskAgent::sendTaskResMsg(TaskInfo & task)
     buildMsgHeader(MSG_TASK_RES_IDX, selfPeer()->name, "TskMng", msg.header);
     msg.task.setData(task.getData());
     PeerMessage * taskResMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_TASK_RES);
-    //registerMsg(selfPeer()->name, *taskResMsg);
+    registerMsg(selfPeer()->name, *taskResMsg);
     setTransmissionToPeer("TskMng", taskResMsg);
     sendMsgsMutex.unlock();
 
@@ -216,7 +233,7 @@ bool TaskAgent::sendTaskResMsg(TaskInfo & task)
 }
 
 inline std::string dbl2IntStr(double x) {
-    return LibComm::toStr<int>((int)(floor(x)));
+    return str::toStr<int>((int)(floor(x)));
 }
 
 //----------------------------------------------------------------------
@@ -234,11 +251,11 @@ bool TaskAgent::sendMonitInfo()
     Message_MONIT_INFO msg;
     buildMsgHeader(MSG_MONIT_INFO_IDX, selfPeer()->name, "TskMng", msg.header);
 
-    msg.variables.paramList["load1m"]     = LibComm::toStr<double>(sysInfo.loadAvgs.at(0));
-    msg.variables.paramList["load5m"]     = LibComm::toStr<double>(sysInfo.loadAvgs.at(1));
-    msg.variables.paramList["load15m"]    = LibComm::toStr<double>(sysInfo.loadAvgs.at(2));
+    msg.variables.paramList["load1m"]     = str::toStr<double>(sysInfo.loadAvgs.at(0));
+    msg.variables.paramList["load5m"]     = str::toStr<double>(sysInfo.loadAvgs.at(1));
+    msg.variables.paramList["load15m"]    = str::toStr<double>(sysInfo.loadAvgs.at(2));
 
-    msg.variables.paramList["uptime"]     = LibComm::toStr<int>(sysInfo.upTime);
+    msg.variables.paramList["uptime"]     = str::toStr<int>(sysInfo.upTime);
 
     msg.variables.paramList["totalMem"]   = dbl2IntStr(sysInfo.memStat.total);
     msg.variables.paramList["usedMem"]    = dbl2IntStr(sysInfo.memStat.values.at(0));
@@ -249,8 +266,8 @@ bool TaskAgent::sendMonitInfo()
     msg.variables.paramList["usedSwap"]   = dbl2IntStr(sysInfo.swapStat.values.at(0));
 
     for (int i = 1; i <= sysInfo.cpuCount; ++i) {
-        std::string cpu = "cpu" + LibComm::toStr<int>(i);
-        msg.variables.paramList[cpu] = LibComm::toStr<double>(sysInfo.cpuPercent.at(i));
+        std::string cpu = "cpu" + str::toStr<int>(i);
+        msg.variables.paramList[cpu] = str::toStr<double>(sysInfo.cpuPercent.at(i));
     }
 /*
     std::cerr << "== Monit. Info. - " << selfPeer()->name << " ======================" << std::endl;

@@ -1,7 +1,7 @@
 #include "logframe.h"
 #include "ui_logframe.h"
 
-#include "msgtypes.h"
+#include "datatypes.h"
 
 #include <QTimer>
 

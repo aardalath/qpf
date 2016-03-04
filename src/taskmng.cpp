@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include "taskmng.h"
+#include "str.h"
 
 #include "log.h"
 using LibComm::Log;
@@ -127,7 +128,7 @@ void TaskManager::processMONIT_INFO()
 
     // Save information for TaskAgent selection
     std::string & senderName = msg->header.source;
-    double load = LibComm::strTo<double>(msg->variables.paramList["load1m"]);
+    double load = str::strTo<double>(msg->variables.paramList["load1m"]);
     for (LibComm::Router2RouterPeer::Peer * p : agents) {
         if (p->name == senderName) {
             AgentInfo & ag = agentInfo[p];
@@ -238,7 +239,7 @@ bool TaskManager::sendTaskRes(Message_TASK_RES * msg)
         PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
                                                  msgToRecip.msg->getDataString(),
                                                  MSG_TASK_RES);
-        //registerMsg(selfPeer()->name, *msgForRecip);
+        registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
     return true;
