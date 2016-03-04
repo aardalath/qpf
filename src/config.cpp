@@ -61,7 +61,7 @@ using namespace LibComm;
 
 #define WRITE_MESSAGE_FILES
 
-static const std::string QPFExecutionsBase("/qpf/run/");
+//static const std::string QPFExecutionsBase("/qpf/run/");
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -114,7 +114,14 @@ void Configuration::getGeneralInfo(std::string & appName, std::string appVer, st
     appVer  = cfg["general"]["app_version"].asString();
     last    = cfg["general"]["last_access"].asString();
 
-    PATHBase = QPFExecutionsBase;
+    DBHost = cfg["db"]["host"].asString();
+    DBPort = cfg["db"]["port"].asString();
+    DBName = cfg["db"]["name"].asString();
+    DBUser = cfg["db"]["user"].asString();
+    DBPwd  = cfg["db"]["pwd"].asString();
+
+    PATHBase = cfg["storage"]["base"]["path"].asString();
+
     PATHBin  = PATHBase + "/bin";
     PATHRun  = PATHBase + "/" + LibComm::timeTag();
     PATHLog  = PATHRun + "/log";
@@ -540,10 +547,14 @@ void Configuration::processConfiguration()
     // Storage areas information
 
     const Json::Value & stge             = cfg["storage"];
+    const Json::Value & stgeBase         = stge["base"];
     const Json::Value & stgeIn           = stge["in"];
     const Json::Value & stgeOut          = stge["out"];
     const Json::Value & stgeLocal        = stge["local"];
     const Json::Value & stgeShared       = stge["shared"];
+
+    cfgInfo.storage.base                 = stgeBase["path"].asString();
+    cfgInfo.storage.tasks                = PATHTsk;
     cfgInfo.storage.in.protocol          = stgeIn["protocol"].asString();
     cfgInfo.storage.in.address           = stgeIn["address"].asString();
     cfgInfo.storage.in.port              = stgeIn["port"].asString();
@@ -628,11 +639,11 @@ std::string Configuration::getEnvVar(std::string const & key) const
     return val == NULL ? std::string("") : std::string(val);
 }
 
-std::string Configuration::DBHost("127.0.0.1"); // localhost
-std::string Configuration::DBPort("5432");
-std::string Configuration::DBName("qpfdb");
-std::string Configuration::DBUser("jcgonzalez");
-std::string Configuration::DBPwd("euclidjcg");
+std::string Configuration::DBHost;
+std::string Configuration::DBPort;
+std::string Configuration::DBName;
+std::string Configuration::DBUser;
+std::string Configuration::DBPwd;
 
 std::string Configuration::PATHBase;
 std::string Configuration::PATHBin;
