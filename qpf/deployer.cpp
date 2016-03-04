@@ -189,20 +189,20 @@ void Deployer::readConfig(QPFConfig & qpfCfg, const char * configFile)
     cfg->getProductTypes(qpfCfg.orcParams.productTypes);
 
     for (int i = 0; i < cfg->getNumOrchRules(); ++i) {
-        TaskOrchestrator::Rule * rule = new TaskOrchestrator::Rule;
+        Rule * rule = new Rule;
         cfg->getOrchRule(rule->name, rule->inputs,
                          rule->outputs, rule->processingElement);
         qpfCfg.orcParams.rules.push_back(rule);
     }
 
     for (int i = 0; i < cfg->getNumProcs(); ++i) {
-        TaskOrchestrator::ProcElem * pe = new TaskOrchestrator::ProcElem;
+        Processor * pe = new Processor;
         cfg->getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
-        qpfCfg.orcParams.procElems[pe->name] = pe;
+        qpfCfg.orcParams.processors[pe->name] = pe;
     }
 
     for (int i = 0; i < cfg->getNumNodes(); ++i) {
-        LibComm::Router2RouterPeer::Peer * peer = new LibComm::Router2RouterPeer::Peer;
+        Peer * peer = new Peer;
         cfg->getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
         qpfCfg.peersCfg.push_back(*peer);
         qpfCfg.peerNames.push_back(peer->name);

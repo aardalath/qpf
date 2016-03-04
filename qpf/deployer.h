@@ -121,7 +121,7 @@ private:
         std::string appName;
         std::string appVersion;
         std::string lastAccess;
-        TaskOrchestrator::OrchestrationParameters     orcParams;
+        OrchestrationParameters                       orcParams;
         std::vector<std::string>                      peerNames;
         std::vector<LibComm::Router2RouterPeer::Peer> peersCfg;
         LibComm::Router2RouterPeer::Peer              qpfhmiCfg;
