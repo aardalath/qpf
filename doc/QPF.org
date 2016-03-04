@@ -302,7 +302,7 @@ For the QPF User Stories, we will follow the well known template:
 
 **** System Launch and Initialisation
 ***** Description
-The system application is executed in all the hosts that compose the framework network, the HMI is launched, in the main host, and the entire set of Components start their execution.  The components communications are established, and all of them reach the OPERATIONAL State.
+The system application is executed in all the hosts that compose the framework network, the HMI is launched, in the main host, and the entire set of Components start their execution.  The components communications are established, and all of them reach the INITIALISED State.
 
 ***** Scope
 Optional
@@ -312,18 +312,27 @@ Optional
 ***** Preconditions
 - System is switched off.
 - Database with the configuration is ready or new configuration file is provided..
-- Main host and processing nodes connectivity is ready
--
+- Main host and processing nodes network connectivity is ready
 
 ***** Nominal actions sequence
-1.
+On every host in the hosts network:
+1. The Application component is launched, which creates the Deployer object
+2. The Deployer parses the command line and decides whether the configure must be read from the DB or from a provided configuration file
+3. The Deployer processes the configuration
+4. The Deployer creates the components to be delivered at host
+5. Components are configured according to current configuration
+6. The different components created are launched
+7. The components launched are initialized
+8. If the HMI component is foreseen to be deployed in the host, create the HMI component and launch it.
 
 #+BEGIN_SRC PlantUML
 @startuml
 !include "./config.plu"
 title Use Case: System Launch and Initialisation
-participant "HMI" as HMI
+participant App
 participant "Deployer" as Dply #lightgreen
+participant "HMI" as HMI
+participant "Cfg" as Cfg
 participant Components
 participant "Database" as DB #cyan
 create Dply
