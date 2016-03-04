@@ -126,6 +126,13 @@
                     "LogMng",
                     "TskMng"]
     },
+    "db": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "name": "qpfdb",
+        "user": "jcgonzalez",
+        "pwd": "euclidjcg"
+    },
     "products": {
         "product_types": [
             "VIS_RAW",
@@ -189,6 +196,9 @@
         }
     },
     "storage": {
+        "base": {
+            "path": "/qpf/run"
+        },
         "in": {
             "protocol": "RLINK",
             "address":  "0.0.0.0",
@@ -201,8 +211,8 @@
             "path": "/qpf/data/archive"
         },
         "shared": {
-            "local_path": "/home/jcgonzalez/shared/data",
-            "external_path": "/media/jcgonzalez/shared/data"
+            "local_path": "/home/jcgonzalez/shared/QPF_shared/data",
+            "external_path": "/media/jcgonzalez/shared/QPF_shared/data"
         },
         "out": {
             "protocol": "FTP",
