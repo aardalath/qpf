@@ -117,13 +117,12 @@ void TaskAgent::processTASK_PROC()
 // Method: executeProcessingElement
 // Executes a task
 //----------------------------------------------------------------------
-void TaskAgent::executeProcessingElement(TaskInfo task)
+void TaskAgent::executeProcessingElement(TaskInfo t)
 {
-    std::string pe = task.taskPath;
+    std::string pe = t.taskPath;
 
     // Update number of tasks managed by this agent
     numTasks++;
-
 
     // Define task name and exchange dir.
     std::string internalTaskNameIdx = (selfPeer()->name + "-" +
@@ -132,10 +131,46 @@ void TaskAgent::executeProcessingElement(TaskInfo task)
                                        LibComm::toStr<int>(numTasks));
     std::string exchangeDir = workDir + internalTaskNameIdx;
 
-    // Send initial Task information (for storage)
-    createNewTaskInfo(task);
+    //-------------------------------------------------------------------
+    // 1. Send initial Task information (for storage)
+    //-------------------------------------------------------------------
+    TaskStatus status = TASK_FAILED;
+
+    TaskInfo task;
+    task.setData(t.getData());
+    Json::Value & taskData = task.taskData;
+
+    taskData["TaskAgent"] = self.load(std::memory_order_relaxed)->name;
+    taskData["Name"] = "/UNDEFINED";
+    taskData["NameExtended"] = (taskData["TaskAgent"].asString() +
+                                ":/" + taskData["Name"].asString());
+    taskData["State"]["Dead"] = false;
+    taskData["State"]["Error"] = "";
+    taskData["State"]["ExitCode"] = 0;
+    taskData["State"]["FinishedAt"] = "0001-01-01T00:00:00Z";
+    taskData["State"]["OOMKilled"] = false;
+    taskData["State"]["Paused"] = true;
+    taskData["State"]["Pid"] = 0;
+    taskData["State"]["Progress"] = "0";
+    taskData["State"]["Restarting"] = false;
+    taskData["State"]["Running"] = false;
+    taskData["State"]["StartedAt"] = "0001-01-01T00:00:00Z";
+    task.taskEnd = "";
+    task.taskExitCode = 0;
+    task.taskName = internalTaskNameIdx;
+    task.taskPath = "";
+    task.taskStart = "";
+    task.taskStatus = status;
+
+    //-------------------------------------------------------------------
+    // 2. Loop waiting for execution slot
+    //-------------------------------------------------------------------
+    std::cerr << "Before sending first message: "
+              << task.taskName << " - " << task.taskStatus << "\n";
     if (numRunningTasks >= maxRunningTasks) {
         sendTaskResMsg(task);
+        std::cerr << "While waiting: "
+                  << task.taskName << " - " << task.taskStatus << "\n";
 
         // Loop waiting until numTasks is below threshold
         while (numRunningTasks >= maxRunningTasks) {
@@ -143,72 +178,16 @@ void TaskAgent::executeProcessingElement(TaskInfo task)
         }
     }
 
-    // Update number of running tasks
-    numRunningTasks++;
-
     //-------------------------------------------------------------------
-    // Execute processor
+    // 3. Execute processor
     //-------------------------------------------------------------------
-    if (runProcessor(exchangeDir, pe)) {
 
-        //-------------------------------------------------------------------
-        // Start monitoring
-        //-------------------------------------------------------------------
-
-        // Get dockerId
-        std::string dockerId = getDockerId(exchangeDir);
-
-        // Define task data handler to be obtained from Docker
-        Json::Value taskData(Json::arrayValue);
-
-        // Loop monitoring
-        if (monitorDockerTask(dockerId, task, taskData)) {
-            reportEndOfTask(task, taskData);
-        }
-
-    } else {
-        WarnMsg("Couldn't execute processing element for task " + internalTaskNameIdx);
-    }
-
-    //-------------------------------------------------------------------
-    // Task finished
-    //-------------------------------------------------------------------
-    numRunningTasks--;
-}
-
-//----------------------------------------------------------------------
-// Method: runProcessor
-// Prepares a task processor environment, and launches it
-//----------------------------------------------------------------------
-bool TaskAgent::runProcessor(std::string exchangeDir, std::string pe)
-{
-    bool retVal = false;
-
-    std::string taskDriver;
-    std::string cfgFile;
-
-    if (prepareFolders(exchangeDir, taskDriver, cfgFile)) {
-        executeTaskDriver(pe, taskDriver, cfgFile);
-        retVal = true;
-    }
-
-    return retVal;
-}
-
-//----------------------------------------------------------------------
-// Method: executeProcessingElement
-// repares a task processor environment and folders
-//----------------------------------------------------------------------
-bool TaskAgent::prepareFolders(std::string exchangeDir,
-                               std::string & taskDriver, std::string & cfgFile)
-{
-    bool retVal = true;
-
+    // Prepare folders
     std::string exchgIn     = exchangeDir + "/in";
     std::string exchgOut    = exchangeDir + "/out";
 
-    taskDriver  = workDir + std::string("runTask.sh");
-    cfgFile     = exchangeDir + std::string("/dummy.cfg");
+    std::string taskDriver  = workDir + std::string("runTask.sh");
+    std::string cfgFile     = exchangeDir + std::string("/dummy.cfg");
 
     // Create exchange area
     mkdir(exchangeDir.c_str(), 0755);
@@ -224,18 +203,10 @@ bool TaskAgent::prepareFolders(std::string exchangeDir,
         oInFile1.close();
     } else {
         WarnMsg("Cannot create " + (exchgIn + "/1.in"));
-        retVal = false;
+        return;
     }
 
-    return retVal;
-}
-
-//----------------------------------------------------------------------
-// Method: executeTaskDriver
-// Executes a task's taskDriver
-//----------------------------------------------------------------------
-void TaskAgent::executeTaskDriver(std::string pe, std::string taskDriver, std::string cfgFile)
-{
+    // Execute task driver
     pid_t pid = fork();
 
     if (pid < 0) {
@@ -254,14 +225,15 @@ void TaskAgent::executeTaskDriver(std::string pe, std::string taskDriver, std::s
         ErrMsg("EXECV: " + std::string(strerror(errno)));
         exit(EXIT_FAILURE);
     }
-}
 
-//----------------------------------------------------------------------
-// Method: getDockerId
-// Returns the docker id of a docker task
-//----------------------------------------------------------------------
-std::string TaskAgent::getDockerId(std::string exchangeDir)
-{
+    // Update number of running tasks
+    numRunningTasks++;
+
+    //-------------------------------------------------------------------
+    // Start monitoring
+    //-------------------------------------------------------------------
+
+    // Get dockerId
     std::string dockerIdFile = exchangeDir + "/docker.id";
     std::string dockerId("");
     do {
@@ -270,27 +242,20 @@ std::string TaskAgent::getDockerId(std::string exchangeDir)
         ifDockerId.close();
     } while (dockerId.empty());
 
-    return dockerId;
-}
-
-//----------------------------------------------------------------------
-// Method: monitorDockerTask
-// Continuously monitor Docker executing task
-//----------------------------------------------------------------------
-bool TaskAgent::monitorDockerTask(std::string & dockerId,
-                                  TaskInfo & task, Json::Value & taskData)
-{
+    // Monitor executing task
     bool childEnded = false;
 
     Json::Reader jsonReader;
     std::string inspectInfo;
 
     float progressValue = 0.;
-    std::string progress;
     float monitStep = 5.; //seconds
     float estimatedMonitSteps = 180 / monitStep;
     float estimatedProgressStep = 100. / estimatedMonitSteps;
     int sleepPeriod = (int)(monitStep * 1000000.);
+
+    bool running, dead, paused, killed, finished;
+    int excode;
 
     do {
 
@@ -298,76 +263,100 @@ bool TaskAgent::monitorDockerTask(std::string & dockerId,
         std::this_thread::sleep_for(std::chrono::microseconds(sleepPeriod));
 
         // Get monitoring information from docker task
-        inspectDockerRunningTask(dockerId, inspectInfo);
+        std::string cmd = "docker inspect " + dockerId;
+        inspectInfo = "";
+
+        FILE* pipe = popen(cmd.c_str(), "r");
+        if (!pipe) { return; }
+        char buffer[128];
+        while (!feof(pipe)) {
+            if(fgets(buffer, 128, pipe) != NULL) { inspectInfo += buffer; }
+        }
+        pclose(pipe);
 
         // Parse information
-        if (inspectInfo == "ERROR") {
-            childEnded = true;
-            if  (! jsonReader.parse(inspectInfo, taskData)) {
-                taskData[0] = task.taskData;
-                childEnded = true;
-                break;
+        if (inspectInfo != "ERROR") {
+            Json::Value td(Json::arrayValue);
+            if  (jsonReader.parse(inspectInfo, td)) {
+                taskData = td[0u];
             } else {
-                childEnded =  ! taskData[0]["State"]["Running"].asBool();
+                childEnded = true;
             }
+        } else {
+            childEnded = true;
         }
 
+        running  = taskData["State"]["Running"].asBool();
+        dead     = taskData["State"]["Dead"].asBool();
+        paused   = taskData["State"]["Paused"].asBool();
+        killed   = taskData["State"]["OOMKilled"].asBool();
+        excode   = taskData["State"]["ExitCode"].asInt();
+        finished = (taskData["State"]["FinishedAt"].asString()
+                    != "0001-01-01T00:00:00Z");        
+        task.taskExitCode = excode;
+        if (finished) {
+            status = (excode == 0) ? TASK_FINISHED : TASK_FAILED;
+        } else if (dead || killed) {
+            status = TASK_FAILED;
+        } else if (paused) {
+            status = TASK_WAITING;
+        } else {
+            status = TASK_RUNNING;
+            assert(running);
+        }
+        childEnded = (status == TASK_FAILED) || (status == TASK_FINISHED);
+
+        std::cerr << "R D P K F : code : ended : status = "
+                  << running << dead << paused << killed << finished << " : "
+                  << excode << " : " << childEnded << " : " << TaskStatusName.find(status)->second << "\n";
         // Additional info
-        taskData[0]["TaskAgent"] = selfPeer()->name;
-        taskData[0]["NameExtended"] = selfPeer()->name + ":/" + taskData[0]["Name"].asString();
+        taskData["TaskAgent"] = selfPeer()->name;
+        taskData["NameExtended"] = selfPeer()->name + ":/" + taskData["Name"].asString();
 
         // Update progress
-        if (!childEnded) {
+        if (status != TASK_FINISHED) {
             progressValue += estimatedProgressStep;
             if (progressValue > 100.) { progressValue = 100.; }
-            progress = LibComm::toStr<int>(floor(progressValue));
-            taskData[0]["State"]["Progress"] = progress;
-            task.taskStatus = TASK_RUNNING;
+            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
+        } else {
+            taskData["State"]["Progress"] = "100";
         }
 
         // Incorporate taskData to task data structure
-        task.setData("taskData", taskData[0]);
+        task.taskStatus = status;
+
+        std::cerr << "In monitoring loop: "
+                  << task.taskName << " - " << task.taskStatus << "\n";
 
         // Send message
         sendTaskResMsg(task);
 
     } while ((!childEnded) && (!stopTasks));
 
-    return childEnded;
-}
+    std::cerr << "Before end: "
+              << task.taskName << " - " << task.taskStatus << "\n";
 
-//----------------------------------------------------------------------
-// Method: reportEndOfTask
-// Send final TASK_RES message after a Docker task is finished
-//----------------------------------------------------------------------
-void TaskAgent::reportEndOfTask(TaskInfo & task, Json::Value & taskData)
-{
-    taskData[0]["TaskAgent"] = selfPeer()->name;
-    taskData[0]["NameExtended"] = selfPeer()->name + ":/" + taskData[0]["Name"].asString();
-
-    // Set actual exit code
-    task.taskExitCode = taskData[0]["State"]["ExitCode"].asInt();
-
-    if (task.taskExitCode == 0) {
-        // Set final parameters
-        taskData[0]["State"]["Progress"] = "100";
-        task.taskStatus = TASK_FINISHED;
-    } else {
-        task.taskStatus = TASK_FAILED;
-    }
+    //-------------------------------------------------------------------
+    // Report end of task
+    //-------------------------------------------------------------------
 
     // Set end time
-    std::string endTime = taskData[0]["State"]["FinishedAt"].asString();
+    std::string endTime = taskData["State"]["FinishedAt"].asString();
     endTime = LibComm::replaceAll(endTime, "-", "");
     endTime = LibComm::replaceAll(endTime, ":", "");
     endTime = LibComm::replaceAll(endTime, "Z", "");
     task.taskEnd = endTime;
 
-    // Incorporate taskData to task data structure
-    task.setData("taskData", taskData[0]);
-
     // Send message
     sendTaskResMsg(task);
+
+    std::cerr << "After end: "
+              << task.taskName << " - " << task.taskStatus << "\n";
+
+    //-------------------------------------------------------------------
+    // Task finished
+    //-------------------------------------------------------------------
+    numRunningTasks--;
 }
 
 //----------------------------------------------------------------------
@@ -377,71 +366,16 @@ void TaskAgent::reportEndOfTask(TaskInfo & task, Json::Value & taskData)
 //----------------------------------------------------------------------
 bool TaskAgent::sendTaskResMsg(TaskInfo & task)
 {
+    sendMsgsMutex.lock();
     Message_TASK_RES msg;
     buildMsgHeader(MSG_TASK_RES_IDX, selfPeer()->name, "TskMng", msg.header);
     msg.task.setData(task.getData());
     PeerMessage * taskResMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_TASK_RES);
     registerMsg(selfPeer()->name, *taskResMsg);
     setTransmissionToPeer("TskMng", taskResMsg);
+    sendMsgsMutex.unlock();
+
     return true;
-}
-
-//----------------------------------------------------------------------
-// Method: inspectDockerRunningTask
-// Send a TaskResultMsg to the Task Manager, with information on the
-// processing task at hand
-//----------------------------------------------------------------------
-void TaskAgent::inspectDockerRunningTask(std::string id, std::string & result)
-{
-    static int idx = 0;
-    std::string cmd = "docker inspect " + id;
-    result = "";
-
-    FILE* pipe = popen(cmd.c_str(), "r");
-    if (!pipe) { return; }
-    char buffer[128];
-    while (!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL) { result += buffer; }
-    }
-    pclose(pipe);
-
-    std::string msgFileName("/tmp/");
-    char baseName[100];
-    sprintf(baseName, "d.%04d.json", ++idx);
-    msgFileName += baseName;
-    std::ofstream msgOut(msgFileName);
-    msgOut << result << "\n";
-    msgOut.close();
-}
-
-//----------------------------------------------------------------------
-// Method: createNewTaskInfo
-// Add basic information about processing to task
-//----------------------------------------------------------------------
-void TaskAgent::createNewTaskInfo(TaskInfo & task)
-{
-    task.taskData["TaskAgent"] = self.load(std::memory_order_relaxed)->name;
-    task.taskData["Name"] = "/UNDEFINED";
-    task.taskData["NameExtended"] = (task.taskData["TaskAgent"].asString() +
-                                     ":/" + task.taskData["Name"].asString());
-    task.taskData["State"]["Dead"] = false;
-    task.taskData["State"]["Error"] = "";
-    task.taskData["State"]["ExitCode"] = 0;
-    task.taskData["State"]["FinishedAt"] = "0001-01-01T00:00:00Z";
-    task.taskData["State"]["OOMKilled"] = false;
-    task.taskData["State"]["Paused"] = true;
-    task.taskData["State"]["Pid"] = 0;
-    task.taskData["State"]["Progress"] = "0";
-    task.taskData["State"]["Restarting"] = false;
-    task.taskData["State"]["Running"] = false;
-    task.taskData["State"]["StartedAt"] = "0001-01-01T00:00:00Z";
-    task.taskEnd = "";
-    task.taskExitCode = 0;
-    task.taskName = "task-rule3_20150810T181527";
-    task.taskPath = "PE_NISP_S";
-    task.taskStart = "";
-    task.taskStatus = TASK_WAITING;
-    task.toData();
 }
 
 }
