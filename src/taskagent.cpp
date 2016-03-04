@@ -158,6 +158,7 @@ void TaskAgent::checkProcessingElements()
             // Send latest information for completed task
             // And decrease the number of tasks running
             --numRunningTasks;
+            markAsArchived = true;
             sendMsg = true;
             break;
 
