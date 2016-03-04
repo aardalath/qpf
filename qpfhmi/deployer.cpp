@@ -227,7 +227,7 @@ void Deployer::launchPeerNodes()
     // Event Manager launched always as a thread
     L("Launching nodes . . .");
     for (unsigned int k = 0; k < cfgInfo.peerNodes.size(); ++k) {
-        CommNode * node = cfgInfo.peerNodes.at(k);
+        Component * node = cfgInfo.peerNodes.at(k);
         node->initialize();
         L("   ====> Initialising " << node->selfPeer()->name);
         usleep(usec);
@@ -236,10 +236,6 @@ void Deployer::launchPeerNodes()
             evtMng = dynamic_cast<EventManager*>(node);
             L("   ====> Creating " << node->selfPeer()->name);
         } else {
-            if (node->selfPeer()->type == "taskorc") {
-                TaskOrchestrator * taskOrc = dynamic_cast<TaskOrchestrator*>(node);
-                taskOrc->defineOrchestrationParams(cfgInfo.orcParams);
-            }
             if (spawnPeerProcesses) {
                 childrenPids.push_back(node->spawn(node));
                 L("   ====> Spawning " << node->selfPeer()->name);
