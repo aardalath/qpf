@@ -265,6 +265,7 @@ void Deployer::start()
         L("Waiting for START signal . . .");
         while (waitingForGoAhead()) { usleep(10000); }
         L("GO!");
+        usleep(200000);
         evtMng->go();
     } else {
         L("Starting...");
