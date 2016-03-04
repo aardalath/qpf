@@ -113,6 +113,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void fromRunningToOff();
 
+    //----------------------------------------------------------------------
+    // Method: execAdditonalLoopTasks
+    //----------------------------------------------------------------------
+    virtual void execAdditonalLoopTasks() {}
+
 protected:
 
     //----------------------------------------------------------------------
@@ -164,11 +169,6 @@ protected:
     // Method: processUNKNOWN
     //----------------------------------------------------------------------
     virtual void processUNKNOWN() {}
-
-    //----------------------------------------------------------------------
-    // Method: execAdditonalLoopTasks
-    //----------------------------------------------------------------------
-    virtual void execAdditonalLoopTasks() {}
 
     //----------------------------------------------------------------------
     // Method: canProcessMessage
@@ -247,17 +247,46 @@ protected:
                      bool isBroadcast = false);
 
     //----------------------------------------------------------------------
+    // Method: assignMsgDataString
+    // Sets msg content in msgData to incoming msg content frame
+    //----------------------------------------------------------------------
+    void assignMsgDataString(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
     // Method: procInData
     // Process a new MSG_INDATA message
     //----------------------------------------------------------------------
     bool procInData(Router2RouterPeer::PeerMessage & inPeerMsg);
 
     //----------------------------------------------------------------------
+    // Method: procDataRqst
+    // Process a new MSG_DATA_RQST message
+    //----------------------------------------------------------------------
+    bool procDataRqst(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
+    // Method: procDataInfo
+    // Infoess a new MSG_DATA_INFO message
+    //----------------------------------------------------------------------
+    bool procDataInfo(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
+    // Method: procMonitRqst
+    // Process a new MSG_MONIT_RQST message
+    //----------------------------------------------------------------------
+    bool procMonitRqst(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
+    // Method: procMonitInfo
+    // Infoess a new MSG_MONIT_INFO message
+    //----------------------------------------------------------------------
+    bool procMonitInfo(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
     // Method: procTaskProc
     // Process a new MSG_TASK_PROC message
     //----------------------------------------------------------------------
     bool procTaskProc(Router2RouterPeer::PeerMessage & inPeerMsg);
-
 
     //----------------------------------------------------------------------
     // Method: procTaskRes
