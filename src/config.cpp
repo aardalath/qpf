@@ -36,8 +36,16 @@
  *
  ******************************************************************************/
 
+#include <cstdlib>
+
 #include "config.h"
 
+#include "evtmng.h"
+#include "datamng.h"
+#include "logmng.h"
+#include "taskmng.h"
+#include "taskorc.h"
+#include "taskagent.h"
 #include "tools.h"
 
 #include "dbhdlpostgre.h"
@@ -47,6 +55,7 @@ using namespace LibComm;
 
 #include <sys/time.h>
 #include <fstream>
+#include <iostream>
 
 #define WRITE_MESSAGE_FILES
 
@@ -83,6 +92,15 @@ Configuration::Configuration(const char * fName)
 }
 
 //----------------------------------------------------------------------
+// Method: getCfgInfo
+// Get entire configuration info structure
+//----------------------------------------------------------------------
+ConfigurationInfo & Configuration::getCfgInfo()
+{
+    return cfgInfo;
+}
+
+//----------------------------------------------------------------------
 // Method: getGeneralInfo
 // Get general parameters from the configuration
 //----------------------------------------------------------------------
@@ -111,6 +129,7 @@ void Configuration::reset()
     ruleIt = cfg["orchestration"]["rules"].begin();
     procIt = cfg["processing"]["processors"].begin();
     nodeIt = cfg["nodes"]["node_list"].begin();
+    machIt = cfg["machines"].begin();
 }
 
 //----------------------------------------------------------------------
@@ -233,6 +252,51 @@ std::string Configuration::getHMINodeName()
 }
 
 //----------------------------------------------------------------------
+// Method: getNumMachines
+// Return number of machines in the network
+//----------------------------------------------------------------------
+int Configuration::getNumMachines()
+{
+    return cfg["machines"].size();
+}
+
+//----------------------------------------------------------------------
+// Method: getMachine
+// Return list of nodes to be deployed in a machine
+//----------------------------------------------------------------------
+void Configuration::getMachine(std::string & machine,
+                               std::vector<std::string> & vec)
+{
+    Json::Value const & v = (*machIt);
+    machine = machIt.key().asString();
+
+    vec.clear();
+    const Json::Value & nodesInMachine = v;
+    for (unsigned int i = 0; i < nodesInMachine.size(); ++i) {
+        vec.push_back(nodesInMachine[i].asString());
+    }
+
+    machIt++;
+    if (machIt == cfg["machines"].end()) {
+        machIt = cfg["machines"].begin();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: getConnectionsForNode
+// Return list of nodes connecting to a given one
+//----------------------------------------------------------------------
+void Configuration::getConnectionsForNode(std::string nodeName,
+                                          std::vector<std::string> & vec)
+{
+    vec.clear();
+    const Json::Value & nodesToConnect = cfg["connections"][nodeName];
+    for (unsigned int i = 0; i < nodesToConnect.size(); ++i) {
+        vec.push_back(nodesToConnect[i].asString());
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: applyNewConfig
 // Get new configuration information from an external (JSON) file
 //----------------------------------------------------------------------
@@ -240,7 +304,7 @@ void Configuration::applyNewConfig(std::string fName)
 {
     setConfigFile(fName);
     readConfigurationFromFile();
-    saveConfigurationToDB();
+    //saveConfigurationToDB();
 }
 
 //----------------------------------------------------------------------
@@ -266,6 +330,129 @@ void Configuration::readConfigurationFromFile()
     Json::Reader reader;
     reader.parse(cfgJsonFile, cfg);
     cfgJsonFile.close();
+
+    // Now, fill in ConfigurationInfo structure
+    reset();
+    cfgInfo.clear();
+    cfgInfo.hmiPresent = false;
+
+    // Configuration file name
+    cfgInfo.currentMachine = getEnvVar("HOSTNAME");
+    cfgInfo.currentUser    = getEnvVar("USER");
+    cfgInfo.cfgFileName    = cfgFileName;
+
+    // General
+    getGeneralInfo(cfgInfo.appName, cfgInfo.appVersion, cfgInfo.lastAccess);
+
+    // Product types
+    getProductTypes(cfgInfo.orcParams.productTypes);
+
+    // Orchestration rulesfile
+    for (int i = 0; i < getNumOrchRules(); ++i) {
+        Rule * rule = new Rule;
+        getOrchRule(rule->name, rule->inputs,
+                    rule->outputs, rule->processingElement);
+        cfgInfo.orcParams.rules.push_back(rule);
+    }
+
+    // Processors
+    for (int i = 0; i < getNumProcs(); ++i) {
+        Processor * pe = new Processor;
+        getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
+        cfgInfo.orcParams.processors[pe->name] = pe;
+    }
+
+    // Nodes
+    for (int i = 0; i < getNumNodes(); ++i) {
+        Peer * peer = new Peer;
+        getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
+        cfgInfo.peersCfg.push_back(*peer);
+        cfgInfo.peerNames.push_back(peer->name);
+        cfgInfo.peersCfgByName[peer->name] = peer;
+        if (peer->type == "evtmng") {
+            cfgInfo.evtMngCfg.name = peer->name;
+            cfgInfo.evtMngCfg.type = peer->name;
+            cfgInfo.evtMngCfg.clientAddr = peer->clientAddr;
+            cfgInfo.evtMngCfg.serverAddr = peer->serverAddr;
+        }
+    }
+
+    cfgInfo.qpfhmiCfg.name = getHMINodeName();
+    getNodeByName(cfgInfo.qpfhmiCfg.name,
+                  cfgInfo.qpfhmiCfg.type,
+                  cfgInfo.qpfhmiCfg.clientAddr,
+                  cfgInfo.qpfhmiCfg.serverAddr);
+
+    // Machines and connections
+    reset();
+    std::string mname;
+    std::vector<std::string> mnodes;
+    for (int i = 0; i < getNumMachines(); ++i) {
+        mnodes.clear();
+        getMachine(mname, mnodes);
+        cfgInfo.machines.push_back(mname);
+        cfgInfo.machineNodes[mname] = mnodes;
+    }
+
+    for (unsigned int i = 0; i < cfgInfo.peerNames.size(); ++i) {
+        std::vector<std::string> nconn;
+        getConnectionsForNode(cfgInfo.peerNames.at(i), nconn);
+        cfgInfo.connections[cfgInfo.peerNames.at(i)] = nconn;
+    }
+
+    // Create peer commnodes for nodes in current machine
+    std::vector<std::string> & machineNodes =
+            cfgInfo.machineNodes[cfgInfo.currentMachine];
+
+    for (unsigned int i = 0; i < machineNodes.size(); ++i) {
+
+        Peer * peer = cfgInfo.peersCfgByName[machineNodes.at(i)];
+        std::string & peerName = peer->name;
+        std::string & peerType = peer->type;
+        const char * cpeerName = peerName.c_str();
+
+        CommNode * commNode = 0;
+
+        if        (peerType == "evtmng") {
+            commNode = new EventManager(cpeerName);
+        } else if (peerType == "hmi") {
+            cfgInfo.hmiPresent = true;
+        } else if (peerType == "datamng") {
+            commNode = new DataManager(cpeerName);
+        } else if (peerType == "logmng") {
+            commNode = new LogManager(cpeerName);
+        } else if (peerType == "taskmng") {
+            commNode = new TaskManager(cpeerName);
+        } else if (peerType == "taskorc") {
+            commNode = new TaskOrchestrator(cpeerName);
+        } else if (peerType == "taskagent") {
+            commNode = new TaskAgent(cpeerName);
+            cfgInfo.peerAgents.push_back(commNode);
+        } else {
+            // Do nothing, not yet implemented
+        }
+
+        if (commNode == 0) { continue; }
+
+        commNode->addPeer(cfgInfo.peersCfgByName[peerName], true);
+        std::cerr << "Creating connections for " << peerName
+                  << "  [" << peer->clientAddr
+                  << " ; " << peer->serverAddr << "]\n";
+
+        std::vector<std::string> & connectNodes = cfgInfo.connections[peerName];
+
+        for (unsigned int j = 0; j < connectNodes.size(); ++j) {
+            Peer * otherPeer = cfgInfo.peersCfgByName[connectNodes.at(j)];
+            commNode->addPeer(otherPeer);
+            std::cerr << "  Connecting to " << otherPeer->name
+                      << "  [" << otherPeer->clientAddr
+                      << " ; " << otherPeer->serverAddr << "]\n";
+        }
+
+        cfgInfo.peerNodes.push_back(commNode);
+
+    }
+
 }
 
 //----------------------------------------------------------------------
@@ -464,6 +651,16 @@ void Configuration::saveConfigurationToDB()
 
     // Close connection
     dbHdl->closeConnection();
+}
+
+//----------------------------------------------------------------------
+// Method: getEnvVar
+// Returns the content of an environment variable
+//----------------------------------------------------------------------
+std::string Configuration::getEnvVar(std::string const & key) const
+{
+    char * val = std::getenv( key.c_str() );
+    return val == NULL ? std::string("") : std::string(val);
 }
 
 std::string Configuration::DBHost("127.0.0.1"); // localhost

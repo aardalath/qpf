@@ -44,18 +44,12 @@
 //------------------------------------------------------------
 #include <string>
 #include <map>
+#include <iostream>
 
 //------------------------------------------------------------
 // Topic: Project dependencies
 //------------------------------------------------------------
-#include "propdef.h"
-
-#include "r2rpeer.h"
-using LibComm::Router2RouterPeer;
-
-#include "json/json.h"
-
-#include <iostream>
+#include "cfg.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -75,6 +69,12 @@ public:
     Configuration(const char * fName = 0);
 
 public:
+
+    //----------------------------------------------------------------------
+    // Method: getCfgInfo
+    // Get entire configuration info structure
+    //----------------------------------------------------------------------
+    ConfigurationInfo & getCfgInfo();
 
     //----------------------------------------------------------------------
     // Method: getGeneralInfo
@@ -152,6 +152,32 @@ public:
     //----------------------------------------------------------------------
     std::string getHMINodeName();
 
+    //----------------------------------------------------------------------
+    // Method: getNumMachines
+    // Return number of machines in the network
+    //----------------------------------------------------------------------
+    int getNumMachines();
+
+    //----------------------------------------------------------------------
+    // Method: getMachine
+    // Return list of nodes to be deployed in a machine
+    //----------------------------------------------------------------------
+    void getMachine(std::string & machine,
+                    std::vector<std::string> & vec);
+
+    //----------------------------------------------------------------------
+    // Method: getConnectionsForNode
+    // Return list of nodes connecting to a given one
+    //----------------------------------------------------------------------
+    void getConnectionsForNode(std::string nodeName,
+                               std::vector<std::string> & vec);
+
+    //----------------------------------------------------------------------
+    // Method: getEnvVar
+    // Returns the content of an environment variable
+    //----------------------------------------------------------------------
+    std::string getEnvVar(std::string const & key) const;
+
 private:
 
     //----------------------------------------------------------------------
@@ -185,19 +211,24 @@ private:
     void saveConfigurationToDB();
 
 private:
-    std::string cfgFileName;
-    Json::Value cfg;
+    std::string           cfgFileName;
+    Json::Value           cfg;
+
+    ConfigurationInfo     cfgInfo;
 
     Json::Value::iterator ruleIt;
     Json::Value::iterator procIt;
     Json::Value::iterator nodeIt;
+    Json::Value::iterator machIt;
+
+    bool hmiPresent;
 
 public:
-    static std::string DBHost;
-    static std::string DBPort;
-    static std::string DBName;
-    static std::string DBUser;
-    static std::string DBPwd;
+    static std::string    DBHost;
+    static std::string    DBPort;
+    static std::string    DBName;
+    static std::string    DBUser;
+    static std::string    DBPwd;
 
 };
 
