@@ -444,7 +444,6 @@ void Configuration::saveConfigurationToDB()
     cmd = "INSERT INTO configuration (created, last_accessed, cfg) VALUES ";
     cmd += "('" + now + "', '" + now + "', '" + cfgString + "')";
 
-
     try {
          dbHdl->runCmd(cmd);
     } catch (RuntimeException & e) {
@@ -536,6 +535,29 @@ void Configuration::processConfiguration()
         cfgInfo.connections[cfgInfo.peerNames.at(i)] = nconn;
     }
 
+    // Storage areas information
+
+    const Json::Value & stge             = cfg["storage"];
+    const Json::Value & stgeIn           = stge["in"];
+    const Json::Value & stgeOut          = stge["out"];
+    const Json::Value & stgeLocal        = stge["local"];
+    const Json::Value & stgeShared       = stge["shared"];
+    cfgInfo.storage.in.protocol          = stgeIn["protocol"].asString();
+    cfgInfo.storage.in.address           = stgeIn["address"].asString();
+    cfgInfo.storage.in.port              = stgeIn["port"].asString();
+    cfgInfo.storage.in.user              = stgeIn["user"].asString();
+    cfgInfo.storage.in.passwd            = stgeIn["password"].asString();
+    cfgInfo.storage.in.exchangeBox       = stgeIn["inbox"].asString();
+    cfgInfo.storage.out.protocol         = stgeOut["protocol"].asString();
+    cfgInfo.storage.out.address          = stgeOut["address"].asString();
+    cfgInfo.storage.out.port             = stgeOut["port"].asString();
+    cfgInfo.storage.out.user             = stgeOut["user"].asString();
+    cfgInfo.storage.out.passwd           = stgeOut["password"].asString();
+    cfgInfo.storage.out.exchangeBox      = "";
+    cfgInfo.storage.local.path           = stgeLocal["path"].asString();
+    cfgInfo.storage.shared.local_path    = stgeShared["external_path"].asString();
+    cfgInfo.storage.shared.external_path = stgeShared["local_path"].asString();
+
     // Create peer commnodes for nodes in current machine
     std::vector<std::string> & machineNodes =
             cfgInfo.machineNodes[cfgInfo.currentMachine];
@@ -547,33 +569,34 @@ void Configuration::processConfiguration()
         std::string & peerType = peer->type;
         const char * cpeerName = peerName.c_str();
 
-        CommNode * commNode = 0;
+        Component * component = 0;
 
         if        (peerType == "evtmng") {
-            commNode = new EventManager(cpeerName);
+            component = new EventManager(cpeerName);
         } else if (peerType == "hmi") {
             cfgInfo.hmiPresent = true;
         } else if (peerType == "datamng") {
-            commNode = new DataManager(cpeerName);
+            component = new DataManager(cpeerName);
         } else if (peerType == "logmng") {
-            commNode = new LogManager(cpeerName);
+            component = new LogManager(cpeerName);
         } else if (peerType == "taskmng") {
-            commNode = new TaskManager(cpeerName);
+            component = new TaskManager(cpeerName);
         } else if (peerType == "taskorc") {
-            commNode = new TaskOrchestrator(cpeerName);
+            component = new TaskOrchestrator(cpeerName);
         } else if (peerType == "taskagent") {
             TaskAgent * ag = new TaskAgent(cpeerName);
             ag->setSysDir(Configuration::PATHBase);
             ag->setWorkDir(Configuration::PATHTsk);
-            commNode = ag;
-            cfgInfo.peerAgents.push_back(commNode);
+            component = ag;
+            cfgInfo.peerAgents.push_back(component);
         } else {
             // Do nothing, not yet implemented
         }
 
-        if (commNode == 0) { continue; }
+        if (component == 0) { continue; }
 
-        commNode->addPeer(cfgInfo.peersCfgByName[peerName], true);
+        component->setCfgInfo(cfgInfo);
+        component->addPeer(cfgInfo.peersCfgByName[peerName], true);
         DBG("Creating connections for " << peerName
             << "  [" << peer->clientAddr
             << " ; " << peer->serverAddr << "]");
@@ -582,13 +605,13 @@ void Configuration::processConfiguration()
 
         for (unsigned int j = 0; j < connectNodes.size(); ++j) {
             Peer * otherPeer = cfgInfo.peersCfgByName[connectNodes.at(j)];
-            commNode->addPeer(otherPeer);
+            component->addPeer(otherPeer);
             DBG("  Connecting to " << otherPeer->name
                 << "  [" << otherPeer->clientAddr
                 << " ; " << otherPeer->serverAddr << "]");
         }
 
-        cfgInfo.peerNodes.push_back(commNode);
+        cfgInfo.peerNodes.push_back(component);
 
     }
 
