@@ -89,6 +89,12 @@ public:
     void setLastAccess(std::string last);
 
     //----------------------------------------------------------------------
+    // Method: reset
+    // Restarts iterators to begin of containers
+    //----------------------------------------------------------------------
+    void reset();
+
+    //----------------------------------------------------------------------
     // Method: getProductTypes
     // Return vector of product type identifiers
     //----------------------------------------------------------------------
@@ -181,6 +187,10 @@ private:
 private:
     std::string cfgFileName;
     Json::Value cfg;
+
+    Json::Value::iterator ruleIt;
+    Json::Value::iterator procIt;
+    Json::Value::iterator nodeIt;
 
 public:
     static std::string DBHost;

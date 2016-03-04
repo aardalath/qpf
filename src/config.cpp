@@ -103,6 +103,17 @@ void Configuration::setLastAccess(std::string last)
 }
 
 //----------------------------------------------------------------------
+// Method: reset
+// Restarts iterators to begin of containers
+//----------------------------------------------------------------------
+void Configuration::reset()
+{
+    ruleIt = cfg["orchestration"]["rules"].begin();
+    procIt = cfg["processing"]["processors"].begin();
+    nodeIt = cfg["nodes"]["node_list"].begin();
+}
+
+//----------------------------------------------------------------------
 // Method: getProductTypes
 // Return vector of product type identifiers
 //----------------------------------------------------------------------
@@ -131,15 +142,13 @@ int Configuration::getNumOrchRules()
 void Configuration::getOrchRule(std::string & name, std::vector<std::string> & in,
                                 std::vector<std::string> & out, std::string & pElem)
 {
-    static Json::Value::iterator ruleIt = cfg["orchestration"]["rules"].begin();
-
-    Json::Value & v = (*ruleIt);
+    Json::Value const & v = (*ruleIt);
     name  = ruleIt.key().asString();
     in    = LibComm::split(v["inputs"].asString(), ',');
     out   = LibComm::split(v["outputs"].asString(), ',');
     pElem = v["processing"].asString();
-    ruleIt++;
 
+    ruleIt++;
     if (ruleIt == cfg["orchestration"]["rules"].end()) {
         ruleIt = cfg["orchestration"]["rules"].begin();
     }
@@ -161,9 +170,7 @@ int Configuration::getNumProcs()
 void Configuration::getProc(std::string & name, std::string & exe,
                             std::string & in, std::string & out)
 {
-    static Json::Value::iterator procIt = cfg["processing"]["processors"].begin();
-
-    Json::Value & v = (*procIt);
+    Json::Value const & v = (*procIt);
     name = v["name"].asString();
     exe  = v["exe_path"].asString();
     in   = v["input_path"].asString();
@@ -191,9 +198,7 @@ int Configuration::getNumNodes()
 void Configuration::getNode(std::string & name, std::string & type,
                             std::string & cAddr, std::string & sAddr)
 {
-    static Json::Value::iterator nodeIt = cfg["nodes"]["node_list"].begin();
-
-    Json::Value & v = (*nodeIt);
+    Json::Value const & v = (*nodeIt);
     name  = nodeIt.key().asString();
     type  = v["type"].asString();
     cAddr = v["client"].asString();
