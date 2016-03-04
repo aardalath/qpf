@@ -66,10 +66,13 @@ const std::string TLIST_MESSAGE_TYPES;
 const std::string MessageTypeId[] = { TLIST_MESSAGE_TYPES };
 #undef T
 
-#define T(a,b) { TASK_ ## a, #a }
+#define T(a,b) { TASK_ ## a , #a }
 std::map<TaskStatus, std::string> TaskStatusName = { TLIST_TASK_STATUS };
 #undef T
 
+#define T(a,b) { #a , TASK_ ## a }
+std::map<std::string, TaskStatus> TaskStatusValue = { TLIST_TASK_STATUS };
+#undef T
 const int BadMsgProcessing = -1;
 
 //----------------------------------------------------------------------
