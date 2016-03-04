@@ -14,7 +14,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declares App class
+ *   Declares App application wrapper class
  *
  * Created by:
  *   J C Gonzalez
@@ -42,14 +42,28 @@
 #include <QApplication>
 #include "deployer.h"
 
+////////////////////////////////////////////////////////////////////////////
+// Namespace: QPF
+// -----------------------
+//
+// Library namespace
+////////////////////////////////////////////////////////////////////////////
+namespace QPF {
+
+//==========================================================================
+// Class: App
+//==========================================================================
 class App Q_DECL_FINAL : public QApplication {
     Q_OBJECT
 public:
     App(int& argc, char** argv);
     virtual bool notify(QObject *receiver, QEvent *event) Q_DECL_OVERRIDE;
+    virtual bool mustLaunchHMI();
+    virtual char * getConfigFileName();
 private:
     Deployer * deployer;
 };
 
+}
 
 #endif // APP_H

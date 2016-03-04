@@ -14,7 +14,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Implement App class
+ *   Implements App application wrapper class
  *
  * Created by:
  *   J C Gonzalez
@@ -39,9 +39,21 @@
 #include "app.h"
 #include <QDebug>
 
+namespace QPF {
+
 App::App(int& argc, char** argv) :
     QApplication(argc, argv), deployer(new Deployer(argc, argv))
 {
+}
+
+bool App::mustLaunchHMI()
+{
+    return deployer->mustLaunchHMI();
+}
+
+char * App::getConfigFileName()
+{
+    return deployer->getConfigFileName();
 }
 
 bool App::notify(QObject *receiver, QEvent *event)
@@ -60,4 +72,6 @@ bool App::notify(QObject *receiver, QEvent *event)
     // qFatal aborts, so this isn't really necessary
     // but you might continue if you use a different logging lib
     return false;
+}
+
 }
