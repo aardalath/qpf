@@ -182,7 +182,12 @@ int Component::run()
 
                 InfoMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
 
-                if (canProcess.find(msgIdx) == canProcess.end()) { msgIdx = -1; }
+                if (canProcess.find(msgIdx) == canProcess.end()) {
+                    WarnMsg("Component " + selfPeer()->name +
+                            " received an unexpected message: " +
+                            MessageTypeId[msgIdx]);
+                    msgIdx = -1;
+                }
 
                 switch (msgIdx) {
                 case MSG_START_IDX:
@@ -216,9 +221,6 @@ int Component::run()
                     processUNKNOWN();
                     break;
                 default:
-                    WarnMsg("Component " + selfPeer()->name +
-                            " received an unexpected message: " +
-                            MessageTypeId[msgIdx]);
                     break;
                 }
             }
@@ -227,7 +229,6 @@ int Component::run()
 
             // Nothing for the time being
             LibComm::waitForHeartBeat(hbSecs, hbMicroSecs);
-            //InfoMsg("Heart Beat!");
 
         }
 
@@ -348,6 +349,10 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
         if (!procTaskRes(inPeerMsg)) { return BadMsgProcessing; }
         break;
 
+    case MSG_CMD_IDX:
+        if (!procCmd(inPeerMsg)) { return BadMsgProcessing; }
+        break;
+
     default:
         break;
     }
@@ -405,22 +410,13 @@ bool Component::buildMsgTASKPROC(MessageHeader & hdr,
 }
 
 //----------------------------------------------------------------------
-// Method: assignMsgDataString
-// Sets msg content in msgData to incoming msg content frame
-//----------------------------------------------------------------------
-void Component::assignMsgDataString(Router2RouterPeer::PeerMessage & inPeerMsg)
-{
-    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
-}
-
-//----------------------------------------------------------------------
 // Method: procInData
 // Process a new MSG_INDATA message
 //----------------------------------------------------------------------
 bool Component::procInData(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_INDATA);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -431,7 +427,7 @@ bool Component::procInData(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procDataRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_DATA_RQST);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -442,7 +438,7 @@ bool Component::procDataRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procDataInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_DATA_INFO);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -453,7 +449,7 @@ bool Component::procDataInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procMonitRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_MONIT_RQST);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -464,7 +460,7 @@ bool Component::procMonitRqst(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procMonitInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_MONIT_INFO);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -475,7 +471,7 @@ bool Component::procMonitInfo(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procTaskProc(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_TASK_PROC);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 
@@ -486,7 +482,18 @@ bool Component::procTaskProc(Router2RouterPeer::PeerMessage & inPeerMsg)
 bool Component::procTaskRes(Router2RouterPeer::PeerMessage & inPeerMsg)
 {
     msgData.assign(new Message_TASK_RES);
-    assignMsgDataString(inPeerMsg);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
+    return true;
+}
+
+//----------------------------------------------------------------------
+// Method: procCmd
+// Process a new MSG_CMD message
+//----------------------------------------------------------------------
+bool Component::procCmd(Router2RouterPeer::PeerMessage & inPeerMsg)
+{
+    msgData.assign(new Message_CMD);
+    msgData.msg->setDataString(inPeerMsg.at(Router2RouterPeer::FRAME_MSG_CONTENT));
     return true;
 }
 

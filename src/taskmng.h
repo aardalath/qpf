@@ -59,6 +59,7 @@
 //------------------------------------------------------------
 
 #include "component.h"
+#include "tools.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -77,12 +78,12 @@ public:
     TaskManager(const char * name = 0);
 
     struct AgentInfo {
-        int idx;
-        int runningTasks;
-        int failedTasks;
-        int finishedTasks;
-        int launchedTasks;
-        int load;
+        int    idx;
+        int    runningTasks;
+        int    failedTasks;
+        int    finishedTasks;
+        int    launchedTasks;
+        double load;
     };
 
 protected:
@@ -109,6 +110,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void processTASK_RES();
 
+    //----------------------------------------------------------------------
+    // Method: processMONIT_INFO
+    //----------------------------------------------------------------------
+    virtual void processMONIT_INFO();
+
 private:
     //----------------------------------------------------------------------
     // Method: run
@@ -131,10 +137,14 @@ private:
     //----------------------------------------------------------------------
     bool sendTaskRes(Message_TASK_RES * msg);
 
+    //----------------------------------------------------------------------
+    // Method: sendMonitInfo
+    //----------------------------------------------------------------------
+    bool sendMonitInfo(Message_MONIT_INFO * msg);
+
 private:
     std::vector<LibComm::Router2RouterPeer::Peer *> agents;
     std::map<LibComm::Router2RouterPeer::Peer *, AgentInfo> agentInfo;
-
 };
 
 }

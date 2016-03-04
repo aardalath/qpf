@@ -161,6 +161,11 @@ protected:
     virtual void processTASK_RES() {}
 
     //----------------------------------------------------------------------
+    // Method: processTASK_RES
+    //----------------------------------------------------------------------
+    virtual void processCMD() {}
+
+    //----------------------------------------------------------------------
     // Method: processSTOP
     //----------------------------------------------------------------------
     virtual void processSTOP() {}
@@ -247,12 +252,6 @@ protected:
                      bool isBroadcast = false);
 
     //----------------------------------------------------------------------
-    // Method: assignMsgDataString
-    // Sets msg content in msgData to incoming msg content frame
-    //----------------------------------------------------------------------
-    void assignMsgDataString(Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
     // Method: procInData
     // Process a new MSG_INDATA message
     //----------------------------------------------------------------------
@@ -293,6 +292,12 @@ protected:
     // Process a new MSG_TASK_RES message
     //----------------------------------------------------------------------
     bool procTaskRes(Router2RouterPeer::PeerMessage & inPeerMsg);
+
+    //----------------------------------------------------------------------
+    // Method: procCmd
+    // Process a new MSG_CMD message
+    //----------------------------------------------------------------------
+    bool procCmd(Router2RouterPeer::PeerMessage & inPeerMsg);
 
     //----------------------------------------------------------------------
     // Method: writeToFile

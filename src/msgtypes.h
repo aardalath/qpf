@@ -476,6 +476,8 @@ typedef Message_DATA_Exchange Message_DATA_INFO;
 typedef Message_DATA_Exchange Message_MONIT_RQST;
 typedef Message_DATA_Exchange Message_MONIT_INFO;
 
+typedef Message_DATA_Exchange Message_CMD;
+
 struct Message_TASK_Processing : public Message {
     TaskInfo    task;
     std::string rule;
@@ -506,6 +508,7 @@ class Message_TASK_RES  : public Message_TASK_Processing {};
     T(MONIT_INFO), \
     T(TASK_PROC), \
     T(TASK_RES), \
+    T(CMD), \
     T(STOP), \
     T(UNKNOWN)
 

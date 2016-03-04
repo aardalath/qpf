@@ -62,6 +62,7 @@ EventManager::EventManager(const char * name) :
 {
     canProcessMessage(MSG_INDATA_IDX);
     canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this for EvtMng in favour of DB
+    canProcessMessage(MSG_MONIT_INFO_IDX);
 
     setHeartBeatPeriod(0, 10000);
 }
@@ -152,6 +153,13 @@ void EventManager::processTASK_RES()
         InfoMsg("RECEIVED NOTIFICATION OF TASK " + msg->task.taskName +
                 " FINISHED AT " + msg->task.taskEnd);
     }
+}
+
+//----------------------------------------------------------------------
+// Method: processMONIT_INFO
+//----------------------------------------------------------------------
+void EventManager::processMONIT_INFO()
+{
 }
 
 }

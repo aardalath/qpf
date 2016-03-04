@@ -112,6 +112,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void processTASK_RES();
 
+    //----------------------------------------------------------------------
+    // Method: processMONIT_INFO
+    //----------------------------------------------------------------------
+    virtual void processMONIT_INFO();
+
 private:
     std::atomic<bool> waitingForGO;
 };

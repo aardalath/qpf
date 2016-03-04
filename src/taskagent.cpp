@@ -56,7 +56,10 @@ namespace QPF {
 TaskAgent::TaskAgent(const char * name) :
     Component(name), workDir("")
 {
+    setHeartBeatPeriod(5, 0);
+
     canProcessMessage(MSG_TASK_PROC_IDX);
+    canProcessMessage(MSG_CMD_IDX);
 }
 
 //----------------------------------------------------------------------
@@ -119,11 +122,31 @@ void TaskAgent::processTASK_PROC()
 }
 
 //----------------------------------------------------------------------
+// Method: processCMD
+//----------------------------------------------------------------------
+void TaskAgent::processCMD()
+{
+
+}
+
+//----------------------------------------------------------------------
 // Method: execAdditonalLoopTasks
 //----------------------------------------------------------------------
 void TaskAgent::execAdditonalLoopTasks()
 {
+    static int cycle = 0;
+
+    cycle = (cycle + 1) % 3;
+
+    // Check status of child processing elements
     checkProcessingElements();
+
+    // Send host-related monitoring information
+    if (cycle == 0) {
+        if (!sendMonitInfo()) {
+            WarnMsg("Couldn't send host monitoring information");
+        }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -232,6 +255,57 @@ bool TaskAgent::sendTaskResMsg(TaskInfo & task)
     registerMsg(selfPeer()->name, *taskResMsg);
     setTransmissionToPeer("TskMng", taskResMsg);
     sendMsgsMutex.unlock();
+
+    return true;
+}
+
+inline std::string dbl2IntStr(double x) {
+    return LibComm::toStr<int>((int)(floor(x)));
+}
+
+//----------------------------------------------------------------------
+// Method: sendMonitInfo
+// Send a MonitInfoMsg to the Task Manager, with information on
+// processing node status (load avgs., uptime, etc.)
+//----------------------------------------------------------------------
+bool TaskAgent::sendMonitInfo()
+{
+    static LibComm::SysInfo sysInfo {};
+
+    if (!sysInfo.update()) { return false; }
+    sysInfo.computeStats();
+
+    Message_MONIT_INFO msg;
+    buildMsgHeader(MSG_MONIT_INFO_IDX, selfPeer()->name, "TskMng", msg.header);
+
+    msg.variables.paramList["load1m"]  = LibComm::toStr<double>(sysInfo.loadAvgs.at(0));
+    msg.variables.paramList["load5m"]  = LibComm::toStr<double>(sysInfo.loadAvgs.at(1));
+    msg.variables.paramList["load15m"] = LibComm::toStr<double>(sysInfo.loadAvgs.at(2));
+
+    msg.variables.paramList["uptime"]  = LibComm::toStr<int>(sysInfo.upTime);
+
+    msg.variables.paramList["totalMem"]   = dbl2IntStr(sysInfo.memStat.total);
+    msg.variables.paramList["usedMem"]    = dbl2IntStr(sysInfo.memStat.values.at(0));
+    msg.variables.paramList["buffersMem"] = dbl2IntStr(sysInfo.memStat.values.at(1));
+    msg.variables.paramList["cachedMem"]  = dbl2IntStr(sysInfo.memStat.values.at(2));
+
+    msg.variables.paramList["totalSwap"]  = dbl2IntStr(sysInfo.swapStat.total);
+    msg.variables.paramList["usedSwap"]   = dbl2IntStr(sysInfo.swapStat.values.at(0));
+
+    for (int i = 1; i <= sysInfo.cpuCount; ++i) {
+        std::string cpu = "cpu" + LibComm::toStr<int>(i);
+        msg.variables.paramList[cpu] = LibComm::toStr<double>(sysInfo.cpuPercent.at(i));
+    }
+
+    std::cerr << "== Monit. Info. - " << selfPeer()->name << " ======================" << std::endl;
+    for (auto & kv : msg.variables.paramList) {
+        std::cerr << kv.first << ": " << kv.second << std::endl;
+    }
+    std::cerr << std::endl;
+    PeerMessage * monitInfoMsg = buildPeerMsg("TskMng", msg.getDataString(), MSG_MONIT_INFO);
+    // MonitInfo messages are not registered
+    //registerMsg(selfPeer()->name, *monitInfoMsg);
+    setTransmissionToPeer("TskMng", monitInfoMsg);
 
     return true;
 }

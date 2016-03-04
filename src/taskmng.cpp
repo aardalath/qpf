@@ -60,8 +60,8 @@ TaskManager::TaskManager(const char * name) :
     Component(name)
 {
     canProcessMessage(MSG_TASK_PROC_IDX);
-    // TODO: Deprecate this channel for EvtMng in favour of DB
-    canProcessMessage(MSG_TASK_RES_IDX);
+    canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this channel for EvtMng in favour of DB
+    canProcessMessage(MSG_MONIT_INFO_IDX);
 }
 
 //----------------------------------------------------------------------
@@ -119,6 +119,29 @@ void TaskManager::processTASK_RES()
 }
 
 //----------------------------------------------------------------------
+// Method: processMONIT_INFO
+//----------------------------------------------------------------------
+void TaskManager::processMONIT_INFO()
+{
+    Message_MONIT_INFO * msg = dynamic_cast<Message_MONIT_INFO *>(msgData.msg);
+
+    // Save information for TaskAgent selection
+    std::string & senderName = msg->header.source;
+    double load = LibComm::strTo<double>(msg->variables.paramList["load1m"]);
+    for (LibComm::Router2RouterPeer::Peer * p : agents) {
+        if (p->name == senderName) {
+            AgentInfo & ag = agentInfo[p];
+            ag.load = load;
+            std::cerr << p->name << " info updated to : "
+                      << ag.runningTasks << " tasks, load = " << ag.load << "\n";
+        }
+    }
+
+    // ... and forward message to EvtMsg
+    sendMonitInfo(msg);
+}
+
+//----------------------------------------------------------------------
 // Method: exeRule
 // Execute the rule requested by Task Orchestrator
 //----------------------------------------------------------------------
@@ -139,6 +162,8 @@ void TaskManager::exeRule(Message_TASK_PROC * msg)
 
 }
 
+inline double weightFunc(double load, double tasks) { return 100 * load + tasks; }
+
 //----------------------------------------------------------------------
 // Method: selectAgent
 // Send a TaskProcessingMsg to the Task Manager, requesting the
@@ -146,6 +171,7 @@ void TaskManager::exeRule(Message_TASK_PROC * msg)
 //----------------------------------------------------------------------
 LibComm::Router2RouterPeer::Peer * TaskManager::selectAgent()
 {
+/*
     // Select agent with smaller number of running tasks
     int nRunTasks = -1;
     int agIdx;
@@ -157,7 +183,21 @@ LibComm::Router2RouterPeer::Peer * TaskManager::selectAgent()
             agIdx = i;
         }
     }
+*/
 
+    // Select agent with lower weight (try to balance load)
+    double weight = -1;
+    double newW;
+    int agIdx;
+    for (unsigned int i = 0; i < agents.size(); ++i) {
+        Peer * p = agents.at(i);
+        AgentInfo & agInfo = agentInfo[p];
+        newW = weightFunc(agInfo.load, agInfo.runningTasks);
+        if ((weight < 0) || (weight > newW)) {
+            weight = newW;
+            agIdx = i;
+        }
+    }
     // Return agent peer
     return agents.at(agIdx);
 }
@@ -198,6 +238,28 @@ bool TaskManager::sendTaskRes(Message_TASK_RES * msg)
         PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
                                                  msgToRecip.msg->getDataString(),
                                                  MSG_TASK_RES);
+        registerMsg(selfPeer()->name, *msgForRecip);
+        setTransmissionToPeer(recip, msgForRecip);
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------
+// Method: sendMonitInfo
+// Send a TaskResMsg to the Event Manager
+//----------------------------------------------------------------------
+bool TaskManager::sendMonitInfo(Message_MONIT_INFO * msg)
+{
+    // Send TASK_RES to all the recipients
+    // TODO: Deprecate this channel for EvtMng in favour of DB
+    std::array<std::string,1> fwdRecip = {"EvtMng"};
+    for (std::string & recip : fwdRecip) {
+        MessageData msgToRecip(new Message_MONIT_INFO);
+        msgToRecip.msg->setData(msg->getData());
+        setForwardTo(recip, msgToRecip.msg->header);
+        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
+                                                 msgToRecip.msg->getDataString(),
+                                                 MSG_MONIT_INFO);
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
