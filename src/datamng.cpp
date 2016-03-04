@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * File:    datamng.cpp
  *          This file is part of QLA Processing Framework
  *
@@ -45,6 +45,7 @@ using LibComm::Log;
 #include "dbhdlpostgre.h"
 #include "except.h"
 #include "config.h"
+#include "dbg.h"
 
 #include "urlhdl.h"
 
@@ -213,6 +214,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 
         URLHandler urlh;
 
+        DBG("Preparing to send new INDATA with outputs to TskOrc...");
         for (auto & md : msg->task.outputs.productList) {
             urlh.setProduct(md.second);
             md.second = urlh.fromShared2Local();
