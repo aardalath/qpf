@@ -134,7 +134,7 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     //-------------------------------------------------------------------
     // 1. Send initial Task information (for storage)
     //-------------------------------------------------------------------
-    TaskStatus status = TASK_FAILED;
+    TaskStatus status = TASK_WAITING;
 
     TaskInfo task;
     task.setData(t.getData());
@@ -165,13 +165,8 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
     //-------------------------------------------------------------------
     // 2. Loop waiting for execution slot
     //-------------------------------------------------------------------
-    std::cerr << "Before sending first message: "
-              << task.taskName << " - " << task.taskStatus << "\n";
     if (numRunningTasks >= maxRunningTasks) {
         sendTaskResMsg(task);
-        std::cerr << "While waiting: "
-                  << task.taskName << " - " << task.taskStatus << "\n";
-
         // Loop waiting until numTasks is below threshold
         while (numRunningTasks >= maxRunningTasks) {
             LibComm::waitForHeartBeat(0, 200000);
@@ -306,9 +301,6 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         }
         childEnded = (status == TASK_FAILED) || (status == TASK_FINISHED);
 
-        std::cerr << "R D P K F : code : ended : status = "
-                  << running << dead << paused << killed << finished << " : "
-                  << excode << " : " << childEnded << " : " << TaskStatusName.find(status)->second << "\n";
         // Additional info
         taskData["TaskAgent"] = selfPeer()->name;
         taskData["NameExtended"] = selfPeer()->name + ":/" + taskData["Name"].asString();
@@ -325,16 +317,10 @@ void TaskAgent::executeProcessingElement(TaskInfo t)
         // Incorporate taskData to task data structure
         task.taskStatus = status;
 
-        std::cerr << "In monitoring loop: "
-                  << task.taskName << " - " << task.taskStatus << "\n";
-
         // Send message
         sendTaskResMsg(task);
 
     } while ((!childEnded) && (!stopTasks));
-
-    std::cerr << "Before end: "
-              << task.taskName << " - " << task.taskStatus << "\n";
 
     //-------------------------------------------------------------------
     // Report end of task
