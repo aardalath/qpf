@@ -267,14 +267,13 @@ struct ParameterList : public JsonStruct {
 typedef std::string                            TaskName;
 typedef std::string                            TaskPath;
 typedef int                                    TaskExitCode;
-//typedef int                                    TaskStatus;
 typedef Json::Value                            TaskData;
 
 #define TLIST_TASK_STATUS \
-    T(FAILED,-1), \
-    T(FINISHED,0), \
-    T(RUNNING,1), \
-    T(WAITING,2)
+    T(FAILED,  -1), \
+    T(FINISHED, 0), \
+    T(RUNNING,  1), \
+    T(WAITING,  2)
 
 #define T(a,b) TASK_ ## a = b
 enum TaskStatus { TLIST_TASK_STATUS };
@@ -301,7 +300,7 @@ struct TaskInfo : public JsonStruct {
         taskStart    = data["taskStart"   ].asString();
         taskEnd      = data["taskEnd"     ].asString();
         taskExitCode = data["taskExitCode"].asInt();
-        taskStatus   = TaskStatus(data["taskStatus"  ].asInt());
+        taskStatus   = static_cast<TaskStatus>(data["taskStatus"  ].asInt());
         inputs .setData(data["inputs" ]);
         outputs.setData(data["outputs"]);
         params .setData(data["params" ]);
@@ -314,7 +313,7 @@ struct TaskInfo : public JsonStruct {
         data["taskStart"    ] = taskStart;
         data["taskEnd"      ] = taskEnd;
         data["taskExitCode" ] = taskExitCode;
-        data["taskStatus"   ] = taskStatus;
+        data["taskStatus"   ] = static_cast<int>(taskStatus);
         data["inputs" ]  = inputs .getData();
         data["outputs"]  = outputs.getData();
         data["params" ]  = params .getData();
