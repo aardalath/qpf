@@ -32,7 +32,8 @@ HEADERS += \
         propdef.h \
         version.h \
     procelem.h \
-    cfg.h
+    cfg.h \
+    dbg.h
 
 HEADERS += \
         config.h \
