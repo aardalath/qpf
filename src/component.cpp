@@ -123,7 +123,6 @@ void Component::fromOperationalToRunning()
 void Component::fromRunningToOff()
 {
     InfoMsg("Ending . . . ");
-    flushLog();
 }
 
 //----------------------------------------------------------------------
@@ -134,7 +133,7 @@ void Component::init()
 {
     // Define log output
     Log::defineLogSystem(getCommNodeName(),
-                         Log::getLogBaseDir() + "/" +
+                         Log::getLogBaseDir() + "/log/" +
                          getCommNodeName() + ".log");
 
     // Define valid state transitions
@@ -157,14 +156,12 @@ int Component::run()
     /* Transition to Running */
     transitTo(RUNNING);
     InfoMsg("New state: " + getStateName(getState()));
-    flushLog();
 
     fromRunningToOperational();
 
     /* Transition to Operational */
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
-    flushLog();
 
     /* MAIN LOOP */
     while (getState() == OPERATIONAL) {
@@ -181,8 +178,7 @@ int Component::run()
             int msgIdx = process(inPeer, inPeerMsg);
             if (msgIdx > 0) {
 
-                //Json::StyledWriter jsonWriter;
-                InfoMsg("New message of type " + MessageTypeId[msgIdx] + " arrived");
+                InfoMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
 
                 if (canProcess.find(msgIdx) == canProcess.end()) { msgIdx = -1; }
 
@@ -233,6 +229,11 @@ int Component::run()
 
         }
 
+        // Send log info to LogMng in case there is something to send
+        if (!fileToSend.empty()) {
+            sendLogPacketAsDataInfoMsg();
+        }
+
         // Additional loop tasks (entry for additional functionality
         //to be exectued every loop step)
         execAdditonalLoopTasks();
@@ -244,7 +245,6 @@ int Component::run()
     // Set state to Running
     transitTo(RUNNING);
     InfoMsg("New state: " + getStateName(getState()));
-    flushLog();
 
     fromRunningToOff();
 
@@ -540,7 +540,7 @@ void Component::writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg)
     }
 
     // Time timestamp
-    std::string msgFileName("/tmp/");
+    std::string msgFileName(Log::getLogBaseDir() + "/msg/");
     msgFileName += (inPeerMsg.at(Router2RouterPeer::FRAME_PEER_ID) + "_" +
                     inPeerMsg.at(Router2RouterPeer::FRAME_MSG_TYPE) + "_" +
                     LibComm::preciseTimeTag() + ".msg");
@@ -576,8 +576,6 @@ void Component::registerMsg(std::string from,
 }
 
 //----------------------------------------------------------------------
-<<<<<<< 404d81f9b9d799ba68419a5b5874643e2c884dc3
-=======
 // Method: sendLogPacketAsDataInfoMsg
 //----------------------------------------------------------------------
 void Component::sendLogPacketAsDataInfoMsg()
@@ -586,30 +584,15 @@ void Component::sendLogPacketAsDataInfoMsg()
 
     Message_DATA_INFO msg;
     buildMsgHeader(MSG_DATA_INFO_IDX, selfPeer()->name, "LogMng", msg.header);
-
-    // Get file content
-    std::ifstream fileToSendStrm(fileToSend);
-    if (!fileToSendStrm) {
-        WarnMsg("Could not send Data Info msg with content of file " + fileToSend);
-        fileToSend = "";
-        return;
-    }
-
-    std::stringstream bufferStrm;
-    bufferStrm << fileToSendStrm.rdbuf();
-    fileToSendStrm.close();
-    unlink(fileToSend.c_str());
-    fileToSend = "";
-
-    msg.variables.paramList["contents"] = bufferStrm.str();
+    msg.variables.paramList["contents"] = logChunk;
     PeerMessage * dataInfoMsg = buildPeerMsg("LogMng", msg.getDataString(), MSG_DATA_INFO);
     // DataInfo messages are not registered
     // registerMsg(selfPeer()->name, *dataInfoMsg);
     setTransmissionToPeer("LogMng", dataInfoMsg);
+    logChunk = "";
 }
 
 //----------------------------------------------------------------------
->>>>>>> DataInfo messages will not be registered in DB
 // MethoComponent::d: setHeartBeatPeriod
 // Sets number of seconds and microseconds for HeartBeat period
 //----------------------------------------------------------------------
