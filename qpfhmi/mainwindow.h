@@ -146,6 +146,7 @@ protected:
     void setLogWatch();
 
 private slots:
+    void saveAs();
 #ifndef QT_NO_CLIPBOARD
     void cut();
     void copy();
