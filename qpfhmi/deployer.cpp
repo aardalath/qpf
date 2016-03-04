@@ -175,9 +175,168 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 //----------------------------------------------------------------------
 void Deployer::readConfig(const char * configFile)
 {
-    cfg   = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = cfg->getCfgInfo();
-    hmiNeeded = cfgInfo.hmiPresent;
+    Configuration * cfg = new Configuration(configFile);
+
+    cfg->getGeneralInfo(qpfCfg->appName, qpfCfg->appVersion, qpfCfg->lastAccess);
+    cfg->getProductTypes(qpfCfg->orcParams.productTypes);
+    cfg->reset();
+
+    for (int i = 0; i < cfg->getNumOrchRules(); ++i) {
+        TaskOrchestrator::Rule * rule = new TaskOrchestrator::Rule;
+        cfg->getOrchRule(rule->name, rule->inputs,
+                         rule->outputs, rule->processingElement);
+        qpfCfg->orcParams.rules.push_back(rule);
+    }
+
+    for (int i = 0; i < cfg->getNumProcs(); ++i) {
+        TaskOrchestrator::ProcElem * pe = new TaskOrchestrator::ProcElem;
+        cfg->getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
+        qpfCfg->orcParams.procElems[pe->name] = pe;
+    }
+
+    for (int i = 0; i < cfg->getNumNodes(); ++i) {
+        LibComm::Router2RouterPeer::Peer * peer = new LibComm::Router2RouterPeer::Peer;
+        cfg->getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
+        qpfCfg->peersCfg.push_back(*peer);
+        qpfCfg->peerNames.push_back(peer->name);
+    }
+
+    qpfCfg->qpfhmiCfg.name = cfg->getHMINodeName();
+    cfg->getNodeByName(qpfCfg->qpfhmiCfg.name,
+                       qpfCfg->qpfhmiCfg.type,
+                       qpfCfg->qpfhmiCfg.clientAddr,
+                       qpfCfg->qpfhmiCfg.serverAddr);
+
+    // Ensure paths for the execution are available and readu
+    std::vector<std::string> runPaths { Configuration::PATHRun,
+                                        Configuration::PATHLog,
+                                        Configuration::PATHTmp,
+                                        Configuration::PATHTsk,
+                                        Configuration::PATHMsg };
+    for (auto & p : runPaths) {
+        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
+            std::perror(("mkdir " + p).c_str());
+            exit(EXIT_FAILURE);
+        }
+    }
+    LibComm::Log::setLogBaseDir(Configuration::PATHRun);
+
+    delete cfg;
+}
+
+//----------------------------------------------------------------------
+// Method: createPeerNodes
+// Creates the peer node objects with the information from the system
+// configuration
+//----------------------------------------------------------------------
+void Deployer::createPeerNodes()
+{
+    L("Creating peer nodes . . .");
+
+    for (unsigned int i = 0; i < qpfCfg->peersCfg.size(); ++i) {
+
+        std::string & peerName = qpfCfg->peersCfg[i].name;
+        std::string & peerType = qpfCfg->peersCfg[i].type;
+
+        const char * cpeerName = qpfCfg->peersCfg[i].name.c_str();
+
+        L("Creating peer node " << peerName << " . . .");
+
+        if        (peerType == "evtmng") {
+            assert(pnd->evtMng == 0);
+            pnd->evtMng = new EventManager(cpeerName);
+            pnd->evtMng->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->nodes.push_back(pnd->evtMng);
+        } else if (peerType == "datamng") {
+            assert(pnd->dataMng == 0);
+            pnd->dataMng = new DataManager(cpeerName);
+            pnd->dataMng->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->nodes.push_back(pnd->dataMng);
+        } else if (peerType == "logmng") {
+            assert(pnd->logMng == 0);
+            pnd->logMng = new LogManager(cpeerName);
+            pnd->logMng->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->nodes.push_back(pnd->logMng);
+        } else if (peerType == "taskmng") {
+            assert(pnd->tskMng == 0);
+            pnd->tskMng = new TaskManager(cpeerName);
+            pnd->tskMng->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->nodes.push_back(pnd->tskMng);
+        } else if (peerType == "taskorc") {
+            assert(pnd->tskOrc == 0);
+            pnd->tskOrc = new TaskOrchestrator(cpeerName);
+            pnd->tskOrc->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->nodes.push_back(pnd->tskOrc);
+        } else if (peerType == "taskagent") {
+            TaskAgent * tskAg = new TaskAgent(cpeerName);
+            tskAg->addPeer(&(qpfCfg->peersCfg[i]), true);
+            pnd->tskAgents.push_back(tskAg);
+            pnd->nodes.push_back(tskAg);
+        } else {
+            // Do nothing, not yet implemented
+        }
+
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: createPeerNodeConnections
+// Creates the node connections
+//----------------------------------------------------------------------
+void Deployer::createPeerNodeConnections()
+{
+    L("Creating peer connections . . .");
+
+    // - Event Manager
+    pnd->evtMng->addPeer(pnd->dataMng->selfPeer());
+    pnd->evtMng->addPeer(pnd->logMng->selfPeer());
+    pnd->evtMng->addPeer(pnd->tskMng->selfPeer());
+    pnd->evtMng->addPeer(pnd->tskOrc->selfPeer());
+    // Set connection to QPFHMI
+    pnd->evtMng->addPeer(&qpfCfg->qpfhmiCfg);
+    // TaskAgents must be awaked by the Event Manager
+    // (though no other direct messages are expected by them
+    //  comming from the Event Manager)
+    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
+        pnd->evtMng->addPeer(pnd->tskAgents.at(k)->selfPeer());
+    }
+
+    // - Data Manager
+    pnd->dataMng->addPeer(pnd->evtMng->selfPeer());
+    pnd->dataMng->addPeer(pnd->tskOrc->selfPeer());
+    pnd->dataMng->addPeer(pnd->tskMng->selfPeer());
+    pnd->dataMng->addPeer(pnd->logMng->selfPeer());
+
+    // - Log Manager
+    pnd->logMng->addPeer(pnd->evtMng->selfPeer());
+    pnd->logMng->addPeer(pnd->dataMng->selfPeer());
+    pnd->logMng->addPeer(pnd->tskMng->selfPeer());
+    pnd->logMng->addPeer(pnd->tskOrc->selfPeer());
+    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
+        pnd->logMng->addPeer(pnd->tskAgents.at(k)->selfPeer());
+    }
+
+    // - Task Manager
+    pnd->tskMng->addPeer(pnd->evtMng->selfPeer());
+    pnd->tskMng->addPeer(pnd->tskOrc->selfPeer());
+    pnd->tskMng->addPeer(pnd->dataMng->selfPeer());
+    pnd->tskMng->addPeer(pnd->logMng->selfPeer());
+    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
+        pnd->tskMng->addPeer(pnd->tskAgents.at(k)->selfPeer());
+    }
+
+    // - Task Orchestrator
+    pnd->tskOrc->addPeer(pnd->evtMng->selfPeer());
+    pnd->tskOrc->addPeer(pnd->tskMng->selfPeer());
+    pnd->tskOrc->addPeer(pnd->dataMng->selfPeer());
+    pnd->tskOrc->addPeer(pnd->logMng->selfPeer());
+
+    // - Task Agents
+    for (unsigned int k = 0; k < pnd->tskAgents.size(); ++k) {
+        pnd->tskAgents[k]->addPeer(pnd->tskMng->selfPeer());
+        pnd->tskAgents[k]->addPeer(pnd->evtMng->selfPeer());
+        pnd->tskAgents[k]->addPeer(pnd->logMng->selfPeer());
+    }
 }
 
 //----------------------------------------------------------------------
