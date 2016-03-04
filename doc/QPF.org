@@ -41,6 +41,7 @@ The SOC is responsible for the development, procurement, integration, validation
 - EAS@S :: Euclid Archive System at SOC
 - SOC Storage :: Storage at SOC
 
+
 ** QLA
 
 *** QLA Capabilities
@@ -185,6 +186,7 @@ The QLA Logical Decomposition shown above in the previous section is a good way 
 
 In the next section, the QLA Processing Framework is further described.
 
+
 ** QPF - QLA Processing Framework
 
 *** Purpose
@@ -192,6 +194,7 @@ In the next section, the QLA Processing Framework is further described.
 Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, I will refer to this framework as the QPF (QLA Processing Framework).
 
 The QPF will be composed of a set of components that take the incoming external events and data, check their basic consistency, perform a specific orchestration based on the type of incoming data, and launches the neccessary processing tasks to end up with the set of diagnostics, statistics and output parameters to evaluate the validity and quality of the products.  In section [[QPF Components]] a detailed description of the different components is provided.
+
 
 *** QPF Overall Architecture
 
@@ -215,6 +218,7 @@ The overall architecture of the QPF is shown in the following figure.
 #+NAME:   fig:QPF-arch
 #+ATTR_HTML: :width 90%
 [[QPF_Prototype_arch_Page_2.png]]
+
 
 *** QPF Components
 
@@ -285,15 +289,18 @@ title Use Case: External Data Injection
 @enduml
 #+END_SRC
 
+
 *** Mapping between QPF and QLA components
 
 There is a mapping between the logical decomposition of the QLA shown in [[QLA Components]] and the QPF components shown above.  This mapping is still *[TBD]*.
+
 
 *** QPF User Stories
 
 For the QPF User Stories, we will follow the well known template:
 
 "/As a _<type of user>_, I want _<some goal>_ so that _<some reason>_. /"
+
 
 *** QPF Use Cases
 
@@ -470,7 +477,6 @@ DataMng -> DB: registerOutputs
 #+END_SRC
 
 
-
 *** Technologies
 
 For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the following technologies are planned to be used.
@@ -488,6 +494,8 @@ For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the fo
 - Qt :: The HMI component will be based on Qt and coded on C++.  For the Toy Model, the HMI will be responsible also for providing appropriate input events and data to the system via the Event Manager.
 
 - C++ :: All managment components will be coded in C++.
+
+
 
 ** QPF Internals
 *** QPF Database Specification
@@ -1310,6 +1318,7 @@ A Database Controller (DBController), that allows variable registration and prov
 
 *** Notes
 
+
 ** Glossary
 
 *** External Auxiliary Products Provider
@@ -1332,6 +1341,7 @@ A Database Controller (DBController), that allows variable registration and prov
 
 *** Processing Element
     An structure that defines an element that receives input files, parameters files and configuration files, and processes those input data to generate some output (results) files.  Together with the different files, it is the basic element in a [[Processing Chain]].
+
 
 ** Acronyms
 
@@ -1383,6 +1393,7 @@ A Database Controller (DBController), that allows variable registration and prov
 | EAS@S       | Euclid Archive System at SOC                                            |
 | SOC Storage | Storage at SOC                                                          |
 |-------------+-------------------------------------------------------------------------|
+
 
 ** TBDs, TBCs and TODO lists
 
