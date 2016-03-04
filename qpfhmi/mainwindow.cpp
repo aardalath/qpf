@@ -338,7 +338,17 @@ void MainWindow::setLogWatch()
         } else {
             ui->tabLogs->addTab(pltxted, fs.baseName());
         }
+        connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
+}
+
+//----------------------------------------------------------------------
+// Slot: processPendingEvents
+// Processes Application pending events
+//----------------------------------------------------------------------
+void MainWindow::processPendingEvents()
+{
+    qApp->processEvents();
 }
 
 //----------------------------------------------------------------------
@@ -629,6 +639,8 @@ void MainWindow::stopSendingMessages()
 //----------------------------------------------------------------------
 void MainWindow::checkForTaskRes()
 {
+    qApp->processEvents();
+
     if (hmiNode->isThereTaskResInfo()) {
         std::map<std::string, Json::Value> newTaskResInfo;
         int numOfTaskResMsgs = hmiNode->getTaskResInfo(newTaskResInfo);
@@ -656,9 +668,12 @@ void MainWindow::showTaskRes()
     static ProgressBarDelegate * progressBarDisplay = 0;
     static QStringList hdrLabels;
 
-    setUpdatesEnabled(false);
+    // Process pending events from Qt events loop
+    processPendingEvents();
 
     if (firstTime) {
+        firstTime = false;
+
         // Set up context menu
         ui->treeTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -690,6 +705,9 @@ void MainWindow::showTaskRes()
                 this, SLOT(sortTaskViewByColumn(int)));
         ui->treeTaskMonit->header()->setSectionsClickable(true);
     }
+
+    // Process pending events from Qt events loop
+    processPendingEvents();
 
     int nCols = 8;
 
@@ -756,11 +774,11 @@ void MainWindow::showTaskRes()
         ui->treeTaskMonit->addTopLevelItem(treeItem);
     }
 
-    if (firstTime) {
-        firstTime = false;
-        for (int i = 0; i < nCols; ++i) {
-            ui->treeTaskMonit->resizeColumnToContents(i);
-        }
+    // Process pending events from Qt events loop
+    processPendingEvents();
+
+    for (int i = 0; i < nCols; ++i) {
+        ui->treeTaskMonit->resizeColumnToContents(i);
     }
 
     // Now, update information for Task Agents Status Info.
@@ -814,6 +832,9 @@ void MainWindow::showTaskRes()
         }
     }
 
+    // Process pending events from Qt events loop
+    processPendingEvents();
+
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
@@ -834,10 +855,8 @@ void MainWindow::showTaskRes()
     // Activate sorting - we are done
     ui->treeTaskMonit->setSortingEnabled(true);
 
-    setUpdatesEnabled(true);
-
     // Process pending events from Qt events loop
-    qApp->processEvents();
+    processPendingEvents();
 }
 
 //----------------------------------------------------------------------

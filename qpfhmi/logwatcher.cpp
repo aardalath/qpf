@@ -89,6 +89,8 @@ void LogWatcher::updateLogView(const QString & path)
   cursor.insertText(QString(c));
   textView->setTextCursor(cursor);
   textView->ensureCursorVisible();
+
+  emit logUpdated();
 }
 
 }

@@ -100,6 +100,7 @@ signals:
 
 public slots:
     void commandSystem();
+    void processPendingEvents();
 
 protected slots:
     void transitToOperational();

@@ -57,6 +57,9 @@ public:
 private slots:
   void updateLogView(const QString & path);
 
+signals:
+  void logUpdated();
+
 private:
   QPlainTextEdit * textView;
   QFileSystemWatcher * fsWatcher;
