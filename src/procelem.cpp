@@ -404,37 +404,26 @@ void ProcessingElement::monitorProcElemLoop()
         taskData["Key"]          = dockerId;
         taskData["RegKey"]       = originalRegKey;
 
+        // Set actual start time
+        task.taskStart = getSimplifiedDateTime(taskData["State"]["StartedAt"]);
+
         // Update progress
-        progressValue = updateProgress(progressValue);
-        taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
+        if (status == TASK_FINISHED) {
+            taskData["State"]["Progress"] = "100";
+            task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
+        } else {
+            progressValue = updateProgress(progressValue);
+            taskData["State"]["Progress"] = LibComm::toStr<int>(floor(progressValue));
+        }
 
         // Incorporate taskData to task data structure
         task.taskStatus = status;
         taskData["State"]["TaskStatus"] = (int)(status);
 
-        // Set actual start time
-        task.taskStart = getSimplifiedDateTime(taskData["State"]["StartedAt"]);
-
-//        std::cerr << LibComm::timeTag() << ": "
-//                  << "Task: " << originalRegKey
-//                  << "  Name: " << taskData["NameExtended"].asString()
-//                  << " Status: " << TaskStatusName[status]
-//                  << " Progress: " << progressValue
-//                  << " Finished: " << taskData["State"]["FinishedAt"].asString()
-//                  << std::endl;
-
         mutexTask.unlock();
 
     } while ((!childEnded) && (!endProc));
 
-//    std::cerr << "Task " << originalRegKey
-//              << "  Name: " << taskData["NameExtended"].asString()
-//              << "  FINISHED!!\n";
-
-    // Set actual end time
-    mutexTask.lock();
-    task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
-    mutexTask.unlock();
 }
 
 //----------------------------------------------------------------------
@@ -455,7 +444,9 @@ void ProcessingElement::retrieveOutputProducts()
         std::cerr << "Cannot open output directory " << exchgOut << std::endl;
     } else {
         while ((dirp = readdir(dp)) != NULL) {
-            outFiles.push_back(std::string(dirp->d_name));
+            if (dirp->d_name[0] != '.') {
+                outFiles.push_back(std::string(dirp->d_name));
+            }
         }
         closedir(dp);
     }
@@ -464,20 +455,36 @@ void ProcessingElement::retrieveOutputProducts()
 
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
         ProductMetadata m;
-        m.startTime = task.taskStart;
-        m.endTime  = task.taskEnd;
-        m.creator = task.taskPath;
-        m.instrument = "UNKNOWN_INST";
-        m.productType = "UNKNOWN_TYPE";
-        m.productSize = 1234;
-        m.productStatus = "OK";
-        m.productVersion = "1";
-        m.productId = ("EUCL_" +
-                       m.productType + "_" +
-                       m.startTime  + "-" + m.endTime  + "_10");
-        m.regTime = LibComm::timeTag();
-        m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
+        std::string & outFileName = outFiles.at(i);
+        if (outFileName.substr(0, 5).compare("EUCL_") == 0) {
+            m.startTime = task.taskStart;
+            m.endTime  = task.taskEnd;
+            m.creator = task.taskPath;
+            m.instrument = "VIS";
+            m.productType = outFileName.substr(5,7);
+            m.productSize = 1234;
+            m.productStatus = "OK";
+            m.productVersion = "1";
+            m.productId = outFileName.substr(0, 47);
+            m.regTime = LibComm::timeTag();
+            m.url = "http://euclid.esa.int/archive/" + outFileName;
+        } else {
+            m.startTime = task.taskStart;
+            m.endTime  = task.taskEnd;
+            m.creator = task.taskPath;
+            m.instrument = "UNKNOWN_INST";
+            m.productType = "UNKNOWN_TYPE";
+            m.productSize = 1234;
+            m.productStatus = "OK";
+            m.productVersion = "1";
+            m.productId = ("EUCL_" +
+                           m.productType + "_" +
+                           m.startTime  + "-" + m.endTime  + "_10");
+            m.regTime = LibComm::timeTag();
+            m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
+        }
 
+        std::cerr << "output product: " << outFileName << " => " << m.productId << "\n";
         task.outputs.productList[m.productType] = m;
     }
 
