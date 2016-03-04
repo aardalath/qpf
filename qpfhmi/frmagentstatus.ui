@@ -98,7 +98,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Run&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#008b8b;&quot;&gt;Wait&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#ffa500;&quot;&gt;Pau&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#808080;&quot;&gt;Sto&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;Fail&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#00ff00;&quot;&gt;Fin&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Run&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#008b8b;&quot;&gt;Wait&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#ffa500;&quot;&gt;Pau&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#808080;&quot;&gt;Sto&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;Fail&lt;/span&gt;/&lt;span style=&quot; font-weight:600; color:#21ca21;&quot;&gt;Fin&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -486,7 +486,7 @@
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(0, 240, 0);</string>
+           <string notr="true">background-color: rgb(33, 202, 33);</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::Panel</enum>
