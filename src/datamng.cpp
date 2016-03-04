@@ -167,8 +167,7 @@ void DataManager::initializeDB()
 //----------------------------------------------------------------------
 void DataManager::saveToDB(Message_INDATA * msg)
 {
-//    Json::Value & prodMetadata = msg->productsMetadata.getData();
-//    saveProductsToDB(prodMetadata);
+    InfoMsg("Saving inputs...");
     saveProductsToDB(msg->productsMetadata);
 }
 
@@ -178,13 +177,6 @@ void DataManager::saveToDB(Message_INDATA * msg)
 //----------------------------------------------------------------------
 void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 {
-#ifdef DUMP_TASK_CONTENT_TO_LOG
-    // TODO: save task information in task_info table
-    Json::Value & taskResData = msg->task.getData();
-    Json::StyledWriter writer;
-    InfoMsg("TASK TO STORE: " + writer.write(taskResData));
-#endif
-
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
@@ -208,6 +200,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 
     // In case the task has finished, save output products metadata
     if (!msg->task.taskEnd.empty()) {
+        InfoMsg("Saving outputs...");
         saveProductsToDB(msg->task.outputs);
     }
 }
@@ -226,9 +219,10 @@ void DataManager::saveProductsToDB(ProductCollection & productList) //Json::Valu
         dbHdl->openConnection();
 
         // Try to store the data into the DB
-        //dbHdl->storeProducts(productList);
+        dbHdl->storeProducts(productList);
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
+        ErrMsg(productList.getDataString());
         return;
     }
 
