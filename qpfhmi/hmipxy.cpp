@@ -144,10 +144,14 @@ void HMIProxy::requestStop()
 
 bool checkForCorruption(HMIProxy::TaskResultsInfo & m)
 {
-    int sum = 0;
-    for (auto & kv : m) {
-        std::string key = kv.first;
-        sum += (int)(key[0]);
+    try {
+        int sum = 0;
+        for (auto & kv : m) {
+            std::string key = kv.first;
+            sum += (int)(key[0]);
+        }
+    } catch(...) {
+        return false;
     }
     return true;
 }
@@ -158,6 +162,8 @@ bool checkForCorruption(HMIProxy::TaskResultsInfo & m)
 //----------------------------------------------------------------------
 void HMIProxy::registerTaskRes(Json::Value jsonValue)
 {
+    registeringTaskMutex.lock();
+
     if (!checkForCorruption(taskResInfo)) {
         FatalMsg("taskResInfo got corrupted!!");
     }
@@ -176,14 +182,14 @@ void HMIProxy::registerTaskRes(Json::Value jsonValue)
 
     msgOut << writer.write(jsonValue) << "\n";
     msgOut << "{ "
-           << K(jsonValue.isNull()) << ",\n  "
-           << K(jsonValue.isArray()) << ",\n  "
+           << K(jsonValue.isNull()) << ",  "
+           << K(jsonValue.isArray()) << ",  "
            << K(jsonValue.isObject()) << " }\n";
     Json::Value & v = jsonValue["task"]["taskData"];
     msgOut << writer.write(v) << "\n";
     msgOut << "{ "
-           << K(v.isNull()) << ",\n  "
-           << K(v.isArray()) << ",\n  "
+           << K(v.isNull()) << ",  "
+           << K(v.isArray()) << ",  "
            << K(v.isObject()) << " }\n";
     if (v.isNull()) {
         // Set minimum information
@@ -198,9 +204,9 @@ void HMIProxy::registerTaskRes(Json::Value jsonValue)
     }
     msgOut << writer.write(v) << "\n";
     msgOut << "{ "
-           << K(v.isNull()) << ",\n  "
-           << K(v.isArray()) << ",\n  "
-           << K(v.isObject()) << " }\n";
+           << K(v.isNull()) << ",  "
+           << K(v.isArray()) << ",  "
+           << K(v.isObject()) << " }";
     msgOut.close();
 
     if (v.isObject()) {
@@ -212,6 +218,12 @@ void HMIProxy::registerTaskRes(Json::Value jsonValue)
             InfoMsg("There are TaskRes information chunks");
         }
     }
+
+    if (!checkForCorruption(taskResInfo)) {
+        FatalMsg("taskResInfo got corrupted!!");
+    }
+
+    registeringTaskMutex.unlock();
 }
 
 //----------------------------------------------------------------------
@@ -229,9 +241,12 @@ bool HMIProxy::isThereTaskResInfo()
 //----------------------------------------------------------------------
 int HMIProxy::getTaskResInfo(TaskResultsInfo & newTaskInfo)
 {
+    registeringTaskMutex.lock();
     newTaskInfo = taskResInfo;
     taskResInfo.clear();
     thereIsTaskResInfo = false;
+    registeringTaskMutex.unlock();
+
     return newTaskInfo.size();
 }
 

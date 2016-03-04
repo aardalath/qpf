@@ -53,6 +53,8 @@
 //   none
 //------------------------------------------------------------
 
+#include <mutex>
+
 //------------------------------------------------------------
 // Topic: Project headers
 //   - component.h
@@ -143,6 +145,7 @@ private:
     TaskResultsInfo taskResInfo;
 
     std::atomic<bool> thereIsTaskResInfo;
+    std::mutex registeringTaskMutex;
     std::atomic<bool> startSignalFromHMIReceived;
 };
 
