@@ -68,11 +68,6 @@ license you like.
 // End of content of file: LICENSE
 // //////////////////////////////////////////////////////////////////////
 
-
-static void showBacktrace(void);
-
-
-
 #include "json/json.h"
 
 #ifndef JSON_IS_AMALGAMATION
@@ -5116,34 +5111,3 @@ std::ostream& operator<<(std::ostream& sout, Value const& root) {
 // //////////////////////////////////////////////////////////////////////
 // End of content of file: src/lib_json/json_writer.cpp
 // //////////////////////////////////////////////////////////////////////
-
-
-#include <execinfo.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-void showBacktrace(void)
-{
-    int j, nptrs;
-#define SIZE 100
-    void *buffer[100];
-    char **strings;
-
-    nptrs = backtrace(buffer, SIZE);
-    fprintf(stderr, "backtrace() returned %d addresses\n", nptrs);
-
-    /* The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
-       would produce similar output to the following: */
-
-    strings = backtrace_symbols(buffer, nptrs);
-    if (strings == NULL) {
-        perror("backtrace_symbols");
-        exit(EXIT_FAILURE);
-    }
-
-    for (j = 0; j < nptrs; j++)
-        fprintf(stderr, "%s\n", strings[j]);
-
-    free(strings);
-}
