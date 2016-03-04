@@ -45,6 +45,8 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QSpacerItem>
+#include <QMdiSubWindow>
+#include <QSignalMapper>
 
 #include <future>
 
@@ -54,6 +56,7 @@
 #include "archivemodel.h"
 #include "frmagentstatus.h"
 #include "simindata.h"
+#include "textview.h"
 
 //INI#include "iniparser.h"
 #include "json/json.h"
@@ -74,39 +77,16 @@ public:
     explicit MainWindow(QWidget *parent = 0, char * cfgFile = 0);
     ~MainWindow();
 
-    /*
-    typedef LibComm::Router2RouterPeer::Peer   Peer;
-    typedef LibComm::Router2RouterPeer::Frame  Frame;
-
-    struct Processor {
-        std::string name;
-        std::string exePath;
-        std::string inPath;
-        std::string outPath;
-        std::vector<std::string> connections;
-    };
-
-    struct QPFHMIConfig {
-        std::string appName;
-        std::string appVersion;
-        std::string lastAccess;
-
-        std::vector<std::string>                         productTypes;
-        std::map<std::string, Processor*>                processors;
-        std::vector<std::string>                         machines;
-        std::map<std::string, std::vector<std::string> > machineNodes;
-
-        Peer evtMngCfg;
-        Peer qpfhmiCfg;
-    };    
-*/
-
 signals:
     void goToOperational();
     void stopSendingMessages();
 
 public slots:
     void commandSystem();
+
+protected:
+    void manualSetupUI();
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 protected slots:
     void transitToOperational();
@@ -165,6 +145,56 @@ protected:
     //----------------------------------------------------------------------
     void setLogWatch();
 
+private slots:
+#ifndef QT_NO_CLIPBOARD
+    void cut();
+    void copy();
+    void paste();
+#endif
+    void about();
+    void updateMenus();
+    void updateWindowMenu();
+    TextView *createTextView();
+    void switchLayoutDirection();
+    void setActiveSubWindow(QWidget *window);
+
+private:
+    void createActions();
+    void createMenus();
+    void createToolBars();
+    void createStatusBar();
+    void readSettings();
+    void writeSettings();
+    TextView *activeTextView();
+    QMdiSubWindow *findTextView(const QString &fileName);
+
+    QSignalMapper *windowMapper;
+
+    QMenu *fileMenu;
+    QMenu *editMenu;
+    QMenu *windowMenu;
+    QMenu *helpMenu;
+    QToolBar *fileToolBar;
+    QToolBar *editToolBar;
+
+    QAction *saveAsAct;
+    QAction *exitAct;
+#ifndef QT_NO_CLIPBOARD
+    QAction *cutAct;
+    QAction *copyAct;
+    QAction *pasteAct;
+#endif
+    QAction *dbgInfoAct;
+    QAction *closeAct;
+    QAction *closeAllAct;
+    QAction *tileAct;
+    QAction *cascadeAct;
+    QAction *nextAct;
+    QAction *previousAct;
+    QAction *separatorAct;
+    QAction *aboutAct;
+    QAction *aboutQtAct;
+
 private:
     QVector<double> getLoadAvgs();
     void clearLayout(QLayout *layout);
@@ -173,7 +203,6 @@ private:
     Ui::MainWindow *ui;
 
     char * configFile;
-
     QVector<LogWatcher*> nodeLogs;
 
     HMIProxy * hmiNode;
@@ -181,14 +210,11 @@ private:
     std::thread hmiPxyThread;
 
     SimInData * simInData;
-
     Configuration * cfg;
-
     ArchiveModel * archHdl;
-
     QString  fileInDataParams;
-
     QTimer * taskMonitTimer;
+
     QMap<QString, Json::Value> taskResInfo;
     QMap<QString, QTreeWidgetItem *> taskResItems;
     QMap<QString, Json::Value> processedTasksInfo;
