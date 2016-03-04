@@ -71,11 +71,13 @@ public:
     {
         if (FrmAgentStatus->objectName().isEmpty())
             FrmAgentStatus->setObjectName(QStringLiteral("FrmAgentStatus"));
-        FrmAgentStatus->resize(871, 91);
+        FrmAgentStatus->resize(873, 85);
         FrmAgentStatus->setFrameShape(QFrame::Box);
         FrmAgentStatus->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(FrmAgentStatus);
+        verticalLayout->setSpacing(2);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(4, 4, 4, 4);
         lblTaskAgentName = new QLabel(FrmAgentStatus);
         lblTaskAgentName->setObjectName(QStringLiteral("lblTaskAgentName"));
         QFont font;
@@ -98,6 +100,7 @@ public:
         lblTotalTasks = new QLabel(FrmAgentStatus);
         lblTotalTasks->setObjectName(QStringLiteral("lblTotalTasks"));
         lblTotalTasks->setFont(font);
+        lblTotalTasks->setMargin(3);
 
         horizontalLayout_8->addWidget(lblTotalTasks);
 
@@ -118,6 +121,7 @@ public:
         lblRuningTasks = new QLabel(FrmAgentStatus);
         lblRuningTasks->setObjectName(QStringLiteral("lblRuningTasks"));
         lblRuningTasks->setFont(font);
+        lblRuningTasks->setMargin(3);
 
         horizontalLayout_3->addWidget(lblRuningTasks);
 
@@ -174,6 +178,7 @@ public:
         lblMaxTasks = new QLabel(FrmAgentStatus);
         lblMaxTasks->setObjectName(QStringLiteral("lblMaxTasks"));
         lblMaxTasks->setFont(font);
+        lblMaxTasks->setMargin(3);
 
         horizontalLayout_7->addWidget(lblMaxTasks);
 
@@ -196,18 +201,21 @@ public:
         lblLoadAvg1 = new QLabel(FrmAgentStatus);
         lblLoadAvg1->setObjectName(QStringLiteral("lblLoadAvg1"));
         lblLoadAvg1->setFont(font);
+        lblLoadAvg1->setMargin(3);
 
         horizontalLayout->addWidget(lblLoadAvg1);
 
         lblLoadAvg2 = new QLabel(FrmAgentStatus);
         lblLoadAvg2->setObjectName(QStringLiteral("lblLoadAvg2"));
         lblLoadAvg2->setFont(font);
+        lblLoadAvg2->setMargin(3);
 
         horizontalLayout->addWidget(lblLoadAvg2);
 
         lblLoadAvg3 = new QLabel(FrmAgentStatus);
         lblLoadAvg3->setObjectName(QStringLiteral("lblLoadAvg3"));
         lblLoadAvg3->setFont(font);
+        lblLoadAvg3->setMargin(3);
 
         horizontalLayout->addWidget(lblLoadAvg3);
 
@@ -228,6 +236,7 @@ public:
         lblUptime = new QLabel(FrmAgentStatus);
         lblUptime->setObjectName(QStringLiteral("lblUptime"));
         lblUptime->setFont(font);
+        lblUptime->setMargin(3);
 
         horizontalLayout_9->addWidget(lblUptime);
 
@@ -247,7 +256,7 @@ public:
         horizontalLayout_4->setContentsMargins(0, 4, 0, 4);
         frmRunning = new QFrame(frmStatusBar);
         frmRunning->setObjectName(QStringLiteral("frmRunning"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(frmRunning->sizePolicy().hasHeightForWidth());
