@@ -366,7 +366,7 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
                                    "task_status_id", (int)(task.taskStatus));
         result &= updateTable<std::string>("tasks_info", filter,
                                            "start_time", task.taskStart);
-        if (task.taskStatus == TASK_FINISHED) {
+        if (!task.taskEnd.empty()) {
             result &= updateTable<std::string>("tasks_info", filter,
                                                "end_time", task.taskEnd);
         }
