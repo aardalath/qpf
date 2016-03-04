@@ -46,7 +46,7 @@
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
 
-Exception::Exception(std::string const & msg, int i) : msg_(msg)
+Exception::Exception(std::string const & msg, int i) : msg_(msg), code_(i)
 {}
 
 Exception::~Exception() noexcept
