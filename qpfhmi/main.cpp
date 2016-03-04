@@ -41,10 +41,12 @@
 
 int main(int argc, char *argv[])
 {
-    App a(argc, argv);
+    QPF::App app(argc, argv);
 
-    QPF::MainWindow w;
-    w.show();
+    if (app.mustLaunchHMI()) {
+        QPF::MainWindow * w = new QPF::MainWindow(0, app.getConfigFileName());
+        w->show();
+    }
 
-    return a.exec();
+    return app.exec();
 }
