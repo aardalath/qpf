@@ -487,6 +487,7 @@ deployer.o: ../../../qpf/deployer.cpp ../../../qpf/deployer.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
 		../../../src/taskagent.h \
+		../../../src/procelem.h \
 		../../../src/taskorc.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o deployer.o ../../../qpf/deployer.cpp
@@ -509,6 +510,7 @@ main.o: ../../../qpf/main.cpp ../../../../libcomm/src/log.h \
 		../../../src/logmng.h \
 		../../../src/taskmng.h \
 		../../../src/taskagent.h \
+		../../../src/procelem.h \
 		../../../src/taskorc.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../../qpf/main.cpp

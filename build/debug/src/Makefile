@@ -57,7 +57,8 @@ SOURCES       = ../../../src/config.cpp \
 		../../../src/logmng.cpp \
 		../../../src/taskagent.cpp \
 		../../../src/taskmng.cpp \
-		../../../src/taskorc.cpp 
+		../../../src/taskorc.cpp \
+		../../../src/procelem.cpp 
 OBJECTS       = config.o \
 		component.o \
 		dbhdlpostgre.o \
@@ -67,7 +68,8 @@ OBJECTS       = config.o \
 		logmng.o \
 		taskagent.o \
 		taskmng.o \
-		taskorc.o
+		taskorc.o \
+		procelem.o
 DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt/5.4/gcc_64/mkspecs/common/shell-unix.conf \
 		/opt/Qt/5.4/gcc_64/mkspecs/common/unix.conf \
@@ -188,6 +190,7 @@ DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		msgtypes.h \
 		propdef.h \
 		version.h \
+		procelem.h \
 		config.h \
 		component.h \
 		dbhdlpostgre.h \
@@ -206,7 +209,8 @@ DIST          = /opt/Qt/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../src/logmng.cpp \
 		../../../src/taskagent.cpp \
 		../../../src/taskmng.cpp \
-		../../../src/taskorc.cpp
+		../../../src/taskorc.cpp \
+		../../../src/procelem.cpp
 QMAKE_TARGET  = QPF
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = libQPF.so.1.0.0
@@ -649,6 +653,7 @@ taskagent.o: ../../../src/taskagent.cpp ../../../src/taskagent.h \
 		../../../src/msgtypes.h \
 		../../../json/json/json.h \
 		../../../src/config.h \
+		../../../src/procelem.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o taskagent.o ../../../src/taskagent.cpp
 
@@ -683,6 +688,17 @@ taskorc.o: ../../../src/taskorc.cpp ../../../src/taskorc.h \
 		../../../src/config.h \
 		../../../../libcomm/src/tools.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o taskorc.o ../../../src/taskorc.cpp
+
+procelem.o: ../../../src/procelem.cpp ../../../src/procelem.h \
+		../../../src/msgtypes.h \
+		../../../src/propdef.h \
+		../../../json/json/json.h \
+		../../../src/config.h \
+		../../../../libcomm/src/r2rpeer.h \
+		/opt/cots/include/zmq.hpp \
+		/opt/cots/include/zmq.h \
+		../../../../libcomm/src/tools.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o procelem.o ../../../src/procelem.cpp
 
 ####### Install
 

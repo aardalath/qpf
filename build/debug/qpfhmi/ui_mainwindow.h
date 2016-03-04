@@ -18,6 +18,7 @@
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -156,10 +157,13 @@ public:
     QDockWidget *dockMainControl;
     QWidget *dockWidgetContents;
     QVBoxLayout *verticalLayout_2;
-    QHBoxLayout *horizontalLayout;
+    QFrame *frame;
+    QHBoxLayout *horizontalLayout_15;
     QSpacerItem *horizontalSpacer;
     QPushButton *btnStart;
     QSpacerItem *horizontalSpacer_2;
+    QFrame *frame_2;
+    QVBoxLayout *verticalLayout_15;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *btnStopMultInDataEvt;
@@ -688,7 +692,7 @@ public:
         scrollAreaAgents->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 843, 484));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 839, 484));
         scrollAreaAgents->setWidget(scrollAreaWidgetContents);
 
         vlyAgents->addWidget(scrollAreaAgents);
@@ -734,30 +738,46 @@ public:
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        frame = new QFrame(dockWidgetContents);
+        frame->setObjectName(QStringLiteral("frame"));
+        frame->setFrameShape(QFrame::StyledPanel);
+        frame->setFrameShadow(QFrame::Raised);
+        horizontalLayout_15 = new QHBoxLayout(frame);
+        horizontalLayout_15->setSpacing(6);
+        horizontalLayout_15->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
+        horizontalLayout_15->setContentsMargins(1, 4, 1, 4);
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout->addItem(horizontalSpacer);
+        horizontalLayout_15->addItem(horizontalSpacer);
 
-        btnStart = new QPushButton(dockWidgetContents);
+        btnStart = new QPushButton(frame);
         btnStart->setObjectName(QStringLiteral("btnStart"));
         btnStart->setMinimumSize(QSize(100, 40));
         btnStart->setCheckable(false);
 
-        horizontalLayout->addWidget(btnStart);
+        horizontalLayout_15->addWidget(btnStart);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(17, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout->addItem(horizontalSpacer_2);
+        horizontalLayout_15->addItem(horizontalSpacer_2);
 
-        horizontalLayout->setStretch(0, 1);
-        horizontalLayout->setStretch(1, 4);
-        horizontalLayout->setStretch(2, 1);
+        horizontalLayout_15->setStretch(0, 1);
+        horizontalLayout_15->setStretch(1, 8);
+        horizontalLayout_15->setStretch(2, 1);
+        btnStart->raise();
 
-        verticalLayout_2->addLayout(horizontalLayout);
+        verticalLayout_2->addWidget(frame);
 
+        frame_2 = new QFrame(dockWidgetContents);
+        frame_2->setObjectName(QStringLiteral("frame_2"));
+        frame_2->setFrameShape(QFrame::StyledPanel);
+        frame_2->setFrameShadow(QFrame::Raised);
+        verticalLayout_15 = new QVBoxLayout(frame_2);
+        verticalLayout_15->setSpacing(6);
+        verticalLayout_15->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_15->setObjectName(QStringLiteral("verticalLayout_15"));
+        verticalLayout_15->setContentsMargins(1, 4, 1, 4);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
@@ -765,7 +785,7 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
-        btnStopMultInDataEvt = new QPushButton(dockWidgetContents);
+        btnStopMultInDataEvt = new QPushButton(frame_2);
         btnStopMultInDataEvt->setObjectName(QStringLiteral("btnStopMultInDataEvt"));
 
         horizontalLayout_2->addWidget(btnStopMultInDataEvt);
@@ -775,13 +795,17 @@ public:
         horizontalLayout_2->addItem(horizontalSpacer_4);
 
         horizontalLayout_2->setStretch(0, 1);
+        horizontalLayout_2->setStretch(1, 8);
         horizontalLayout_2->setStretch(2, 1);
 
-        verticalLayout_2->addLayout(horizontalLayout_2);
+        verticalLayout_15->addLayout(horizontalLayout_2);
 
-        verticalSpacer = new QSpacerItem(20, 463, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 328, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        verticalLayout_2->addItem(verticalSpacer);
+        verticalLayout_15->addItem(verticalSpacer);
+
+
+        verticalLayout_2->addWidget(frame_2);
 
         groupBox = new QGroupBox(dockWidgetContents);
         groupBox->setObjectName(QStringLiteral("groupBox"));
