@@ -51,18 +51,15 @@
 
 //------------------------------------------------------------
 // Topic: External packages
-//   - commnode.h
 //------------------------------------------------------------
-
-#include "commnode.h"
-using LibComm::CommNode;
 
 //------------------------------------------------------------
 // Topic: Project headers
 //   - msgtypes.h
+//   - cfg.h
 //------------------------------------------------------------
-
-#include "msgtypes.h"
+#include "propdef.h"
+#include "cfg.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -80,6 +77,8 @@ class Component : public CommNode {
 public:
     Component(const char * name = 0);
     virtual ~Component() {}
+
+    PropertyRef(Component, ConfigurationInfo, cfgInfo, CfgInfo);
 
 protected:
 
