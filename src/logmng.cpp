@@ -66,7 +66,7 @@ void LogManager::processDATA_INFO()
     // Check the product type as input for any rule
     Message_DATA_INFO * msg = dynamic_cast<Message_DATA_INFO *>(msgData.msg);
     msg->toFields();
-    std::string & logChunk = msg->variables.paramList["content"];
+    std::string & logChunk = msg->variables.paramList["contents"];
     std::string logFileName(Log::getLogBaseDir() + "/rlog/" +
                             msg->header.source + ".log");
     std::ofstream logOut;
