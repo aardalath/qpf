@@ -204,4 +204,6 @@ template class Evaluator<int>;
 
 }
 
+#include "infixeval.tcc"
+
 #endif

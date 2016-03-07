@@ -18,4 +18,4 @@ TARGET = infix
 INCLUDEPATH +=
 
 HEADERS += infixeval.h
-SOURCES += infixeval.cpp
+#SOURCES += infixeval.cpp
