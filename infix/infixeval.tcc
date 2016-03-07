@@ -36,8 +36,6 @@
  *
  ******************************************************************************/
 
-#include "infixeval.h"
-
 #include <cmath>
 using namespace std;
 
@@ -223,7 +221,7 @@ template <class NumericType>
 NumericType Evaluator<NumericType>::getValue()
 {
     vector<string> singleExpr = split(expressions, ';');
-    NumericType theResult;
+    NumericType theResult = NumericType(0);
 
     opStack.push(EOL);
     for (unsigned int i = 0; i < singleExpr.size(); ++i) {
