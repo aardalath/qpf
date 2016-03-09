@@ -38,6 +38,8 @@
 
 #include "deployer.h"
 
+#include "init.h"
+
 #include <thread>
 #include <cerrno>
 
@@ -91,7 +93,7 @@ Deployer::~Deployer()
 //----------------------------------------------------------------------
 bool Deployer::mustLaunchHMI()
 {
-    while (!deploymentCompleted) {}
+    while (!deploymentCompleted) { usleep(10000); }
     return hmiNeeded;
 }
 
@@ -304,9 +306,8 @@ bool Deployer::fexists(const char * name)
 //----------------------------------------------------------------------
 bool Deployer::waitingForGoAhead()
 {
-    static const char evtmngGoFile[] = "/tmp/EventManager.GO.msg";
-    bool keepWaiting = !fexists(evtmngGoFile);
-    if (!keepWaiting) { unlink(evtmngGoFile); }
+    bool keepWaiting = !fexists(EvtMngGoFile);
+    if (!keepWaiting) { unlink(EvtMngGoFile); }
     return keepWaiting;
 }
 

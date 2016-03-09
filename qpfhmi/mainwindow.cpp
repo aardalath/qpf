@@ -45,6 +45,8 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "init.h"
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -569,8 +571,6 @@ void MainWindow::commandSystem()
     static bool firstTime = true;
     static bool isStart = true;
 
-    static const char evtmngGoFile[] = "/tmp/EventManager.GO.msg";
-
     if (isStart) {
         if (firstTime) {
             // Non-GUI (communications) Initializations
@@ -586,7 +586,8 @@ void MainWindow::commandSystem()
         init();
 
         // System START signal
-        std::ofstream fEvtMngGoAhead(evtmngGoFile);
+        std::ofstream fEvtMngGoAhead(EvtMngGoFile);
+        fEvtMngGoAhead << '.';
         fEvtMngGoAhead.close();
         //pid_t parentPid = getppid();
         //kill(parentPid, SIGUSR1);
