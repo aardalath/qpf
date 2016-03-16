@@ -41,6 +41,8 @@
 
 #include <iterator>
 #include <iostream>
+#include <cstring>
+#include <libgen.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -161,6 +163,54 @@ std::string mid(std::string & s, int from)
 std::string quoted(std::string s, char q)
 {
     return q + s + q;
+}
+
+//----------------------------------------------------------------------
+// Function: getExtension
+// Returns the extension  part of filename
+//----------------------------------------------------------------------
+std::string getExtension(std::string fName)
+{
+    const char * filename = fName.c_str();
+    const char *dot = strrchr(filename, '.');
+    if (!dot || dot == filename) return "";
+    return std::string(dot + 1);
+}
+
+//----------------------------------------------------------------------
+// Function: getBaseName
+// Returns the base name part of a filename
+//----------------------------------------------------------------------
+std::string getBaseName(char * fName)
+{
+    return std::string(basename(fName));
+}
+
+//----------------------------------------------------------------------
+// Function: getBaseName
+// Returns the base name part of a filename
+//----------------------------------------------------------------------
+std::string getBaseName(std::string fName)
+{
+    return getBaseName((char *)(fName.c_str()));
+}
+
+//----------------------------------------------------------------------
+// Function: getDirName
+// Returns the directory part of a filename
+//----------------------------------------------------------------------
+std::string getDirName(char * fName)
+{
+    return std::string(dirname(fName));
+}
+
+//----------------------------------------------------------------------
+// Function: getDirName
+// Returns the directory part of a filename
+//----------------------------------------------------------------------
+std::string getDirName(std::string fName)
+{
+    return getDirName((char*)(fName.c_str()));
 }
 
 //----------------------------------------------------------------------

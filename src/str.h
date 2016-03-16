@@ -191,6 +191,36 @@ std::string mid(std::string & s, int from);
 std::string quoted(std::string s, char q = '\'');
 
 //----------------------------------------------------------------------
+// Function: getExtension
+// Returns the extension  part of filename
+//----------------------------------------------------------------------
+std::string getExtension(std::string fName);
+
+//----------------------------------------------------------------------
+// Function: getBaseName
+// Returns the base name part of a filename
+//----------------------------------------------------------------------
+std::string getBaseName(char * fName);
+
+//----------------------------------------------------------------------
+// Function: getBaseName
+// Returns the base name part of a filename
+//----------------------------------------------------------------------
+std::string getBaseName(std::string fName);
+
+//----------------------------------------------------------------------
+// Function: getDirName
+// Returns the directory part of a filename
+//----------------------------------------------------------------------
+std::string getDirName(char * fName);
+
+//----------------------------------------------------------------------
+// Function: getDirName
+// Returns the directory part of a filename
+//----------------------------------------------------------------------
+std::string getDirName(std::string fName);
+
+//----------------------------------------------------------------------
 // Function: tagToTimestamp
 // Get date and time components from time tag
 //----------------------------------------------------------------------
