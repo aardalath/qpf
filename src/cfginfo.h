@@ -138,11 +138,11 @@ const std::string ExternalSpace("EXTERNAL");
 const std::string UserSpace("USER");
 const std::string InboxSpace("INBOX");
 const std::string LocalArchSpace("LOCAL_ARCHIVE");
-const std::string SharedSpace("SHARED");
+const std::string GatewaySpace("GATEWAY");
 const std::string ProcessingSpace("PROCESSING");
 
 const std::set<std::string> URLSpaces
-{ ExternalSpace, UserSpace, InboxSpace, LocalArchSpace, SharedSpace, ProcessingSpace };
+{ ExternalSpace, UserSpace, InboxSpace, LocalArchSpace, GatewaySpace, ProcessingSpace };
 
 }
 

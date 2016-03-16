@@ -583,28 +583,33 @@ void Configuration::processConfiguration()
 
     const Json::Value & stge             = cfg["storage"];
     const Json::Value & stgeBase         = stge["base"];
-    const Json::Value & stgeIn           = stge["in"];
-    const Json::Value & stgeOut          = stge["out"];
-    const Json::Value & stgeLocal        = stge["local"];
-    const Json::Value & stgeShared       = stge["shared"];
+    const Json::Value & stgeIn           = stge["incoming"];
+    const Json::Value & stgeOut          = stge["outgoing"];
+    const Json::Value & stgeLocal        = stge["local_archive"];
+    const Json::Value & stgeGatew        = stge["gateway"];
 
     cfgInfo.storage.base                 = stgeBase["path"].asString();
+
     cfgInfo.storage.tasks                = PATHTsk;
-    cfgInfo.storage.in.protocol          = stgeIn["protocol"].asString();
-    cfgInfo.storage.in.address           = stgeIn["address"].asString();
-    cfgInfo.storage.in.port              = stgeIn["port"].asString();
-    cfgInfo.storage.in.user              = stgeIn["user"].asString();
-    cfgInfo.storage.in.passwd            = stgeIn["password"].asString();
-    cfgInfo.storage.in.inbox             = stgeIn["inbox"].asString();
-    cfgInfo.storage.out.protocol         = stgeOut["protocol"].asString();
-    cfgInfo.storage.out.address          = stgeOut["address"].asString();
-    cfgInfo.storage.out.port             = stgeOut["port"].asString();
-    cfgInfo.storage.out.user             = stgeOut["user"].asString();
-    cfgInfo.storage.out.passwd           = stgeOut["password"].asString();
-    cfgInfo.storage.out.inbox            = "";
-    cfgInfo.storage.local.path           = stgeLocal["path"].asString();
-    cfgInfo.storage.shared.local_path    = stgeShared["local_path"].asString();
-    cfgInfo.storage.shared.external_path = stgeShared["external_path"].asString();
+
+    cfgInfo.storage.inbox.protocol          = stgeIn["protocol"].asString();
+    cfgInfo.storage.inbox.address           = stgeIn["address"].asString();
+    cfgInfo.storage.inbox.port              = stgeIn["port"].asString();
+    cfgInfo.storage.inbox.user              = stgeIn["user"].asString();
+    cfgInfo.storage.inbox.passwd            = stgeIn["password"].asString();
+    cfgInfo.storage.inbox.local             = stgeIn["local"].asString();
+
+    cfgInfo.storage.outbox.protocol         = stgeOut["protocol"].asString();
+    cfgInfo.storage.outbox.address          = stgeOut["address"].asString();
+    cfgInfo.storage.outbox.port             = stgeOut["port"].asString();
+    cfgInfo.storage.outbox.user             = stgeOut["user"].asString();
+    cfgInfo.storage.outbox.passwd           = stgeOut["password"].asString();
+    cfgInfo.storage.outbox.local            = stgeOut["local"].asString();;
+
+    cfgInfo.storage.local_archive.path      = stgeLocal["path"].asString();
+
+    cfgInfo.storage.gateway.gateway_path    = stgeGatew["gateway_path"].asString();
+    cfgInfo.storage.gateway.processing_path = stgeGatew["processing_path"].asString();
 
     // Create peer commnodes for nodes in current machine
     std::vector<std::string> & machineNodes =

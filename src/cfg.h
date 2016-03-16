@@ -92,7 +92,7 @@ struct OrchestrationMaps {
     std::map<Rule *, std::string>       ruleDesc;
 };
 
-enum LocalArchiveMethod { LINK, MOVE, COPY, SYMLINK };
+enum LocalArchiveMethod { LINK, MOVE, COPY, REMOTE_COPY, SYMLINK };
 
 struct StorageExternal {
     std::string protocol;
@@ -100,26 +100,25 @@ struct StorageExternal {
     std::string port;
     std::string user;
     std::string passwd;
-    std::string inbox;
+    std::string local;
 };
 
 struct StorageLocal {
     std::string path;
-    LocalArchiveMethod method;
 };
 
-struct StorageShared {
-    std::string local_path;
-    std::string external_path;
+struct StorageProcessing {
+    std::string gateway_path;
+    std::string processing_path;
 };
 
 struct StorageConfig {
-    std::string     base;
-    std::string     tasks;
-    StorageExternal in;
-    StorageLocal    local;
-    StorageShared   shared;
-    StorageExternal out;
+    std::string       base;
+    std::string       tasks;
+    StorageExternal   inbox;
+    StorageLocal      local_archive;
+    StorageProcessing gateway;
+    StorageExternal   outbox;
 };
 
 }
