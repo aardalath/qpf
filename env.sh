@@ -1,26 +1,81 @@
 #!/bin/bash
 
-pth="$pth:/opt/Qt/5.4/gcc_64/bin"
-pth="$pth:/opt/Qt/Tools/QtCreator/bin"
-pth="$pth:/opt/cots/bin"
-pth="$pth:/opt/anaconda/bin"
+#---- Basic variables -------------------------------------------------
+
+COTSDIR=${HOME}/opt
+QTVER=5.4
+
+QTDIR=${COTSDIR}/Qt/${QTVER}/gcc_64
+QTCREATORDIR=${COTSDIR}/Qt/Tools/QtCreator
+
+SODIUMDIR=${HOME}/opt/libsodium
+ZMQDIR=${HOME}/opt/zmq
+CURLDIR=${HOME}/opt/curl
+PCRE2DIR=${HOME}/opt/pcre2
+GTESTDIR=${HOME}/ws/jcgg/cots/gtest-1.7.0
+PGSQLDIR=${HOME}/opt/pgsql
+
+WORKAREA=${HOME}/ws/jcgg
+
+QPFWSDIR=${WORKAREA}/QPF
+BUILDDIR=build
+QPFBUILD=${QPFWSDIR}/${BUILDDIR}
+
+#---- PATH ------------------------------------------------------------
+
+pth=""
+
+pth="$pth:${COTSDIR}/bin"
+pth="$pth:${QTDIR}/bin"
+pth="$pth:${QTCREATORDIR}/bin"
+pth="$pth:${SODIUMDIR}/bin"
+pth="$pth:${ZMQDIR}/bin"
+pth="$pth:${CURLDIR}/bin"
+pth="$pth:${PCRE2DIR}/bin"
+pth="$pth:${PGSQLDIR}/bin"
 pth="$pth:$HOME/bin"
 pth="$pth:$HOME/local/bin"
 
-pth="$pth:/home/jcgonzalez/ws/personal/QPF/build/debug/qpf"
-pth="$pth:/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi"
+pth="$pth:${QPFBUILD}/qpf"
+pth="$pth:${QPFBUILD}/qpfhmi"
 
-lpth="$lpth:$HOME/local/lib"
-lpth="$lpth:/opt/Qt/5.4/gcc_64/lib"
-lpth="$lpth:/opt/cots/lib"
+export PATH="$pth:${PATH}"
 
-lpth="$lpth:/home/jcgonzalez/ws/personal/libcomm/build/debug/src"
-lpth="$lpth:/home/jcgonzalez/ws/personal/QPF/build/debug/src"
-lpth="$lpth:/home/jcgonzalez/ws/personal/QPF/build/debug/json"
-lpth="$lpth:/home/jcgonzalez/ws/personal/QPF/build/debug/src"
+#---- LD_LIBRARY_PATH--------------------------------------------------
 
-export PATH="$pth:$PATH"
-export LD_LIBRARY_PATH="$lpth:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/opt/cots/lib/pkgconfig"
+lpth=""
+lpth="$lpth:${HOME}/local/lib"
 
-export QPFHMI=/home/jcgonzalez/ws/personal/QPF/build/debug/qpfhmi/qpfhmi
+lpth="$lpth:${COTSDIR}/bin"
+lpth="$lpth:${QTDIR}/lib"
+lpth="$lpth:${SODIUMDIR}/lib"
+lpth="$lpth:${ZMQDIR}/lib"
+lpth="$lpth:${CURLDIR}/lib"
+lpth="$lpth:${PCRE2DIR}/lib"
+lpth="$lpth:${PGSQLDIR}/lib"
+
+lpth="$lpth:${QPFBUILD}/libcomm"
+lpth="$lpth:${QPFBUILD}/infix"
+lpth="$lpth:${QPFBUILD}/json"
+lpth="$lpth:${QPFBUILD}/sdc"
+lpth="$lpth:${QPFBUILD}/src"
+
+export LD_LIBRARY_PATH="$lpth:${LD_LIBRARY_PATH}"
+
+#---- PKG_CONFIG_PATH -------------------------------------------------
+
+pkgpth=""
+
+pkgpth="$pkgpth:${QTDIR}/lib/pkgconfig"
+pkgpth="$pkgpth:${SODIUMDIR}/lib/pkgconfig"
+pkgpth="$pkgpth:${ZMQDIR}/lib/pkgconfig"
+pkgpth="$pkgpth:${CURLDIR}/lib/pkgconfig"
+pkgpth="$pkgpth:${PCRE2DIR}/lib/pkgconfig"
+pkgpth="$pkgpth:${PGSQLDIR}/lib/pkgconfig"
+
+export PKG_CONFIG_PATH="$pkgpth:${PKG_CONFIG_PATH}"
+
+#---- User specific variables -----------------------------------------
+
+export QPFHMI=${QPFBUILD}/qpfhmi/qpfhmi
+export QPFDIR=${HOME}/qpf

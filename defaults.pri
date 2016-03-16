@@ -11,6 +11,7 @@ ZMQDIR = $$(HOME)/opt/zmq
 CURLDIR = $$(HOME)/opt/curl
 GTESTDIR = $$(HOME)/ws/jcgg/cots/gtest-1.7.0
 PSQLDIR = $$(HOME)/opt/pgsql
+PCRE2DIR = $$(HOME)/opt/pcre2
 }
 
 exists(/home/jcgonzalez) {
@@ -18,6 +19,7 @@ ZMQDIR = $$COTSDIR
 CURLDIR = $$COTSDIR
 GTESTDIR = $$(HOME)/ws/cots/gtest-1.7.0
 PSQLDIR = /opt/pgsql
+PCRE2DIR = $$COTSDIR
 }
 
 PSQLLIB = pq
@@ -41,13 +43,14 @@ SDCINC = $$SDCPATH/sdc
 
 #===== Compilation/Linkage variables =====
 QMAKE_CXXFLAGS += -g3 -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI=0
+LIBS += -lpcre2-8
 
 INCLUDEPATH += . $$PRJ_ROOT_DIR/src
 INCLUDEPATH += $$LIBCOMMINC $$JSONCPPINC $$INFIXINC $$SDCINC
-INCLUDEPATH += $$ZMQDIR/include $$CURLDIR/include $$PSQLDIR/include
+INCLUDEPATH += $$ZMQDIR/include $$CURLDIR/include $$PCRE2DIR/include $$PSQLDIR/include
 INCLUDEPATH += $$(HOME)/opt /usr/include
 
 OLD_LIBDIR = $$QMAKE_LIBDIR
 QMAKE_LIBDIR += $$LIBCOMMLIB $$JSONCPPLIB $$INFIXLIB $$SDCLIB
-QMAKE_LIBDIR += $$ZMQDIR/lib $$CURLDIR/lib $$PSQLDIR/lib
+QMAKE_LIBDIR += $$ZMQDIR/lib $$CURLDIR/lib $$PCRE2DIR/lib $$PSQLDIR/lib
 QMAKE_LIBDIR += /usr/lib64 /lib64 $$OLD_LIBDIR
