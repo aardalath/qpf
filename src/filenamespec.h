@@ -51,8 +51,14 @@
 #include <string>
 #include <set>
 #include <vector>
-#include <regex>
 #include <map>
+
+//#define USE_CX11_REGEX
+#ifdef USE_CX11_REGEX
+#  include <regex>
+#else
+#  include "PCRegEx.h"
+#endif
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -130,8 +136,14 @@ public:
                                std::string ver = "01.00");
 
 private:
-    static std::string                       reStr;
+
+#ifdef USE_CX11_REGEX
     static std::regex                        re;
+#else
+    static PCRegEx *                         re;
+#endif
+
+    static std::string                       reStr;
     static std::string                       assignationsStr;
     static std::map< char, std::set<int> >   assignations;
     static std::string                       productIdTpl;
