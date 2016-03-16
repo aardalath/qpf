@@ -119,7 +119,7 @@ void showBacktrace();
 
 #include <string>
 
-inline std::string mid(std::string s, size_t from, size_t howmany = 1000) {
+inline std::string mid(std::string s, size_t from, size_t howmany = 10000) {
     try {
         return s.substr(from, howmany);
     } catch (...) {
@@ -132,4 +132,3 @@ inline std::string mid(std::string s, size_t from, size_t howmany = 1000) {
 
 
 #endif // DBG_H
-

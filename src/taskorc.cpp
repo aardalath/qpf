@@ -309,7 +309,7 @@ bool TaskOrchestrator::sendTaskProcMsg(Rule * rule,
 
     for (unsigned int i = 0; i < inputs.productList.size(); ++i) {
         urlh.setProduct(inputs.productList.at(i));
-        ProductMetadata & m = urlh.fromLocal2Shared();
+        ProductMetadata & m = urlh.fromLocalArch2Gateway();
         task.inputs.productList[m.productType] = m;
     }
 

@@ -73,12 +73,15 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
+    // NO DOWNLOAD IS STILL IMPLEMENTED
+    // TODO: Implement download of external products into inbox
+
     // Get product basename
     std::vector<std::string> tokens = str::split(product.url, '/');
-    std::string baseName = tokens.at(tokens.size() - 1);
+    std::string baseName = tokens.back();
 
     // Set new location and url
-    std::string newFile(cfgInfo.storage.in.inbox + "/" + baseName);
+    std::string newFile(cfgInfo.storage.inbox.local + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // This method should only be called once the download has been done,
@@ -93,10 +96,22 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 }
 
 //----------------------------------------------------------------------
+// Method: fromOutbox2External
+//----------------------------------------------------------------------
+ProductMetadata & URLHandler::fromOutbox2External()
+{
+    // NO UPLOAD IS STILL IMPLEMENTED
+    // TODO: Implement upload of external products from outbox
+
+    return product;
+}
+
+//----------------------------------------------------------------------
 // Method: fromFolder2Inbox
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromFolder2Inbox()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
@@ -104,15 +119,15 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 
     // Get product basename
     std::vector<std::string> tokens = str::split(product.url, '/');
-    std::string baseName = tokens.at(tokens.size() - 1);
+    std::string baseName = tokens.back();
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
-    std::string newFile(cfgInfo.storage.in.inbox + "/" + baseName);
+    std::string file(str::mid(product.url,7));
+    std::string newFile(cfgInfo.storage.inbox.local + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // Set (hard) link (should it be move?)
-    (void)relocate(file, newFile);
+    (void)relocate(file, newFile, LINK);
 
     // Change url in processing task
     product.url = newUrl;
@@ -124,8 +139,9 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 //----------------------------------------------------------------------
 // Method: fromInbox2Local
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromInbox2Local()
+ProductMetadata & URLHandler::fromInbox2LocalArch()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
@@ -135,11 +151,18 @@ ProductMetadata & URLHandler::fromInbox2Local()
     std::string file(str::mid(product.url,7,1000));
     std::string newFile(file);
     std::string newUrl(product.url);
-    str::replaceAll(newFile, cfgInfo.storage.in.inbox, cfgInfo.storage.local.path + "/in");
-    str::replaceAll(newUrl,  cfgInfo.storage.in.inbox, cfgInfo.storage.local.path + "/in");
+
+    std::string section("/in");
+
+    str::replaceAll(newFile,
+                    cfgInfo.storage.inbox.local,
+                    cfgInfo.storage.local_archive.path + section);
+    str::replaceAll(newUrl,
+                    cfgInfo.storage.inbox.local,
+                    cfgInfo.storage.local_archive.path + section);
 
     // Set (hard) link (should it be move?)
-    (void)relocate(file, newFile);
+    (void)relocate(file, newFile, MOVE);
 
     // Change url in processing task
     product.url = newUrl;
@@ -149,10 +172,11 @@ ProductMetadata & URLHandler::fromInbox2Local()
 }
 
 //----------------------------------------------------------------------
-// Method: fromLocal2Shared
+// Method: fromLocal2Gateway
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromLocal2Shared()
+ProductMetadata & URLHandler::fromLocalArch2Gateway()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
@@ -162,61 +186,52 @@ ProductMetadata & URLHandler::fromLocal2Shared()
     std::string file(str::mid(product.url,7,1000));
     std::string newFile(file);
     std::string newUrl(product.url);
-    std::string archiveSection("/in");
-    if (newUrl.find("/out/") != std::string::npos) {
-        archiveSection = "/out";
-    }
-    str::replaceAll(newFile, cfgInfo.storage.local.path + archiveSection, cfgInfo.storage.shared.local_path    + "/in");
-    str::replaceAll(newUrl,  cfgInfo.storage.local.path + archiveSection, cfgInfo.storage.shared.external_path + "/in");
+
+    std::string section((newUrl.find("/out/") != std::string::npos) ? "/out" : "/in");
+
+    str::replaceAll(newFile,
+                    cfgInfo.storage.local_archive.path + section,
+                    cfgInfo.storage.gateway.gateway_path + "/in");
+    str::replaceAll(newUrl,
+                    cfgInfo.storage.local_archive.path + section,
+                    cfgInfo.storage.gateway.gateway_path + "/in");
 
     // Set (hard) link
-    (void)relocate(file, newFile);
+    (void)relocate(file, newFile, LINK);
 
     // Change url in processing task
     product.url = newUrl;
-    product.urlSpace = SharedSpace;
+    product.urlSpace = GatewaySpace;
 
     return product;
 }
 
 //----------------------------------------------------------------------
-// Method: fromShared2Processing
+// Method: fromGateway2Processing
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromShared2Processing()
+ProductMetadata & URLHandler::fromGateway2Processing()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == SharedSpace);
+    assert(product.urlSpace == GatewaySpace);
 
     // Set new location and url
     std::string file(str::mid(product.url,7,1000));
     std::string newFile(file);
     std::string newUrl(product.url);
-    str::replaceAll(newFile, cfgInfo.storage.shared.external_path + "/in", taskExchgDir + "in");
-    str::replaceAll(newUrl,  cfgInfo.storage.shared.external_path + "/in", taskExchgDir + "in");
 
-    // Get extension
-    std::string extension = str::mid(file,file.find_last_of('.') + 1);
+    std::string section("/in");
 
-    //(void)relocate(file, newFile, 0, (extension == "fits") ? SYMLINK : MOVE);
-    // For the time being (while using VMs) substitute the symlink
-    // above with a hard link to a single file
-    if (extension == "fits") {
-        std::string inst = str::mid(file,4,3);
-        std::string hrdlnkSource;
-        if      (inst == "VIS") { hrdlnkSource = "/qpf/data/....fits"; }
-        else if (inst == "NIR") { hrdlnkSource = "/qpf/data/....fits"; }
-        else if (inst == "SIR") { hrdlnkSource = "/qpf/data/....fits"; }
-        else                    { hrdlnkSource = "/dev/null"; }
-        if (link(hrdlnkSource.c_str(), newFile.c_str()) != 0) {
-            perror(std::string("link input product: from " + file +
-                               " to " + newFile).c_str());
-            showBacktrace();
-        }
-    } else {
-        (void)relocate(file, newFile, 0, COPY);
-    }
+    str::replaceAll(newFile,
+                    cfgInfo.storage.gateway.gateway_path + section,
+                    taskExchgDir + section);
+    str::replaceAll(newUrl,
+                    cfgInfo.storage.gateway.gateway_path + section,
+                    taskExchgDir + section);
+
+    (void)relocate(file, newFile, needsRemoteProcessing() ? REMOTE_COPY : LINK);
 
     // Change url in processing task
     product.url = newUrl;
@@ -226,10 +241,11 @@ ProductMetadata & URLHandler::fromShared2Processing()
 }
 
 //----------------------------------------------------------------------
-// Method: fromProcessing2Shared
+// Method: fromProcessing2Gateway
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromProcessing2Shared()
+ProductMetadata & URLHandler::fromProcessing2Gateway()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
@@ -240,78 +256,57 @@ ProductMetadata & URLHandler::fromProcessing2Shared()
     std::string newFile(file);
     std::string newUrl(product.url);
 
-    DBG("Trying to change URL from " << product.url << " to " << newUrl);
-
     // Get extension
     std::string extension = str::mid(file,file.find_last_of('.') + 1);
-    std::string subdir = (extension == "log") ? "log" : "out";
-    str::replaceAll(newFile, taskExchgDir + subdir, cfgInfo.storage.shared.external_path + "/out");
-    str::replaceAll(newUrl,  taskExchgDir + subdir, cfgInfo.storage.shared.local_path    + "/out");
+    std::string subdir = (extension == "log") ? "/log" : "/out";
 
-    //(void)relocate(file, newFile, (extension == "fits") ? SYMLINK : MOVE);
-    // For the time being (while using VMs) substitute the symlink
-    // above with a hard link to a single file
-    if (extension == "fits") {
-        std::string inFileName(newFile);
-        str::replaceAll(inFileName, "/out/", "/in/");
-        str::replaceAll(inFileName, "_LE1_", "_RAW_");
-        DBG("FITS file, trying to point to orig.:" << inFileName << " => " << newFile);
-        unlink(newFile.c_str());
-        symlink(inFileName.c_str(), newFile.c_str());
-    } else {
-        (void)relocate(file, newFile, 0, COPY);
-    }
+    std::string section("/out");
+
+    str::replaceAll(newFile,
+                    taskExchgDir + subdir,
+                    cfgInfo.storage.gateway.gateway_path + section);
+    str::replaceAll(newUrl,
+                    taskExchgDir + subdir,
+                    cfgInfo.storage.gateway.gateway_path + section);
+
+    DBG("Trying to change URL from " << product.url << " to " << newUrl);
+
+    (void)relocate(file, newFile, needsRemoteProcessing() ? REMOTE_COPY : MOVE);
 
     // Change url in processing task
     product.url = newUrl;
-    product.urlSpace = SharedSpace;
+    product.urlSpace = GatewaySpace;
 
     return product;
 }
 
 //----------------------------------------------------------------------
-// Method: fromShared2Local
+// Method: fromGateway2Local
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromShared2Local()
+ProductMetadata & URLHandler::fromGateway2LocalArch()
 {
+    DBG(__FUNCTION__ << ':' << __LINE__);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == SharedSpace);
+    assert(product.urlSpace == GatewaySpace);
 
     // Set new location and url
     std::string file(str::mid(product.url,7,1000));
     std::string newFile(file);
     std::string newUrl(product.url);
 
-    // If file is FITS, must be symlink to a hard link (RAW), so convert it
-    // instead to a hard link to the original file
-    // Get extension
-    std::string extension = str::mid(file,file.find_last_of('.') + 1);
-    if (extension == "fits") {
-        char cLink[2048];
-        int lenBuf = 0;
-        if ((lenBuf = readlink(newFile.c_str(), cLink, 2048)) < 0) {
-            perror((std::string("readlink: ") + strerror(errno)).c_str());
-            showBacktrace();
-        } else {
-            cLink[lenBuf] = 0;
-            DBG("File " << newFile << " was soft link to " << cLink);
-            std::string scLink(newFile);
-            str::replaceAll(scLink, "/out/", "/in/");
-            str::replaceAll(scLink, "VIS_LE1", "VIS_RAW");
-            unlink(newFile.c_str());
-            relocate(scLink, newFile, 0, MOVE);
-            //link(scLink.c_str(), newFile.c_str());
-            DBG(" now " << newFile << " is what " << scLink << " was");
-        }
-    }
+    std::string section("/out");
 
-    str::replaceAll(newFile, cfgInfo.storage.shared.local_path + "/out", cfgInfo.storage.local.path + "/out");
-    str::replaceAll(newUrl,  cfgInfo.storage.shared.local_path + "/out", cfgInfo.storage.local.path + "/out");
+    str::replaceAll(newFile,
+                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.local_archive.path + section);
+    str::replaceAll(newUrl,
+                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.local_archive.path + section);
 
     // Set (hard) link
-    (void)relocate(file, newFile, 0, MOVE);
+    (void)relocate(file, newFile, LINK);
 
     // Change url in processing task
     product.url = newUrl;
@@ -321,28 +316,10 @@ ProductMetadata & URLHandler::fromShared2Local()
 }
 
 //----------------------------------------------------------------------
-// Method: fromLocal2Archive
-//----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromLocal2Archive()
-{
-    /* TODO */
-    return product;
-}
-
-//----------------------------------------------------------------------
-// Method: fromArchive2Local
-//----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromArchive2Local()
-{
-    /* TODO */
-    return product;
-}
-
-//----------------------------------------------------------------------
 // Method: relocate
 //----------------------------------------------------------------------
 int URLHandler::relocate(std::string & sFrom, std::string & sTo,
-                         int msTimeOut, LocalArchiveMethod method)
+                         LocalArchiveMethod method ,int msTimeOut)
 {
     if (msTimeOut > 0) {
         struct stat buffer;
@@ -374,6 +351,10 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
         retVal = copyfile(sFrom, sTo);
         DBG("Copying file from " << sFrom << " to " << sTo);
         break;
+    case REMOTE_COPY:
+        retVal = rcopyfile(sFrom, sTo);
+        DBG("Transferring file from " << sFrom << " to " << sTo);
+        break;
     default:
         break;
     }
@@ -385,7 +366,6 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     }
     return retVal;
 }
-
 
 //----------------------------------------------------------------------
 // Method: copyfile
@@ -408,6 +388,26 @@ int URLHandler::copyfile(std::string & sFrom, std::string & sTo)
 }
 
 //----------------------------------------------------------------------
+// Method: rcopyfile
+//----------------------------------------------------------------------
+int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo)
+{
+    static std::string scp("/usr/bin/scp");
+    std::string cmd(scp + " " + sFrom + " " + "eucops@eucdev02.net3.lan:" + sTo);
+    system(cmd.c_str());
+
+    return 0;
+}
+
+//----------------------------------------------------------------------
+// Method: needsRemoteProcessing
+//----------------------------------------------------------------------
+bool URLHandler::needsRemoteProcessing()
+{
+    return false;
+}
+
+//----------------------------------------------------------------------
 // Method: setProcElemRunDir
 //----------------------------------------------------------------------
 void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
@@ -415,7 +415,7 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     workDir = wkDir;
     intTaskDir = tskDir;
 
-    taskExchgDir = workDir + "/" + intTaskDir + "/";
+    taskExchgDir = workDir + "/" + intTaskDir;
 }
 
 }

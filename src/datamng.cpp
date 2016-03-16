@@ -115,7 +115,7 @@ void DataManager::processINDATA()
     // Synthetic INDATA messages, that means reading products from folder
     for (auto & md : msg->productsMetadata.productList) {
         urlh.setProduct(md.second);
-        md.second = urlh.fromInbox2Local();
+        md.second = urlh.fromInbox2LocalArch();
     }
 
     // Send InData message to TaskOrc
@@ -219,7 +219,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         DBG("Preparing to send new INDATA with outputs to TskOrc...");
         for (auto & md : msg->task.outputs.productList) {
             urlh.setProduct(md.second);
-            md.second = urlh.fromShared2Local();
+            md.second = urlh.fromGateway2LocalArch();
         }
 
         InfoMsg("Saving outputs...");
@@ -279,6 +279,8 @@ void DataManager::archiveDSSnEAS(ProductCollection & productList)
     static std::string proxyHost("eucdev.n1data.lan");
     static std::string proxyDropbox("ws/jcgg/DSS_EAS_Proxy/incoming");
     static std::string proxyUrl = proxyUser + "@" + proxyHost + ":" + proxyDropbox + "/";
+
+    return;
 
     for (auto & kv : productList.productList) {
         ProductType & prodType = const_cast<ProductType&>(kv.first);

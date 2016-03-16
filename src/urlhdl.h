@@ -88,6 +88,11 @@ public:
     ProductMetadata & fromExternal2Inbox();
 
     //----------------------------------------------------------------------
+    // Method: fromOutbox2External
+    //----------------------------------------------------------------------
+    ProductMetadata & fromOutbox2External();
+
+    //----------------------------------------------------------------------
     // Method: fromFolder2Inbox
     //----------------------------------------------------------------------
     ProductMetadata & fromFolder2Inbox();
@@ -95,43 +100,33 @@ public:
     //----------------------------------------------------------------------
     // Method: fromInbox2Local
     //----------------------------------------------------------------------
-    ProductMetadata & fromInbox2Local();
+    ProductMetadata & fromInbox2LocalArch();
 
     //----------------------------------------------------------------------
-    // Method: fromLocal2Shared
+    // Method: fromLocal2Gateway
     //----------------------------------------------------------------------
-    ProductMetadata & fromLocal2Shared();
-
-     //----------------------------------------------------------------------
-    // Method: fromShared2Processing
-    //----------------------------------------------------------------------
-    ProductMetadata & fromShared2Processing();
-
-    //----------------------------------------------------------------------
-    // Method: fromProcessing2Shared
-    //----------------------------------------------------------------------
-    ProductMetadata & fromProcessing2Shared();
+    ProductMetadata & fromLocalArch2Gateway();
 
      //----------------------------------------------------------------------
-    // Method: fromShared2Local
+    // Method: fromGateway2Processing
     //----------------------------------------------------------------------
-    ProductMetadata & fromShared2Local();
+    ProductMetadata & fromGateway2Processing();
 
     //----------------------------------------------------------------------
-    // Method: fromLocal2Archive
+    // Method: fromProcessing2Gateway
     //----------------------------------------------------------------------
-    ProductMetadata & fromLocal2Archive();
+    ProductMetadata & fromProcessing2Gateway();
 
+     //----------------------------------------------------------------------
+    // Method: fromGateway2Local
     //----------------------------------------------------------------------
-    // Method: fromArchive2Local
-    //----------------------------------------------------------------------
-    ProductMetadata & fromArchive2Local();
+    ProductMetadata & fromGateway2LocalArch();
 
     //----------------------------------------------------------------------
     // Method: relocate
     //----------------------------------------------------------------------
     int relocate(std::string & sFrom, std::string & sTo,
-                 int msTimeOut = 0, LocalArchiveMethod method = LINK);
+                 LocalArchiveMethod method = LINK, int msTimeOut = 0);
 
     //----------------------------------------------------------------------
     // Method: copyfile
@@ -139,17 +134,19 @@ public:
     int copyfile(std::string & sFrom, std::string & sTo);
 
     //----------------------------------------------------------------------
+    // Method: rcopyfile
+    //----------------------------------------------------------------------
+    int rcopyfile(std::string & sFrom, std::string & sTo);
+
+    //----------------------------------------------------------------------
+    // Method: needsRemoteProcessing
+    //----------------------------------------------------------------------
+    bool needsRemoteProcessing();
+
+    //----------------------------------------------------------------------
     // Method: setProcElemRunDir
     //----------------------------------------------------------------------
     void setProcElemRunDir(std::string wkDir, std::string tskDir);
-
-    inline ProductMetadata & i2l() { return fromInbox2Local(); }
-    inline ProductMetadata & l2s() { return fromLocal2Shared(); }
-    inline ProductMetadata & s2p() { return fromShared2Processing(); }
-    inline ProductMetadata & p2s() { return fromProcessing2Shared(); }
-    inline ProductMetadata & s2l() { return fromShared2Local(); }
-    inline ProductMetadata & i2a() { return fromLocal2Archive(); }
-    inline ProductMetadata & a2l() { return fromArchive2Local(); }
 
 private:
     std::string workDir;

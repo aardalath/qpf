@@ -341,7 +341,7 @@ void ProcessingElement::configureProcElem()
         while (it != task.inputs.productList.end()) {
             ProductMetadata & m = it->second;
             urlh.setProduct(m);
-            m = urlh.fromShared2Processing();
+            m = urlh.fromGateway2Processing();
             ++it;
         }
 /*
@@ -551,29 +551,31 @@ void ProcessingElement::retrieveOutputProducts()
                 if (dirp->d_name[0] != '.') {
                     std::string dname(dirp->d_name);
                     std::string fullName = vd + "/" + dname;
-                    /*
-                    DBG("Output file: " << fullName);
-                    // Check that it is not a link to a internal (Docker)
-                    // file, in which case change the target
-                    if (dirp->d_type == DT_LNK) {                        
-                        char cLink[2048];
-                        int lenBuf = 0;
-                        if ((lenBuf = readlink(fullName.c_str(), cLink, 2048)) < 0) {
-                            perror((std::string("readlink: ") + strerror(errno)).c_str());
-                        } else {
-                            cLink[lenBuf] = 0;
-                            std::string sLink(cLink);
-                            DBG("    is a link to " << sLink);
-                            if (sLink.substr(0, 9) == "/var/run/") {
-                                std::string newLink(workDir + "/" + sLink.substr(9));
-                                DBG("    the file " << fullName);
-                                DBG("    will be converted to link to " << newLink);
-                                unlink(fullName.c_str());
-                                symlink(newLink.c_str(), fullName.c_str());
+
+                    /**************************************************
+                     *** HACK: Simulate FITS output files
+                     ***       with hard links to input images
+                     **************************************************/
+
+                    if (str::getExtension(dname) == "fits") {
+                        std::string refName;
+                        std::ifstream ifs(fullName);
+                        if (ifs.good()) {
+                            std::getline(ifs, refName);
+                            ifs.close();
+                        }
+                        if (refName.length() > 0) {
+                            std::string origFile = (str::getDirName(vd) + "/in/" +
+                                                    str::getBaseName(refName));
+                            DBG("Converting output file " << fullName << " in a link to " << origFile);
+                            unlink(fullName.c_str());
+                            if (link(origFile.c_str(), fullName.c_str()) != 0) {
+                                perror(std::string("link output product: from " + origFile +
+                                                   " to " + fullName).c_str());
                             }
                         }
                     }
-*/
+
                     DBG("Saving outfile " << fullName);
                     outFiles.push_back(fullName);
                 }
@@ -613,7 +615,7 @@ void ProcessingElement::retrieveOutputProducts()
             // Place output product at external (output) shared area
             DBG(" >> " << m);
             urlh.setProduct(m);
-            m = urlh.fromProcessing2Shared();
+            m = urlh.fromProcessing2Gateway();
             DBG(" << " << m);
  /*
             std::string relFileName = cfgInfo.storage.shared.local_path + "/out/" +
