@@ -583,33 +583,18 @@ void Configuration::processConfiguration()
 
     const Json::Value & stge             = cfg["storage"];
     const Json::Value & stgeBase         = stge["base"];
-    const Json::Value & stgeIn           = stge["incoming"];
-    const Json::Value & stgeOut          = stge["outgoing"];
     const Json::Value & stgeLocal        = stge["local_archive"];
     const Json::Value & stgeGatew        = stge["gateway"];
 
     cfgInfo.storage.base                 = stgeBase["path"].asString();
+    cfgInfo.storage.local_archive.path   = stgeLocal["path"].asString();
+    cfgInfo.storage.gateway.path         = stgeGatew["path"].asString();
 
     cfgInfo.storage.tasks                = PATHTsk;
 
-    cfgInfo.storage.inbox.protocol          = stgeIn["protocol"].asString();
-    cfgInfo.storage.inbox.address           = stgeIn["address"].asString();
-    cfgInfo.storage.inbox.port              = stgeIn["port"].asString();
-    cfgInfo.storage.inbox.user              = stgeIn["user"].asString();
-    cfgInfo.storage.inbox.passwd            = stgeIn["password"].asString();
-    cfgInfo.storage.inbox.local             = stgeIn["local"].asString();
-
-    cfgInfo.storage.outbox.protocol         = stgeOut["protocol"].asString();
-    cfgInfo.storage.outbox.address          = stgeOut["address"].asString();
-    cfgInfo.storage.outbox.port             = stgeOut["port"].asString();
-    cfgInfo.storage.outbox.user             = stgeOut["user"].asString();
-    cfgInfo.storage.outbox.passwd           = stgeOut["password"].asString();
-    cfgInfo.storage.outbox.local            = stgeOut["local"].asString();;
-
-    cfgInfo.storage.local_archive.path      = stgeLocal["path"].asString();
-
-    cfgInfo.storage.gateway.gateway_path    = stgeGatew["gateway_path"].asString();
-    cfgInfo.storage.gateway.processing_path = stgeGatew["processing_path"].asString();
+    getExternalStorage(stge["incoming"], cfgInfo.storage.inbox);
+    getExternalStorage(stge["outgoing"], cfgInfo.storage.outbox);
+    getExternalStorage(stge["archive"],  cfgInfo.storage.archive);
 
     // Create peer commnodes for nodes in current machine
     std::vector<std::string> & machineNodes =
@@ -667,6 +652,22 @@ void Configuration::processConfiguration()
 
     }
 
+}
+
+//----------------------------------------------------------------------
+// Method: getExternalStorage
+// Stores the values of a StorageExternal strucure from configuration
+// into the appropriate data structure
+//----------------------------------------------------------------------
+void Configuration::getExternalStorage(const Json::Value & section,
+                                       StorageExternal & ext)
+{
+    ext.protocol          = section["protocol"].asString();
+    ext.address           = section["address"].asString();
+    ext.port              = section["port"].asString();
+    ext.user              = section["user"].asString();
+    ext.passwd            = section["password"].asString();
+    ext.path              = section["path"].asString();
 }
 
 //----------------------------------------------------------------------

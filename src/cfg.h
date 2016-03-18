@@ -100,16 +100,11 @@ struct StorageExternal {
     std::string port;
     std::string user;
     std::string passwd;
-    std::string local;
+    std::string path;
 };
 
 struct StorageLocal {
     std::string path;
-};
-
-struct StorageProcessing {
-    std::string gateway_path;
-    std::string processing_path;
 };
 
 struct StorageConfig {
@@ -117,7 +112,8 @@ struct StorageConfig {
     std::string       tasks;
     StorageExternal   inbox;
     StorageLocal      local_archive;
-    StorageProcessing gateway;
+    StorageExternal   archive;
+    StorageLocal      gateway;
     StorageExternal   outbox;
 };
 
