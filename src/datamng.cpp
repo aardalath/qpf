@@ -275,10 +275,21 @@ void DataManager::saveProductsToDB(ProductCollection & productList)
 //----------------------------------------------------------------------
 void DataManager::archiveDSSnEAS(ProductCollection & productList)
 {
-    static std::string proxyUser("eucops");
-    static std::string proxyHost("eucdev.n1data.lan");
-    static std::string proxyDropbox("ws/jcgg/DSS_EAS_Proxy/incoming");
-    static std::string proxyUrl = proxyUser + "@" + proxyHost + ":" + proxyDropbox + "/";
+    static bool firstTime = true;
+    static std::string proxyUser;
+    static std::string proxyHost;
+    static std::string proxyDropbox;
+    static std::string proxyUrl;
+
+    if (firstTime) {
+        ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+        proxyUser    = cfgInfo.storage.archive.user;
+        proxyHost    = cfgInfo.storage.archive.address;
+        proxyDropbox = cfgInfo.storage.archive.path;
+        proxyUrl     = proxyUser + "@" + proxyHost + ":" + proxyDropbox + "/";
+
+        firstTime = false;
+    }
 
     return;
 

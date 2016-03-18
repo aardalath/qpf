@@ -546,7 +546,7 @@ void MainWindow::readConfig()
         ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
         ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
     }
-    ui->edInboxPath->setText(QString(cfgInfo.storage.inbox.local.c_str()));
+    ui->edInboxPath->setText(QString(cfgInfo.storage.inbox.path.c_str()));
 }
 
 //----------------------------------------------------------------------

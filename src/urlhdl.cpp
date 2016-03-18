@@ -81,7 +81,7 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
     std::string baseName = tokens.back();
 
     // Set new location and url
-    std::string newFile(cfgInfo.storage.inbox.local + "/" + baseName);
+    std::string newFile(cfgInfo.storage.inbox.path + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // This method should only be called once the download has been done,
@@ -123,7 +123,7 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 
     // Set new location and url
     std::string file(str::mid(product.url,7));
-    std::string newFile(cfgInfo.storage.inbox.local + "/" + baseName);
+    std::string newFile(cfgInfo.storage.inbox.path + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // Set (hard) link (should it be move?)
@@ -155,10 +155,10 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
     std::string section("/in");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.inbox.local,
+                    cfgInfo.storage.inbox.path,
                     cfgInfo.storage.local_archive.path + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.inbox.local,
+                    cfgInfo.storage.inbox.path,
                     cfgInfo.storage.local_archive.path + section);
 
     // Set (hard) link (should it be move?)
@@ -191,10 +191,10 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
 
     str::replaceAll(newFile,
                     cfgInfo.storage.local_archive.path + section,
-                    cfgInfo.storage.gateway.gateway_path + "/in");
+                    cfgInfo.storage.gateway.path + "/in");
     str::replaceAll(newUrl,
                     cfgInfo.storage.local_archive.path + section,
-                    cfgInfo.storage.gateway.gateway_path + "/in");
+                    cfgInfo.storage.gateway.path + "/in");
 
     // Set (hard) link
     (void)relocate(file, newFile, LINK);
@@ -225,10 +225,10 @@ ProductMetadata & URLHandler::fromGateway2Processing()
     std::string section("/in");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.gateway.path + section,
                     taskExchgDir + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.gateway.path + section,
                     taskExchgDir + section);
 
     (void)relocate(file, newFile, needsRemoteProcessing() ? REMOTE_COPY : LINK);
@@ -264,10 +264,10 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 
     str::replaceAll(newFile,
                     taskExchgDir + subdir,
-                    cfgInfo.storage.gateway.gateway_path + section);
+                    cfgInfo.storage.gateway.path + section);
     str::replaceAll(newUrl,
                     taskExchgDir + subdir,
-                    cfgInfo.storage.gateway.gateway_path + section);
+                    cfgInfo.storage.gateway.path + section);
 
     DBG("Trying to change URL from " << product.url << " to " << newUrl);
 
@@ -299,10 +299,10 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
     std::string section("/out");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.gateway.path + section,
                     cfgInfo.storage.local_archive.path + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.gateway.gateway_path + section,
+                    cfgInfo.storage.gateway.path + section,
                     cfgInfo.storage.local_archive.path + section);
 
     // Set (hard) link
