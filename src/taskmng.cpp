@@ -189,7 +189,7 @@ LibComm::Router2RouterPeer::Peer * TaskManager::selectAgent()
     // Select agent with lower weight (try to balance load)
     double weight = -1;
     double newW;
-    int agIdx;
+    int agIdx = 0;
     for (unsigned int i = 0; i < agents.size(); ++i) {
         Peer * p = agents.at(i);
         AgentInfo & agInfo = agentInfo[p];
