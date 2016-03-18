@@ -140,11 +140,6 @@ void MainWindow::manualSetupUI()
     connect(ui->btnStart, SIGNAL(pressed()), this, SLOT(commandSystem()));
     connect(this, SIGNAL(goToOperational()), this, SLOT(transitToOperational()));
 
-    connect(ui->btnSendInDataEvt, SIGNAL(pressed()), this, SLOT(sendInData()));
-    connect(ui->btnSendMultInDataEvt, SIGNAL(pressed()), this, SLOT(prepareSendMultInData()));
-    connect(ui->btnSendMultInDataEvtFile, SIGNAL(pressed()), this, SLOT(prepareSendInDataFromFile()));
-    connect(ui->btnSelectInDataParamFile, SIGNAL(pressed()), this, SLOT(selectInDataParamsFile()));
-
     connect(simInData, SIGNAL(simInDataSent(int)), this, SLOT(sentInData(int)));
     connect(simInData, SIGNAL(endOfInData()), this, SLOT(endOfInDataMsgs()));
 
@@ -540,12 +535,6 @@ void MainWindow::readConfig()
                        .toString("yyyyMMddTHHmmss").toStdString());
 
     // Modify HMI with the product datatypes obtained from configuration
-    ui->cboxProdType->clear();
-    ui->lstProductTypes->clear();
-    for (unsigned int i = 0; i < cfgInfo.orcParams.productTypes.size(); ++i) {
-        ui->cboxProdType->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
-        ui->lstProductTypes->addItem(QString::fromStdString(cfgInfo.orcParams.productTypes.at(i)));
-    }
     ui->edInboxPath->setText(QString(cfgInfo.storage.inbox.path.c_str()));
 }
 
@@ -738,76 +727,6 @@ void MainWindow::handleFinishedHMI()
 }
 
 //----------------------------------------------------------------------
-// Method: sendInDatapushButton
-// Send sample InData message to Event Manager
-//----------------------------------------------------------------------
-void MainWindow::sendInData()
-{
-    simInData->sendInData(ui->dtStart->text(),
-                          ui->dtEnd->text(),
-                          ui->edProdId->text(),
-                          ui->cboxProdType->currentText(),
-                          ui->edProdVer->text(),
-                          ui->cboxProdStatus->currentText(),
-                          ui->edURL->text());
-    ui->tabpgLog->setFocus();
-    statusBar()->showMessage(tr("Message INDATA sent to Event Manager..."),
-                             MessageDelay);
-}
-
-//----------------------------------------------------------------------
-// Method: prepareSendMultInData
-// Prepare a set of sample InData messages to be sent to Event Manager
-//----------------------------------------------------------------------
-void MainWindow::prepareSendMultInData()
-{
-    QStringList prodTypes;
-    foreach (QListWidgetItem * i, ui->lstProductTypes->selectedItems()) {
-        prodTypes << i->text();
-    }
-
-    QStringList prodStat;
-    foreach (QListWidgetItem * i, ui->lstProductStatus->selectedItems()) {
-        prodStat << i->text();
-    }
-
-    bool ok = simInData->sendMultInData(ui->dtStartMult->dateTime(), // start
-                                        ui->dtEndMult->dateTime(), // end
-                                        prodTypes, prodStat, // datatypes and status
-                                        ui->cboxStep->currentText().toInt(), // step in h
-                                        ui->cboxFreq->currentText().toInt()); // freq in s
-
-    if (ok) {
-        ui->tabEventsToInject->setEnabled(false);
-        ui->btnStopMultInDataEvt->show();
-
-        // Activate task monitoring
-        taskMonitTimer = new QTimer(this);
-        connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
-        taskMonitTimer->start(1000);
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: prepareSendInDataFromFile
-// Send a set of sample InData messages to Event Manager, according to
-// a user-defined file
-//----------------------------------------------------------------------
-void MainWindow::prepareSendInDataFromFile()
-{
-    if (fileInDataParams.isEmpty()) { return; }
-    bool ok = simInData->sendInDataFromFile(fileInDataParams);
-
-    if (ok) {
-        ui->tabEventsToInject->setEnabled(false);
-        ui->btnStopMultInDataEvt->show();
-    } else {
-        QMessageBox::information(0, "Error reading input file",
-                                 "Error reading input file " + fileInDataParams);
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processInbox
 // Generates INDATA messages into the system, to process all the
 // products in the Inbox directory selected
@@ -819,7 +738,7 @@ void MainWindow::processInbox()
     bool ok = simInData->processInbox(ui->edInboxPath->text(), metadata);
 
     if (ok) {
-        ui->tabEventsToInject->setEnabled(false);
+        //ui->tabEventsToInject->setEnabled(false);
         ui->btnStopMultInDataEvt->show();
 
         ui->pltxtInboxProducts->setPlainText(metadata);
@@ -829,22 +748,6 @@ void MainWindow::processInbox()
         connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
         taskMonitTimer->start(1000);
     }
-}
-
-//----------------------------------------------------------------------
-// Method: selectInDataParamsFile
-// Select user-defined InData parameters file
-//----------------------------------------------------------------------
-void MainWindow::selectInDataParamsFile()
-{
-    QString fileName =
-      QFileDialog::getOpenFileName(this,
-                                   tr("Select InData parameters file"),
-                                   getenv("HOME"),
-                                   QString("QPF InData Parameter files (*.lst)"));
-    if (fileName.isEmpty()) { return; }
-    ui->edInDataParamFile->setText(fileName);
-    fileInDataParams = fileName;
 }
 
 //----------------------------------------------------------------------
@@ -884,7 +787,7 @@ void MainWindow::sentInData(int msgsLeft)
 //----------------------------------------------------------------------
 void MainWindow::endOfInDataMsgs()
 {
-    ui->tabEventsToInject->setEnabled(true);
+    //ui->tabEventsToInject->setEnabled(true);
     ui->btnStopMultInDataEvt->hide();
 }
 

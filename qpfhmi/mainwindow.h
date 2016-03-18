@@ -87,11 +87,7 @@ protected:
 
 protected slots:
     void transitToOperational();
-    void sendInData();
-    void prepareSendMultInData();
-    void prepareSendInDataFromFile();
     void processInbox();
-    void selectInDataParamsFile();
     void selectInboxPath();
     void stopSendingMultInData();
     void sentInData(int msgsLeft);
