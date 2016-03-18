@@ -182,6 +182,14 @@ public:
 private:
 
     //----------------------------------------------------------------------
+    // Method: getExternalStorage
+    // Stores the values of a StorageExternal strucure from configuration
+    // into the appropriate data structure
+    //----------------------------------------------------------------------
+    void getExternalStorage(const Json::Value & section,
+                            StorageExternal & ext);
+
+    //----------------------------------------------------------------------
     // Method: setConfigFile
     // Set configuration file name
     //----------------------------------------------------------------------
