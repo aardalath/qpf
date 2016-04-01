@@ -562,6 +562,9 @@ void Configuration::processConfiguration()
                   cfgInfo.qpfhmiCfg.clientAddr,
                   cfgInfo.qpfhmiCfg.serverAddr);
 
+    cfgInfo.masterMachine = cfg["nodes"]["master_machine"].asString();
+    cfgInfo.isMaster = (cfgInfo.masterMachine == cfgInfo.currentMachine);
+
     // Machines and connections
     reset();
     std::string mname;
@@ -583,8 +586,11 @@ void Configuration::processConfiguration()
 
     const Json::Value & stge             = cfg["storage"];
     const Json::Value & stgeBase         = stge["base"];
+    const Json::Value & stgeIn           = stge["incoming"];
     const Json::Value & stgeLocal        = stge["local_archive"];
     const Json::Value & stgeGatew        = stge["gateway"];
+    const Json::Value & stgeArch         = stge["archive"];
+    const Json::Value & stgeOut          = stge["outgoing"];
 
     cfgInfo.storage.base                 = stgeBase["path"].asString();
     cfgInfo.storage.local_archive.path   = stgeLocal["path"].asString();
@@ -592,9 +598,9 @@ void Configuration::processConfiguration()
 
     cfgInfo.storage.tasks                = PATHTsk;
 
-    getExternalStorage(stge["incoming"], cfgInfo.storage.inbox);
-    getExternalStorage(stge["outgoing"], cfgInfo.storage.outbox);
-    getExternalStorage(stge["archive"],  cfgInfo.storage.archive);
+    getExternalStorage(stgeIn,   cfgInfo.storage.inbox);
+    getExternalStorage(stgeOut,  cfgInfo.storage.outbox);
+    getExternalStorage(stgeArch, cfgInfo.storage.archive);
 
     // Create peer commnodes for nodes in current machine
     std::vector<std::string> & machineNodes =
@@ -625,6 +631,9 @@ void Configuration::processConfiguration()
             TaskAgent * ag = new TaskAgent(cpeerName);
             ag->setSysDir(Configuration::PATHBase);
             ag->setWorkDir(Configuration::PATHTsk);
+            ag->setAgentAddress(cfgInfo.currentUser + "@" + cfgInfo.currentMachine);
+            ag->setMasterAddress(cfgInfo.currentUser + "@" + cfgInfo.masterMachine);
+            ag->setRemote(!cfgInfo.isMaster);
             component = ag;
             cfgInfo.peerAgents.push_back(component);
         } else {
