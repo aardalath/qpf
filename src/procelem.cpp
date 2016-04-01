@@ -37,7 +37,6 @@
  ******************************************************************************/
 #include "procelem.h"
 #include "taskagent.h"
-#include "urlhdl.h"
 #include "str.h"
 #include "filenamespec.h"
 
@@ -70,11 +69,13 @@ ProcessingElement::ProcessingElement(TaskAgent * parent) :
     startProc(false),
     endProc(false),
     checkStartSleepPeriod( 500000), // microseconds
-    threadLoopSleepPeriod(3000000)  // microseconds
+    threadLoopSleepPeriod(3000000), // microseconds
+    urlh(0)
 #ifdef DEBUG_BUILD
     ,chkLevel(0)
 #endif
 {
+    isRemote = super->getRemote();
 }
 
 //----------------------------------------------------------------------
@@ -207,6 +208,10 @@ void ProcessingElement::executeProcessor()
 void ProcessingElement::initTaskInfo()
 {
     CHKIN;
+
+    //ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    //cfgInfo.dump();
+
     // Save actual processing element to be executed
     pe = task.taskPath;
 
@@ -298,8 +303,12 @@ void ProcessingElement::configureProcElem()
     // being this will be used in the tests.
     //FIXME:  * * * * NOTE * * * *
 
-    URLHandler urlh;
-    urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
+    urlh = new URLHandler;
+    urlh->setProcElemRunDir(workDir, internalTaskNameIdx);
+    if (isRemote) {
+        urlh->setRemoteCopyParams(super->getMasterAddress(),
+                                  super->getAgentAddress());
+    }
 
     // Create input files
     if (task.taskPath == "QLA_VIS") {
@@ -323,7 +332,7 @@ void ProcessingElement::configureProcElem()
 //            perror(std::string("symlink input product: from " + sourceImg +
 //                               " to " + inputProduct).c_str());
 // Copyfile version
-//        if (urlh.copyfile(sourceImg, inputProduct) != 0) {
+//        if (urlh->copyfile(sourceImg, inputProduct) != 0) {
 //            perror(std::string("copygile input product: from " + sourceImg +
 //                               " to " + inputProduct).c_str());
         if (link("/qpf/data/mef.fits", inputProduct.c_str()) != 0) {
@@ -340,8 +349,8 @@ void ProcessingElement::configureProcElem()
                 ProductMetadata>::iterator it = task.inputs.productList.begin();
         while (it != task.inputs.productList.end()) {
             ProductMetadata & m = it->second;
-            urlh.setProduct(m);
-            m = urlh.fromGateway2Processing();
+            urlh->setProduct(m);
+            m = urlh->fromGateway2Processing();
             ++it;
         }
 /*
@@ -353,7 +362,7 @@ void ProcessingElement::configureProcElem()
                                                                             "bin"));
             std::string inputFile = exchgIn + "/" + m.productId + "." + ext;
             if (ext == "xml") {
-                if (urlh.copyfile(sourceFile, inputFile) != 0) {
+                if (urlh->copyfile(sourceFile, inputFile) != 0) {
                     perror(std::string("copy input product: from " + sourceFile +
                                        " to " + inputFile).c_str());
                     status = TASK_FAILED;
@@ -586,9 +595,6 @@ void ProcessingElement::retrieveOutputProducts()
 
     task.outputs.productList.clear();
 
-    URLHandler urlh;
-    urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
-
     FileNameSpec fs;
 
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
@@ -614,17 +620,23 @@ void ProcessingElement::retrieveOutputProducts()
 
             // Place output product at external (output) shared area
             DBG(" >> " << m);
-            urlh.setProduct(m);
-            m = urlh.fromProcessing2Gateway();
+            urlh->setProduct(m);
+            m = urlh->fromProcessing2Gateway();
             DBG(" << " << m);
+
+            // Place output product copy at local archive
+            DBG(" >> " << m);
+            m = urlh->fromGateway2LocalArch();
+            DBG(" << " << m);
+
  /*
-            std::string relFileName = cfgInfo.storage.shared.local_path + "/out/" +
+            std::string relFileName = cfgInfo.storage.gateway.path + "/out/" +
                                       c.baseName + "." + c.extension;
             m.url = ("file://" + relFileName);
             m.urlSpace = SharedSpace;
 
             if (c.extension != "fits") {
-                urlh.relocate(outFileName, relFileName, 0, COPY);
+                urlh->relocate(outFileName, relFileName, 0, COPY);
             } else {
                 std::string inFileName = relFileName;
                 str::replaceAll(inFileName, "/out/", "/in/");
@@ -706,6 +718,8 @@ void ProcessingElement::cleanup()
     status = TASK_ARCHIVED;
     task.taskStatus = status;
     task.taskData["State"]["TaskStatus"] = (int)(status);
+    delete urlh;
+    urlh = 0;
     super->procElemFinished(this);
 }
 

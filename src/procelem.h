@@ -41,6 +41,7 @@
 
 #include "datatypes.h"
 #include "cfg.h"
+#include "urlhdl.h"
 
 #include "dbg.h"
 
@@ -221,11 +222,15 @@ private:
     bool running, dead, paused, killed, finished;
     int excode;
 
+    bool isRemote;
+
     std::atomic<bool> startProc;
     std::atomic<bool> endProc;
 
     const int checkStartSleepPeriod;
     const int threadLoopSleepPeriod;
+
+    URLHandler * urlh;
 
 #ifdef DEBUG_BUILD
     int chkLevel;
