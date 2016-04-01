@@ -453,8 +453,8 @@ void Router2RouterPeer::transmissionsHandler()
         }
 
         int pass = 0;
-        dumpId(selfPeer()->name.c_str(), ("Loop pass = " + toStr<int>(pass) +
-                        ", outTxSize = " + toStr<unsigned int>(outTx.size())).c_str());
+        // dumpId(selfPeer()->name.c_str(), ("Loop pass = " + toStr<int>(pass) +
+        //                 ", outTxSize = " + toStr<unsigned int>(outTx.size())).c_str());
 
         // Send as much as we can during a window of
         int64_t windowSpan = 200000; // 200 us
@@ -594,7 +594,7 @@ void Router2RouterPeer::transmissionsHandler()
                     dumpId(selfPeer()->name.c_str(),
                            (selfPeer()->name + ": mpeer = " + mpeer).c_str());
                     std::map<PeerName, int>::iterator it = mapOfPeers.find(mpeer);
-                    if (it != mapOfPeers.end()) {                        
+                    if (it != mapOfPeers.end()) {
                         if (ackInfo.waitAckFrom[mpeer] && frames->isAck()) {
                             // If we were waiting for ACK from peer, and this is
                             // an ACK, we remove the flag, and forget about the
@@ -693,4 +693,3 @@ void Router2RouterPeer::dumpMsgStats(std::string fileName)
 }
 
 }
-
