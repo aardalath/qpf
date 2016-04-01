@@ -76,7 +76,7 @@ namespace QPF {
 class URLHandler {
 
 public:
-    URLHandler();
+    URLHandler(bool remote = false);
 
     PropertyRef(URLHandler, ProductMetadata, product, Product);
 
@@ -136,12 +136,12 @@ public:
     //----------------------------------------------------------------------
     // Method: rcopyfile
     //----------------------------------------------------------------------
-    int rcopyfile(std::string & sFrom, std::string & sTo);
+    int rcopyfile(std::string & sFrom, std::string & sTo, bool toRemote);
 
     //----------------------------------------------------------------------
-    // Method: needsRemoteProcessing
+    // Method: setRemoteCopyParams
     //----------------------------------------------------------------------
-    bool needsRemoteProcessing();
+    void setRemoteCopyParams(std::string maddr, std::string raddr);
 
     //----------------------------------------------------------------------
     // Method: setProcElemRunDir
@@ -152,6 +152,9 @@ private:
     std::string workDir;
     std::string intTaskDir;
     std::string taskExchgDir;
+    std::string master_address;
+    std::string remote_address;
+    bool isRemote;
 };
 
 }

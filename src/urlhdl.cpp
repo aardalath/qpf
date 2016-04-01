@@ -62,7 +62,7 @@ namespace QPF {
 //----------------------------------------------------------------------
 // Method: Constructor
 //----------------------------------------------------------------------
-URLHandler::URLHandler()
+URLHandler::URLHandler(bool remote) : isRemote(remote)
 {
 }
 
@@ -231,7 +231,7 @@ ProductMetadata & URLHandler::fromGateway2Processing()
                     cfgInfo.storage.gateway.path + section,
                     taskExchgDir + section);
 
-    (void)relocate(file, newFile, needsRemoteProcessing() ? REMOTE_COPY : LINK);
+    (void)relocate(file, newFile, isRemote ? COPY_TO_REMOTE : LINK);
 
     // Change url in processing task
     product.url = newUrl;
@@ -271,7 +271,7 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 
     DBG("Trying to change URL from " << product.url << " to " << newUrl);
 
-    (void)relocate(file, newFile, needsRemoteProcessing() ? REMOTE_COPY : MOVE);
+    (void)relocate(file, newFile, isRemote ? COPY_TO_MASTER : MOVE);
 
     // Change url in processing task
     product.url = newUrl;
@@ -337,23 +337,25 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     switch(method) {
     case LINK:
         retVal = link(sFrom.c_str(), sTo.c_str());
-        DBG("Hard link of " << sFrom << " to " << sTo);
+        DBG("LINK: Hard link of " << sFrom << " to " << sTo);
         break;
     case SYMLINK:
         retVal = symlink(sFrom.c_str(), sTo.c_str());
-        DBG("Soft link of " << sFrom << " to " << sTo);
+        DBG("SYMLINK: Soft link of " << sFrom << " to " << sTo);
         break;
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
-        DBG("Moving file from " << sFrom << " to " << sTo);
+        DBG("MOVE: Moving file from " << sFrom << " to " << sTo);
         break;
     case COPY:
         retVal = copyfile(sFrom, sTo);
-        DBG("Copying file from " << sFrom << " to " << sTo);
+        DBG("COPY: Copying file from " << sFrom << " to " << sTo);
         break;
-    case REMOTE_COPY:
-        retVal = rcopyfile(sFrom, sTo);
-        DBG("Transferring file from " << sFrom << " to " << sTo);
+    case COPY_TO_REMOTE:
+    case COPY_TO_MASTER:
+        retVal = rcopyfile(sFrom, sTo, method == COPY_TO_REMOTE);
+        DBG(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
+            << "Transferring file from " << sFrom << " to " << sTo);
         break;
     default:
         break;
@@ -390,21 +392,31 @@ int URLHandler::copyfile(std::string & sFrom, std::string & sTo)
 //----------------------------------------------------------------------
 // Method: rcopyfile
 //----------------------------------------------------------------------
-int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo)
+int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
+                          bool toRemote)
 {
     static std::string scp("/usr/bin/scp");
-    std::string cmd(scp + " " + sFrom + " " + "eucops@eucdev02.net3.lan:" + sTo);
+    std::string cmd;
+    if (toRemote) {
+        cmd = scp + " " + master_address + ":" + sFrom + " " + sTo;
+    } else {
+        cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
+    }
+    DBG("CMD: " << cmd);
     system(cmd.c_str());
 
     return 0;
 }
 
 //----------------------------------------------------------------------
-// Method: needsRemoteProcessing
+// Method: setRemoteCopyParams
 //----------------------------------------------------------------------
-bool URLHandler::needsRemoteProcessing()
+void URLHandler::setRemoteCopyParams(std::string maddr, std::string raddr)
 {
-    return false;
+    master_address = maddr;
+    remote_address = raddr;
+    isRemote = true;
+    DBG("Master addr: " << maddr << "  Remote addr: " << raddr);
 }
 
 //----------------------------------------------------------------------
@@ -416,6 +428,7 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     intTaskDir = tskDir;
 
     taskExchgDir = workDir + "/" + intTaskDir;
+    DBG("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir << "  => TaskExchgDir: " << taskExchgDir);
 }
 
 }
