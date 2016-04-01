@@ -82,6 +82,9 @@ public:
     std::string                         currentMachine;
     std::string                         currentUser;
 
+    std::string                         masterMachine;
+    bool                                isMaster;
+
     // General
     std::string                         appName;
     std::string                         appVersion;
@@ -128,6 +131,7 @@ public:
     std::string                         DBPwd;
 
     void clear();
+    void dump();
 
 private:
     ConfigurationInfo();
