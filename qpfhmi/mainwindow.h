@@ -55,6 +55,7 @@
 #include "frmagentstatus.h"
 #include "simindata.h"
 #include "textview.h"
+#include "statem.h"
 
 #include "json/json.h"
 
@@ -66,13 +67,21 @@ namespace QPF {
 
 class LogWatcher;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, LibComm::StateMachine
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0, Configuration * cfgHdl = 0);
     ~MainWindow();
+
+    struct Alert {
+        QDateTime timeStamp;
+        QString id;
+        QString severity;
+        QString component;
+        QString description;
+    };
 
 signals:
     void goToOperational();
@@ -99,11 +108,19 @@ protected slots:
     void checkForTaskRes();
     void showTaskRes();
 
-    void updateTasksMonitTree(int nCols);
     void initTasksMonitTree(int nCols);
+    void initAlertsTable();
+    void initArchiveTable();
+
+    void updateTasksMonitTree(int nCols);
+    void updateAlertsTree();
+
     void updateAgentsMonitPanel();
 
     void showTaskMonitContextMenu(const QPoint & p);
+    void showAlertsContextMenu(const QPoint & p);
+    void showArchiveTableContextMenu(const QPoint & p);
+
     void showWorkDir();
     void displayTaskInfo();
 
@@ -155,7 +172,10 @@ private slots:
     void setActiveSubWindow(QWidget *window);
 
     void showConfigTool();
-
+    void showDBBrowser();
+    void showExtToolsDef();
+    void showVerbLevel();
+    void execTestRun();
 
 private:
     void createActions();
@@ -167,12 +187,16 @@ private:
     TextView *activeTextView();
     QMdiSubWindow *findTextView(const QString &fileName);
 
+    virtual void defineValidTransitions();
+    void showState();
+
     QSignalMapper *windowMapper;
 
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *windowMenu;
     QMenu *toolsMenu;
+    QMenu *sessionInfoMenu;
     QMenu *helpMenu;
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
@@ -186,8 +210,13 @@ private:
 #endif
 
     QAction *configToolAct;
+    QAction *browseDBAct;
+    QAction *extToolsAct;
+    QAction *verbosityAct;
+    QAction *execTestRunAct;
 
     QAction *dbgInfoAct;
+
     QAction *closeAct;
     QAction *closeAllAct;
     QAction *tileAct;
@@ -221,6 +250,7 @@ private:
     QMap<QString, Json::Value> taskResInfo;
     QMap<QString, QTreeWidgetItem *> taskResItems;
     QMap<QString, Json::Value> processedTasksInfo;
+    QList<Alert> alerts;
 
     QAction * acWorkDir;
     QAction * acShowTaskInfo;
@@ -228,11 +258,18 @@ private:
     QAction * acResumeTask;
     QAction * acStopTask;
 
+    QAction * acAckAlert;
+
+    QAction * acArchiveShow;
+    QMenu *   acArchiveOpenExt;
+    QList<QAction *> acArchiveOpenExtTools;
+
     QVBoxLayout * vlyFrmAgents;
     QSpacerItem * spacerFrmAgents;
 
     std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
     std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
+
 };
 
 }

@@ -37,6 +37,10 @@
  ******************************************************************************/
 
 #include <iostream>
+#include <fstream>
+
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -65,9 +69,19 @@ using LibComm::Log;
 #include "progbardlg.h"
 #include "dlgshowtaskinfo.h"
 #include "configtool.h"
+#include "dbbrowser.h"
+#include "exttoolsdef.h"
+#include "verbleveldlg.h"
+#include "testrundlg.h"
 
 #include <QProcess>
 namespace QPF {
+
+// Valid Manager states
+static const int ERROR        = -1;
+static const int OFF          =  0;
+static const int INITIALISED  =  1;
+static const int RUNNING      =  2;
 
 static const int MessageDelay = 2000;
 static const char * FixedWidthStyle = "font: 7pt \"Droid Sans Mono\";";
@@ -83,6 +97,7 @@ MainWindow::MainWindow(QWidget *parent, Configuration * cfgHdl) :
     // Set-up UI
     ui->setupUi(this);
     manualSetupUI();
+    defineValidTransitions();
 
     // Read QPF Configuration
     readConfig();
@@ -154,6 +169,7 @@ void MainWindow::manualSetupUI()
     readSettings();
     setWindowTitle(tr("QLA Processing Framework"));
     setUnifiedTitleAndToolBarOnMac(true);
+    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
 }
 
 //----------------------------------------------------------------------
@@ -291,11 +307,12 @@ TextView *MainWindow::createTextView()
 }
 
 //----------------------------------------------------------------------
-// Method: closeEvent
-// Reads configuration file
+// Method: createActions
+// Create actions to be included in mainwindow menus
 //----------------------------------------------------------------------
 void MainWindow::createActions()
 {
+    // File menu
     saveAsAct = new QAction(tr("Save &As..."), this);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
@@ -306,6 +323,7 @@ void MainWindow::createActions()
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
 
+    // Edit menu
 #ifndef QT_NO_CLIPBOARD
     cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
     cutAct->setShortcuts(QKeySequence::Cut);
@@ -326,9 +344,26 @@ void MainWindow::createActions()
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 #endif
 
+    // Tools menu
     configToolAct = new QAction(tr("&Configuration Tool ..."), this);
     configToolAct->setStatusTip(tr("Open Configuration Tool with current configuration"));
     connect(configToolAct, SIGNAL(triggered()), this, SLOT(showConfigTool()));
+
+    browseDBAct = new QAction(tr("&Browse System DB ..."), this);
+    browseDBAct->setStatusTip(tr("Open System Database Browser"));
+    connect(browseDBAct, SIGNAL(triggered()), this, SLOT(showDBBrowser()));
+
+    extToolsAct = new QAction(tr("&Define External Tools ..."), this);
+    extToolsAct->setStatusTip(tr("Define external tools to open data products"));
+    connect(extToolsAct, SIGNAL(triggered()), this, SLOT(showExtToolsDef()));
+
+    verbosityAct = new QAction(tr("&Define Verbosity Level ..."), this);
+    verbosityAct->setStatusTip(tr("Define verbosity level to be used in this session"));
+    connect(verbosityAct, SIGNAL(triggered()), this, SLOT(showVerbLevel()));
+
+    execTestRunAct = new QAction(tr("&Execute test run ..."), this);
+    execTestRunAct->setStatusTip(tr("Execute a test run processing on dummy data"));
+    connect(execTestRunAct, SIGNAL(triggered()), this, SLOT(execTestRun()));
 
     dbgInfoAct = new QAction(tr("Activate debug"), this);
     dbgInfoAct->setStatusTip(tr("Activate debug information"));
@@ -338,6 +373,7 @@ void MainWindow::createActions()
     connect(dbgInfoAct, SIGNAL(toggled(bool)), ui->chkDebugInfo, SLOT(setChecked(bool)));
     connect(ui->chkDebugInfo, SIGNAL(toggled(bool)), dbgInfoAct, SLOT(setChecked(bool)));
 
+    // Window menu
     closeAct = new QAction(tr("Cl&ose"), this);
     closeAct->setStatusTip(tr("Close the active window"));
     connect(closeAct, SIGNAL(triggered()),
@@ -372,6 +408,7 @@ void MainWindow::createActions()
     separatorAct = new QAction(this);
     separatorAct->setSeparator(true);
 
+    // Help menu
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
@@ -382,11 +419,12 @@ void MainWindow::createActions()
 }
 
 //----------------------------------------------------------------------
-// Method: closeEvent
-// Reads configuration file
+// Method: createMenus
+// Create mainwindow menus
 //----------------------------------------------------------------------
 void MainWindow::createMenus()
 {
+    // File menu
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(saveAsAct);
     fileMenu->addSeparator();
@@ -394,24 +432,36 @@ void MainWindow::createMenus()
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
     fileMenu->addAction(exitAct);
 
+    // Edit menu
     editMenu = menuBar()->addMenu(tr("&Edit"));
 #ifndef QT_NO_CLIPBOARD
     editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
-    editMenu->addSeparator();
 #endif
-    editMenu->addAction(dbgInfoAct);
 
+    // Tools menu
     toolsMenu = menuBar()->addMenu(tr("&Tools"));
     toolsMenu->addAction(configToolAct);
+    toolsMenu->addAction(browseDBAct);
+    toolsMenu->addAction(extToolsAct);
+    toolsMenu->addSeparator();
 
+    sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
+    sessionInfoMenu->addAction(verbosityAct);
+    sessionInfoMenu->addAction(dbgInfoAct);
+
+    toolsMenu->addSeparator();
+    toolsMenu->addAction(execTestRunAct);
+
+    // Window menu
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
     connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
 
     menuBar()->addSeparator();
 
+    // Help menu
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
@@ -551,6 +601,128 @@ void MainWindow::showConfigTool()
 }
 
 //----------------------------------------------------------------------
+// Method: showDBBrowser
+// Shows System Database Browser
+//----------------------------------------------------------------------
+void MainWindow::showDBBrowser()
+{
+    DBBrowser dlg;
+
+    //dlg.readConfig();
+    dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// Method: showExtToolsDef
+// Shows external toos definition window
+//----------------------------------------------------------------------
+void MainWindow::showExtToolsDef()
+{
+    ExtToolsDef dlg;
+
+    //dlg.readConfig();
+    dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// Method: showVerbLevel
+// Shows verbosity level selector dialog
+//----------------------------------------------------------------------
+void MainWindow::showVerbLevel()
+{
+    VerbLevelDlg dlg;
+
+    dlg.exec();
+
+    ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
+}
+
+//----------------------------------------------------------------------
+// Method: execTestRun
+// Shows execution of test run confirmation dialog
+//----------------------------------------------------------------------
+void MainWindow::execTestRun()
+{
+    static QString testFileName("EUC_VIS_INFO_W-91100-2_20200707T151811Z.xml");
+    static QString testData("<?xml version=\"1.0\"?>"
+      "<ns1:DpdVisObservationFrame xmlns:ns1=\"http://euclid.esa.org/schema/dpd/vis\">"
+      "<Header><ProductId>91100</ProductId><ProductType>SCIENCE</ProductType><Software"
+      "Name>LE1</SoftwareName><SoftwareRelease>0.0.1</SoftwareRelease><PipelineRun>1</"
+      "PipelineRun><ExitStatusCode>a</ExitStatusCode><DataModelVersion>0.0.1</DataMode"
+      "lVersion><MinDataModelVersion>0.0.1</MinDataModelVersion><ScientificCustodian>V"
+      "IS</ScientificCustodian><AccessRights><EuclidConsortiumRead>true</EuclidConsort"
+      "iumRead><EuclidConsortiumWrite>false</EuclidConsortiumWrite><ScientificGroupRea"
+      "d>true</ScientificGroupRead><ScientificGroupWrite>false</ScientificGroupWrite><"
+      "/AccessRights><Curator><Name>Curator</Name></Curator><Creator>SOC</Creator><Cre"
+      "ationDate>2020-07-07T15:18:11.356298</CreationDate></Header><Data><ExposureTime"
+      "><Value>565.0</Value><Unit>s</Unit></ExposureTime><ImgType><Category>SCIENCE</C"
+      "ategory><FirstType>STD</FirstType><SecondType>SKY</SecondType><ThirdType>WIDE</"
+      "ThirdType><Technique>IMAGE</Technique></ImgType><ImgNumber>144</ImgNumber><Axis"
+      "Number>2</AxisNumber><AxisLengths>2118 2066</AxisLengths><DataSize>16</DataSize"
+      "><DataLength>4375788</DataLength><ImgStatistics><Min>0.0</Min><Max>0.0</Max><Me"
+      "an>0.0</Mean><Stdev>0.0</Stdev><Median>0.0</Median><MinX>0</MinX><MinY>0</MinY>"
+      "<MaxX>2118</MaxX><MaxY>2066</MaxY><NPix>4375788</NPix><XLower>51</XLower><YLowe"
+      "r>0</YLower><XUpper>2048</XUpper><YUpper>2066</YUpper></ImgStatistics><Instrume"
+      "nt><InstrumentName>VISIns</InstrumentName><TelescopeName>EUCLID</TelescopeName>"
+      "</Instrument><ObservationDateTime><OBT>2020-07-07T15:18:11.356298</OBT><UTC>202"
+      "0-07-07T15:18:11.356298Z</UTC><MJD>56923.0</MJD></ObservationDateTime><Observat"
+      "ionSequence><FieldId>0</FieldId><ObservationId>91100</ObservationId><DitherObse"
+      "rvation>10</DitherObservation><Exposure>1</Exposure><TotSequence>1</TotSequence"
+      "><ObjectId>XE34409</ObjectId></ObservationSequence><InstrumentMode>Science</Ins"
+      "trumentMode><ObservationMode>ScienceWide</ObservationMode><CompressionAlgorithm"
+      ">CCSDS121</CompressionAlgorithm><FrameChecksum>1</FrameChecksum><CommandedFPAPo"
+      "inting type=\"Center\"><RA>195.4258</RA><Dec>36.2739</Dec><Orientation>27.0</Or"
+      "ientation></CommandedFPAPointing><ReconsFPAPointing type=\"Center\"><RA>195.425"
+      "8</RA><Dec>36.2739</Dec><Orientation>27.0</Orientation></ReconsFPAPointing><Pre"
+      "dictedOrbit><Position>1100000.0 960000.0 1300000.0</Position><Velocity>100.0 90"
+      ".0 200.0</Velocity><SolarAspectAngle>1.6</SolarAspectAngle></PredictedOrbit><Re"
+      "consOrbit><Position>1100000.0 960000.0 1300000.0</Position><Velocity>100.0 90.0"
+      " 200.0</Velocity><SolarAspectAngle>1.6</SolarAspectAngle></ReconsOrbit><Readout"
+      "><ReadoutModeMethod>NominalScience</ReadoutModeMethod><StartTime>2020-07-07T15:"
+      "18:11.356298</StartTime><ParallelRegFrequency>0.5</ParallelRegFrequency><Serial"
+      "RegFrequency>0.5</SerialRegFrequency></Readout><ShutterUnit><Status>CLOSED</Sta"
+      "tus></ShutterUnit><CalibUnit><Status>false</Status></CalibUnit><ChargedInduced>"
+      "<Status>false</Status><IntensityLevel>9.0</IntensityLevel></ChargedInduced><Fra"
+      "meFitsFile format=\"le1.visRawImage\" version=\"0.1\"><DataContainer filestatus"
+      "=\"ARCHIVED\"><FileName>EUC_VIS_RAW_W-91100-2_20200707T151811Z.fits</FileName><"
+      "/DataContainer></FrameFitsFile><Parameters><SoftwareVersion>1.0.0</SoftwareVers"
+      "ion><PipelineCodeVIS>1</PipelineCodeVIS><Status><Name>MOD</Name><Code>0</Code><"
+      "ModuleSpecificCode>0</ModuleSpecificCode><SoftwareVersion>1.0</SoftwareVersion>"
+      "</Status></Parameters></Data></ns1:DpdVisObservationFrame>");
+
+    TestRunDlg dlg;
+    if (!dlg.exec()) { return; }
+
+    // Get config info
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    // Create input file
+    QString runPath = QString::fromStdString(cfgInfo.storage.base);
+    QString testInputPath = runPath + "/testRunInput";
+    mkdir(qPrintable(testInputPath), 0777);
+
+    QString testInputFile = testInputPath + "/" + testFileName;
+    std::string filename(testInputFile.toStdString());
+    std::ofstream dataFile;
+    dataFile.open(filename);
+    if (dataFile.good()) {
+        dataFile << qPrintable(testData) << std::endl;
+        dataFile.close();
+    } else {
+        std::cerr << "Cannot create file " + filename  << std::endl;
+    }
+
+    // Process folder with test data
+    QString metadata;
+    ui->spbxInjFreq->setValue(10);
+    ui->edInboxPath->setText(testInputPath);
+
+    statusBar()->showMessage(tr("Processing Test File ") + testInputFile,
+                             MessageDelay);
+    processInbox();
+}
+
+//----------------------------------------------------------------------
 // Method: commandSystem
 // Send SIG_USR1 signal to qpf, to trigger the START message to be sent,
 // or send STOP message, depending on the current status
@@ -561,6 +733,7 @@ void MainWindow::commandSystem()
     static bool isStart = true;
 
     if (isStart) {
+
         if (firstTime) {
             // Non-GUI (communications) Initializations
             //            init();
@@ -591,6 +764,8 @@ void MainWindow::commandSystem()
         // Activate Archive Monitoring
         archHdl = new ArchiveModel(ui->tblvwArchive);
 
+	transitTo(INITIALISED);
+        showState();
         statusBar()->showMessage(tr("START Signal sent to all elements . . ."),
                                  MessageDelay);
 
@@ -603,6 +778,8 @@ void MainWindow::commandSystem()
         ui->btnStart->setText("QUIT");
         ui->tabpgEvtInj->setEnabled(false);
 
+	transitTo(OFF);
+        showState();
         statusBar()->showMessage(tr("STOP Signal sent to all elements . . ."),
                                  MessageDelay);
     }
@@ -747,6 +924,9 @@ void MainWindow::processInbox()
         taskMonitTimer = new QTimer(this);
         connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
         taskMonitTimer->start(1000);
+
+	transitTo(RUNNING);
+        showState();
     }
 }
 
@@ -789,6 +969,9 @@ void MainWindow::endOfInDataMsgs()
 {
     //ui->tabEventsToInject->setEnabled(true);
     ui->btnStopMultInDataEvt->hide();
+
+    transitTo(INITIALISED);
+    showState();
 }
 
 //----------------------------------------------------------------------
@@ -798,7 +981,7 @@ void MainWindow::endOfInDataMsgs()
 void MainWindow::stopSendingMultInData()
 {
     emit stopSendingMessages();
-    endOfInDataMsgs();
+    //endOfInDataMsgs();
 }
 
 //----------------------------------------------------------------------
@@ -844,17 +1027,25 @@ void MainWindow::showTaskRes()
     if (firstTime) {
         // Set up context menu
         initTasksMonitTree(nCols);
+        initAlertsTable();
+        initArchiveTable();
+
+        firstTime = false;
     }
 
     // Update Tasks Monitorization Tree
     updateTasksMonitTree(nCols);
+    updateAlertsTree();
 
-    if (firstTime) {
-        for (int i = 0; i < nCols; ++i) {
-            ui->treeTaskMonit->resizeColumnToContents(i);
-        }
-        firstTime = false;
+    //if (firstTime) {
+    for (int i = 0; i < nCols; ++i) {
+        ui->treeTaskMonit->resizeColumnToContents(i);
     }
+    for (int i = 0; i < 5; ++i) {
+        ui->treeAlerts->resizeColumnToContents(i);
+    }
+    // firstTime = false;
+    //}
 
     // Now, update information for Task Agents Status Info.
     updateAgentsMonitPanel();
@@ -907,6 +1098,58 @@ void MainWindow::initTasksMonitTree(int nCols)
     ui->treeTaskMonit->setColumnCount(nCols);
     ui->treeTaskMonit->setHeaderLabels(hdrLabels);
     ui->treeTaskMonit->setItemDelegateForColumn(6, progressBarDisplay);
+}
+
+//----------------------------------------------------------------------
+// METHOD: initAlertsTable
+//----------------------------------------------------------------------
+void MainWindow::initAlertsTable()
+{
+    static QStringList hdrLabels;
+    hdrLabels << "Time Stamp" << "ID" << "Severity" << "Component" << "Description";
+
+    ui->treeAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    acAckAlert = new QAction(tr("Acknowledge alert"), ui->treeAlerts);
+    // connect(acAckAlert,     SIGNAL(triggered()), this, SLOT(alertAck()));
+
+    connect(ui->treeAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showAlertsContextMenu(const QPoint &)));
+
+    ui->treeAlerts->header()->setSectionsClickable(true);
+    alerts.clear();
+    Alert sampleAlert;
+    sampleAlert.timeStamp = QDateTime::currentDateTime();
+    sampleAlert.id = "QPFHMI_1";
+    sampleAlert.severity = "NO_ALERT";
+    sampleAlert.component = "QPFHMI";
+    sampleAlert.description = "This is just a sample alert";
+    alerts.append(sampleAlert);
+
+    ui->treeAlerts->clear();
+    ui->treeAlerts->setSortingEnabled(false);
+    ui->treeAlerts->setColumnCount(5);
+    ui->treeAlerts->setHeaderLabels(hdrLabels);
+}
+
+//----------------------------------------------------------------------
+// METHOD: initArchiveTable
+//----------------------------------------------------------------------
+void MainWindow::initArchiveTable()
+{
+    ui->tblvwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
+    acArchiveOpenExt = new QMenu(tr("Open with external toolDisplay task information"), ui->tblvwArchive);
+    QAction * acTool1 = new QAction(tr("GEdit"), acArchiveOpenExt);
+    acTool1->setStatusTip(tr("Gnome editor"));
+    acArchiveOpenExtTools.append(acTool1);
+    acArchiveOpenExt->addAction(acTool1);
+
+    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
+
+    connect(ui->tblvwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
 }
 
 //----------------------------------------------------------------------
@@ -1068,6 +1311,31 @@ void MainWindow::updateTasksMonitTree(int nCols)
 }
 
 //----------------------------------------------------------------------
+// METHOD: updateAlertsTree
+//----------------------------------------------------------------------
+void MainWindow::updateAlertsTree()
+{
+    static int numOfAlerts = 0;
+
+    if (numOfAlerts < alerts.count()) {
+
+        for (int i = numOfAlerts; i < alerts.count(); ++i) {
+            QTreeWidgetItem * treeItem = new QTreeWidgetItem(ui->treeAlerts);
+            const Alert & alert = alerts.at(i);
+
+            treeItem->setText(0, alert.timeStamp.toString("yyyy-MM-dd hh:mm:ss.zzz"));
+            treeItem->setText(1, alert.id);
+            treeItem->setText(2, alert.severity);
+            treeItem->setText(3, alert.component);
+            treeItem->setText(4, alert.description);
+            ui->treeAlerts->addTopLevelItem(treeItem);
+        }
+
+        numOfAlerts = alerts.count();
+    }
+}
+
+//----------------------------------------------------------------------
 // METHOD: updateAgentsMonitPanel
 //----------------------------------------------------------------------
 void MainWindow::updateAgentsMonitPanel()
@@ -1173,6 +1441,41 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
     }
     if (actions.count() > 0) {
         QMenu::exec(actions, ui->treeTaskMonit->mapToGlobal(p));
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: showAlertsContextMenu
+//----------------------------------------------------------------------
+void MainWindow::showAlertsContextMenu(const QPoint & p)
+{
+    QModelIndex m = ui->treeAlerts->currentIndex();
+    if (m.parent() != QModelIndex()) { return; }
+
+    QList<QAction *> actions;
+    if (ui->treeAlerts->indexAt(p).isValid()) {
+        actions.append(acAckAlert);
+    }
+    if (actions.count() > 0) {
+        QMenu::exec(actions, ui->treeAlerts->mapToGlobal(p));
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: showArchiveTableContextMenu
+//----------------------------------------------------------------------
+void MainWindow::showArchiveTableContextMenu(const QPoint & p)
+{
+    QModelIndex m = ui->tblvwArchive->currentIndex();
+    if (m.parent() != QModelIndex()) { return; }
+
+    QList<QAction *> actions;
+    if (ui->tblvwArchive->indexAt(p).isValid()) {
+        actions.append(acArchiveShow);
+        actions.append(acArchiveOpenExtTools);
+    }
+    if (actions.count() > 0) {
+        QMenu::exec(actions, ui->tblvwArchive->mapToGlobal(p));
     }
 }
 
@@ -1338,6 +1641,60 @@ void MainWindow::clearLayout(QLayout *layout)
         }
         delete item;
     }
+}
+
+//----------------------------------------------------------------------
+// Method: defineValidTransitions
+// Define valid state transitions
+//----------------------------------------------------------------------
+void MainWindow::defineValidTransitions()
+{
+    defineState(ERROR,        "ERROR");
+    defineState(OFF,          "OFF");
+    defineState(INITIALISED,  "INITIALISED");
+    defineState(RUNNING,      "RUNNING");
+
+    defineValidTransition(ERROR,        OFF);
+    defineValidTransition(OFF,          INITIALISED);
+    defineValidTransition(INITIALISED,  RUNNING);
+    defineValidTransition(INITIALISED,  OFF);
+    defineValidTransition(INITIALISED,  ERROR);
+    defineValidTransition(RUNNING,      OFF);
+    defineValidTransition(RUNNING,      ERROR);
+    defineValidTransition(RUNNING,      INITIALISED);
+
+    setState(ERROR);
+    transitTo(OFF);
+    showState();
+}
+
+//----------------------------------------------------------------------
+// Method: showState
+// Define valid state transitions
+//----------------------------------------------------------------------
+void MainWindow::showState()
+{
+    const int & state = getState();
+    std::string stateName = stateNames[state];
+    ui->lblSysStatus->setText(QString::fromStdString(stateName));
+    QString stys;
+    switch (state) {
+    case ERROR:
+	stys = "QLabel { background-color : red; color : orange; }";
+	break;
+    case OFF:
+	stys = "QLabel { background-color : black; color : grey; }";
+	break;
+    case INITIALISED:
+	stys = "QLabel { background-color : blue; color : lightgrey; }";
+	break;
+    case RUNNING:
+	stys = "QLabel { background-color : green; color : white; }";
+	break;
+    default:
+	break;
+    }
+    ui->lblSysStatus->setStyleSheet(stys);
 }
 
 }
