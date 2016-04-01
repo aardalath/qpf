@@ -61,6 +61,10 @@ std::string Log::dateString("");
 
 std::string Log::logBaseDir = std::string("/qpf/run");
 
+static const Log::LogLevel DefaultMinimumLogLevel = Log::INFO;
+
+Log::LogLevel Log::minimumLogLevel = DefaultMinimumLogLevel;
+
 bool Log::consoleOutput = false;
 bool Log::quietExit = false;
 
@@ -88,7 +92,7 @@ Log::~Log()
 //----------------------------------------------------------------------
 void Log::log(std::string caller, Log::LogLevel level, std::string message)
 {
-  static char LogLevelLetters[] = {'D', 'I', 'W', 'E', 'F'};
+  static char LogLevelLetters[] = {'T', 'D', 'I', 'W', 'E', 'F'};
 
   std::map<std::string, std::fstream *>::iterator logIt;
   logIt = logStream.find(caller);
@@ -177,7 +181,7 @@ std::string Log::getTimeTag()
          it != logStream.end(); ++it) {
         dateChangeShown[it->first] = false;
 //      log(it->first, Log::INFO, msg.str());
-    }    
+    }
     time(&secs);
     (void)localtime_r(&secs, &locTime);
   }
@@ -280,6 +284,30 @@ void Log::setLogBaseDir(std::string base)
 std::string Log::getLogBaseDir()
 {
     return logBaseDir;
+}
+
+//----------------------------------------------------------------------
+// Static Method: setMinLogLevel
+// Sets the value of the minimum log level
+//
+// Parameters:
+//   lvl - (I) Minimum log level to be used
+//----------------------------------------------------------------------
+void Log::setMinLogLevel(Log::LogLevel lvl)
+{
+    Log::minimumLogLevel = lvl;
+}
+
+//----------------------------------------------------------------------
+// Static Method: getMinLogLevel
+// Returns the value of the minimum log level
+//
+// Returns:
+//   Value of the minimum log level
+//----------------------------------------------------------------------
+Log::LogLevel Log::getMinLogLevel()
+{
+    return Log::minimumLogLevel;
 }
 
 #include <execinfo.h>

@@ -71,6 +71,7 @@
 //------------------------------------------------------------
 // Topic: Macros
 //   - LogMsg(l, s) - Generic macro to call logMsg method
+//   - TraceMsg(s)  - Macro to call logMsg for TRACE msgs
 //   - DbgMsg(s)    - Macro to call logMsg for DEBUG msgs
 //   - InfoMsg(s)   - Macro to call logMsg for INFO msgs
 //   - WarnMsg(s)   - Macro to call logMsg for WARNING msgs
@@ -79,6 +80,7 @@
 //------------------------------------------------------------
 
 #define LogMsg(l,s)  Log::log(LOG_SYSTEM, l, s)
+#define TraceMsg(s)  Log::log(LOG_SYSTEM, Log::TRACE,   s)
 #define DbgMsg(s)    Log::log(LOG_SYSTEM, Log::DEBUG,   s)
 #define InfoMsg(s)   Log::log(LOG_SYSTEM, Log::INFO,    s)
 #define WarnMsg(s)   Log::log(LOG_SYSTEM, Log::WARNING, s)
@@ -102,6 +104,7 @@ public:
 
   //----------------------------------------------------------------------
   // Typedef: LogLevel
+  //   TRACE   - (=T) Trace information level
   //   DEBUG   - (=D) Debug information level
   //   INFO    - (=I) Normal informational level
   //   WARNING - (=W) Level for exceptional, non problematic situations
@@ -109,11 +112,13 @@ public:
   //   FATAL   - (=F) Level for exceptional, problematic, non-recoverable cases
   //----------------------------------------------------------------------
   enum LogLevel {
-    DEBUG = 0,
-    INFO = 1,
-    WARNING = 2,
-    ERROR = 3,
-    FATAL = 4,
+    TRACE = 0,
+    DEBUG = 1,
+    INFO = 2,
+    WARNING = 3,
+    ERROR = 4,
+    FATAL = 5,
+    T = TRACE,
     D = DEBUG,
     I = INFO,
     W = WARNING,
@@ -205,6 +210,24 @@ public:
   //----------------------------------------------------------------------
   static std::string getLogBaseDir();
 
+  //----------------------------------------------------------------------
+  // Static Method: setMinLogLevel
+  // Sets the value of the minimum log level
+  //
+  // Parameters:
+  //   lvl - (I) Minimum log level to be used
+  //----------------------------------------------------------------------
+  static void setMinLogLevel(LogLevel lvl);
+
+  //----------------------------------------------------------------------
+  // Static Method: getMinLogLevel
+  // Returns the value of the minimum log level
+  //
+  // Returns:
+  //   Value of the minimum log level
+  //----------------------------------------------------------------------
+  static LogLevel getMinLogLevel();
+
 private:
   //----------------------------------------------------------------------
   // Constructor: Log
@@ -268,6 +291,9 @@ private:
   // Maps the underlying log stream to the entity name
   static std::map<std::string, bool> dateChangeShown;
 
+  // Variable: minimumLogLevel
+  // Defines the minimum level to display log messages
+  static LogLevel minimumLogLevel;
 };
 
 }
