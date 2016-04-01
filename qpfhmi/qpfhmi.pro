@@ -28,7 +28,11 @@ SOURCES += main.cpp \
     simindata.cpp \
     textview.cpp \
     logframe.cpp \
-    configtool.cpp
+    configtool.cpp \
+    dbbrowser.cpp \
+    exttoolsdef.cpp \
+    verbleveldlg.cpp \
+    testrundlg.cpp
 
 HEADERS  += mainwindow.h \
          hmipxy.h \
@@ -44,13 +48,21 @@ HEADERS  += mainwindow.h \
     simindata.h \
     textview.h \
     logframe.h \
-    configtool.h
+    configtool.h \
+    dbbrowser.h \
+    exttoolsdef.h \
+    verbleveldlg.h \
+    testrundlg.h
 
 FORMS    += mainwindow.ui \
     dlgshowtaskinfo.ui \
     frmagentstatus.ui \
     logframe.ui \
-    configtool.ui
+    configtool.ui \
+    dbbrowser.ui \
+    exttoolsdef.ui \
+    verbleveldlg.ui \
+    testrundlg.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
