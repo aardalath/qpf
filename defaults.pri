@@ -1,5 +1,5 @@
 #===== Projec dir. =======
-PRJ_ROOT_DIR = $$PWD
+PRJ_ROOT_DIR = $$PWD 
 
 BUILDROOT = build/debug
 
