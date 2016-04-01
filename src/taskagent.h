@@ -81,8 +81,11 @@ class TaskAgent : public Component {
 public:
     TaskAgent(const char * name = 0);
 
-    Property(TaskAgent, std::string, workDir, WorkDir);
-    Property(TaskAgent, std::string, sysDir,  SysDir);
+    Property(TaskAgent, std::string, workDir,    WorkDir);
+    Property(TaskAgent, std::string, sysDir,     SysDir);
+    Property(TaskAgent, bool,        remote,     Remote);
+    Property(TaskAgent, std::string, agentAddress,  AgentAddress);
+    Property(TaskAgent, std::string, masterAddress, MasterAddress);
 
     //----------------------------------------------------------------------
     // Method: sendTaskResMsg
