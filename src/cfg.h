@@ -92,7 +92,14 @@ struct OrchestrationMaps {
     std::map<Rule *, std::string>       ruleDesc;
 };
 
-enum LocalArchiveMethod { LINK, MOVE, COPY, REMOTE_COPY, SYMLINK };
+enum LocalArchiveMethod {
+    LINK,
+    MOVE,
+    COPY,
+    COPY_TO_REMOTE,
+    COPY_TO_MASTER,
+    SYMLINK
+};
 
 struct StorageExternal {
     std::string protocol;
