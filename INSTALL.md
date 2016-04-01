@@ -21,6 +21,7 @@ The following is the list of COTS needed to build and run QPF v-1.0.  The versio
 - 0MQ Library (v-4.1.1), together with the C++ binding for 0MQ
 - PostgreSQL (v-9.4.4.1 x64)
 - libsodium (v-1.0.3)
+- PCRE2 library (v-2.8)
 
 Installation procedure
 --------------------------------
