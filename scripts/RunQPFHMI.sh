@@ -1,11 +1,11 @@
 ##############################################################################
-# File       : RunQPFHMI.sh - QPF Release Generation script
+# File       : RunQPFHMI.sh - Run QPF HMI
 # Domain     : QPF.scripts
 # Version    : 1.0
 # Date       : 2016/04/01
 # Copyright (C) 2015, 2016 J C Gonzalez
 #_____________________________________________________________________________
-# Purpose    : Generate QPF Release Package
+# Purpose    : Run QPF HMI
 # Created by : J C Gonzalez
 # Status     : Prototype
 # History    : See <Changelog>
@@ -17,11 +17,6 @@
 QPFDIR=/home/eucops/qpf
 VERSION=1.0
 
-DBG=""
-if [ $1 == "-d" ]; then
-
-fi
-
 #- Messages
 _ONHDR="\e[1;49;93m"
 _ONMSG="\e[1;49;92m"
@@ -31,11 +26,10 @@ _OFF="\e[0m"
 STEP=0
 
 #- Options
-TARGET_FOLDER="."
-VERSION=$(cat "${QPF_PATH}/VERSION")
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 LOG_FILE=./qpfhmi_${TIMESTAMP}.log
 CFG_FILE="${QPFDIR}/cfg/qpf_v1_rc1_multihost_eucdev02+eucdev03.json"
+DBG=""
 
 ###### Handy functions
 
@@ -43,8 +37,7 @@ greetings () {
     say "${_ONHDR}==============================================================================="
     say "${_ONHDR} Euclid QLA Processing Framework"
     say "${_ONHDR} Version ${VERSION}"
-    say "${_ONHDR} Release Package Generation"
-    say "${_ONHDR} Build time-stamp: ${TIMESTAMP}"
+    say "${_ONHDR} Run QPF HMI"
     say "${_ONHDR}==============================================================================="
     say ""
 }
