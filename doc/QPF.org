@@ -1,9 +1,7 @@
-#////////////////////////////////////////////////////////////////////////////
 #+TITLE:        QPF - QLA Processing Framework
 #+AUTHOR:       Jose C. Gonzalez
 #+EMAIL:        JCGonzalez@sciops.esa.int
 #+DATE:         Time-stamp: <2015-07-07 mar 12:24>
-#////////////////////////////////////////////////////////////////////////////
 
 #+SETUPFILE: ./config.org
 
@@ -788,6 +786,8 @@ For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the fo
 - 0MQ :: Communications among the different managment components (all but the processing elements) will used Zero-MQ sockets for their communications
 
 - PostgreSQL :: The system configuration, alarms, product metadata, etc. will be stored in a PostgreSQL database.
+
+- PCRE2 :: File name templates will be compiled against PCRE2 library.
 
 - Qt :: The HMI component will be based on Qt and coded on C++.  For the Toy Model, the HMI will be responsible also for providing appropriate input events and data to the system via the Event Manager.
 
@@ -1618,27 +1618,22 @@ The Alarm Database stores:
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
 
-*** DONE Issues [2/2]
-**** DONE [#A] Remote log chunks are received in DATA_INFO messages, but they are not saved to disk
+*** TODO Issues [2/3]
+**** DONE [#A] Remote log chunks are received in =DATA_INFO= messages, but they are not saved to disk
 CLOSED: [2015-10-05 lun 11:44]
 **** DONE [#A] Database structure is obsolete, so INSERTs and other operations fail
 CLOSED: [2015-10-05 lun 11:44]
+**** TODO [#A] JSONCpp library shows some bugs from time to time, this should be avoided by using our own SDC library, and restricting JSON just to I/O operations
 
-
-*** TODO Functionalities to be included [7/14]
+*** TODO Functionalities to be included [8/14]
 **** DONE [#A] Correct DB structure so the incoming data and overall information can be stored
 CLOSED: [2015-10-05 lun 11:43]
 **** DONE [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
 CLOSED: [2015-10-05 lun 11:43]
-**** TODO [#A] Ensure the HMI monitors the remote log directory and they are shown in the HMI
-**** STARTED [#B] Prepare an infrastructure for product downloading
-**** TODO [#B] Implement MONIT_RQST and MONIT_INFO messages
-**** TODO [#B] Implement Commanding messages to handle running processors
+**** DONE [#B] Prepare an infrastructure for product downloading
+CLOSED: [2016-04-04 lun 09:14]
 **** DONE [#B] Implement output products registering and archival
 CLOSED: [2016-01-29 vie 08:48]
-**** TODO [#B] Pause/Resume/Stop of tasks
-**** STARTED [#B] Implement preferences for HMI
-**** TODO [#C] Tasks History Report
 **** DONE [#A] Registration of tasks status
 CLOSED: [2015-09-30 mié 13:23]
 **** DONE [#A] Checking of last execution tasks status
@@ -1647,9 +1642,49 @@ CLOSED: [2015-09-30 mié 13:23]
 CLOSED: [2015-09-30 mié 13:23]
 **** DONE [#B] Output files registration
 CLOSED: [2015-09-30 mié 13:23]
+**** TODO [#A] Ensure the HMI monitors the remote log directory and they are shown in the HMI
+**** TODO [#B] Implement =MONIT_RQST= and =MONIT_INFO= messages
+**** TODO [#B] Implement Commanding messages to handle running processors
+**** TODO [#B] Pause/Resume/Stop of tasks
+**** STARTED [#C] Implement preferences for HMI
+**** TODO [#C] Tasks History Report
 
 
 *** Notes
+
+*** QPF Installation and Quick Start
+
+**** Introduction
+
+***** Purpose
+
+***** Scope
+
+***** Reference Documents
+
+***** Acronyms and Abbreviations
+
+***** Contact Information
+
+**** System Installation
+
+***** Pre-requisites
+
+***** Pre-installation tasks
+
+***** Installation Procedure
+
+***** Post-installation
+
+***** Installation tests
+
+***** Uninstallation Procedure
+
+**** Quick Start
+
+**** System Configuration
+
+**** Troubleshooting
 
 
 ** Glossary
