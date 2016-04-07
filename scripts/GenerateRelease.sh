@@ -109,6 +109,7 @@ n=0
 ((n++)); content[$n]="src"
 ((n++)); content[$n]="qpfhmi"
 ((n++)); content[$n]="scripts/BuildQPF.sh"
+((n++)); content[$n]="scripts/RunQPFHMI.sh"
 ((n++)); content[$n]="scripts/GenerateRelease.sh"
 ((n++)); content[$n]="run/QPF-workarea.tgz"
 ((n++)); content[$n]="run/qpfdb.sql"
