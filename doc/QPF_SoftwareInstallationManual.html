@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>QLA Processing Framework Installation and Quick Start Config. file</title>
+<!-- 2016-04-07 jue 16:24 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Jose C. Gonzalez" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">QLA Processing Framework Installation and Quick Start Config. file</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Purpose</a></li>
+<li><a href="#sec-1-2">1.2. Scope</a></li>
+<li><a href="#sec-1-3">1.3. Acronyms and Abbreviations</a></li>
+<li><a href="#sec-1-4">1.4. TBDs and TBCs</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. TBDs</a></li>
+<li><a href="#sec-1-4-2">1.4.2. TBCs</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. Contact Information</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. System Installation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Pre-requisites</a></li>
+<li><a href="#sec-2-2">2.2. Pre-installation tasks</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. COTS installation</a></li>
+<li><a href="#sec-2-2-2">2.2.2. Obtaining the Source Code</a></li>
+<li><a href="#sec-2-2-3">2.2.3. Pre-building environment settings</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Installation Procedure</a></li>
+<li><a href="#sec-2-4">2.4. Post-installation</a></li>
+<li><a href="#sec-2-5">2.5. Installation tests</a></li>
+<li><a href="#sec-2-6">2.6. Uninstallation Procedure</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Quick Start</a></li>
+<li><a href="#sec-4">4. System Configuration</a></li>
+<li><a href="#sec-5">5. Troubleshooting</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Purpose</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+This document shows the installation procedure for the Euclid Quick-Look Analysis (QLA) Processing Framework, or QPF for short.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Scope</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+The current version of this document covers the building and installation process for the QLA Processing Framework release V1.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Acronyms and Abbreviations</h3>
+<div class="outline-text-3" id="text-1-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">Acr./Abbr.</th>
+<th scope="col" class="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">COTS</td>
+<td class="left">Commercial Off-The-Shelf</td>
+</tr>
+
+<tr>
+<td class="left">HMI</td>
+<td class="left">Human-Machine Interface</td>
+</tr>
+
+<tr>
+<td class="left">JSON</td>
+<td class="left">Javascript Object Notation</td>
+</tr>
+
+<tr>
+<td class="left">QLA</td>
+<td class="left">Quick Look Analysis</td>
+</tr>
+
+<tr>
+<td class="left">QPF</td>
+<td class="left">QLA Processing Framework</td>
+</tr>
+
+<tr>
+<td class="left">TBC</td>
+<td class="left">To be confirmed</td>
+</tr>
+
+<tr>
+<td class="left">TBD</td>
+<td class="left">To be defined</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> TBDs and TBCs</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> TBDs</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">TBD Loc.</th>
+<th scope="col" class="left">Comment</th>
+<th scope="col" class="left">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left"><a href="#TBD1">2.5</a></td>
+<td class="left">Create and document installation tests</td>
+<td class="left">Open</td>
+</tr>
+
+<tr>
+<td class="left"><a href="#TBD2">2.6</a></td>
+<td class="left">Define complete uninstallation procedure</td>
+<td class="left">Open</td>
+</tr>
+
+<tr>
+<td class="left"><a href="#TBD3">3</a></td>
+<td class="left">Quickstart section</td>
+<td class="left">Open</td>
+</tr>
+
+<tr>
+<td class="left"><a href="#TBD4">4</a></td>
+<td class="left">System Configuration</td>
+<td class="left">Open</td>
+</tr>
+
+<tr>
+<td class="left"><a href="#TBD5">5</a></td>
+<td class="left">Troubleshooting</td>
+<td class="left">Open</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> TBCs</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">TBC Loc.</th>
+<th scope="col" class="left">Comment</th>
+<th scope="col" class="left">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> Contact Information</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+For any doubt or comment on the building and installation procedure here described, please do not hesitate to contact <a href="mailto:JCGonzalez@sciops.esa.int">JCGonzalez@sciops.esa.int</a>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> System Installation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Pre-requisites</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+QPF is a C++ application that makes use of some of the C++-11 new features of the C++ language.  It was originally developed in an Ubuntu 15.10 box with a GCC compiler version 5.2.1 (Ubuntu 5.2.1-22ubuntu2 - 20151010).  The compiler used to build the executables and libraries must cover most of the C++-11 features included in that GCC version.
+</p>
+
+<p>
+One exception is the Regular Expressions matching component.  Initially, the code made use of the functionality included in the C++-11 standard.  However, for the sake of compatibility with earlier (non-fully C++-11 compliant) GCC versions, the regular expressions matching used now is the one included in the external library PCRE2.  For the purposes of the QPF, the functionality included therein is more than enough.
+</p>
+
+<p>
+The QPF Graphical User Interface (<code>qpfhmi</code>) is based on Qt 5.4.1 (GCC 4.6.1, 64 bit), built on Apr 22nd 2015 04:12:47 from revision 6302a28c97, and developed using Qt Creator 3.4.0 (open source).
+</p>
+
+<p>
+The list of COTS is shown below.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Pre-installation tasks</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> COTS installation</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+The QPF source code needs some COTS to be installed in the building host.  It is assumed by this installation guide that these COTS are already installed.
+</p>
+
+<p>
+The following is the list of COTS needed to build and run QPF Release V1.  The version numbers shown in some of the COTS are used for reference: those versions or higher with backward-compatibility could be used.  Where no version number appears, it means that any reasonably recent version should work.  Note that the QPF source code also makes use of the JSONCpp library (v.1.6.2), although this library is already integrated in the source tree.
+</p>
+
+<ul class="org-ul">
+<li>Qt 5.4
+</li>
+<li>0MQ Library (v-4.1.1), together with the C++ binding for 0MQ
+</li>
+<li>PostgreSQL (v-9.4.4.1 x64)
+</li>
+<li>PCRE2 (v-2.8)
+</li>
+<li>libcurl
+</li>
+<li>libsodium
+</li>
+<li>libuuid
+</li>
+</ul>
+
+<p>
+The PostsgreSQL database server must be started for the installation process to end successfully.  By default, the server is listening for connection requests at <code>localhost:5432</code>.  It you or your system administrator changes this address or port, you should specify the new values in the appropriate settings file (see below).
+</p>
+
+<p>
+In addition, for the execution of the Unitary Tests, the library Google Test v-1.7 is used.  However, this is not a requirement for compiling and installing the QPF.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> Obtaining the Source Code</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+The QPF source code for this release can be obtained from the Euclid SVN repository, using the following branch URL:
+</p>
+
+<p>
+<a href="https://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.0">https://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.0</a>
+</p>
+
+<p>
+In order to fetch the source code, move to a folder where you want the system to store the code, and type:
+</p>
+
+<pre class="example">
+$ svn checkout https://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.0 QPF-V1
+</pre>
+
+<p>
+The source code will be available under the folder QPF-V1.
+</p>
+
+<p>
+Alternatively, if you got a QPF Release V1 source code package <code>QPF-V1.0-&lt;timestamp&gt;.tar.gz</code>, you can move to the desired folder and extract the source code files, as follows:
+</p>
+
+<pre class="example">
+$ tar xvzf &lt;source_path&gt;/QPF-V1.0-&lt;timestamp&gt;.tar.gz
+</pre>
+
+<p>
+where <code>&lt;source_path&gt;</code> is the place where the source code package is located.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> Pre-building environment settings</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+After getting the source code, but before starting the compilation &amp; installation process, you must set your environment.  In particular, you should make sure the compilation system addresses correctly the appropriate COTS header and library files.
+</p>
+
+<p>
+Note that the system by default assumes the following:
+</p>
+<ul class="org-ul">
+<li>Your user name is <code>eucops</code> and your home folder is <code>/home/eucops</code>.
+</li>
+<li>The COTS needed to build and run the QPF are placed under the folder <code>${HOME}/opt</code>, in the following paths:
+<ul class="org-ul">
+<li>Qt (5.4): <code>${HOME}/opt/Qt</code>
+</li>
+<li>0MQ: <code>${HOME}/opt/zmq</code>
+</li>
+<li>PCRE2: <code>${HOME}/opt/pcre2</code>
+</li>
+<li>PostgreSQL: <code>${HOME}/opt/pgsql</code>
+</li>
+<li>libsodium: <code>${HOME}/opt/libsodium</code>
+</li>
+<li>Libcurl: <code>${HOME}/opt/curl</code>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>
+If all these assumptions are met, you may not need to do the modifications described in the following two sections.
+</p>
+</div>
+
+<ol class="org-ol"><li><a id="sec-2-2-3-1" name="sec-2-2-3-1"></a>Environment Variables<br  /><div class="outline-text-5" id="text-2-2-3-1">
+<p>
+There is a Bash script in the source code tree, where a bunch of environment variables are set for the compilation and execution of QPF.  The script is <code>QPF-V1/env.sh</code>.  You should first edit this file (modifying <b>only</b> the section <i>Basic variables</i>), and then run it with:
+</p>
+
+<pre class="example">
+$ source &lt;QPF_path&gt;/env.sh
+</pre>
+
+<p>
+where <code>&lt;QPF_path&gt;</code> is the path where the QPF source code is located, including the <code>QPF-V1</code> part.
+</p>
+</div>
+</li>
+
+<li><a id="sec-2-2-3-2" name="sec-2-2-3-2"></a>Compilation Variables<br  /><div class="outline-text-5" id="text-2-2-3-2">
+<p>
+In addition, similar information must be included in the file <code>QPF-V1/defaults.pri</code>, used by the building system.  You must edit this file (only the section <i>External libraries</i>), and ensure the COTS are pointed to correctly by the paths defined therein.
+</p>
+</div>
+</li></ol>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Installation Procedure</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Once the appropriate environment is set, and the <code>defaults.pri</code> ensures the COTS are reachable, the compilation and installation process is rather automatic.
+</p>
+
+<p>
+There is a compilation &amp; installation script, <code>QPF-V1/scripts/BuildQPF.sh</code>, that is used for this task.  The actions performed by this script are:
+</p>
+
+<ul class="org-ul">
+<li>Check that the needed programs for the compilation, installation and execution of QPF are installed.
+</li>
+<li>Check that the required libraries are installed and reachable.
+</li>
+<li>Generate the required dependencies between the different QPF components.
+</li>
+<li>Compile the QPF system.
+</li>
+<li>Set up the working (execution) area and install the sample configuration and processors.
+</li>
+<li>Install the QPF executable and libraries.
+</li>
+<li>(Re)generate the internal QPF database.
+</li>
+</ul>
+
+<p>
+Every action performed by this script is registered in a log file.
+</p>
+
+<p>
+You can run this script by moving into the <code>QPF-V1/scripts</code> folder and typing in the console <code>./BuildQPF.sh -h</code>:
+</p>
+
+<pre class="example">
+$ ./BuildQPF.sh -h
+Usage: BuildQPF.sh [ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -w &lt;path&gt; ] [ -H &lt;host&gt; ] [ -P &lt;port&gt; ]
+where:
+  -h         Show this usage message
+  -c         Compile the source code
+  -i         Install libraries and binary
+  -n         Show the actions without executing them
+  -r         Clear previous build
+  -b         Re-create PostsgreSQL system database
+  -w &lt;path&gt;  Folder to locate QPF working area (default:HOME)
+  -H &lt;host&gt;  Host where system database is located (default:localhost)
+  -P &lt;port&gt;  Port to access the database (default:5432)
+</pre>
+
+<p>
+With the option <code>-h</code>, the script displays an usage message with the possible options.  To start the compilation and installation process for the first time, with the default values for the working area folder and the PostsgreSQL server connections address and port, just type:
+</p>
+
+<pre class="example">
+$ ./BuildQPF.sh -c -i -r -b
+</pre>
+
+<p>
+The script will start performing all the actions needed for the preparation, compilation and installation of the QPF, as well as for the PostsgreSQL database initial setup.  The option <code>-r</code> can be skipped the first time (it just removes any previous compiled object files), but it does no harm.
+</p>
+
+<p>
+Note that specifying the option <code>-b</code> (database re-creation) will have the effect of removing completely any previous database with the same name (<code>qpfdb</code>) in the server.
+</p>
+
+<p>
+Once the installation has finished, as indicated by the script you should:
+</p>
+
+<ul class="org-ul">
+<li>include the directory <code>&lt;path&gt;/qpf/bin</code> in the <code>PATH</code> variable, and
+</li>
+<li>include the directory <code>&lt;path&gt;/qpf/lib</code> in the <code>LD_LIBRARY_PATH</code> variable.
+</li>
+</ul>
+
+<p>
+Note that <code>&lt;path&gt;</code> represents the folder where the QPF working area will be placed.  By default this path is <code>${HOME}</code>.
+</p>
+
+<p>
+Once the <code>PATH</code> and <code>LD_LIBRARY_PATH</code> variables are set, you can check if the QPF was correctly installed.  The QPF operation is handled by the QPF HMI (<code>qpfhmi</code>).  Just type:
+</p>
+
+<pre class="example">
+$ qpfhmi -h
+</pre>
+
+<p>
+A help message should appear in the console.
+</p>
+
+<p>
+Initial configuration files (in JSON) are available at <code>&lt;path&gt;/qpf/cfg</code>.  You may need to modify them before launching any processing task from the HMI.  If no configuration file is specified at command line, <code>qpfhmi</code> will read the last configuration used from the internal database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> Post-installation</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+After installing the QPF, and before actually running the framework, the <code>Docker</code> application must be installed.  <code>Docker</code> is assumed to be installed, and the user that runs QPF must be able to run any container.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Installation tests</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+<a id="TBD1" name="TBD1"></a> installation tests.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> Uninstallation Procedure</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+<a id="TBD2" name="TBD2"></a> to define uninstallation procedure.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Quick Start</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<a id="TBD3" name="TBD3"></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> System Configuration</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+<a id="TBD4" name="TBD4"></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Troubleshooting</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+<a id="TBD5" name="TBD5"></a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Time-stamp: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-03-23 14:34:32 jcgg&gt;</span></span></p>
+<p class="author">Author: Jose C. Gonzalez</p>
+<p class="date">Created: 2016-04-07 jue 16:24</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
