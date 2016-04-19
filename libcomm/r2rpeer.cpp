@@ -549,7 +549,7 @@ void Router2RouterPeer::transmissionsHandler()
         int64_t rcvmore = 0;
         static size_t type_size = sizeof(int64_t);
         zmq::pollitem_t servers[] = { {skServer, 0, ZMQ_POLLIN, 0} };
-        int rc;
+        int rc = 0;
 
         if (skServer.connected()) {
             // Check now incoming messages
@@ -563,7 +563,6 @@ void Router2RouterPeer::transmissionsHandler()
         } else {
             std::cerr << "ERROR: Server socket not connected for "
                       << self.load()->name << std::endl;
-            rc = 0;
         }
 
         if (rc > 0) {
