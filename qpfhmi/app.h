@@ -61,6 +61,8 @@ public:
     virtual bool mustLaunchHMI();
     virtual char * getConfigFileName();
     virtual Configuration * getConfigHandler();
+    virtual void restart();
+
 private:
     Deployer * deployer;
 };
