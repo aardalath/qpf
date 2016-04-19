@@ -65,6 +65,7 @@ public:
 public slots:
     void save();
     void saveAs();
+    void setWorkingPaths(QString newPath);
 
 private:
     ModelView * createListModelView(QAbstractItemView * v,

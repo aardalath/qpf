@@ -7,6 +7,7 @@
 using LibComm::join;
 
 #include <QHostInfo>
+#include <QFileInfo>
 
 #define C(x) (x).c_str()
 #define QS(x) QString::fromStdString(x)
@@ -76,9 +77,9 @@ ConfigTool::ConfigTool(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Hide GUI parts with functionality not yet implemented
-    ui->tbtnStorage->hide();
-    ui->gpboxProc->widget(PageStorage)->hide();
+    // Hide non-yet-implemented widgets
+    ui->gpboxInput->hide();
+    ui->gpboxOutput->hide();
 
     ui->btngrpSection->setId(ui->tbtnGeneral       , PageGeneral);
     ui->btngrpSection->setId(ui->tbtnMachines      , PageMachines);
@@ -86,6 +87,8 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui->btngrpSection->setId(ui->tbtnNetwork       , PageNetwork);
     ui->btngrpSection->setId(ui->tbtnOrchestration , PageOrchestration);
     ui->btngrpSection->setId(ui->tbtnStorage       , PageStorage);
+
+    connect(ui->edBasePath, SIGNAL(textChanged(QString)), this, SLOT(setWorkingPaths(QString)));
 }
 
 ConfigTool::~ConfigTool()
@@ -232,6 +235,11 @@ void ConfigTool::readConfig()
     ModelView * mvRules = createTableModelView(ui->tblviewRules, rulesTable, hdr);
     (void)(mvRules);
 
+    // 5. STORAGE
+    ui->edBasePath->setText(C(cfgInfo.storage.base));
+    ui->nedLocalArchiveFolder->setText(C(cfgInfo.storage.local_archive.path));
+    ui->nedInbox->setText(C(cfgInfo.storage.inbox.path));
+    ui->nedOutbox->setText(C(cfgInfo.storage.outbox.path));
 }
 
 ModelView * ConfigTool::createListModelView(QAbstractItemView * v,
@@ -267,6 +275,16 @@ void ConfigTool::saveAs()
     (void)QMessageBox::warning(this, tr("Save as..."),
                                tr("Sorry, but this functionality is not yet implemented."),
                                QMessageBox::Ok);
+}
+
+void ConfigTool::setWorkingPaths(QString newPath)
+{
+    QFileInfo fs(newPath);
+
+    QString base = fs.path();
+    ui->nedLocalArchiveFolder->setText(base + "/data/archive");
+    ui->nedInbox->setText(base + "/data/inbox");
+    ui->nedOutbox->setText(base + "/data/outbox");
 }
 
 
