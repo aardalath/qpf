@@ -6,18 +6,21 @@
 
 include(../defaults.pri)
 
-QT       += core gui
+QT       += core gui sql network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = qpfhmi
 TEMPLATE = app
 
-SOURCES += main.cpp \
-        mainwindow.cpp \
-        hmipxy.cpp \
-        logwatcher.cpp \
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp \
+    hmipxy.cpp \
+    logwatcher.cpp \
     archivemodel.cpp \
+    browser.cpp \
+    connectionwidget.cpp \
     taskmonmodel.cpp \
     types.cpp \
     progbardlg.cpp \
@@ -34,10 +37,13 @@ SOURCES += main.cpp \
     verbleveldlg.cpp \
     testrundlg.cpp
 
-HEADERS  += mainwindow.h \
-         hmipxy.h \
-         logwatcher.h \
+HEADERS  += \
+    mainwindow.h \
+    hmipxy.h \
+    logwatcher.h \
     archivemodel.h \
+    browser.h \
+    connectionwidget.h \
     taskmonmodel.h \
     types.h \
     progbardlg.h \
@@ -54,7 +60,9 @@ HEADERS  += mainwindow.h \
     verbleveldlg.h \
     testrundlg.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
+    mainwindow.ui \
+    browserwidget.ui \
     dlgshowtaskinfo.ui \
     frmagentstatus.ui \
     logframe.ui \
@@ -76,4 +84,3 @@ LIBS += -L../src -lQPF \
 
 RESOURCES += \
     configtool.qrc
-
