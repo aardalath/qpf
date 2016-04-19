@@ -177,8 +177,7 @@ void ConfigTool::readConfig()
 
     // Now, put data in the GUI
 
-    ui->lblConfigName->setText(C(cfgInfo.cfgFileName));
-
+    ui->lblConfigName->setText(C("Source: " + cfgInfo.cfgFileName));
 
     // 1. GENERAL
     // 1.1 General
