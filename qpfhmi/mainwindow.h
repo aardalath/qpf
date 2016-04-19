@@ -124,6 +124,8 @@ protected slots:
     void showWorkDir();
     void displayTaskInfo();
 
+    void showArchInfo();
+
     void pauseTask();
     void resumeTask();
     void stopTask();
@@ -177,6 +179,9 @@ private slots:
     void showVerbLevel();
     void execTestRun();
 
+    void restart();
+    void quitApp();
+
 private:
     void createActions();
     void createMenus();
@@ -202,7 +207,8 @@ private:
     QToolBar *editToolBar;
 
     QAction *saveAsAct;
-    QAction *exitAct;
+    QAction *restartAct;
+    QAction *quitAct;
 #ifndef QT_NO_CLIPBOARD
     QAction *cutAct;
     QAction *copyAct;
@@ -270,6 +276,8 @@ private:
     std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
     std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
 
+public:
+    static int const EXIT_CODE_RESTART;
 };
 
 }

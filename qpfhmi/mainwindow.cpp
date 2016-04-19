@@ -49,6 +49,8 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "version.h"
+
 #include "init.h"
 
 #include <sys/time.h>
@@ -220,8 +222,10 @@ void MainWindow::paste()
 //----------------------------------------------------------------------
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About QPF"),
-            tr("This is the QLA Processing Framework v 0.1"));
+   QMessageBox::about(this, tr("About " APP_NAME),
+            tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
+                APP_COMPANY "\n"
+                APP_DATE));
 }
 
 //----------------------------------------------------------------------
@@ -318,10 +322,15 @@ void MainWindow::createActions()
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    exitAct->setStatusTip(tr("Exit the application"));
-    connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+    restartAct = new QAction(tr("&Restart"), this);
+    //restartAct->setShortcuts(QKeySequence::Quit);
+    restartAct->setStatusTip(tr("Restart the application"));
+    connect(restartAct, SIGNAL(triggered()), this, SLOT(restart()));
+
+    quitAct = new QAction(tr("&Quit"), this);
+    quitAct->setShortcuts(QKeySequence::Quit);
+    quitAct->setStatusTip(tr("Quit the application"));
+    connect(quitAct, SIGNAL(triggered()), this, SLOT(quitApp()));
 
     // Edit menu
 #ifndef QT_NO_CLIPBOARD
@@ -428,9 +437,11 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(saveAsAct);
     fileMenu->addSeparator();
+    fileMenu->addAction(restartAct);
+    fileMenu->addSeparator();
 //    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
-    fileMenu->addAction(exitAct);
+    fileMenu->addAction(quitAct);
 
     // Edit menu
     editMenu = menuBar()->addMenu(tr("&Edit"));
@@ -474,7 +485,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 //    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(exitAct);
+//    fileToolBar->addAction(quitAct);
 
 //#ifndef QT_NO_CLIPBOARD
 //    editToolBar = addToolBar(tr("Edit"));
@@ -608,7 +619,6 @@ void MainWindow::showDBBrowser()
 {
     DBBrowser dlg;
 
-    //dlg.readConfig();
     dlg.exec();
 }
 
@@ -740,7 +750,6 @@ void MainWindow::commandSystem()
             //            hmiNode->getStartSignal();
             firstTime = false;
         } else {
-            this->close();
             qApp->quit();
             exit(0);
         }
@@ -764,7 +773,7 @@ void MainWindow::commandSystem()
         // Activate Archive Monitoring
         archHdl = new ArchiveModel(ui->tblvwArchive);
 
-	transitTo(INITIALISED);
+        transitTo(INITIALISED);
         showState();
         statusBar()->showMessage(tr("START Signal sent to all elements . . ."),
                                  MessageDelay);
@@ -778,13 +787,48 @@ void MainWindow::commandSystem()
         ui->btnStart->setText("QUIT");
         ui->tabpgEvtInj->setEnabled(false);
 
-	transitTo(OFF);
+        transitTo(OFF);
         showState();
         statusBar()->showMessage(tr("STOP Signal sent to all elements . . ."),
                                  MessageDelay);
     }
 
     isStart = !isStart;
+}
+
+//----------------------------------------------------------------------
+// Method: restart
+// Confirme and perform restart of the application
+//----------------------------------------------------------------------
+void MainWindow::restart()
+{
+    statusBar()->showMessage(tr("Restart application?"), 2 * MessageDelay);
+    int ret = QMessageBox::warning(this, tr("Restart " APP_NAME),
+                                   tr("Do you really want to restart the application?"),
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::No);
+
+    if (ret != QMessageBox::Yes) { return; }
+
+    qApp->exit( MainWindow::EXIT_CODE_RESTART );
+}
+
+//----------------------------------------------------------------------
+// Method: quitApp
+// Confirme and perform restart of the application
+//----------------------------------------------------------------------
+void MainWindow::quitApp()
+{
+    statusBar()->showMessage(tr("Quit application?"), 2 * MessageDelay);
+    int ret = QMessageBox::warning(this, tr("Quit " APP_NAME),
+                                   tr("Do you really want to quit the application?"),
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::No);
+
+    if (ret != QMessageBox::Yes) { return; }
+
+    qApp->closeAllWindows();
+    qApp->quit();
 }
 
 //----------------------------------------------------------------------
@@ -925,7 +969,7 @@ void MainWindow::processInbox()
         connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
         taskMonitTimer->start(1000);
 
-	transitTo(RUNNING);
+        transitTo(RUNNING);
         showState();
     }
 }
@@ -1514,6 +1558,14 @@ void MainWindow::displayTaskInfo()
 }
 
 //----------------------------------------------------------------------
+// Method: showArchInfo
+// Show information about archive items
+//----------------------------------------------------------------------
+void MainWindow::showArchInfo()
+{
+}
+
+//----------------------------------------------------------------------
 // Method: pauseTask
 // Pauses selected task
 //----------------------------------------------------------------------
@@ -1680,21 +1732,23 @@ void MainWindow::showState()
     QString stys;
     switch (state) {
     case ERROR:
-	stys = "QLabel { background-color : red; color : orange; }";
-	break;
+        stys = "QLabel { background-color : red; color : orange; }";
+        break;
     case OFF:
-	stys = "QLabel { background-color : black; color : grey; }";
-	break;
+        stys = "QLabel { background-color : black; color : grey; }";
+        break;
     case INITIALISED:
-	stys = "QLabel { background-color : blue; color : lightgrey; }";
-	break;
+        stys = "QLabel { background-color : blue; color : lightgrey; }";
+        break;
     case RUNNING:
-	stys = "QLabel { background-color : green; color : white; }";
-	break;
+        stys = "QLabel { background-color : green; color : white; }";
+        break;
     default:
-	break;
+        break;
     }
     ui->lblSysStatus->setStyleSheet(stys);
 }
+
+int const MainWindow::EXIT_CODE_RESTART = -9991;
 
 }
