@@ -403,7 +403,8 @@ int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
         cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
     }
     DBG("CMD: " << cmd);
-    system(cmd.c_str());
+    int res = system(cmd.c_str());
+    (void)(res);
 
     return 0;
 }
