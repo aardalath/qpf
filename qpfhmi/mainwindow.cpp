@@ -64,6 +64,7 @@ using LibComm::Log;
 #include <QTimer>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDomDocument>
 
 #include <thread>
 
@@ -166,6 +167,8 @@ void MainWindow::manualSetupUI()
     connect(this, SIGNAL(stopSendingMessages()), simInData, SLOT(stopSendingInData()));
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
+
+    connect(ui->btnSelectQLAReport, SIGNAL(clicked()), this, SLOT(selectQLAReportFile()));
 
     // Read settings and set title
     readSettings();
@@ -653,7 +656,7 @@ void MainWindow::showVerbLevel()
 //----------------------------------------------------------------------
 void MainWindow::execTestRun()
 {
-    static QString testFileName("EUC_VIS_INFO_W-91100-2_20200707T151811Z.xml");
+    static QString testFileName("EUC_VIS_INFO_W-91100-2_@TIMESTAMP@Z.xml");
     static QString testData("<?xml version=\"1.0\"?>"
       "<ns1:DpdVisObservationFrame xmlns:ns1=\"http://euclid.esa.org/schema/dpd/vis\">"
       "<Header><ProductId>91100</ProductId><ProductType>SCIENCE</ProductType><Software"
@@ -694,7 +697,7 @@ void MainWindow::execTestRun()
       "tus></ShutterUnit><CalibUnit><Status>false</Status></CalibUnit><ChargedInduced>"
       "<Status>false</Status><IntensityLevel>9.0</IntensityLevel></ChargedInduced><Fra"
       "meFitsFile format=\"le1.visRawImage\" version=\"0.1\"><DataContainer filestatus"
-      "=\"ARCHIVED\"><FileName>EUC_VIS_RAW_W-91100-2_20200707T151811Z.fits</FileName><"
+      "=\"ARCHIVED\"><FileName>EUC_VIS_RAW_W-91100-2_@TIMESTAMP@Z.fits</FileName><"
       "/DataContainer></FrameFitsFile><Parameters><SoftwareVersion>1.0.0</SoftwareVers"
       "ion><PipelineCodeVIS>1</PipelineCodeVIS><Status><Name>MOD</Name><Code>0</Code><"
       "ModuleSpecificCode>0</ModuleSpecificCode><SoftwareVersion>1.0</SoftwareVersion>"
@@ -702,6 +705,13 @@ void MainWindow::execTestRun()
 
     TestRunDlg dlg;
     if (!dlg.exec()) { return; }
+
+    QString newFileName(testFileName);
+    QString newData(testData);
+
+    QString nowTimeStamp(QDateTime::currentDateTime().toString("yyyyMMddTHHmmss"));
+    newFileName.replace("@TIMESTAMP@", nowTimeStamp);
+    newData.replace("@TIMESTAMP@", nowTimeStamp);
 
     // Get config info
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
@@ -711,17 +721,46 @@ void MainWindow::execTestRun()
     QString testInputPath = runPath + "/testRunInput";
     mkdir(qPrintable(testInputPath), 0777);
 
-    QString testInputFile = testInputPath + "/" + testFileName;
+    // Clean test run folder
+    QDirIterator it(testInputPath, QDirIterator::Subdirectories);
+
+    QStringList illegalFileTypes;
+    illegalFileTypes << "xml" << "sdc";
+
+    while (it.hasNext()) {
+        it.next();
+        foreach (QString illegalType, illegalFileTypes) {
+            if (it.fileInfo().absoluteFilePath().endsWith(illegalType, Qt::CaseInsensitive)) {
+                QDir dir;
+                dir.remove(it.filePath());
+                break;
+            }
+        }
+    }
+
+    QString testInputFile = testInputPath + "/" + newFileName;
+#define USE_STDSTRING
+#undef  USE_STDSTRING
+#ifdef USE_STDSTRING
     std::string filename(testInputFile.toStdString());
     std::ofstream dataFile;
     dataFile.open(filename);
     if (dataFile.good()) {
-        dataFile << qPrintable(testData) << std::endl;
+        dataFile << qPrintable(newData) << std::endl;
         dataFile.close();
     } else {
         std::cerr << "Cannot create file " + filename  << std::endl;
     }
+#else
+    QDomDocument document;
+    document.setContent(newData);
 
+    QFile file(testInputFile);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    document.save(out, 4);
+    file.close();
+#endif
     // Process folder with test data
     QString metadata;
     ui->spbxInjFreq->setValue(10);
@@ -1664,6 +1703,38 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
         t->setData(1, Qt::DisplayRole, s);
     }
 }
+
+//----------------------------------------------------------------------
+// Method: selectQLAReportFile
+// Select QLA report file to browse
+//----------------------------------------------------------------------
+void MainWindow::selectQLAReportFile()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    QString reportsFolder(cfgInfo.storage.base.c_str());
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open QLA Report File"),
+                                                    reportsFolder,
+                                                    tr("QLA Reports (*.xml)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0, "ERROR", "Cannot open selected QLA Report file:\n" +
+                                 file.errorString());
+        return;
+    }
+
+    QString content = file.readAll();
+    file.close();
+
+    ui->textBrowser->setPlainText(content);
+    ui->lblQLAReportFileName->setText(fileName);
+}
+
+
 
 //----------------------------------------------------------------------
 // Method: setDebugInfo
