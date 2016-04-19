@@ -14,7 +14,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   
+ *   Create the Application object and run it, and show the HMI if needed
  *
  * Created by:
  *   J C Gonzalez
@@ -41,12 +41,22 @@
 
 int main(int argc, char *argv[])
 {
+    int exitCode = 0;
+
     QPF::App app(argc, argv);
 
+    QPF::MainWindow * w = 0;
     if (app.mustLaunchHMI()) {
-        QPF::MainWindow * w = new QPF::MainWindow(0, app.getConfigHandler());
+        if (w != 0) { delete w; }
+        w = new QPF::MainWindow(0, app.getConfigHandler());
         w->show();
     }
 
-    return app.exec();
+    exitCode = app.exec();
+
+    if (exitCode == QPF::MainWindow::EXIT_CODE_RESTART) {
+        app.restart();// Spawn a new instance of application
+    }
+
+    return exitCode;
 }
