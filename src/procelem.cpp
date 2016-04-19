@@ -746,7 +746,8 @@ std::string ProcessingElement::getMonitoringInfo(std::string id)
     FILE* pipe = popen(cmd.c_str(), "r");
     if (pipe) {
         char buffer[10240];
-        fread(buffer, 1, sizeof(buffer), pipe);
+        int res = fread(buffer, 1, sizeof(buffer), pipe);
+        (void)(res);
         pclose(pipe);
         info = std::string(buffer);
     }
