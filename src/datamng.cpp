@@ -291,7 +291,7 @@ void DataManager::archiveDSSnEAS(ProductCollection & productList)
         firstTime = false;
     }
 
-    // return;
+    return;
 
     for (auto & kv : productList.productList) {
         ProductType & prodType = const_cast<ProductType&>(kv.first);
