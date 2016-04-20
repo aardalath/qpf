@@ -35,7 +35,8 @@ SOURCES += \
     dbbrowser.cpp \
     exttoolsdef.cpp \
     verbleveldlg.cpp \
-    testrundlg.cpp
+    testrundlg.cpp \
+    dlgalert.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -58,7 +59,8 @@ HEADERS  += \
     dbbrowser.h \
     exttoolsdef.h \
     verbleveldlg.h \
-    testrundlg.h
+    testrundlg.h \
+    dlgalert.h
 
 FORMS    += \
     mainwindow.ui \
@@ -70,7 +72,8 @@ FORMS    += \
     dbbrowser.ui \
     exttoolsdef.ui \
     verbleveldlg.ui \
-    testrundlg.ui
+    testrundlg.ui \
+    dlgalert.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
