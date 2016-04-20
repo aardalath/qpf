@@ -52,6 +52,7 @@
 #include "datatypes.h"
 #include "config.h"
 #include "archivemodel.h"
+#include "dlgalert.h"
 #include "frmagentstatus.h"
 #include "simindata.h"
 #include "textview.h"
@@ -74,14 +75,6 @@ class MainWindow : public QMainWindow, LibComm::StateMachine
 public:
     explicit MainWindow(QWidget *parent = 0, Configuration * cfgHdl = 0);
     ~MainWindow();
-
-    struct Alert {
-        QDateTime timeStamp;
-        QString id;
-        QString severity;
-        QString component;
-        QString description;
-    };
 
 signals:
     void goToOperational();
@@ -123,7 +116,7 @@ protected slots:
 
     void showWorkDir();
     void displayTaskInfo();
-
+    void showAlertInfo();
     void showArchInfo();
 
     void pauseTask();
@@ -180,6 +173,8 @@ private slots:
     void showExtToolsDef();
     void showVerbLevel();
     void execTestRun();
+
+    void runTool1();
 
     void restart();
     void quitApp();
@@ -266,6 +261,7 @@ private:
     QAction * acResumeTask;
     QAction * acStopTask;
 
+    QAction * acShowAlert;
     QAction * acAckAlert;
 
     QAction * acArchiveShow;

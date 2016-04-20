@@ -1193,7 +1193,9 @@ void MainWindow::initAlertsTable()
 
     ui->treeAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    acShowAlert = new QAction(tr("Show alert information"), ui->treeAlerts);
     acAckAlert = new QAction(tr("Acknowledge alert"), ui->treeAlerts);
+    connect(acShowAlert,     SIGNAL(triggered()), this, SLOT(showAlertInfo()));
     // connect(acAckAlert,     SIGNAL(triggered()), this, SLOT(alertAck()));
 
     connect(ui->treeAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -1222,17 +1224,28 @@ void MainWindow::initArchiveTable()
 {
     ui->tblvwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
-    acArchiveOpenExt = new QMenu(tr("Open with external toolDisplay task information"), ui->tblvwArchive);
+    //acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
+    acArchiveOpenExt = new QMenu(tr("Open with external tool..."), ui->tblvwArchive);
     QAction * acTool1 = new QAction(tr("GEdit"), acArchiveOpenExt);
     acTool1->setStatusTip(tr("Gnome editor"));
-    acArchiveOpenExtTools.append(acTool1);
     acArchiveOpenExt->addAction(acTool1);
+    //acArchiveOpenExtTools.append(acArchiveOpenExt->menu);
 
-    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
+//    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
+    connect(acTool1,          SIGNAL(triggered()), this, SLOT(runTool1()));
 
     connect(ui->tblvwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+}
+
+void MainWindow::runTool1()
+{
+    QModelIndex item = ui->tblvwArchive->currentIndex();
+    QModelIndex urlItem = item.model()->index(item.row(), 11, item);
+    QString fileName = urlItem.data().toString().replace("file://","");
+    QProcess *process = new QProcess(this);
+    QString program = "gedit";
+    process->start(program, QStringList() << fileName);
 }
 
 //----------------------------------------------------------------------
@@ -1537,6 +1550,7 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 
     QList<QAction *> actions;
     if (ui->treeAlerts->indexAt(p).isValid()) {
+        actions.append(acShowAlert);
         actions.append(acAckAlert);
     }
     if (actions.count() > 0) {
@@ -1554,11 +1568,12 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 
     QList<QAction *> actions;
     if (ui->tblvwArchive->indexAt(p).isValid()) {
-        actions.append(acArchiveShow);
-        actions.append(acArchiveOpenExtTools);
-    }
-    if (actions.count() > 0) {
-        QMenu::exec(actions, ui->tblvwArchive->mapToGlobal(p));
+        //actions.append(acArchiveShow);
+        //actions.append(acArchiveOpenExtTools);
+        QMenu menu(this);
+        //menu.addAction(acArchiveShow);
+        menu.addMenu(acArchiveOpenExt);
+        menu.exec(ui->tblvwArchive->mapToGlobal(p));
     }
 }
 
@@ -1593,6 +1608,19 @@ void MainWindow::displayTaskInfo()
     dumpTaskInfoToTree(taskName, v, dlg.getTreeTaskInfo());
     dlg.setWindowTitle("Information for task" + taskName);
     dlg.setTaskInfo(taskInfoString);
+    dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// Method: showAlertInfo
+// Show dialog with alert information
+//----------------------------------------------------------------------
+void MainWindow::showAlertInfo()
+{
+    QModelIndex idx = ui->treeAlerts->currentIndex();
+    Alert alert = alerts[idx.row()];
+    DlgAlert dlg;
+    dlg.setAlert(alert);
     dlg.exec();
 }
 

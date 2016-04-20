@@ -277,8 +277,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>66</width>
-                 <height>16</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
               </widget>
@@ -389,7 +389,7 @@
       </widget>
       <widget class="QWidget" name="tabpgArchive">
        <attribute name="title">
-        <string>Archive</string>
+        <string>Internal/Local Archive</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
