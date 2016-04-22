@@ -52,6 +52,7 @@
 #include "datatypes.h"
 #include "config.h"
 #include "archivemodel.h"
+#include "dlgalert.h"
 #include "frmagentstatus.h"
 #include "simindata.h"
 #include "textview.h"
@@ -74,14 +75,6 @@ class MainWindow : public QMainWindow, LibComm::StateMachine
 public:
     explicit MainWindow(QWidget *parent = 0, Configuration * cfgHdl = 0);
     ~MainWindow();
-
-    struct Alert {
-        QDateTime timeStamp;
-        QString id;
-        QString severity;
-        QString component;
-        QString description;
-    };
 
 signals:
     void goToOperational();
@@ -123,6 +116,8 @@ protected slots:
 
     void showWorkDir();
     void displayTaskInfo();
+    void showAlertInfo();
+    void showArchInfo();
 
     void pauseTask();
     void resumeTask();
@@ -171,11 +166,18 @@ private slots:
     void switchLayoutDirection();
     void setActiveSubWindow(QWidget *window);
 
+    void selectQLAReportFile();
+
     void showConfigTool();
     void showDBBrowser();
     void showExtToolsDef();
     void showVerbLevel();
     void execTestRun();
+
+    void runTool1();
+
+    void restart();
+    void quitApp();
 
 private:
     void createActions();
@@ -202,7 +204,8 @@ private:
     QToolBar *editToolBar;
 
     QAction *saveAsAct;
-    QAction *exitAct;
+    QAction *restartAct;
+    QAction *quitAct;
 #ifndef QT_NO_CLIPBOARD
     QAction *cutAct;
     QAction *copyAct;
@@ -258,6 +261,7 @@ private:
     QAction * acResumeTask;
     QAction * acStopTask;
 
+    QAction * acShowAlert;
     QAction * acAckAlert;
 
     QAction * acArchiveShow;
@@ -270,6 +274,8 @@ private:
     std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
     std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
 
+public:
+    static int const EXIT_CODE_RESTART;
 };
 
 }

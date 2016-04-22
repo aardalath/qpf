@@ -112,7 +112,7 @@ ConfigurationInfo & Configuration::getCfgInfo()
 // Method: getGeneralInfo
 // Get general parameters from the configuration
 //----------------------------------------------------------------------
-void Configuration::getGeneralInfo(std::string & appName, std::string appVer, std::string & last)
+void Configuration::getGeneralInfo(std::string & appName, std::string & appVer, std::string & last)
 {
     appName = cfg["general"]["app_name"].asString();
     appVer  = cfg["general"]["app_version"].asString();
@@ -163,7 +163,7 @@ void Configuration::reset()
 void Configuration::getProductTypes(std::vector<std::string> & vec)
 {
     vec.clear();
-    Json::Value pTypes = cfg["products"]["product_datatypes"];
+    Json::Value pTypes = cfg["products"]["product_types"];
     for (unsigned int i = 0; i < pTypes.size(); ++i) {
         vec.push_back(pTypes[i].asString());
     }
@@ -395,6 +395,7 @@ void Configuration::readConfigurationFromDB()
         Json::Reader reader;
         reader.parse(configuration.at(lastConfiguration).at(1), cfg);
         dateCreated = configuration.at(lastConfiguration).at(0);
+        cfgFileName = "<internalDB> " + Configuration::DBName + "::configuration";
     } catch (RuntimeException & e) {
         LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
         return;
@@ -550,7 +551,7 @@ void Configuration::processConfiguration()
         cfgInfo.peersCfgByName[peer->name] = peer;
         if (peer->type == "evtmng") {
             cfgInfo.evtMngCfg.name = peer->name;
-            cfgInfo.evtMngCfg.type = peer->name;
+            cfgInfo.evtMngCfg.type = peer->type;
             cfgInfo.evtMngCfg.clientAddr = peer->clientAddr;
             cfgInfo.evtMngCfg.serverAddr = peer->serverAddr;
         }

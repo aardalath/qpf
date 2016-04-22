@@ -1,0 +1,245 @@
+#+TITLE:	QLA Processing Framework Installation and Quick Start
+#+AUTHOR:	Jose C. Gonzalez
+#+EMAIL:	JCGonzalez@sciops.esa.int
+#+DATE:	Time-stamp: <2016-04-07 16:27:10 jcgonzalez>
+
+#+SETUPFILE: ./config.org
+
+* Introduction
+
+** Purpose
+
+This document shows the installation procedure for the Euclid Quick-Look Analysis (QLA) Processing Framework, or QPF for short.
+
+** Scope
+
+The current version of this document covers the building and installation process for the QLA Processing Framework release V1.
+
+** Reference Documents                                            :noexport:
+
+** Acronyms and Abbreviations
+
+|------------+------------------------------------------------|
+| Acr./Abbr. | Description                                    |
+|------------+------------------------------------------------|
+| COTS       | Commercial Off-The-Shelf                       |
+| HMI        | Human-Machine Interface                        |
+| JSON       | Javascript Object Notation                     |
+| QLA        | Quick Look Analysis                            |
+| QPF        | QLA Processing Framework                       |
+| TBC        | To be confirmed                                |
+| TBD        | To be defined                                  |
+|------------+------------------------------------------------|
+
+** Glossary                                                       :noexport:
+
+*** External Auxiliary Products Provider
+    External Element where the Auxiliary Products can be retrieved from.
+
+*** External Products Provider
+    External Element where the Products can be retrieved from.
+
+*** File Type identifier
+    A string that identifies a file of a given type.  Something similar to the MIME types created for the SMTP protocol.
+
+*** Job Order
+    A set of parameters that define specific behaviour, together with input data, that can be associated to a [[Processing Element]], in order to generate output data.
+
+*** Metadata extractor
+    A plugin based routine to extract (and provide back to the executing application) a set of metadata from the input files given as arguments.  The DSM maintains a table with pairs ([[File type identifier]], [[Metadata extractor]]).
+
+*** Processing Chain
+    A processing chain is an ordered graph where the nodes are pairs ([[Processing Element]], [[Job Order]]), and where to move from one node to the other a set of rules must be satisfied.
+
+*** Processing Element
+    An structure that defines an element that receives input files, parameters files and configuration files, and processes those input data to generate some output (results) files.  Together with the different files, it is the basic element in a [[Processing Chain]].
+
+** TBDs and TBCs
+
+*** TBDs
+| TBD Loc. | Comment                                  | Status |
+|----------+------------------------------------------+--------|
+| [[TBD1]]     | Create and document installation tests   | Open   |
+| [[TBD2]]     | Define complete uninstallation procedure | Open   |
+| [[TBD3]]     | Quickstart section                       | Open   |
+| [[TBD4]]     | System Configuration                     | Open   |
+| [[TBD5]]     | Troubleshooting                          | Open   |
+|          |                                          |        |
+
+*** TBCs
+| TBC Loc. | Comment | Status |
+|----------+---------+--------|
+|          |         |        |
+
+** Contact Information
+
+For any doubt or comment on the building and installation procedure here described, please do not hesitate to contact [[mailto:JCGonzalez@sciops.esa.int][JCGonzalez@sciops.esa.int]].
+
+* System Installation
+
+** Pre-requisites
+
+QPF is a C++ application that makes use of some of the C++-11 new features of the C++ language.  It was originally developed in an Ubuntu 15.10 box with a GCC compiler version 5.2.1 (Ubuntu 5.2.1-22ubuntu2 - 20151010).  The compiler used to build the executables and libraries must cover most of the C++-11 features included in that GCC version.
+
+One exception is the Regular Expressions matching component.  Initially, the code made use of the functionality included in the C++-11 standard.  However, for the sake of compatibility with earlier (non-fully C++-11 compliant) GCC versions, the regular expressions matching used now is the one included in the external library PCRE2.  For the purposes of the QPF, the functionality included therein is more than enough.
+
+The QPF Graphical User Interface (=qpfhmi=) is based on Qt 5.4.1 (GCC 4.6.1, 64 bit), built on Apr 22nd 2015 04:12:47 from revision 6302a28c97, and developed using Qt Creator 3.4.0 (open source).
+
+The list of COTS is shown below.
+
+** Pre-installation tasks
+
+*** COTS installation
+
+The QPF source code needs some COTS to be installed in the building host.  It is assumed by this installation guide that these COTS are already installed.
+
+The following is the list of COTS needed to build and run QPF Release V1.  The version numbers shown in some of the COTS are used for reference: those versions or higher with backward-compatibility could be used.  Where no version number appears, it means that any reasonably recent version should work.  Note that the QPF source code also makes use of the JSONCpp library (v.1.6.2), although this library is already integrated in the source tree.
+
+- Qt 5.4
+- 0MQ Library (v-4.1.1), together with the C++ binding for 0MQ
+- PostgreSQL (v-9.4.4.1 x64)
+- PCRE2 (v-2.8)
+- libcurl
+- libsodium
+- libuuid
+
+The PostsgreSQL database server must be started for the installation process to end successfully.  By default, the server is listening for connection requests at =localhost:5432=.  It you or your system administrator changes this address or port, you should specify the new values in the appropriate settings file (see below).
+
+In addition, for the execution of the Unitary Tests, the library Google Test v-1.7 is used.  However, this is not a requirement for compiling and installing the QPF.
+
+*** Obtaining the Source Code
+
+The QPF source code for this release can be obtained from the Euclid SVN repository, using the following branch URL:
+
+https://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.0
+
+In order to fetch the source code, move to a folder where you want the system to store the code, and type:
+
+#+BEGIN_SRC
+$ svn checkout https://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.0 QPF-V1
+#+END_SRC
+
+The source code will be available under the folder QPF-V1.
+
+Alternatively, if you got a QPF Release V1 source code package =QPF-V1.0-<timestamp>.tar.gz=, you can move to the desired folder and extract the source code files, as follows:
+
+#+BEGIN_SRC
+$ tar xvzf <source_path>/QPF-V1.0-<timestamp>.tar.gz
+#+END_SRC
+
+where =<source_path>= is the place where the source code package is located.
+
+*** Pre-building environment settings
+
+After getting the source code, but before starting the compilation & installation process, you must set your environment.  In particular, you should make sure the compilation system addresses correctly the appropriate COTS header and library files.
+
+Note that the system by default assumes the following:
+- Your user name is =eucops= and your home folder is =/home/eucops=.
+- The COTS needed to build and run the QPF are placed under the folder =${HOME}/opt=, in the following paths:
+  + Qt (5.4): =${HOME}/opt/Qt=
+  + 0MQ: =${HOME}/opt/zmq=
+  + PCRE2: =${HOME}/opt/pcre2=
+  + PostgreSQL: =${HOME}/opt/pgsql=
+  + libsodium: =${HOME}/opt/libsodium=
+  + Libcurl: =${HOME}/opt/curl=
+
+If all these assumptions are met, you may not need to do the modifications described in the following two sections.
+
+**** Environment Variables
+
+There is a Bash script in the source code tree, where a bunch of environment variables are set for the compilation and execution of QPF.  The script is =QPF-V1/env.sh=.  You should first edit this file (modifying *only* the section /Basic variables/), and then run it with:
+
+#+BEGIN_SRC
+$ source <QPF_path>/env.sh
+#+END_SRC
+
+where =<QPF_path>= is the path where the QPF source code is located, including the =QPF-V1= part.
+
+**** Compilation Variables
+
+In addition, similar information must be included in the file =QPF-V1/defaults.pri=, used by the building system.  You must edit this file (only the section /External libraries/), and ensure the COTS are pointed to correctly by the paths defined therein.
+
+** Installation Procedure
+
+Once the appropriate environment is set, and the =defaults.pri= ensures the COTS are reachable, the compilation and installation process is rather automatic.
+
+There is a compilation & installation script, =QPF-V1/scripts/BuildQPF.sh=, that is used for this task.  The actions performed by this script are:
+
+- Check that the needed programs for the compilation, installation and execution of QPF are installed.
+- Check that the required libraries are installed and reachable.
+- Generate the required dependencies between the different QPF components.
+- Compile the QPF system.
+- Set up the working (execution) area and install the sample configuration and processors.
+- Install the QPF executable and libraries.
+- (Re)generate the internal QPF database.
+
+Every action performed by this script is registered in a log file.
+
+You can run this script by moving into the =QPF-V1/scripts= folder and typing in the console =./BuildQPF.sh -h=:
+
+#+BEGIN_SRC
+$ ./BuildQPF.sh -h
+Usage: BuildQPF.sh [ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -w <path> ] [ -H <host> ] [ -P <port> ]
+where:
+  -h         Show this usage message
+  -c         Compile the source code
+  -i         Install libraries and binary
+  -n         Show the actions without executing them
+  -r         Clear previous build
+  -b         Re-create PostsgreSQL system database
+  -w <path>  Folder to locate QPF working area (default:HOME)
+  -H <host>  Host where system database is located (default:localhost)
+  -P <port>  Port to access the database (default:5432)
+
+#+END_SRC
+
+With the option =-h=, the script displays an usage message with the possible options.  To start the compilation and installation process for the first time, with the default values for the working area folder and the PostsgreSQL server connections address and port, just type:
+
+#+BEGIN_SRC
+$ ./BuildQPF.sh -c -i -r -b
+#+END_SRC
+
+The script will start performing all the actions needed for the preparation, compilation and installation of the QPF, as well as for the PostsgreSQL database initial setup.  The option =-r= can be skipped the first time (it just removes any previous compiled object files), but it does no harm.
+
+Note that specifying the option =-b= (database re-creation) will have the effect of removing completely any previous database with the same name (=qpfdb=) in the server.
+
+Once the installation has finished, as indicated by the script you should:
+
+- include the directory =<path>/qpf/bin= in the =PATH= variable, and
+- include the directory =<path>/qpf/lib= in the =LD_LIBRARY_PATH= variable.
+
+Note that =<path>= represents the folder where the QPF working area will be placed.  By default this path is =${HOME}=.
+
+Once the =PATH= and =LD_LIBRARY_PATH= variables are set, you can check if the QPF was correctly installed.  The QPF operation is handled by the QPF HMI (=qpfhmi=).  Just type:
+
+#+BEGIN_SRC
+$ qpfhmi -h
+#+END_SRC
+
+A help message should appear in the console.
+
+Initial configuration files (in JSON) are available at =<path>/qpf/cfg=.  You may need to modify them before launching any processing task from the HMI.  If no configuration file is specified at command line, =qpfhmi= will read the last configuration used from the internal database.
+
+** Post-installation
+
+After installing the QPF, and before actually running the framework, the =Docker= application must be installed.  =Docker= is assumed to be installed, and the user that runs QPF must be able to run any container.
+
+** Installation tests
+
+<<TBD1>> installation tests.
+
+** Uninstallation Procedure
+
+<<TBD2>> to define uninstallation procedure.
+
+* Quick Start
+
+<<TBD3>>
+
+* System Configuration
+
+<<TBD4>>
+
+* Troubleshooting
+
+<<TBD5>>

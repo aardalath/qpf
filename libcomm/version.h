@@ -58,13 +58,13 @@
 #define APP_NAME         "LibComm"
 
 //! Application release number
-#define APP_RELEASE      "0.0.1"
+#define APP_RELEASE      "1.0rc2"
 
 //! Application release date
-#define APP_DATE         "JUL 2015"
+#define APP_DATE         "APR 2016"
 
 //! Application developer company
-#define APP_COMPANY      "JCG"
+#define APP_COMPANY      "Euclid SOC Team"
 
 //! Application developer company
 #define APP_DOMAIN       "jcg"
@@ -85,6 +85,6 @@
 #define APP_CREATED_BY   APP_COMPANY
 
 //! Copyright Notice
-#define APP_COPYRIGHT    "(C) J C Gonzalez - All rights reserved"
+#define APP_COPYRIGHT    "(C) Euclid SOC Team - All rights reserved"
 
 #endif /* VERSION_H */

@@ -1,7 +1,7 @@
 #===== Projec dir. =======
 PRJ_ROOT_DIR = $$PWD 
 
-BUILDROOT = build/debug
+BUILDROOT = build
 
 #===== External libraries =======
 COTSDIR = /opt/cots

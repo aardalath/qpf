@@ -49,6 +49,8 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "version.h"
+
 #include "init.h"
 
 #include <sys/time.h>
@@ -62,6 +64,7 @@ using LibComm::Log;
 #include <QTimer>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDomDocument>
 
 #include <thread>
 
@@ -165,6 +168,8 @@ void MainWindow::manualSetupUI()
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
+    connect(ui->btnSelectQLAReport, SIGNAL(clicked()), this, SLOT(selectQLAReportFile()));
+
     // Read settings and set title
     readSettings();
     setWindowTitle(tr("QLA Processing Framework"));
@@ -220,8 +225,10 @@ void MainWindow::paste()
 //----------------------------------------------------------------------
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About QPF"),
-            tr("This is the QLA Processing Framework v 0.1"));
+   QMessageBox::about(this, tr("About " APP_NAME),
+            tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
+                APP_COMPANY "\n"
+                APP_DATE));
 }
 
 //----------------------------------------------------------------------
@@ -318,10 +325,15 @@ void MainWindow::createActions()
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    exitAct->setStatusTip(tr("Exit the application"));
-    connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+    restartAct = new QAction(tr("&Restart"), this);
+    //restartAct->setShortcuts(QKeySequence::Quit);
+    restartAct->setStatusTip(tr("Restart the application"));
+    connect(restartAct, SIGNAL(triggered()), this, SLOT(restart()));
+
+    quitAct = new QAction(tr("&Quit"), this);
+    quitAct->setShortcuts(QKeySequence::Quit);
+    quitAct->setStatusTip(tr("Quit the application"));
+    connect(quitAct, SIGNAL(triggered()), this, SLOT(quitApp()));
 
     // Edit menu
 #ifndef QT_NO_CLIPBOARD
@@ -428,9 +440,11 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(saveAsAct);
     fileMenu->addSeparator();
+    fileMenu->addAction(restartAct);
+    fileMenu->addSeparator();
 //    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
-    fileMenu->addAction(exitAct);
+    fileMenu->addAction(quitAct);
 
     // Edit menu
     editMenu = menuBar()->addMenu(tr("&Edit"));
@@ -474,7 +488,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 //    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(exitAct);
+//    fileToolBar->addAction(quitAct);
 
 //#ifndef QT_NO_CLIPBOARD
 //    editToolBar = addToolBar(tr("Edit"));
@@ -608,7 +622,6 @@ void MainWindow::showDBBrowser()
 {
     DBBrowser dlg;
 
-    //dlg.readConfig();
     dlg.exec();
 }
 
@@ -643,7 +656,7 @@ void MainWindow::showVerbLevel()
 //----------------------------------------------------------------------
 void MainWindow::execTestRun()
 {
-    static QString testFileName("EUC_VIS_INFO_W-91100-2_20200707T151811Z.xml");
+    static QString testFileName("EUC_VIS_INFO_W-91100-2_@TIMESTAMP@Z.xml");
     static QString testData("<?xml version=\"1.0\"?>"
       "<ns1:DpdVisObservationFrame xmlns:ns1=\"http://euclid.esa.org/schema/dpd/vis\">"
       "<Header><ProductId>91100</ProductId><ProductType>SCIENCE</ProductType><Software"
@@ -684,7 +697,7 @@ void MainWindow::execTestRun()
       "tus></ShutterUnit><CalibUnit><Status>false</Status></CalibUnit><ChargedInduced>"
       "<Status>false</Status><IntensityLevel>9.0</IntensityLevel></ChargedInduced><Fra"
       "meFitsFile format=\"le1.visRawImage\" version=\"0.1\"><DataContainer filestatus"
-      "=\"ARCHIVED\"><FileName>EUC_VIS_RAW_W-91100-2_20200707T151811Z.fits</FileName><"
+      "=\"ARCHIVED\"><FileName>EUC_VIS_RAW_W-91100-2_@TIMESTAMP@Z.fits</FileName><"
       "/DataContainer></FrameFitsFile><Parameters><SoftwareVersion>1.0.0</SoftwareVers"
       "ion><PipelineCodeVIS>1</PipelineCodeVIS><Status><Name>MOD</Name><Code>0</Code><"
       "ModuleSpecificCode>0</ModuleSpecificCode><SoftwareVersion>1.0</SoftwareVersion>"
@@ -692,6 +705,13 @@ void MainWindow::execTestRun()
 
     TestRunDlg dlg;
     if (!dlg.exec()) { return; }
+
+    QString newFileName(testFileName);
+    QString newData(testData);
+
+    QString nowTimeStamp(QDateTime::currentDateTime().toString("yyyyMMddTHHmmss"));
+    newFileName.replace("@TIMESTAMP@", nowTimeStamp);
+    newData.replace("@TIMESTAMP@", nowTimeStamp);
 
     // Get config info
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
@@ -701,17 +721,46 @@ void MainWindow::execTestRun()
     QString testInputPath = runPath + "/testRunInput";
     mkdir(qPrintable(testInputPath), 0777);
 
-    QString testInputFile = testInputPath + "/" + testFileName;
+    // Clean test run folder
+    QDirIterator it(testInputPath, QDirIterator::Subdirectories);
+
+    QStringList illegalFileTypes;
+    illegalFileTypes << "xml" << "sdc";
+
+    while (it.hasNext()) {
+        it.next();
+        foreach (QString illegalType, illegalFileTypes) {
+            if (it.fileInfo().absoluteFilePath().endsWith(illegalType, Qt::CaseInsensitive)) {
+                QDir dir;
+                dir.remove(it.filePath());
+                break;
+            }
+        }
+    }
+
+    QString testInputFile = testInputPath + "/" + newFileName;
+#define USE_STDSTRING
+#undef  USE_STDSTRING
+#ifdef USE_STDSTRING
     std::string filename(testInputFile.toStdString());
     std::ofstream dataFile;
     dataFile.open(filename);
     if (dataFile.good()) {
-        dataFile << qPrintable(testData) << std::endl;
+        dataFile << qPrintable(newData) << std::endl;
         dataFile.close();
     } else {
         std::cerr << "Cannot create file " + filename  << std::endl;
     }
+#else
+    QDomDocument document;
+    document.setContent(newData);
 
+    QFile file(testInputFile);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    document.save(out, 4);
+    file.close();
+#endif
     // Process folder with test data
     QString metadata;
     ui->spbxInjFreq->setValue(10);
@@ -740,7 +789,6 @@ void MainWindow::commandSystem()
             //            hmiNode->getStartSignal();
             firstTime = false;
         } else {
-            this->close();
             qApp->quit();
             exit(0);
         }
@@ -764,7 +812,7 @@ void MainWindow::commandSystem()
         // Activate Archive Monitoring
         archHdl = new ArchiveModel(ui->tblvwArchive);
 
-	transitTo(INITIALISED);
+        transitTo(INITIALISED);
         showState();
         statusBar()->showMessage(tr("START Signal sent to all elements . . ."),
                                  MessageDelay);
@@ -778,13 +826,48 @@ void MainWindow::commandSystem()
         ui->btnStart->setText("QUIT");
         ui->tabpgEvtInj->setEnabled(false);
 
-	transitTo(OFF);
+        transitTo(OFF);
         showState();
         statusBar()->showMessage(tr("STOP Signal sent to all elements . . ."),
                                  MessageDelay);
     }
 
     isStart = !isStart;
+}
+
+//----------------------------------------------------------------------
+// Method: restart
+// Confirme and perform restart of the application
+//----------------------------------------------------------------------
+void MainWindow::restart()
+{
+    statusBar()->showMessage(tr("Restart application?"), 2 * MessageDelay);
+    int ret = QMessageBox::warning(this, tr("Restart " APP_NAME),
+                                   tr("Do you really want to restart the application?"),
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::No);
+
+    if (ret != QMessageBox::Yes) { return; }
+
+    qApp->exit( MainWindow::EXIT_CODE_RESTART );
+}
+
+//----------------------------------------------------------------------
+// Method: quitApp
+// Confirme and perform restart of the application
+//----------------------------------------------------------------------
+void MainWindow::quitApp()
+{
+    statusBar()->showMessage(tr("Quit application?"), 2 * MessageDelay);
+    int ret = QMessageBox::warning(this, tr("Quit " APP_NAME),
+                                   tr("Do you really want to quit the application?"),
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::No);
+
+    if (ret != QMessageBox::Yes) { return; }
+
+    qApp->closeAllWindows();
+    qApp->quit();
 }
 
 //----------------------------------------------------------------------
@@ -925,7 +1008,7 @@ void MainWindow::processInbox()
         connect(taskMonitTimer, SIGNAL(timeout()), this, SLOT(checkForTaskRes()));
         taskMonitTimer->start(1000);
 
-	transitTo(RUNNING);
+        transitTo(RUNNING);
         showState();
     }
 }
@@ -1110,7 +1193,9 @@ void MainWindow::initAlertsTable()
 
     ui->treeAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    acShowAlert = new QAction(tr("Show alert information"), ui->treeAlerts);
     acAckAlert = new QAction(tr("Acknowledge alert"), ui->treeAlerts);
+    connect(acShowAlert,     SIGNAL(triggered()), this, SLOT(showAlertInfo()));
     // connect(acAckAlert,     SIGNAL(triggered()), this, SLOT(alertAck()));
 
     connect(ui->treeAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -1139,17 +1224,28 @@ void MainWindow::initArchiveTable()
 {
     ui->tblvwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
-    acArchiveOpenExt = new QMenu(tr("Open with external toolDisplay task information"), ui->tblvwArchive);
+    //acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
+    acArchiveOpenExt = new QMenu(tr("Open with external tool..."), ui->tblvwArchive);
     QAction * acTool1 = new QAction(tr("GEdit"), acArchiveOpenExt);
     acTool1->setStatusTip(tr("Gnome editor"));
-    acArchiveOpenExtTools.append(acTool1);
     acArchiveOpenExt->addAction(acTool1);
+    //acArchiveOpenExtTools.append(acArchiveOpenExt->menu);
 
-    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
+//    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
+    connect(acTool1,          SIGNAL(triggered()), this, SLOT(runTool1()));
 
     connect(ui->tblvwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+}
+
+void MainWindow::runTool1()
+{
+    QModelIndex item = ui->tblvwArchive->currentIndex();
+    QModelIndex urlItem = item.model()->index(item.row(), 11, item);
+    QString fileName = urlItem.data().toString().replace("file://","");
+    QProcess *process = new QProcess(this);
+    QString program = "gedit";
+    process->start(program, QStringList() << fileName);
 }
 
 //----------------------------------------------------------------------
@@ -1454,6 +1550,7 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 
     QList<QAction *> actions;
     if (ui->treeAlerts->indexAt(p).isValid()) {
+        actions.append(acShowAlert);
         actions.append(acAckAlert);
     }
     if (actions.count() > 0) {
@@ -1471,11 +1568,12 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 
     QList<QAction *> actions;
     if (ui->tblvwArchive->indexAt(p).isValid()) {
-        actions.append(acArchiveShow);
-        actions.append(acArchiveOpenExtTools);
-    }
-    if (actions.count() > 0) {
-        QMenu::exec(actions, ui->tblvwArchive->mapToGlobal(p));
+        //actions.append(acArchiveShow);
+        //actions.append(acArchiveOpenExtTools);
+        QMenu menu(this);
+        //menu.addAction(acArchiveShow);
+        menu.addMenu(acArchiveOpenExt);
+        menu.exec(ui->tblvwArchive->mapToGlobal(p));
     }
 }
 
@@ -1511,6 +1609,27 @@ void MainWindow::displayTaskInfo()
     dlg.setWindowTitle("Information for task" + taskName);
     dlg.setTaskInfo(taskInfoString);
     dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// Method: showAlertInfo
+// Show dialog with alert information
+//----------------------------------------------------------------------
+void MainWindow::showAlertInfo()
+{
+    QModelIndex idx = ui->treeAlerts->currentIndex();
+    Alert alert = alerts[idx.row()];
+    DlgAlert dlg;
+    dlg.setAlert(alert);
+    dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// Method: showArchInfo
+// Show information about archive items
+//----------------------------------------------------------------------
+void MainWindow::showArchInfo()
+{
 }
 
 //----------------------------------------------------------------------
@@ -1614,6 +1733,38 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 }
 
 //----------------------------------------------------------------------
+// Method: selectQLAReportFile
+// Select QLA report file to browse
+//----------------------------------------------------------------------
+void MainWindow::selectQLAReportFile()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    QString reportsFolder(cfgInfo.storage.base.c_str());
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open QLA Report File"),
+                                                    reportsFolder,
+                                                    tr("QLA Reports (*.xml)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0, "ERROR", "Cannot open selected QLA Report file:\n" +
+                                 file.errorString());
+        return;
+    }
+
+    QString content = file.readAll();
+    file.close();
+
+    ui->textBrowser->setPlainText(content);
+    ui->lblQLAReportFileName->setText(fileName);
+}
+
+
+
+//----------------------------------------------------------------------
 // Method: setDebugInfo
 // Sets flag for output of debug information
 //----------------------------------------------------------------------
@@ -1680,21 +1831,23 @@ void MainWindow::showState()
     QString stys;
     switch (state) {
     case ERROR:
-	stys = "QLabel { background-color : red; color : orange; }";
-	break;
+        stys = "QLabel { background-color : red; color : orange; }";
+        break;
     case OFF:
-	stys = "QLabel { background-color : black; color : grey; }";
-	break;
+        stys = "QLabel { background-color : black; color : grey; }";
+        break;
     case INITIALISED:
-	stys = "QLabel { background-color : blue; color : lightgrey; }";
-	break;
+        stys = "QLabel { background-color : blue; color : lightgrey; }";
+        break;
     case RUNNING:
-	stys = "QLabel { background-color : green; color : white; }";
-	break;
+        stys = "QLabel { background-color : green; color : white; }";
+        break;
     default:
-	break;
+        break;
     }
     ui->lblSysStatus->setStyleSheet(stys);
 }
+
+int const MainWindow::EXIT_CODE_RESTART = -9991;
 
 }

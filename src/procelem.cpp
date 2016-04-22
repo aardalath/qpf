@@ -501,6 +501,7 @@ void ProcessingElement::monitorProcElemLoop()
         // Update progress
         if (status == TASK_FINISHED) {
             taskData["State"]["Progress"] = "100";
+            progressValue = 100.0;
             task.taskEnd = getSimplifiedDateTime(taskData["State"]["FinishedAt"]);
         } else {
             progressValue = updateProgress(progressValue);
@@ -559,6 +560,7 @@ void ProcessingElement::retrieveOutputProducts()
             while ((dirp = readdir(dp)) != NULL) {
                 if (dirp->d_name[0] != '.') {
                     std::string dname(dirp->d_name);
+                    if (dname.substr(0, 3) != "EUC") { continue; }
                     std::string fullName = vd + "/" + dname;
 
                     /**************************************************
@@ -593,6 +595,7 @@ void ProcessingElement::retrieveOutputProducts()
         }
     }
 
+    DBG("outFiles has " << outFiles.size() << " elements");
     task.outputs.productList.clear();
 
     FileNameSpec fs;
@@ -622,11 +625,6 @@ void ProcessingElement::retrieveOutputProducts()
             DBG(" >> " << m);
             urlh->setProduct(m);
             m = urlh->fromProcessing2Gateway();
-            DBG(" << " << m);
-
-            // Place output product copy at local archive
-            DBG(" >> " << m);
-            m = urlh->fromGateway2LocalArch();
             DBG(" << " << m);
 
  /*
@@ -673,8 +671,8 @@ void ProcessingElement::retrieveOutputProducts()
             */
         }
 
-        DBG("  output product: " << outFileName << " => " << m.url);
         task.outputs.productList[m.productType] = m;
+        status = TASK_FINISHED;
     }
 
     sendUpdatedInfo();
@@ -691,6 +689,8 @@ void ProcessingElement::sendUpdatedInfo()
     CHKIN;
     static float lastProgress = -1.;
 
+    if (progressValue > 99.9999) { status = TASK_FINISHED; }
+
     bool sendMsg = ((status == TASK_FINISHED) ||
                     (status == TASK_FAILED) ||
                     (status == TASK_PAUSED) ||
@@ -700,7 +700,7 @@ void ProcessingElement::sendUpdatedInfo()
 
     if (sendMsg) {
         if (status == TASK_FINISHED) {
-            Json::StyledWriter w;
+            //Json::StyledWriter w;
             DBG("Task FINISHED:!!\n"); // << w.write(task.getData()));
         }
         super->sendTaskResMsg(task);
@@ -746,7 +746,8 @@ std::string ProcessingElement::getMonitoringInfo(std::string id)
     FILE* pipe = popen(cmd.c_str(), "r");
     if (pipe) {
         char buffer[10240];
-        fread(buffer, 1, sizeof(buffer), pipe);
+        int res = fread(buffer, 1, sizeof(buffer), pipe);
+        (void)(res);
         pclose(pipe);
         info = std::string(buffer);
     }

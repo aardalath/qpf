@@ -306,7 +306,7 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
                     cfgInfo.storage.local_archive.path + section);
 
     // Set (hard) link
-    (void)relocate(file, newFile, LINK);
+    (void)relocate(file, newFile, COPY);  // should be LINK
 
     // Change url in processing task
     product.url = newUrl;
@@ -403,7 +403,8 @@ int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
         cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
     }
     DBG("CMD: " << cmd);
-    system(cmd.c_str());
+    int res = system(cmd.c_str());
+    (void)(res);
 
     return 0;
 }

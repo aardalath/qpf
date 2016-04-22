@@ -3,8 +3,8 @@
 #---- Basic variables -------------------------------------------------
 
 COTSDIR=${HOME}/opt
-QTVER=5.4
 
+QTVER=5.4
 QTDIR=${COTSDIR}/Qt/${QTVER}/gcc_64
 QTCREATORDIR=${COTSDIR}/Qt/Tools/QtCreator
 
@@ -15,9 +15,10 @@ PCRE2DIR=${HOME}/opt/pcre2
 GTESTDIR=${HOME}/ws/jcgg/cots/gtest-1.7.0
 PGSQLDIR=${HOME}/opt/pgsql
 
-WORKAREA=${HOME}/ws/jcgg
+WORKAREA=${HOME}/qpf
 
-QPFWSDIR=${WORKAREA}/QPF
+PARENT=${HOME}/ws/jcgg
+QPFWSDIR=${PARENT}/QPF
 BUILDDIR=build
 QPFBUILD=${QPFWSDIR}/${BUILDDIR}
 
@@ -78,4 +79,4 @@ export PKG_CONFIG_PATH="$pkgpth:${PKG_CONFIG_PATH}"
 #---- User specific variables -----------------------------------------
 
 export QPFHMI=${QPFBUILD}/qpfhmi/qpfhmi
-export QPFDIR=${HOME}/qpf
+export QPFDIR=${WORKAREA}

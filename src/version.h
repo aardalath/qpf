@@ -45,13 +45,13 @@
 #define APP_NAME         "QPF"
 
 //! Application release number
-#define APP_RELEASE      "0.1"
+#define APP_RELEASE      "1.0rc2"
 
 //! Application release date
-#define APP_DATE         "APR 2014"
+#define APP_DATE         "APR 2016"
 
 //! Application developer company
-#define APP_COMPANY      "JCG"
+#define APP_COMPANY      "Euclid SOC Team"
 
 //! Application developer company
 #define APP_DOMAIN       "jcg"
@@ -60,18 +60,18 @@
 #define APP_DIVISION     ""
 
 //! Application long name
-#define APP_LONG_NAME    "Message Communications Library"
+#define APP_LONG_NAME    "QLA Processing Framework"
 
 //! Application short purpose description
-#define APP_PURPOSE      "Message Communications Library"
+#define APP_PURPOSE      "Euclid QLA Processing Framework"
 
 //! Application short purpose description
-#define APP_TITLE        "QPF Library"
+#define APP_TITLE        "QPF"
 
 //! Developer Company
 #define APP_CREATED_BY   APP_COMPANY
 
 //! Copyright Notice
-#define APP_COPYRIGHT    "(C) J C Gonzalez - All rights reserved"
+#define APP_COPYRIGHT    "(C) Euclid SOC Team"
 
 #endif /* VERSION_H */

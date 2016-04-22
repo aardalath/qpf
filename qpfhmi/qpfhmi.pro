@@ -6,18 +6,21 @@
 
 include(../defaults.pri)
 
-QT       += core gui
+QT       += core gui sql network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = qpfhmi
 TEMPLATE = app
 
-SOURCES += main.cpp \
-        mainwindow.cpp \
-        hmipxy.cpp \
-        logwatcher.cpp \
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp \
+    hmipxy.cpp \
+    logwatcher.cpp \
     archivemodel.cpp \
+    browser.cpp \
+    connectionwidget.cpp \
     taskmonmodel.cpp \
     types.cpp \
     progbardlg.cpp \
@@ -32,12 +35,16 @@ SOURCES += main.cpp \
     dbbrowser.cpp \
     exttoolsdef.cpp \
     verbleveldlg.cpp \
-    testrundlg.cpp
+    testrundlg.cpp \
+    dlgalert.cpp
 
-HEADERS  += mainwindow.h \
-         hmipxy.h \
-         logwatcher.h \
+HEADERS  += \
+    mainwindow.h \
+    hmipxy.h \
+    logwatcher.h \
     archivemodel.h \
+    browser.h \
+    connectionwidget.h \
     taskmonmodel.h \
     types.h \
     progbardlg.h \
@@ -52,9 +59,12 @@ HEADERS  += mainwindow.h \
     dbbrowser.h \
     exttoolsdef.h \
     verbleveldlg.h \
-    testrundlg.h
+    testrundlg.h \
+    dlgalert.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
+    mainwindow.ui \
+    browserwidget.ui \
     dlgshowtaskinfo.ui \
     frmagentstatus.ui \
     logframe.ui \
@@ -62,7 +72,8 @@ FORMS    += mainwindow.ui \
     dbbrowser.ui \
     exttoolsdef.ui \
     verbleveldlg.ui \
-    testrundlg.ui
+    testrundlg.ui \
+    dlgalert.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
@@ -76,4 +87,3 @@ LIBS += -L../src -lQPF \
 
 RESOURCES += \
     configtool.qrc
-

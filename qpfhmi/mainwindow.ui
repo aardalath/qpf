@@ -277,8 +277,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>889</width>
-                 <height>433</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
               </widget>
@@ -363,15 +363,33 @@
        <attribute name="title">
         <string>Browser</string>
        </attribute>
-       <layout class="QVBoxLayout" name="vlyAgents">
+       <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <widget class="QTableView" name="tblvwBrowser"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_17">
+          <item>
+           <widget class="QToolButton" name="btnSelectQLAReport">
+            <property name="text">
+             <string>Open QLA report file ...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblQLAReportFileName">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="textBrowser"/>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabpgArchive">
        <attribute name="title">
-        <string>Archive</string>
+        <string>Internal/Local Archive</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
@@ -389,7 +407,7 @@
      <x>0</x>
      <y>0</y>
      <width>1112</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

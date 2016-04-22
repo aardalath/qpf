@@ -38,6 +38,7 @@
 
 #include "app.h"
 #include <QDebug>
+#include <QProcess>
 
 namespace QPF {
 
@@ -96,6 +97,16 @@ bool App::notify(QObject *receiver, QEvent *event)
     // qFatal aborts, so this isn't really necessary
     // but you might continue if you use a different logging lib
     return false;
+}
+
+//----------------------------------------------------------------------
+// Method: restart
+// Restart the application
+//----------------------------------------------------------------------
+void App::restart()
+{
+    qApp->quit();
+    QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
 }
 
 }

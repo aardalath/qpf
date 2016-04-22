@@ -80,7 +80,7 @@ public:
     // Method: getGeneralInfo
     // Get general parameters from the configuration
     //----------------------------------------------------------------------
-    void getGeneralInfo(std::string & appName, std::string appVer, std::string & last);
+    void getGeneralInfo(std::string & appName, std::string & appVer, std::string & last);
 
     //----------------------------------------------------------------------
     // Method: setLastAccess
