@@ -13,9 +13,9 @@
 
 ###### Script variables
 
-#QPFHMI=/home/eucops/qpf/bin/qpfhmi
 QPFDIR=/home/eucops/qpf
 VERSION=1.0
+QPFHMI=${QPFDIR}/bin/qpfhmi
 
 #- Messages
 _ONHDR="\e[1;49;93m"
