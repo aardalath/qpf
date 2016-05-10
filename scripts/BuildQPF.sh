@@ -34,7 +34,7 @@ RUN_PATH="${QPF_PATH}"/run
 QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
 QPF_EXE="qpfhmi/qpfhmi"
-QPF_LIBS="libcomm/liblibcomm json/libjson sdc/libsdc src/libQPF"
+QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 #- Messages
 _ONHDR="\e[1;49;93m"
