@@ -75,9 +75,9 @@ The current version of this document covers the building and installation proces
 
 For any doubt or comment on the building and installation procedure here described, please do not hesitate to contact [[mailto:JCGonzalez@sciops.esa.int][JCGonzalez@sciops.esa.int]].
 
-* System Installation
+** System Installation
 
-** Pre-requisites
+*** Pre-requisites
 
 QPF is a C++ application that makes use of some of the C++-11 new features of the C++ language.  It was originally developed in an Ubuntu 15.10 box with a GCC compiler version 5.2.1 (Ubuntu 5.2.1-22ubuntu2 - 20151010).  The compiler used to build the executables and libraries must cover most of the C++-11 features included in that GCC version.
 
@@ -87,9 +87,9 @@ The QPF Graphical User Interface (=qpfhmi=) is based on Qt 5.4.1 (GCC 4.6.1, 64 
 
 The list of COTS is shown below.
 
-** Pre-installation tasks
+*** Pre-installation tasks
 
-*** COTS installation
+**** COTS installation
 
 The QPF source code needs some COTS to be installed in the building host.  It is assumed by this installation guide that these COTS are already installed.
 
@@ -107,7 +107,7 @@ The PostsgreSQL database server must be started for the installation process to 
 
 In addition, for the execution of the Unitary Tests, the library Google Test v-1.7 is used.  However, this is not a requirement for compiling and installing the QPF.
 
-*** Obtaining the Source Code
+**** Obtaining the Source Code
 
 The QPF source code for this release can be obtained from the Euclid SVN repository, using the following branch URL:
 
@@ -129,7 +129,7 @@ $ tar xvzf <source_path>/QPF-V1.0-<timestamp>.tar.gz
 
 where =<source_path>= is the place where the source code package is located.
 
-*** Pre-building environment settings
+**** Pre-building environment settings
 
 After getting the source code, but before starting the compilation & installation process, you must set your environment.  In particular, you should make sure the compilation system addresses correctly the appropriate COTS header and library files.
 
@@ -145,7 +145,7 @@ Note that the system by default assumes the following:
 
 If all these assumptions are met, you may not need to do the modifications described in the following two sections.
 
-**** Environment Variables
+***** Environment Variables
 
 There is a Bash script in the source code tree, where a bunch of environment variables are set for the compilation and execution of QPF.  The script is =QPF-V1/env.sh=.  You should first edit this file (modifying *only* the section /Basic variables/), and then run it with:
 
@@ -155,11 +155,11 @@ $ source <QPF_path>/env.sh
 
 where =<QPF_path>= is the path where the QPF source code is located, including the =QPF-V1= part.
 
-**** Compilation Variables
+***** Compilation Variables
 
 In addition, similar information must be included in the file =QPF-V1/defaults.pri=, used by the building system.  You must edit this file (only the section /External libraries/), and ensure the COTS are pointed to correctly by the paths defined therein.
 
-** Installation Procedure
+*** Installation Procedure
 
 Once the appropriate environment is set, and the =defaults.pri= ensures the COTS are reachable, the compilation and installation process is rather automatic.
 
@@ -220,15 +220,15 @@ A help message should appear in the console.
 
 Initial configuration files (in JSON) are available at =<path>/qpf/cfg=.  You may need to modify them before launching any processing task from the HMI.  If no configuration file is specified at command line, =qpfhmi= will read the last configuration used from the internal database.
 
-** Post-installation
+*** Post-installation
 
 After installing the QPF, and before actually running the framework, the =Docker= application must be installed.  =Docker= is assumed to be installed, and the user that runs QPF must be able to run any container.
 
-** Installation tests
+*** Installation tests
 
 <<TBD1>> installation tests.
 
-** Uninstallation Procedure
+*** Uninstallation Procedure
 
 <<TBD2>> to define uninstallation procedure.
 

@@ -5,17 +5,19 @@
 
 #+SETUPFILE: ./config.org
 
-http://easdps01.esac.esa.int:8000/DbView
-https://euclidsoc.esac.esa.int:8300/{status,jobs,files}
-http://archives.esac.esa.int/esasky-beta
+#http://easdps01.esac.esa.int:8000/DbView
+#https://euclidsoc.esac.esa.int:8300/{status,jobs,files}
+#http://archives.esac.esa.int/esasky-beta
 
 * QPF - QLA Processing Framework
 
-** Euclid Operations Main Entities
+** Introduction
+
+*** Euclid Operations Main Entities
 
 The main elements interfacing each other at the mission operation phase are the *Science Operations Centre* (SOC) and the *Mission Operations Centre* (MOC). In addition, there are two Instrument Operations Teams (IOTs), responsible for the definition of the instrument operational procedures as well as to ensure the operability of the different instruments along the mission.
 
-*** Mission Operations Centre
+**** Mission Operations Centre
 
 The Euclid Mission Operations Centre at ESOC is the responsible for the consolidation and uplink of all the telecommanding to Euclid, including those related to instrument operations. It is also the responsible to obtain the telemetry generated on board, and make it available to the SOC and, (through MOC infrastructures), to the IOTs-SDCs during the Commissioning and PV phases, and for contingencies.
 
@@ -23,26 +25,26 @@ Being the responsible to uplink telecommands, it is the final responsible to gua
 
 The MOC shall also act as configuration control holder of the instruments operational DBs (MIB), being the entity in charge of its formal dissemination to SOC and operational deployment.
 
-*** Science Operations Centre
+**** Science Operations Centre
 
 The Science Operations Centre at ESAC is the responsible of the Survey execution. It generates the required commanding requests to ensure its fulfilment as well as the routine calibration plan. It also acts as formal interface from the IOT’s to the MOC during the routine mission, consolidating instrument operational requests against the on-going survey, and if required and not covered by a coordinating IOT entity, across instrument consolidation. It is part of the Instrument Monitoring to provide a quick look assessment on the instrument performance and survey execution.
 
 The SOC is the entity responsible to gather the data provided by the MOC and make it available to the rest of the Science Ground Segment in appropriate format, generating the Level 1. The content and format of Level 1 is not part of this document, but it is foreseen that will comprise the scientific, house-keeping and ancillary information received from MOC.
 
-*** Instrument Operation Teams
+**** Instrument Operation Teams
 
 The Instrument Operations Teams are the entities responsible to define the Instrument Operations, mainly the instrument operational procedures, the instrument DBs and the criteria for instrument safety and health, as well as for instrument monitoring. They must ensure operability along the mission, and also ensure optimal operations strategy through an overall instrument monitoring, capability to update or modify the instrument SW, DB or procedures, and generate updates to the calibration and characterisation. They should inherit and build on expertise from the Instrument Development Teams, in order to understand and react to instrument anomalies and also to assess instrument data.
 
 The two IOT’s will have a single IOT coordinator that will act as single point of contact regarding overall system architecture, issues of mutual concern and also as main responsible of ensuring towards SOC (and therefore MOC) the coordination of combined instrument activities.
 
-*** Science Data Centres
+**** Science Data Centres
 
 The Science Data Centres are entrusted to run pipelines to process the Science Telemetry of the instruments. Part of this process can encompass the Instrument Monitoring assessment and flagging, to be used by IOTs in identification of trends or misbehaviours, and also to process specific calibration observations that may end up in updates to On Board or Ground items. However, it could also be the case that the IOT’s themselves will be OU-SDC’s related to this dedicated pipelines. Both IOT’s and SDC’s will feed int0 EAS relevant information to allow the assessment of the survey execution by SOC. Even if the key personnel is the same running IOT and SDC tasks, a clear functional split across the two domains may be desirable.
 
 
-** Euclid SOC Architecture Design
+*** Euclid SOC Architecture Design
 
-*** Euclid SOC responsibilities
+**** Euclid SOC responsibilities
 
 The SOC is the only interface to the MOC during routine operations, and is in charge of the following satellite and payload operations specific tasks:
 - planning the surveys, based on observing guidelines by the EST,
@@ -61,7 +63,7 @@ The SOC takes the lead in the overall design and engineering of the SGS, and, un
 
 The SOC is responsible for the development, procurement, integration, validation and maintenance of all the software and hardware systems which it operates.
 
-*** Euclid SOC Subsystems
+**** Euclid SOC Subsystems
 
 - QLA :: Quick Look Analysis
 - HMS :: Health Monitoring System
@@ -74,11 +76,11 @@ The SOC is responsible for the development, procurement, integration, validation
 - SOC Storage :: Storage at SOC
 
 
-** QLA Subsystem
+*** QLA Subsystem
 
-*** QLA Capabilities
+**** QLA Capabilities
 
-**** Introduction
+***** Introduction
 The aim of this page is to present a first draft of the quick-look analysis tool requirements run at the SOC.
 
 Part of the Euclid SOC duties during mission operation is to quickly assess the quality of science data and the associated telemetry. The SOC is responsible to implement in a Quick Look Analysis (QLA) tool capable of:
@@ -86,7 +88,7 @@ Part of the Euclid SOC duties during mission operation is to quickly assess the 
 - Automatically check S/C data, produce and ingest reports in the Euclid Archive System within 48 hours from data retrieval to confirm that the data are correct and eventually quickly react to issues. The IOT (instrument operation team) and EC (Euclid consortium) will investigate the data in further details, but in can take some weeks as the data is foreseen to be reduced once a larger sky patch has been observed
 - Facilitate data inspection by the user (mainly instrument scientists) in case further data inspection is needed, e.g. being capable of accessing detectors data, showing it and/or exporting it to external programs
 
-**** Short Description
+***** Short Description
 The standard, wide-survey observing sequence for Euclid is defined as:
 
 - Each observing field is observed 4 times, i.e. 4 dither positions. The S/C is moved slightly (50-100 arcsec) from one dither to the next.
@@ -102,16 +104,16 @@ QLA is foreseen to mainly work on the following type of data:
 - Comparison/combination of the 4 dithers (per instrument, per band) will be needed to check relative astrometry and a first assessment of the cosmic ray impact
 - Some checks (e.g. to quickly estimate the PSF) may need light data processing, i.e. to create a level 1.5 on-the-fly eventually using calibration data; in such a scenario, the calibration data to be used is going to be the last delivered by the IOTs
 
-*** QLA Functionalities
+**** QLA Functionalities
 
-**** Pointing QLA checks
+***** Pointing QLA checks
 
 - Using VIS data when available and NISP-P otherwise, QLA should check the absolute astrometry of each exposure using an external catalogue as reference.
 - QLA should also check the relative astrometry among dithers using wither an external catalogue and/or catalogues generated from VIS/NISP-P images themselves
 - Most astrometric tools will also give as output an estimation of geometry of the focal plane. This could also be checked (NdL: I don't know, with the light processing we could run in QLA, how much this could be reliable. From the simulations I ran, astrometry should be)
 - An automatic check between adjacent observing fields is not foreseen in QLA, but it would be good to have a manual option to eventually check it
 
-**** VIS QLA checks
+***** VIS QLA checks
 
 The following are a list of QLA checks discussed with the VIS IDT in January 2015:
 
@@ -158,54 +160,54 @@ The following are a list of QLA checks discussed with the VIS IDT in January 201
 8) Automatic reporting and error identification.
 9) QLA will not create any intermediate data products, but will only look at the raw images.
 
-**** NISP QLA checks
+***** NISP QLA checks
 
-**** QLA data analysis capabilities
+***** QLA data analysis capabilities
 
-*** QLA Components
+**** QLA Components
 
-**** QLA-VIM - Visualization and MMI
+***** QLA-VIM - Visualization and MMI
 Set of components supporting data visualization and human analysis routines. It interacts internally with the CAM module for different configurations and runs.
 
-**** QLA-SIF - SOC Interface
+***** QLA-SIF - SOC Interface
 Interface to other SOC components, and to external data received at SOC. It includes the interface with EAS.
 
-**** QLA-SDA - Science Data Analysis
+***** QLA-SDA - Science Data Analysis
 Set of routines analysing the science images. It deals with pixel data analysis.
 
-**** QLA-REP - Reporting
+***** QLA-REP - Reporting
 Component in charge of automatic report generation.
 
-**** QLA-QAF - Quality Analysis Flagging
+***** QLA-QAF - Quality Analysis Flagging
 In charge of setting and defining values of predefined flags and fields from the analysis to be used for LE1 product expansion
 
-**** QLA-PDA - PUS Data Analysis
+***** QLA-PDA - PUS Data Analysis
 Set of routines analysing the PUS (HKTM) data
 
-**** QLA-PAR - Parameter Extraction
+***** QLA-PAR - Parameter Extraction
 Component in charge of extraction of time based parameters from the analysis and export as files to be used by the HMS. It is TBD if this component shall only generate the Science and Auxiliary
 
-**** QLA-CDA - Combined Data Analysis
+***** QLA-CDA - Combined Data Analysis
 Set of routines implementing a combined analysis across science (inter-instrument, multi- dither), and/or across pixel and other type of data: PUS and ancillary data
 
-**** QLA-CAM - Configuration and Monitoring
+***** QLA-CAM - Configuration and Monitoring
 Configuration of the subsystem, including specific information related to the data to be analysed (extracted from ESS). Monitor of performance and generation of log data. It also updates system configuration based on external sources (i.e. HMS reports and or limits)
 
-**** QLA-ADA - Auxiliary Data Analysis
+***** QLA-ADA - Auxiliary Data Analysis
 Set of routines analysing the MOC and other ancillary data (ESS, Configuration)
 
-**** QLA-PRO - Processing
+***** QLA-PRO - Processing
 Routines to process raw or LE1 data if required with support of calibrated data to the required level for the analysis
 
-*** QLA User Stories
+**** QLA User Stories
 
 *[TBD]*
 
-*** QLA Functional Decomposition
+**** QLA Functional Decomposition
 
 The QLA Logical Decomposition shown above in the previous section is a good way to study the entire functionality of the QLA.  In practice, however, we defined two different _Functionality Domains_:
 
-- QLA Algorithmic Functions :: It is formed by the set of libraries and processing elements that perform the different analysis on the input data.
+- QLA Processing/Algorithmic Functions :: It is formed by the set of libraries and processing elements that perform the different analysis on the input data.
 
 - QLA Processing Framework :: It has an entire set of different functions to provide the infrastructure needed for the QLA processing:
   + reception and storage of input files and their metadata
@@ -219,13 +221,13 @@ The QLA Logical Decomposition shown above in the previous section is a good way 
 In the next section, the QLA Processing Framework is further described.
 
 
-** QPF - QLA Processing Framework
+** The QLA Processing Framework (QPF)
 
 *** Purpose
 
-Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, I will refer to this framework as the QPF (/QLA Processing Framework/).
+Our intention is to create a framework for the execution of the different processing tasks that must be performed on the Euclid data (science products and calibration products) by the QLA.  In the following sections, We refer to this framework as the QPF (/QLA Processing Framework/).
 
-The QPF will be composed of a set of components that take the incoming external events and data, check their basic consistency, perform a specific orchestration based on the type of incoming data, and launches the neccessary processing tasks to end up with the set of diagnostics, statistics and output parameters to evaluate the validity and quality of the products.  In section [[QPF Components]] a detailed description of the different components is provided.
+The QPF will be composed of a set of components that take the incoming external events and data, check their basic consistency, perform a specific orchestration based on the type of incoming data, and launches the neccessary processing tasks to end up with the set of diagnostics, statistics and output parameters to evaluate the validity and quality of the products.  In section [[QPF Components]] a detailed description of them is provided.
 
 *** QPF Overall Architecture
 
@@ -248,7 +250,7 @@ The overall architecture of the QPF is shown in the following figure.
 #+CAPTION: QPF Overall Architecture
 #+NAME:   fig:QPF-arch
 #+ATTR_HTML: :width 90%
-[[QPF_Prototype_arch_Page_2.png]]
+[[./QPF_Architecture.png]]
 
 *** QPF Components
 
@@ -267,7 +269,7 @@ The HMI has several functionalities:
 - provides to the operator of the capability of sending fake input messages to the Event Manager (for testing purposes)
 - upon request, provides information from the Event Manager on the current status of the entire system.
 
-**** QPF Data Based
+**** QPF Database
 
 The entire set of data handled by the QPF, from the system configuration to the input/output products metadata, orchestration rules, etc. is stored in a central DB system.  This simplifies the access of the system data to external tools.
 
@@ -304,7 +306,7 @@ Each of the different processing algorithmic tasks that ultimately execute the f
 
 In the current approach, the processing elements are tasks that run into Docker containers.
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file procelem_plantuml.png
 @startuml
 hide footbox
 title Use Case: External Data Injection
@@ -318,18 +320,19 @@ title Use Case: External Data Injection
 (HMI) -- (HMIpxy) : use
 @enduml
 #+END_SRC
+#+RESULTS:
 
-*** Mapping between QPF and QLA components
+*** Mapping between QPF and QLA components                       :noexport:
 
 There is a mapping between the logical decomposition of the QLA shown in [[QLA Components]] and the QPF components shown above.  This mapping is still *[TBD]*.
 
-*** QPF User Stories
+*** QPF User Stories                                             :noexport:
 
 For the QPF User Stories, we will follow the well known template:
 
 "/As a _<type of user>_, I want _<some goal>_ so that _<some reason>_. /"
 
-*** QPF Use Cases
+*** QPF Use Cases                                                :noexport:
 
 **** System Launch and Initialisation
 ***** Description
@@ -356,7 +359,7 @@ On every host in the hosts network:
 7. The components launched are initialized
 8. If the HMI component is foreseen to be deployed in the host, create the HMI component and launch it.
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file system-launch_plantuml.png
 @startuml
 !include "./config.plu"
 title Use Case: System Launch and Initialisation
@@ -380,6 +383,7 @@ Dply -> Components: initialise
 Dply -> Dply: wait for START
 @enduml
 #+END_SRC
+#+RESULTS:
 
 ***** Postconditions
 -
@@ -391,7 +395,7 @@ Dply -> Dply: wait for START
 
 **** System Start
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file system-start_plantuml.png
 @startuml
 !include "./config.plu"
 title Use Case: System Start
@@ -421,10 +425,11 @@ EvtMng ->> TaskAg: MSG_START
 TaskAg -> TaskAg: init
 @enduml
 #+END_SRC
+#+RESULTS:
 
 **** External Data Injection
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file external-data-injection_plantuml.png
 @startuml
 !include "./config.plu"
 title Use Case: External Data Injection
@@ -453,10 +458,11 @@ deactivate TaskOrc
 deactivate TaskOrc
 @enduml
 #+END_SRC
+#+RESULTS:
 
 **** Processing Data from User-selected Input Folder
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file user-selected-input_plantuml.png
 @startuml
 !include "./config.plu"
 !define SEND(a,b,c)  a -[#blue]> b: c
@@ -498,10 +504,11 @@ STOP(TaskOrc)
 end loop
 @enduml
 #+END_SRC
+#+RESULTS:
 
 **** Processing Fired Rule
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file proc-rule_plantuml.png
 @startuml
 !include "./config.plu"
 title Use Case: Processing Fired Rule
@@ -561,10 +568,11 @@ TaskOrc --> DB: <font color="grey"><size:10><i>saveToDB(<b>MSG_TASK_RES</b>)</i>
 DataMng -> DB: registerOutputs
 @enduml
 #+END_SRC
+#+RESULTS:
 
 **** Processing Products fro User-selected Input Folder - Complete Sequence
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file proc-user-input_plantuml.png
 @startuml
 !include "./config.plu"
 show footbox
@@ -714,8 +722,9 @@ end group
 @enduml
 
 #+END_SRC
+#+RESULTS:
 
-**** <tpl>
+**** <tpl>                                                      :noexport:
 ***** Description
 The system application is executed in all the hosts that compose the framework network, the HMI is launched, in the main host, and the entire set of Components start their execution.  The components communications are established, and all of them reach the INITIALISED State.
 
@@ -740,7 +749,7 @@ On every host in the hosts network:
 7. The components launched are initialized
 8. If the HMI component is foreseen to be deployed in the host, create the HMI component and launch it.
 
-#+BEGIN_SRC PlantUML
+#+begin_src plantuml :file _plantuml.png
 @startuml
 !include "./config.plu"
 title Use Case: System Launch and Initialisation
@@ -764,6 +773,7 @@ Dply -> Components: initialise
 Dply -> Dply: wait for START
 @enduml
 #+END_SRC
+#+RESULTS:
 
 ***** Postconditions
 -
@@ -772,6 +782,9 @@ Dply -> Dply: wait for START
 ***** Exceptions
 
 ***** Comments
+
+
+** QPF Internals
 
 *** Technologies
 
@@ -795,12 +808,12 @@ For the so-called QPF Toy Model (a proof of concept of the proposed QPF), the fo
 
 
 
-** QPF Internals
-
 *** Specification
+This section contains obsolete structures and information, and is process of being updated.
+
 **** QPF Database Specification
 
-#+begin_src plantuml
+#+begin_src plantuml :file db-config_plantuml.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -842,8 +855,9 @@ config_orchestration "0..*" -- "1" config_processors
 }
 @enduml
 #+end_src
+#+results:
 
-#+begin_src plantuml
+#+begin_src plantuml :file db-products_plantuml.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -894,8 +908,9 @@ products_info "0..*" -- "1" observation_modes
 }
 @enduml
 #+end_src
+#+results:
 
-#+begin_src plantuml
+#+begin_src plantuml :file db-tasks_plantuml.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -938,8 +953,9 @@ products_info "0..*" -- "1" task_outputs
 }
 @enduml
 #+end_src
+#+results:
 
-#+begin_src plantuml
+#+begin_src plantuml :file db-msg_plantuml.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -972,8 +988,9 @@ messages "0..*" -- "1" config_nodes
 }
 @enduml
 #+end_src
+#+results:
 
-#+begin_src plantuml
+#+begin_src plantuml  :file db-alarms_plantuml.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -1012,10 +1029,11 @@ alarms "0..*" -- "1" variables
 }
 @enduml
 #+end_src
+#+results:
 
 Or everything together
 
-#+begin_src plantuml
+#+begin_src plantuml  :file db.png
 @startuml
 !define table(x) class x << (T,#FFDDAA) >>
 !define primary_key(x) #<b>x</b>
@@ -1194,6 +1212,7 @@ alarms "0..*" -- "1" alarm_severity
 }
 @enduml
 #+end_src
+#+results:
 
 
 This structure can be created with the following code (PostgreSQL):
@@ -1305,12 +1324,13 @@ ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk2 FOREIGN KEY (creato
 ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk3 FOREIGN KEY (instrumentId) REFERENCES instruments(instrumentId);
 ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk4 FOREIGN KEY (obsMode) REFERENCES observation_modes(obsMode);
 #+end_src
+#+results:
 
-**** Classes Specification
+**** Classes Specification                                      :noexport:
 
-***** Database related
+***** Database related                                         :noexport:
 
-#+begin_src plantuml
+#+begin_src plantuml :file noexport.png
 @startuml
 '!define table(x) class x << (T,#FFDDAA) >>
 '!define primary_key(x) #<b>x</b>
@@ -1376,8 +1396,822 @@ interface DBHandler {
 class DBPostgreHdl <|-- DBHandler
 @enduml
 #+end_src
+#+results:
 
-**** Current QPF Configuration
+**** Sample QPF Configuration
+#+BEGIN_SRC json
+{
+    "general": {
+        "app_name": "QPF",
+        "app_version": "1.0rc2",
+        "last_access": "20150616T121555",
+        "run_path": "/home/eucops/qpf/run"
+    },
+    "nodes" : {
+        "hmi_node" : "QPFHMI",
+        "master_machine" : "eucdev02.net3.lan",
+        "node_list" : {
+            "DataMng" : { "client" : "tcp://10.66.180.97:7101", "server" : "tcp://*:7101", "type" : "datamng" },
+            "EvtMng" : { "client" : "tcp://10.66.180.97:7100", "server" : "tcp://*:7100", "type" : "evtmng" },
+            "LogMng" : { "client" : "tcp://10.66.180.97:7102", "server" : "tcp://*:7102", "type" : "logmng" },
+            "QPFHMI" : { "client" : "tcp://10.66.180.97:7999", "server" : "tcp://*:7999", "type" : "hmi" },
+            "TskMng" : { "client" : "tcp://10.66.180.97:7104", "server" : "tcp://*:7104", "type" : "taskmng" },
+            "TskOrc" : { "client" : "tcp://10.66.180.97:7103", "server" : "tcp://*:7103", "type" : "taskorc" },
+            "TskAge1" : { "client" : "tcp://10.66.180.97:7111", "server" : "tcp://*:7111", "type" : "taskagent" },
+            "TskAge2" : { "client" : "tcp://10.66.180.97:7112", "server" : "tcp://*:7112", "type" : "taskagent" },
+            "TskAge3" : { "client" : "tcp://10.66.180.95:7113", "server" : "tcp://*:7113", "type" : "taskagent" },
+            "TskAge4" : { "client" : "tcp://10.66.180.95:7114", "server" : "tcp://*:7114", "type" : "taskagent" },
+            "TskAge5" : { "client" : "tcp://10.66.180.95:7115", "server" : "tcp://*:7115", "type" : "taskagent" },
+            "TskAge6" : { "client" : "tcp://10.66.180.95:7116", "server" : "tcp://*:7116", "type" : "taskagent" },
+            "TskAge7" : { "client" : "tcp://10.66.180.95:7117", "server" : "tcp://*:7117", "type" : "taskagent" }
+        }
+    },
+    "machines" : {
+        "eucdev02.net3.lan" : [ "QPFHMI", "EvtMng", "DataMng", "LogMng", "TskOrc", "TskMng", "TskAge1", "TskAge2" ],
+        "eucdev03.net3.lan" : [ "TskAge3", "TskAge4", "TskAge5", "TskAge6", "TskAge7" ]
+    },
+    "connections" : {
+        "DataMng" : [ "EvtMng", "TskMng", "TskOrc" ],
+        "EvtMng" : [ "QPFHMI", "DataMng", "LogMng", "TskMng", "TskOrc", "TskAge1", "TskAge2", "TskAge3", "TskAge4", "TskAge5", "TskAge6", "TskAge7" ],
+        "LogMng" : [ "EvtMng", "TskAge1", "TskAge2", "TskAge3", "TskAge4", "TskAge5", "TskAge6", "TskAge7" ],
+        "QPFHMI" : [ "EvtMng" ],
+        "TskAge1" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge2" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge3" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge4" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge5" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge6" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskAge7" : [ "EvtMng", "LogMng", "TskMng" ],
+        "TskMng" : [ "EvtMng", "TskOrc", "DataMng", "TskAge1", "TskAge2", "TskAge3", "TskAge4", "TskAge5", "TskAge6", "TskAge7" ],
+        "TskOrc" : [ "EvtMng", "TskMng", "DataMng" ]
+    },
+    "db": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "name": "qpfdb",
+        "user": "eucops",
+        "pwd": ""
+    },
+    "products": {
+        "product_types": [
+            "VIS_RAW",
+            "VIS_INFO",
+            "VIS_LE1",
+            "VIS_LE1_LOG",
+            "VIS_LE1_META",
+            "VIS_LE1_INGLOG",
+            "NIR_RAW",
+            "NIR_INFO",
+            "NIR_LE1",
+            "NIR_LE1_LOG",
+            "NIR_LE1_META",
+            "NIR_LE1_INGLOG",
+            "SIR_RAW",
+            "SIR_INFO",
+            "SIR_LE1",
+            "SIR_LE1_LOG",
+            "SIR_LE1_META",
+            "SIR_LE1_INGLOG",
+            "HK_RAW",
+            "HK_QLA",
+            "UNKNOWN_TYPE"],
+        "parsing_regex": "@filenamespec.tpl",
+        "parsing_assign": "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5",
+        "product_id_tpl": "%M_%T_%S_%f",
+        "data_ext": "fits",
+        "meta_ext": "xml",
+        "log_ext": "log"
+    },
+    "orchestration": {
+        "rules": {
+            "VIS_LE1_Processing": {
+                "inputs": "VIS_RAW",
+                "outputs": "VIS_LE1,VIS_LE1_LOG",
+                "processing": "LE1_VIS_Processor",
+                "condition": "1"
+            },
+            "VIS_LE1_MetadataCollection": {
+                "inputs": "VIS_INFO",
+                "outputs": "VIS_LE1_META",
+                "processing": "LE1_VIS_MetadataCollector",
+                "condition": "1"
+            },
+            "VIS_LE1_Ingestion": {
+                "inputs": "VIS_LE1,VIS_LE1_META",
+                "outputs": "VIS_LE1_INGLOG",
+                "processing": "LE1_VIS_Ingestor",
+                "condition": "(VIS_LE1.date==VIS_LE1_META.date) & (VIS_LE1.time==VIS_LE1_META.time)"
+            }
+        }
+    },
+    "processing": {
+        "processors": {
+            "LE1_VIS_Processor": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "LE1_VIS_Processor",
+                "output_path": "/opt/pe/output"
+            },
+            "LE1_VIS_MetadataCollector": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "LE1_VIS_MetadataCollector",
+                "output_path": "/opt/pe/output"
+            },
+            "LE1_VIS_Ingestor": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "LE1_VIS_Ingestor",
+                "output_path": "/opt/pe/output"
+            }
+        }
+    },
+    "storage": {
+        "base": {
+            "path": "/home/eucops/qpf/run"
+        },
+        "incoming": {
+            "protocol": "NOTUSED",
+            "address":  "0.0.0.0",
+            "port":     "0",
+            "user":     "xxxxx",
+            "password": "yyyyy",
+            "path":     "/home/eucops/qpf/data/inbox"
+        },
+        "local_archive": {
+            "path": "/home/eucops/qpf/data/archive"
+        },
+        "archive": {
+            "protocol": "SCP",
+            "address":  "eucdev.n1data.lan",
+            "port":     "",
+            "user":     "eucops",
+            "password": "",
+            "path":     "/home/eucops/ws/jcgg/DSS_EAS_Proxy/incoming"
+        },
+        "gateway": {
+            "path": "/home/eucops/qpf/data/gateway"
+        },
+        "outgoing": {
+            "protocol": "NOTUSED",
+            "address":  "0.0.0.0",
+            "port":     "0",
+            "user":     "xxxxx",
+            "password": "yyyyy",
+            "path":     "/home/eucops/qpf/data/outbox"
+        }
+    }
+}
+
+#+END_SRC
+
+**** Alarm System
+
+    The QPF includes an Alarm System with the following components:
+
+***** Alarm Database
+The Alarm Database stores:
+     + the values of the registered variables with their validity ranges
+     + the list of alarms and raised, and their current status
+     + In order to create the database with PostgresSQL, the following must be used
+
+***** Alarm Database - TBU                                     :noexport:
+The Alarm Database stores:
+     + the values of the registered variables with their validity ranges
+     + the list of alarms and raised, and their current status
+     + In order to create the database with PostgresSQL, the following must be used
+
+#+BEGIN_EXAMPLE
+      $ mkdir db
+      $ pg_ctl initdb -D db
+      $ pg_ctl -D db -l logfile start # postgres -D db
+      $ createdb alarms
+#+END_EXAMPLE
+
+    create the following tables (psql alarms)
+
+#+BEGIN_SRC sql
+      CREATE TABLE variables (
+          name            char(50) primary key, -- Short name
+          type            int,           -- Variable Type
+          description     char(200),     -- Variable description
+          smin            numeric,       -- Soft minimum value
+          smax            numeric,       -- Soft maximum value
+          hmin            numeric,       -- Hard minimum value
+          hmax            numeric,       -- Hard maximum value
+          x               numeric        -- Current value
+      );
+
+      CREATE TABLE alarms (
+          alarmId         serial primary key, -- Alarm identifier
+          name            char(50) references variables,      -- Variable name
+          source          char(200),     -- Location in the code
+          severity        integer,       -- Initial severity
+          status          integer,       -- Initial status
+          currSeverity    integer,       -- Current severity
+          currStatus      integer,       -- Current status
+          creation        timestamp,     -- Creation date
+          acknowledged    timestamp,     -- Acknowledged date
+          lastUpdate      timestamp,     -- Last update
+          alarmState      integer        -- Current state
+      );
+#+END_SRC
+#+RESULTS:
+
+***** Database Controller
+A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
+
+This Alarm System is yet to be implemented
+
+*** Specification - TO BE UPDATED                                  :noexport:
+**** QPF Database Specification                                 :noexport:
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Configuration" #Pearl {
+
+table(config_general)
+config_general : primary_key(parameter) : field_type(char[32])
+config_general : content : field_type(char[256])
+
+table(config_nodes)
+config_nodes : primary_key(name) : field_type(char[20])
+config_nodes : type : field_type(char[20])
+config_nodes : clientAddr : field_type(char[128])
+config_nodes : serverAddr : field_type(char[128])
+
+table(config_orchestration)
+config_orchestration : primary_key(ruleId) : field_type(int)
+config_orchestration : inputs : field_type(char[1024])
+config_orchestration : outputs : field_type(char[1024])
+config_orchestration : primary_key(processorId) : field_type(int)
+
+table(config_processors)
+config_processors : primary_key(processorId) : field_type(int)
+config_processors : processorName : field_type(char[1024])
+config_processors : exePath : field_type(char[1024])
+config_processors : inputPath : field_type(char[1024])
+config_processors : outputPath : field_type(char[1024])
+
+table(config_products)
+config_products : primary_key(productType) : field_type(char[128])
+
+config_orchestration "0..*" -- "1" config_processors
+
+}
+@enduml
+#+end_src
+#+results:
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Products" #Snow {
+
+table(products_info)
+products_info : primary_key(id) : field_type(int)
+products_info : primary_key(productId) : field_type(char[256])
+products_info : primary_key(productType) : field_type(char[128])
+products_info : primary_key(productStatus) : field_type(int)
+products_info : productVersion : field_type(char[128])
+products_info : productSize : field_type(int)
+products_info : primary_key(creatorId) : field_type(int)
+products_info : primary_key(instrumentId) : field_type(int)
+products_info : primary_key(obsMode) : field_type(int)
+products_info : startTime : field_type(timestamp)
+products_info : endTime : field_type(timestamp)
+products_info : registrationTime : field_type(timestamp)
+products_info : url : field_type(char[1024]
+
+table(product_status)
+product_status : primary_key(productStatus) : field_type(int)
+product_status : statusDesc : field_type(char[128])
+
+table(instruments)
+instruments : primary_key(instrumentId) : field_type(int)
+instruments : instrument : field_type(char[128])
+
+table(creators)
+creators : primary_key(creatorId) : field_type(int)
+creators : creatorDesc : field_type(char[128])
+
+table(observation_modes)
+observation_modes : primary_key(obsMode) : field_type(int)
+observation_modes : obsModeDesc : field_type(char[128])
+
+products_info "0..*" -- "1" config_products
+products_info "0..*" -- "1" product_status
+products_info "0..*" -- "1" instruments
+products_info "0..*" -- "1" creators
+products_info "0..*" -- "1" observation_modes
+
+}
+@enduml
+#+end_src
+#+results:
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Tasks" #LightCyan {
+
+table(tasks_info)
+tasks_info : primary_key(id) : field_type(int)
+tasks_info : primary_key(taskId) : field_type(char[128])
+tasks_info : primary_key(taskStatus) : field_type(int)
+tasks_info : taskExitCode : field_type(int)
+tasks_info : taskPath : field_type(char[1024])
+tasks_info : taskSize : field_type(int)
+tasks_info : registrationTime : field_type(timestamp)
+tasks_info : startTime : field_type(timestamp)
+tasks_info : endTime : field_type(timestamp)
+
+table(task_status)
+task_status : primary_key(taskStatus) : field_type(int)
+task_status : statusDesc : field_type(char[128])
+
+table(task_inputs)
+task_inputs : primary_key(taskId) : field_type(char[128])
+task_inputs : primary_key(productId) : field_type(char[256])
+
+table(task_outputs)
+task_outputs : primary_key(taskId) : field_type(char[128])
+task_outputs : primary_key(productId) : field_type(char[256])
+
+tasks_info "0..*" -- "1" task_status
+tasks_info "0..*" -- "1" task_inputs
+tasks_info "0..*" -- "1" task_outputs
+products_info "0..*" -- "1" task_inputs
+products_info "0..*" -- "1" task_outputs
+
+}
+@enduml
+#+end_src
+#+results:
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Messages" #Bisque {
+
+table(messages)
+messages : primary_key(id) : field_type(int)
+messages : primary_key(messageId) : field_type(char[128])
+messages : primary_key(messageType) : field_type(char[128])
+messages : primary_key(source) : field_type(char[128])
+messages : primary_key(destination) : field_type(char[128])
+messages : messageVersion : field_type(int)
+messages : creationTime : field_type(timestamp)
+messages : transmissionTime : field_type(timestamp)
+messages : receptionTime : field_type(timestamp)
+
+table(message_type)
+message_type : primary_key(messageType) : field_type(int)
+message_type : typeDesc : field_type(char[128])
+
+messages "0..*" -- "1" message_type
+messages "0..*" -- "1" config_nodes
+messages "0..*" -- "1" config_nodes
+
+}
+@enduml
+#+end_src
+#+results:
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+top to bottom direction
+
+package "Alarms" #Ivory {
+
+table(variables)
+variables : primary_key(name) : field_type(char[50])
+variables : type : field_type(int)
+variables : description : field_type(char[200])
+variables : smin : field_type(double)
+variables : smax : field_type(double)
+variables : hmin : field_type(double)
+variables : hmax : field_type(double)
+variables : x : field_type(double)
+
+table(alarms)
+alarms : primary_key(alarmId) : field_type(int)
+alarms : primary_key(name) : field_type(char[50])
+alarms : source : field_type(char[200])
+alarms : severity : field_type(int)
+alarms : status : field_type(int)
+alarms : currSeverity : field_type(int)
+alarms : currStatus : field_type(int)
+alarms : creation : field_type(timestamp)
+alarms : acknowledged : field_type(timestamp)
+alarms : lastUpdate : field_type(timestamp)
+alarms : alarmState : field_type(int)
+
+alarms "0..*" -- "1" variables
+
+}
+@enduml
+#+end_src
+#+results:
+
+Or everything together
+
+#+begin_src plantuml :file noexport.png
+@startuml
+!define table(x) class x << (T,#FFDDAA) >>
+!define primary_key(x) #<b>x</b>
+!define field_type(x) <i>x</i>
+hide methods
+hide stereotypes
+left to right direction
+
+package "Configuration" #Pearl {
+
+table(config_general)
+config_general : primary_key(parameter) : field_type(char[32])
+config_general : content : field_type(char[256])
+
+table(config_nodes)
+config_nodes : primary_key(name) : field_type(char[20])
+config_nodes : type : field_type(char[20])
+config_nodes : clientAddr : field_type(char[128])
+config_nodes : serverAddr : field_type(char[128])
+
+table(config_orchestration)
+config_orchestration : primary_key(ruleId) : field_type(int)
+config_orchestration : inputs : field_type(char[1024])
+config_orchestration : outputs : field_type(char[1024])
+config_orchestration : primary_key(processorId) : field_type(int)
+
+table(config_processors)
+config_processors : primary_key(processorId) : field_type(int)
+config_processors : processorName : field_type(char[1024])
+config_processors : exePath : field_type(char[1024])
+config_processors : inputPath : field_type(char[1024])
+config_processors : outputPath : field_type(char[1024])
+
+table(config_products)
+config_products : primary_key(productType) : field_type(char[128])
+
+config_orchestration "0..*" -- "1" config_processors
+
+}
+
+package "Products" #Snow {
+
+table(products_info)
+products_info : primary_key(id) : field_type(int)
+products_info : primary_key(productId) : field_type(char[256])
+products_info : primary_key(productType) : field_type(char[128])
+products_info : primary_key(productStatus) : field_type(int)
+products_info : productVersion : field_type(char[128])
+products_info : productSize : field_type(int)
+products_info : primary_key(creatorId) : field_type(int)
+products_info : primary_key(instrumentId) : field_type(int)
+products_info : primary_key(obsMode) : field_type(int)
+products_info : startTime : field_type(timestamp)
+products_info : endTime : field_type(timestamp)
+products_info : registrationTime : field_type(timestamp)
+products_info : url : field_type(char[1024]
+
+table(product_status)
+product_status : primary_key(productStatus) : field_type(int)
+product_status : statusDesc : field_type(char[128])
+
+table(instruments)
+instruments : primary_key(instrumentId) : field_type(int)
+instruments : instrument : field_type(char[128])
+
+table(creators)
+creators : primary_key(creatorId) : field_type(int)
+creators : creatorDesc : field_type(char[128])
+
+table(observation_modes)
+observation_modes : primary_key(obsMode) : field_type(int)
+observation_modes : obsModeDesc : field_type(char[128])
+
+products_info "0..*" -- "1" config_products
+products_info "0..*" -- "1" product_status
+products_info "0..*" -- "1" instruments
+products_info "0..*" -- "1" creators
+products_info "0..*" -- "1" observation_modes
+
+}
+
+package "Tasks" #LightCyan {
+
+table(tasks_info)
+tasks_info : primary_key(id) : field_type(int)
+tasks_info : primary_key(taskId) : field_type(char[128])
+tasks_info : primary_key(taskStatus) : field_type(int)
+tasks_info : taskExitCode : field_type(int)
+tasks_info : taskPath : field_type(char[1024])
+tasks_info : taskSize : field_type(int)
+tasks_info : registrationTime : field_type(timestamp)
+tasks_info : startTime : field_type(timestamp)
+tasks_info : endTime : field_type(timestamp)
+
+table(task_status)
+task_status : primary_key(taskStatus) : field_type(int)
+task_status : statusDesc : field_type(char[128])
+
+table(task_inputs)
+task_inputs : primary_key(taskId) : field_type(char[128])
+task_inputs : primary_key(productId) : field_type(char[256])
+
+table(task_outputs)
+task_outputs : primary_key(taskId) : field_type(char[128])
+task_outputs : primary_key(productId) : field_type(char[256])
+
+tasks_info "0..*" -- "1" task_status
+tasks_info "0..*" -- "1" task_inputs
+tasks_info "0..*" -- "1" task_outputs
+products_info "0..*" -- "1" task_inputs
+products_info "0..*" -- "1" task_outputs
+
+}
+
+package "Messages" #Bisque {
+
+table(messages)
+messages : primary_key(id) : field_type(int)
+messages : primary_key(messageId) : field_type(char[128])
+messages : primary_key(messageType) : field_type(char[128])
+messages : primary_key(source) : field_type(char[128])
+messages : primary_key(destination) : field_type(char[128])
+messages : messageVersion : field_type(int)
+messages : creationTime : field_type(timestamp)
+messages : transmissionTime : field_type(timestamp)
+messages : receptionTime : field_type(timestamp)
+
+table(message_type)
+message_type : primary_key(messageType) : field_type(int)
+message_type : typeDesc : field_type(char[128])
+
+messages "0..*" -- "1" message_type
+messages "0..*" -- "1" config_nodes
+messages "0..*" -- "1" config_nodes
+
+}
+
+package "Alarms" #Ivory {
+
+table(variables)
+variables : primary_key(varName) : field_type(char[50])
+variables : type : field_type(int)
+variables : description : field_type(char[200])
+variables : smin : field_type(double)
+variables : smax : field_type(double)
+variables : hmin : field_type(double)
+variables : hmax : field_type(double)
+variables : x : field_type(double)
+
+table(alarms)
+alarms : primary_key(alarmId) : field_type(int)
+alarms : primary_key(varName) : field_type(char[50])
+alarms : source : field_type(char[200])
+alarms : severity : field_type(int)
+alarms : status : field_type(int)
+alarms : currSeverity : field_type(int)
+alarms : currStatus : field_type(int)
+alarms : creation : field_type(timestamp)
+alarms : acknowledged : field_type(timestamp)
+alarms : lastUpdate : field_type(timestamp)
+alarms : alarmState : field_type(int)
+
+table(alarm_status)
+alarm_status : primary_key(status) : field_type(int)
+alarm_status : statusDesc : field_type(char[128])
+
+table(alarm_severity)
+alarm_severity : primary_key(severity) : field_type(int)
+alarm_severity : severityDesc : field_type(char[128])
+
+
+alarms "0..*" -- "1" variables
+alarms "0..*" -- "1" alarm_status
+alarms "0..*" -- "1" alarm_severity
+
+}
+@enduml
+#+end_src
+#+results:
+
+
+This structure can be created with the following code (PostgreSQL):
+
+#+begin_src sql
+CREATE TABLE "config_general" (
+	"parameter" VARCHAR(32) NOT NULL,
+	"content" VARCHAR(256) NOT NULL,
+	CONSTRAINT config_general_pk PRIMARY KEY ("parameter")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_nodes" (
+	"name" VARCHAR(20) NOT NULL,
+	"type" VARCHAR(20) NOT NULL,
+	"clientAddr" VARCHAR(128) NOT NULL,
+	"serverAddr" VARCHAR(128) NOT NULL,
+	CONSTRAINT config_nodes_pk PRIMARY KEY ("name")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_orchestration" (
+	"ruleId" integer NOT NULL,
+	"inputs" VARCHAR(1024) NOT NULL,
+	"outputs" VARCHAR(1024) NOT NULL,
+	"processorId" integer NOT NULL,
+	CONSTRAINT config_orchestration_pk PRIMARY KEY ("ruleId","processorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_processors" (
+	"processorId" integer NOT NULL,
+	"processorName" VARCHAR(1024) NOT NULL,
+	"exePath" VARCHAR(1024) NOT NULL,
+	"inputPath" VARCHAR(1024) NOT NULL,
+	"outputPath" VARCHAR(1024) NOT NULL,
+	CONSTRAINT config_processors_pk PRIMARY KEY ("processorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "config_products" (
+	"productType" VARCHAR(128) NOT NULL,
+	CONSTRAINT config_products_pk PRIMARY KEY ("productType")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "products_info" (
+	"id" integer NOT NULL,
+	"productId" VARCHAR(256) NOT NULL,
+	"productType" VARCHAR(128) NOT NULL,
+	"productStatus" integer NOT NULL,
+	"productVersion" VARCHAR(128) NOT NULL,
+	"productSize" integer NOT NULL,
+	"creatorId" integer NOT NULL,
+	"instrumentId" integer NOT NULL,
+	"obsMode" integer NOT NULL,
+	"startTime" DATETIME NOT NULL,
+	"endTime" DATETIME NOT NULL,
+	"registrationTime" DATETIME NOT NULL,
+	"url" VARCHAR(1024) NOT NULL,
+	CONSTRAINT products_info_pk PRIMARY KEY ("id","productId","productType","productStatus","creatorId","instrumentId","obsMode")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "product_status" (
+	"productStatus" integer NOT NULL,
+	"statusDesc" integer NOT NULL,
+	CONSTRAINT product_status_pk PRIMARY KEY ("productStatus")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "instruments" (
+	"instrumentId" integer NOT NULL,
+	"instrument" VARCHAR(128) NOT NULL,
+	CONSTRAINT instruments_pk PRIMARY KEY ("instrumentId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "creators" (
+	"creatorId" integer NOT NULL,
+	"creatorDesc" VARCHAR(128) NOT NULL,
+	CONSTRAINT creators_pk PRIMARY KEY ("creatorId")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "observation_modes" (
+	"obsMode" integer NOT NULL,
+	"obsModeDesc" VARCHAR(128) NOT NULL,
+	CONSTRAINT observation_modes_pk PRIMARY KEY ("obsMode")
+) WITH (
+  OIDS=FALSE
+);
+
+
+ALTER TABLE "config_orchestration" ADD CONSTRAINT config_orchestration_fk0 FOREIGN KEY (processorId) REFERENCES config_processors(processorId);
+
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk0 FOREIGN KEY (productStatus) REFERENCES product_status(productStatus);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk1 FOREIGN KEY (productType) REFERENCES config_products(productType);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk2 FOREIGN KEY (creatorId) REFERENCES creators(creatorId);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk3 FOREIGN KEY (instrumentId) REFERENCES instruments(instrumentId);
+ALTER TABLE "products_info" ADD CONSTRAINT products_info_fk4 FOREIGN KEY (obsMode) REFERENCES observation_modes(obsMode);
+#+end_src
+#+results:
+
+**** Classes Specification                                      :noexport:
+
+***** Database related
+
+#+begin_src plantuml :file noexport.png
+@startuml
+'!define table(x) class x << (T,#FFDDAA) >>
+'!define primary_key(x) #<b>x</b>
+'!define field_type(x) <i>x</i>
+'hide methods
+'hide stereotypes
+left to right direction
+
+package "Database" #Pearl {
+
+class ProductType
+
+class NodeInfo {
+  +nodeName : string
+  +nodeType : string
+  +clientAddr : string
+  +serverAddr : string
+}
+
+class RuleInfo {
+  +ruleId : int
+  +processorId : int
+  +inputs : list<ProductType>
+  +outputs : list<ProductType>
+}
+
+class ProcessorInfo {
+  +processorId : int
+  +processorName : string
+  +exePath : string
+  +inPath : string
+  +outPath : string
+}
+
+class GeneralInfo {
+  +appName : string
+  +appVersion : string
+  +lastAccess : string
+  +hmiNode : string
+}
+
+class Configuration {
+  +gral : GeneralInfo
+  +nodes : list<NodeInfo>
+  +rules : list<RuleInfo>
+  +processors : list<ProcessorInfo>
+  +products : list<ProductType>
+  +rulesMap : map<int,RuleInfo>
+  +processorsMap : map<int,ProcessorInfo>
+}
+
+interface DBHandler {
+  #{abstract} openConnection() : bool
+  #{abstract} openConnection() : bool
+  +{abstract} getConfiguration() : bool
+  +{abstract} storeProduct() : bool
+  #dbName : string
+  #dbUser : string
+  #dbPasswd : string
+  #config : Configuration
+}
+
+class DBPostgreHdl <|-- DBHandler
+@enduml
+#+end_src
+#+results:
+
+**** Current QPF Configuration                                  :noexport:
 ***** STARTED JSON
 ****** "general":
 ******* "app_name": "QPF",
@@ -1568,7 +2402,7 @@ CLOSED: [2015-10-09 vie 08:45]
 | HK_RAW        |
 | HK_QLA        |
 
-**** Alarm System
+**** Alarm System                                               :noexport:
 
     An addition to provide an Alarm System with the following components:
 
@@ -1613,19 +2447,20 @@ The Alarm Database stores:
           alarmState      integer        -- Current state
       );
 #+END_SRC
+#+RESULTS:
 
 ***** Database Controller
 A Database Controller (DBController), that allows variable registration and provides information on current alarms, upon request from a DBClient.
 
 
-*** TODO Issues [2/3]
+*** TODO Issues [2/3]                                            :noexport:
 **** DONE [#A] Remote log chunks are received in =DATA_INFO= messages, but they are not saved to disk
 CLOSED: [2015-10-05 lun 11:44]
 **** DONE [#A] Database structure is obsolete, so INSERTs and other operations fail
 CLOSED: [2015-10-05 lun 11:44]
 **** TODO [#A] JSONCpp library shows some bugs from time to time, this should be avoided by using our own SDC library, and restricting JSON just to I/O operations
 
-*** TODO Functionalities to be included [8/14]
+*** TODO Functionalities to be included [8/14]                   :noexport:
 **** DONE [#A] Correct DB structure so the incoming data and overall information can be stored
 CLOSED: [2015-10-05 lun 11:43]
 **** DONE [#A] Ensure the received remote log chunks are stored to their corresponding remote log files (under /rlog)
@@ -1650,44 +2485,10 @@ CLOSED: [2015-09-30 mié 13:23]
 **** TODO [#C] Tasks History Report
 
 
-*** Notes
-
-*** QPF Installation and Quick Start
-
-**** Introduction
-
-***** Purpose
-
-***** Scope
-
-***** Reference Documents
-
-***** Acronyms and Abbreviations
-
-***** Contact Information
-
-**** System Installation
-
-***** Pre-requisites
-
-***** Pre-installation tasks
-
-***** Installation Procedure
-
-***** Post-installation
-
-***** Installation tests
-
-***** Uninstallation Procedure
-
-**** Quick Start
-
-**** System Configuration
-
-**** Troubleshooting
+*** Notes                                                        :noexport:
 
 
-** Glossary
+** Glossary                                                       :noexport:
 
 *** External Auxiliary Products Provider
     External Element where the Auxiliary Products can be retrieved from.
@@ -1711,7 +2512,7 @@ CLOSED: [2015-09-30 mié 13:23]
     An structure that defines an element that receives input files, parameters files and configuration files, and processes those input data to generate some output (results) files.  Together with the different files, it is the basic element in a [[Processing Chain]].
 
 
-** Acronyms
+** Acronyms                                                       :noexport:
 
 |-------------+-------------------------------------------------------------------------|
 | Acronym     | Description                                                             |
@@ -1763,7 +2564,7 @@ CLOSED: [2015-09-30 mié 13:23]
 |-------------+-------------------------------------------------------------------------|
 
 
-** TBDs, TBCs and TODO lists
+** TBDs, TBCs and TODO lists                                      :noexport:
 
 *** TODO TBDs
 | TBD Id | Comment                                    | Status |
