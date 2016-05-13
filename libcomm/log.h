@@ -202,6 +202,24 @@ public:
   static void setLogBaseDir(std::string base);
 
   //----------------------------------------------------------------------
+  // Static Method: getLogFileName
+  // Returns the log file name for a given entity name
+  //
+  // Parameters:
+  //   entity - (I) String with the new directory
+  //----------------------------------------------------------------------
+  static std::string getLogFileName(std::string entity);
+
+  //----------------------------------------------------------------------
+  // Static Method: getRemoteLogFileName
+  // Returns the log file name for a given remote entity name
+  //
+  // Parameters:
+  //   entity - (I) String with the new directory
+  //----------------------------------------------------------------------
+  static std::string getRemoteLogFileName(std::string entity);
+
+  //----------------------------------------------------------------------
   // Static Method: getLogBaseDir
   // Access to base directory for log file
   //
@@ -263,6 +281,10 @@ private:
   // Maps the underlying log stream to the entity name
   static std::map<std::string, std::fstream *>            logStream;
 
+  // Variable: logFileName
+  // Maps log file associated name to the entity name
+  static std::map<std::string, std::string>               logFileName;
+
   // Variable: sizeOfLogBuffer
   // Maximum size of buffer of log messages mapped to the entity name
   static std::map<std::string, int >                      sizeOfLogBuffer;
@@ -287,7 +309,7 @@ private:
   // Shows the date at the beginning of an execution or after a day change
   static std::string dateString;
 
-  // Variable: logStream
+  // Variable: dateChangeShown
   // Maps the underlying log stream to the entity name
   static std::map<std::string, bool> dateChangeShown;
 

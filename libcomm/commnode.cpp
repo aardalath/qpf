@@ -147,10 +147,12 @@ void CommNode::flushLog()
 {
     if (sizeOfLogBuffer == 0) { return; }
 
-    // Create temporary file with new log entries
+    // Get last bunch of messages
     std::vector<std::string> lastMsgs;
     Log::getLastLogMsgs(commNodeName, lastMsgs);
     logChunk = join(lastMsgs, "\n");
+
+    // Reset list of messages
     lastMsgs.clear();
     numOfLogMsgsInBuffer = 0;
     Log::defineSizeOfLogBuffer(commNodeName, getSizeOfLogBuffer());

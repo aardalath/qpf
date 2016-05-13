@@ -520,7 +520,7 @@ void Component::sendLogPacketAsDataInfoMsg()
     PeerMessage * dataInfoMsg = buildPeerMsg("LogMng", msg.getDataString(), MSG_DATA_INFO);
     // DataInfo messages are not registered
     registerMsg(selfPeer()->name, *dataInfoMsg);
-    //setTransmissionToPeer("LogMng", dataInfoMsg);
+    setTransmissionToPeer("LogMng", dataInfoMsg);
     logChunk = "";
 }
 

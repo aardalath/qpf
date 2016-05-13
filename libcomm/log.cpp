@@ -38,6 +38,7 @@
 
 #include "log.h"
 #include "common.h"
+#include "tools.h"
 
 #include <cassert>
 #include <cstdio>
@@ -224,9 +225,34 @@ void Log::defineLogSystem(std::string caller, std::string logFile, int numOfMsgs
   std::fstream * fs = new std::fstream(logFile.c_str(),
                                        std::ios::out | std::ios::trunc);
   assert(!fs->fail());
-  logStream[caller] = fs;
+  logStream[caller]   = fs;
+  logFileName[caller] = logFile;
 
   defineSizeOfLogBuffer(caller, numOfMsgs);
+}
+
+//----------------------------------------------------------------------
+// Static Method: getLogFileName
+// Returns the log file name for a given entity name
+//
+// Parameters:
+//   entity - (I) String with the new directory
+//----------------------------------------------------------------------
+std::string Log::getLogFileName(std::string entity)
+{
+    return logFileName[entity];
+}
+
+//----------------------------------------------------------------------
+// Static Method: getRemoteLogFileName
+// Returns the log file name for a given remote entity name
+//
+// Parameters:
+//   entity - (I) String with the new directory
+//----------------------------------------------------------------------
+std::string Log::getRemoteLogFileName(std::string entity)
+{
+    return replaceAll(logFileName[entity], "/log/", "/rlog/");
 }
 
 //----------------------------------------------------------------------
@@ -235,10 +261,8 @@ void Log::defineLogSystem(std::string caller, std::string logFile, int numOfMsgs
 //----------------------------------------------------------------------
 void Log::defineSizeOfLogBuffer(std::string caller, int numOfMsgs)
 {
-  std::vector<std::string> emptyBuffer;
-
   sizeOfLogBuffer[caller] = numOfMsgs;
-  logBuffer[caller]       = emptyBuffer;
+  logBuffer[caller]       = std::vector<std::string>();
 }
 
 //----------------------------------------------------------------------
