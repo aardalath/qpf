@@ -55,6 +55,7 @@
 namespace LibComm {
 
 std::map<std::string, std::fstream *>            Log::logStream;
+std::map<std::string, std::string>               Log::logFileName;
 std::map<std::string, int >                      Log::sizeOfLogBuffer;
 std::map<std::string, std::vector<std::string> > Log::logBuffer;
 std::map<std::string, bool> Log::dateChangeShown = {};
