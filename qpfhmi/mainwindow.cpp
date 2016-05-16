@@ -945,27 +945,43 @@ void MainWindow::setLogWatch()
 
     // Establish log monitoring for all components
     initLogWatch();
-    QString logsDir = QString::fromStdString(Log::getLogBaseDir() + "/log");
-    QDir msgCommDir(logsDir);
-    msgCommDir.setFilter(QDir::Files);
-    QStringList filters;
-    filters << "*.log";
-    msgCommDir.setNameFilters(filters);
 
-    foreach (const QFileInfo & fs, msgCommDir.entryInfoList()) {
-        QString logFileName = fs.absoluteFilePath();
-        TextView * pltxted = new TextView;
-        pltxted->setStyleSheet(FixedWidthStyle);
-        pltxted->setLogName(QFileInfo(logFileName).baseName());
-        LogWatcher * newLog = new LogWatcher(pltxted);
-        newLog->setFile(logFileName);
-        nodeLogs.append(newLog);
-        QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
-        subw->setWindowFlags(Qt::CustomizeWindowHint |
-                             Qt::WindowTitleHint |
-                             Qt::WindowMinMaxButtonsHint);
-        connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    QFileInfo fs;
+    for (auto & kv : cfgInfo.machineNodes) {
+        std::string machine(kv.first);
+        bool masterMach = (machine == cfgInfo.masterMachine);
+        std::string logsDir = Log::getLogBaseDir() + ((masterMach) ? "/log/" : "/rlog/");
+        for (auto & n : kv.second) {
+            fs.setFile(QString::fromStdString(logsDir + n + ".log"));
+            QString logFileName = fs.absoluteFilePath();
+            qDebug() << QString::fromStdString(machine)
+                     << QString::fromStdString(cfgInfo.masterMachine)
+                     << masterMach
+                     << logFileName;
+            if (!fs.exists()) {
+                QFile file(logFileName);
+                //file.resize(0);
+                file.open(QIODevice::WriteOnly | QIODevice::Text);
+                //QTextStream out(&file);
+                //out << "";
+                file.close();
+            }
+            TextView * pltxted = new TextView;
+            pltxted->setStyleSheet(FixedWidthStyle);
+            pltxted->setLogName(QFileInfo(logFileName).baseName());
+            LogWatcher * newLog = new LogWatcher(pltxted);
+            newLog->setFile(logFileName);
+            nodeLogs.append(newLog);
+            QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
+            subw->setWindowFlags(Qt::CustomizeWindowHint |
+                                 Qt::WindowTitleHint |
+                                 Qt::WindowMinMaxButtonsHint);
+            connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
+        }
     }
+
 }
 
 //----------------------------------------------------------------------

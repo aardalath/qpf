@@ -131,12 +131,13 @@ void Component::fromRunningToOff()
 //----------------------------------------------------------------------
 void Component::init()
 {
+    isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
+    isRemote = (!ConfigurationInfo::data().isMaster);
+
     // Define log output
     Log::defineLogSystem(getCommNodeName(),
                          Log::getLogBaseDir() + "/log/" +
                          getCommNodeName() + ".log");
-
-    isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
 
     // Define valid state transitions
     defineValidTransitions();
@@ -233,8 +234,7 @@ int Component::run()
         }
 
         // Send log info to LogMng in case there is something to send
-        if ((!logChunk.empty()) && isPeerLogMng &&
-            (!ConfigurationInfo::data().isMaster)) { sendLogPacketAsDataInfoMsg(); }
+        if ((!logChunk.empty()) && isPeerLogMng && isRemote) { sendLogPacketAsDataInfoMsg(); }
 
         // Additional loop tasks (entry for additional functionality
         //to be exectued every loop step)
