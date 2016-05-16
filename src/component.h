@@ -278,6 +278,7 @@ protected:
     int hbSecs;
     int hbMicroSecs;
     bool isPeerLogMng;
+    bool isRemote;
 };
 
 }
