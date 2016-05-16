@@ -233,7 +233,8 @@ int Component::run()
         }
 
         // Send log info to LogMng in case there is something to send
-        if ((!logChunk.empty()) && isPeerLogMng) { sendLogPacketAsDataInfoMsg(); }
+        if ((!logChunk.empty()) && isPeerLogMng &&
+            (!ConfigurationInfo::data().isMaster)) { sendLogPacketAsDataInfoMsg(); }
 
         // Additional loop tasks (entry for additional functionality
         //to be exectued every loop step)
