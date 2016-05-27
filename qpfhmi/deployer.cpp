@@ -152,7 +152,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     int exitCode = EXIT_FAILURE;
 
     int opt;
-    while ((opt = getopt(argc, argv, "hpvt:c:m:")) != -1) {
+    while ((opt = getopt(argc, argv, "hpvt:c:s:")) != -1) {
         switch (opt) {
         case 'p':
             spawnPeerProcesses = true;
@@ -165,6 +165,9 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
             break;
         case 'c':
             newConfigFile = std::string(optarg);
+            break;
+        case 'c':
+            LibComm::setSessionTag(std::string(optarg));
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
