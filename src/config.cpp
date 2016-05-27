@@ -127,7 +127,7 @@ void Configuration::getGeneralInfo(std::string & appName, std::string & appVer, 
     PATHBase = cfg["storage"]["base"]["path"].asString();
 
     PATHBin  = PATHBase + "/bin";
-    PATHRun  = PATHBase + "/" + LibComm::timeTag();
+    PATHRun  = PATHBase + "/" + LibComm::sessionTag();
     PATHLog  = PATHRun + "/log";
     PATHRlog = PATHRun + "/rlog";
     PATHTmp  = PATHRun + "/tmp";
