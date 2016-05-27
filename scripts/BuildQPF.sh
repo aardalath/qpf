@@ -111,7 +111,7 @@ perform () {
     if [ "${FAKE}" == "yes" ]; then
         say "${_ONRUN}: $*"
     else
-        eval $*
+        eval $* 2>&1 | tee -a "${LOG_FILE}"
     fi
 }
 
