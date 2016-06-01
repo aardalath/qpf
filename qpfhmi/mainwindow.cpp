@@ -1047,6 +1047,16 @@ void MainWindow::selectInboxPath()
     if (dirName.isEmpty()) { return; }
     ui->edInboxPath->setText(dirName);
     inboxDirName = dirName;
+
+    QString metadata;
+    bool ok = simInData->processInbox(inboxDirName, metadata);
+    if (ok) {
+        ui->pltxtInboxProducts->setPlainText(metadata);
+    } else {
+        ui->pltxtInboxProducts->setPlainText(tr("ERROR: Problems when generating "
+                                                "the inbox input files metadata"));
+    }
+
 }
 
 //----------------------------------------------------------------------
