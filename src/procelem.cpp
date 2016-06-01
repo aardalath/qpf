@@ -343,7 +343,8 @@ void ProcessingElement::configureProcElem()
 
     } else if (std::string("LE1_VIS_Processor|"
                            "LE1_VIS_MetadataCollector|"
-                           "LE1_VIS_Ingestor|").find(task.taskPath + "|") != std::string::npos) {
+                           "LE1_VIS_Ingestor|"
+                           "QLA_VIS_Processor|").find(task.taskPath + "|") != std::string::npos) {
 
         std::map<ProductType,
                 ProductMetadata>::iterator it = task.inputs.productList.begin();
