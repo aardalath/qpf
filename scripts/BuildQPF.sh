@@ -158,6 +158,12 @@ install_lib () {
     done
 }
 
+install_scpt () {
+    local scpt=$1
+    say "  - Installing script $scpt"
+    perform cp "'${SCRIPT_PATH}/${scpt}'" "'${WORK_AREA}/qpf/bin/'"
+}
+
 ###### Start
 
 ## Parse command line
@@ -207,7 +213,7 @@ perform mkdir -p "'${BUILD_PATH}'"
 step "Generating dependencies and setting makefiles"
 
 if [ "${COMPILE}" == "yes" ]; then
-    perform cd "'${BUILD_PATH}'"
+    cd "${BUILD_PATH}"
     perform $qmake_exe ../QPF.pro
 fi
 
@@ -235,6 +241,8 @@ install_exe ${QPF_EXE}
 for l in ${QPF_LIBS}; do
     install_lib $l
 done
+
+install_scpt RunQPFHMI.sh
 
 ## Creating QPFDB database
 step "Setting up QPF database"
