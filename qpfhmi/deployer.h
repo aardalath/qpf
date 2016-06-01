@@ -260,6 +260,12 @@ private:
     // Set to TRUE when the deployment (launch of nodes) is finished
     //----------------------------------------------------------------------
     bool deploymentCompleted;
+
+    //----------------------------------------------------------------------
+    // Variable: reusedSession
+    // TRUE if the user requests to use a specific session id
+    //----------------------------------------------------------------------
+    bool userSession;
 };
 
 }

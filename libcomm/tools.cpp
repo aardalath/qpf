@@ -59,7 +59,7 @@ inline T max(T a, T b) { return (a > b) ? a : b; }
 template<class T>
 inline T min(T a, T b) { return (a < b) ? a : b; }
 
-std::string specificSessionTag = std::string();
+static std::string specificSessionTag = std::string();
 
 //----------------------------------------------------------------------
 // Function: waitForHeartBeat

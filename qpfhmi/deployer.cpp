@@ -68,7 +68,8 @@ Deployer::Deployer(int argc, char *argv[]) :
     cfg(0),
     evtMng(0),
     hmiNeeded(false),
-    deploymentCompleted(false)
+    deploymentCompleted(false),
+    userSession(false)
 {
     // Change value for delay between peer nodes launches (default: 50000us)
     if (!processCmdLineOpts(argc, argv)) { exit(EXIT_FAILURE); }
@@ -166,8 +167,9 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
         case 'c':
             newConfigFile = std::string(optarg);
             break;
-        case 'c':
+        case 's':
             LibComm::setSessionTag(std::string(optarg));
+            userSession = true;
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
@@ -213,7 +215,7 @@ void Deployer::readConfig(const char * configFile)
                 Configuration::PATHTsk,
                 Configuration::PATHMsg };
     for (auto & p : runPaths) {
-        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
+        if ((mkdir(p.c_str(), Configuration::PATHMode) != 0) && (!userSession)) {
             std::perror(("mkdir " + p).c_str());
             exit(EXIT_FAILURE);
         }
