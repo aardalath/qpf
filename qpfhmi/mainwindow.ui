@@ -23,7 +23,7 @@
     <item>
      <widget class="QTabWidget" name="tabMainWgd">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="movable">
        <bool>true</bool>
@@ -277,8 +277,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>28</height>
+                 <width>793</width>
+                 <height>439</height>
                 </rect>
                </property>
               </widget>
@@ -359,39 +359,14 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabpgBrowser">
-       <attribute name="title">
-        <string>Browser</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_17">
-          <item>
-           <widget class="QToolButton" name="btnSelectQLAReport">
-            <property name="text">
-             <string>Open QLA report file ...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblQLAReportFileName">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPlainTextEdit" name="textBrowser"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tabpgArchive">
        <attribute name="title">
         <string>Internal/Local Archive</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <widget class="QTreeView" name="treevwArchive"/>
+        </item>
         <item>
          <widget class="QTableView" name="tblvwArchive"/>
         </item>
@@ -407,7 +382,7 @@
      <x>0</x>
      <y>0</y>
      <width>1112</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

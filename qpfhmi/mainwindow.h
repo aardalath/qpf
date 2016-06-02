@@ -166,8 +166,6 @@ private slots:
     void switchLayoutDirection();
     void setActiveSubWindow(QWidget *window);
 
-    void selectQLAReportFile();
-
     void showConfigTool();
     void showDBBrowser();
     void showExtToolsDef();

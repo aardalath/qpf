@@ -168,8 +168,6 @@ void MainWindow::manualSetupUI()
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
-    connect(ui->btnSelectQLAReport, SIGNAL(clicked()), this, SLOT(selectQLAReportFile()));
-
     // Read settings and set title
     readSettings();
     setWindowTitle(tr("QLA Processing Framework"));
@@ -811,6 +809,7 @@ void MainWindow::commandSystem()
 
         // Activate Archive Monitoring
         archHdl = new ArchiveModel(ui->tblvwArchive);
+        archHdl->setupModel("products_info");
 
         transitTo(INITIALISED);
         showState();
@@ -1757,38 +1756,6 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
         t->setData(1, Qt::DisplayRole, s);
     }
 }
-
-//----------------------------------------------------------------------
-// Method: selectQLAReportFile
-// Select QLA report file to browse
-//----------------------------------------------------------------------
-void MainWindow::selectQLAReportFile()
-{
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
-    QString reportsFolder(cfgInfo.storage.base.c_str());
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open QLA Report File"),
-                                                    reportsFolder,
-                                                    tr("QLA Reports (*.xml)"));
-    if (fileName.isEmpty()) {
-        return;
-    }
-
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "ERROR", "Cannot open selected QLA Report file:\n" +
-                                 file.errorString());
-        return;
-    }
-
-    QString content = file.readAll();
-    file.close();
-
-    ui->textBrowser->setPlainText(content);
-    ui->lblQLAReportFileName->setText(fileName);
-}
-
-
 
 //----------------------------------------------------------------------
 // Method: setDebugInfo

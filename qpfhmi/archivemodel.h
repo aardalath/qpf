@@ -83,37 +83,41 @@ public:
     //----------------------------------------------------------------------
     ArchiveModel(QTableView * t);
 
+public:
+    void setupModel(QString t);
+
 protected:
     //----------------------------------------------------------------------
     // Method: setupModel
     // Initialises the underlying data model
     //----------------------------------------------------------------------
-    void setupModel();
+    //void setupModel();
+
 
     //----------------------------------------------------------------------
     // Method: setupView
     // Initialises the view to look at the model data
     //----------------------------------------------------------------------
-    void setupView();
+    //void setupView();
 
     //----------------------------------------------------------------------
     // Method: setupArchiveWatcher
     // Initialises the archive watcher to detect updates
     //----------------------------------------------------------------------
-    void setupArchiveWatcher();
+    //void setupArchiveWatcher();
 
 protected slots:
     //----------------------------------------------------------------------
     // Method: updateView (SLOT)
     // Slot to update the mode view in case of updates
     //----------------------------------------------------------------------
-    void updateView();
+    //void updateView();
 
 private:
-    QStandardItemModel * model;
+    //QStandardItemModel * model;
     QTableView *         tblvw;
-    QString              dbFileName;
-    QFileSystemWatcher * fsWatcher;
+    //QString              dbFileName;
+    //QFileSystemWatcher * fsWatcher;
 };
 
 }

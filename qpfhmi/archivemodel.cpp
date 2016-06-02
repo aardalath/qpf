@@ -49,8 +49,10 @@
 #include <QHeaderView>
 #include <QFile>
 #include <QMessageBox>
+#include <QtSql>
 
 #include <iostream>
+#include "config.h"
 
 
 namespace QPF {
@@ -61,11 +63,62 @@ inline int randInt(int low, int high) {
 
 ArchiveModel::ArchiveModel(QTableView * t) : tblvw(t)
 {
-    setupModel();
-    setupView();
-    setupArchiveWatcher();
+    //setupModel();
+    //setupView();
+    //setupArchiveWatcher();
 }
 
+void ArchiveModel::setupModel(QString t)
+{
+    static QSqlDatabase db;
+    static QString dbId;
+    static bool dbInitialized = false;
+    static QString connectParams;
+
+    if (! dbInitialized) {
+        QString dbName ( QPF::Configuration::DBName.c_str() );
+        QString user   ( QPF::Configuration::DBUser.c_str() );
+        QString passwd ( QPF::Configuration::DBPwd.c_str() );
+        QString host   ( QPF::Configuration::DBHost.c_str() );
+        QString port   ( QPF::Configuration::DBPort.c_str() );
+
+        QSqlError err;
+        dbId = "QPF";
+        db = QSqlDatabase::addDatabase("QPSQL", dbId);
+        db.setDatabaseName(dbName);
+        db.setHostName(host);
+        db.setPort(port.toUInt());
+        if (! db.open(user, passwd)) {
+            if (db.lastError().isValid()) {
+                qDebug() << db.lastError();
+                abort();
+            }
+            // db = QSqlDatabase();
+            // QSqlDatabase::removeDatabase(dbId);
+        } else {
+            dbInitialized = true;
+        }
+        connectParams = QString("host=%1 port=%2 dbname=%3 user=%4 password=%5")
+                        .arg(host).arg(port).arg(dbName).arg(user).arg(passwd);
+    }
+
+    // DB connection is alive, assign and retrieve table
+    QSqlTableModel * model = new QSqlTableModel(tblvw, db);
+    model->setEditStrategy(QSqlTableModel::OnRowChange);
+    model->setTable(db.driver()->escapeIdentifier(t, QSqlDriver::TableName));
+    model->select();
+    if (model->lastError().type() != QSqlError::NoError) {
+        qDebug() << model->lastError().text();
+    }
+    tblvw->setModel(model);
+    tblvw->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
+    tblvw->resizeColumnsToContents();
+
+    //connect(tblvw->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
+    //        this, SLOT(currentChanged()));
+}
+
+/*
 void ArchiveModel::setupModel()
 {
     model = new QStandardItemModel(0, NumOfMdataFieldNames);
@@ -179,5 +232,6 @@ void ArchiveModel::updateView()
         }
     }
 }
+*/
 
 }
