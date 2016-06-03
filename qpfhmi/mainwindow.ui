@@ -18,6 +18,10 @@
   <property name="windowTitle">
    <string>QPF HMI</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icon.qrc">
+    <normaloff>:/img/QPF.png</normaloff>:/img/QPF.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_11">
     <item>
@@ -277,8 +281,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>793</width>
-                 <height>439</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
               </widget>
@@ -584,7 +588,9 @@ incoming data</string>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icon.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>setDebugInfo(bool)</slot>

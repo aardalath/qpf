@@ -86,4 +86,5 @@ LIBS += -L../src -lQPF \
         -L/opt/cots/lib -lzmq -lcurl -luuid
 
 RESOURCES += \
-    configtool.qrc
+    configtool.qrc \
+    icon.qrc
