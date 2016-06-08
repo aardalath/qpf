@@ -78,6 +78,8 @@ using LibComm::Log;
 #include "testrundlg.h"
 
 #include <QProcess>
+
+
 namespace QPF {
 
 // Valid Manager states
@@ -511,11 +513,12 @@ void MainWindow::createStatusBar()
 //----------------------------------------------------------------------
 void MainWindow::readSettings()
 {
-    QSettings settings("QPF", "QLA Processing Framework");
+    QSettings settings(APP_SYS_NAME, APP_NAME);
     QPoint pos = settings.value("pos", QPoint(40, 40)).toPoint();
     QSize size = settings.value("size", QSize(800, 600)).toSize();
     move(pos);
     resize(size);
+    getUserToolsFromSettings();
 }
 
 //----------------------------------------------------------------------
@@ -524,9 +527,75 @@ void MainWindow::readSettings()
 //----------------------------------------------------------------------
 void MainWindow::writeSettings()
 {
-//    QSettings settings("QPF", "QLA Processing Framework");
-//    settings.setValue("pos", pos());
-//    settings.setValue("size", size());
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.setValue("pos", pos());
+    settings.setValue("size", size());
+    putUserToolsToSettings();
+}
+
+//----------------------------------------------------------------------
+// Method: getFromSettings
+// Reads settings file and retrieves a given variable
+//----------------------------------------------------------------------
+QVariant MainWindow::getFromSettings(QString name)
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    return settings.value(name);
+}
+
+//----------------------------------------------------------------------
+// Method: putToSettings
+// Stores a given variable to the settings file
+//----------------------------------------------------------------------
+void MainWindow::putToSettings(QString name, QVariant value)
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.setValue(name, value);
+}
+
+//----------------------------------------------------------------------
+// Method: getUserToolsFromSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::getUserToolsFromSettings()
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    int size = settings.beginReadArray("user_tools");
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        UserDefTool udt;
+        udt.name = settings.value("name").toString();
+        udt.desc = settings.value("description").toString();
+        udt.exe  = settings.value("executable").toString();
+        udt.args = settings.value("arguments").toString();
+        udt.prod_types = settings.value("product_types").toStringList();
+        userDefTools[udt.name] = udt;
+    }
+    settings.endArray();
+    userDefProdTypes = settings.value("product_types").toStringList();
+}
+
+//----------------------------------------------------------------------
+// Method: putUserToolsToSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::putUserToolsToSettings()
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.beginWriteArray("user_tools");
+    int i = 0;
+    foreach (QString key, userDefTools.keys()) {
+        const UserDefTool & udt = userDefTools.value(key);
+        settings.setArrayIndex(i);
+        settings.setValue("name", udt.name);
+        settings.setValue("description", udt.desc);
+        settings.setValue("executable", udt.exe);
+        settings.setValue("arguments", udt.args);
+        settings.setValue("product_types", udt.prod_types);
+        i++;
+    }
+    settings.endArray();
+    settings.setValue("product_types", userDefProdTypes);
 }
 
 //----------------------------------------------------------------------
@@ -569,6 +638,8 @@ void MainWindow::readConfig()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
+    putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfgInfo.cfgFileName)));
+
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
     for (unsigned int i = 0; i < cfgInfo.peersCfg.size(); ++i) {
@@ -593,8 +664,9 @@ void MainWindow::readConfig()
                  << kv.second->failed << kv.second->finished << kv.second->maxnum;
     }
 
-    cfg->setLastAccess(QDateTime::currentDateTime()
-                       .toString("yyyyMMddTHHmmss").toStdString());
+    QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
+    cfg->setLastAccess(lastAccess.toStdString());
+    putToSettings("lastAccess", QVariant(lastAccess));
 
     // Modify HMI with the product datatypes obtained from configuration
     ui->edInboxPath->setText(QString(cfgInfo.storage.inbox.path.c_str()));
@@ -630,9 +702,11 @@ void MainWindow::showDBBrowser()
 void MainWindow::showExtToolsDef()
 {
     ExtToolsDef dlg;
-
-    //dlg.readConfig();
-    dlg.exec();
+    dlg.initialize(userDefTools, userDefProdTypes);
+    if (dlg.exec()) {
+        dlg.getTools(userDefTools);
+        putUserToolsToSettings();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -808,8 +882,43 @@ void MainWindow::commandSystem()
         ui->tabpgEvtInj->setEnabled(true);
 
         // Activate Archive Monitoring
-        archHdl = new ArchiveModel(ui->tblvwArchive);
+//#define OLD_CODE
+#ifdef OLD_CODE
+        archHdl = new ArchiveModel(ui->tblvwArchive, ui->treevwArchive);
         archHdl->setupModel("products_info");
+#else
+        archHdl = new ArchiveModel();
+        archHdl->setupModel(ui->tblvwArchive, "products_info");
+
+        ArchiveModel * archTreeHdl = new ArchiveModel();
+        QList<QString> headers = QList<QString>()
+            << "Signature" << "Prod.Id" << "Prod.Type" << "Version"
+            << "Size" << "Status" << "Creator" << "ObsMode"
+            << "Start" << "End" << "RegTime" << "URL";
+        archTreeHdl->setupModel(ui->treevwArchive,
+                                "SELECT  "
+                                "    concat(instruments.instrument, ':', products_info.signature) AS Signature,  "
+                                "    products_info.product_id as Id,  "
+                                "    products_info.product_type as Type,  "
+                                "    products_info.product_version as Version,  "
+                                "    products_info.product_size as Size,  "
+                                "    product_status.status_desc as Status,  "
+                                "    creators.creator_desc as Creator,  "
+                                "    observation_modes.obsmode_desc as ObsMode,  "
+                                "    products_info.start_time as Start,  "
+                                "    products_info.end_time as End,  "
+                                "    products_info.registration_time as RegTime,  "
+                                "    products_info.url as URL "
+                                "FROM products_info  "
+                                "INNER JOIN instruments ON products_info.instrument_id = instruments.instrument_id  "
+                                "INNER JOIN product_status ON products_info.product_status_id = product_status.product_status_id  "
+                                "INNER JOIN creators ON products_info.creator_id = creators.creator_id  "
+                                "INNER JOIN observation_modes ON products_info.obsmode_id = observation_modes.obsmode_id  "
+                                "ORDER BY concat(instruments.instrument, '.',  "
+                                "                products_info.signature, '.',  "
+                                "                right(concat('00000000000000000000', products_info.ID), 20));",
+                                headers);
+#endif
 
         transitTo(INITIALISED);
         showState();

@@ -68,6 +68,8 @@ public:
     Configuration(std::string fName = std::string());
     Configuration(const char * fName = 0);
 
+    void init(std::string fName);
+
 public:
 
     //----------------------------------------------------------------------

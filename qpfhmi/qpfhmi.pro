@@ -37,6 +37,7 @@ SOURCES += \
     verbleveldlg.cpp \
     testrundlg.cpp \
     dlgalert.cpp \
+    archivetree.cpp \
     exttooledit.cpp
 
 HEADERS  += \
@@ -62,7 +63,9 @@ HEADERS  += \
     verbleveldlg.h \
     testrundlg.h \
     dlgalert.h \
-    exttooledit.h
+    archivetree.h \
+    exttooledit.h \
+    hmitypes.h
 
 FORMS    += \
     mainwindow.ui \

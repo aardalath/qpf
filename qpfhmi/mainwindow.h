@@ -50,6 +50,7 @@
 
 #include "hmipxy.h"
 #include "datatypes.h"
+#include "hmitypes.h"
 #include "config.h"
 #include "archivemodel.h"
 #include "dlgalert.h"
@@ -184,6 +185,11 @@ private:
     void createStatusBar();
     void readSettings();
     void writeSettings();
+    QVariant getFromSettings(QString name);
+    void putToSettings(QString name, QVariant value);
+    void getUserToolsFromSettings();
+    void putUserToolsToSettings();
+
     TextView *activeTextView();
     QMdiSubWindow *findTextView(const QString &fileName);
 
@@ -271,6 +277,10 @@ private:
 
     std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
     std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
+
+    // User Defined Tools
+    MapOfUserDefTools userDefTools;
+    QStringList       userDefProdTypes;
 
 public:
     static int const EXIT_CODE_RESTART;

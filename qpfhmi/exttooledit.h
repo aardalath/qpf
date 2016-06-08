@@ -3,9 +3,13 @@
 
 #include <QDialog>
 
+#include "hmitypes.h"
+
 namespace Ui {
 class ExtToolEdit;
 }
+
+namespace QPF {
 
 class ExtToolEdit : public QDialog
 {
@@ -15,8 +19,21 @@ public:
     explicit ExtToolEdit(QWidget *parent = 0);
     ~ExtToolEdit();
 
+public:
+    void setProdTypes(QStringList pts);
+    void editTool(UserDefTool & udt);
+    void getToolInfo(UserDefTool & udt);
+
+private slots:
+    void showHelp();
+    void selectApp();
+    void selectProdTypes();
+
 private:
     Ui::ExtToolEdit *ui;
+    QStringList prodTypes;
 };
+
+}
 
 #endif // EXTTOOLEDIT_H
