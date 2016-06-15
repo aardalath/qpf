@@ -33,7 +33,8 @@ RUN_PATH="${QPF_PATH}"/run
 
 QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
-QPF_EXE="qpfhmi/qpfhmi"
+QPF_EXE="qpf/qpf"
+QPFHMI_EXE="qpfhmi/qpfhmi"
 QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 #- Messages
@@ -111,7 +112,7 @@ perform () {
     if [ "${FAKE}" == "yes" ]; then
         say "${_ONRUN}: $*"
     else
-        eval $*
+        eval $* 2>&1 | tee -a "${LOG_FILE}"
     fi
 }
 
@@ -156,6 +157,12 @@ install_lib () {
     for l in  "${BUILD_PATH}/"${lib}* ; do
         perform cp -d "'$l'" "'${WORK_AREA}/qpf/lib/'"
     done
+}
+
+install_scpt () {
+    local scpt=$1
+    say "  - Installing script $scpt"
+    perform cp "'${SCRIPT_PATH}/${scpt}'" "'${WORK_AREA}/qpf/bin/'"
 }
 
 ###### Start
@@ -207,7 +214,7 @@ perform mkdir -p "'${BUILD_PATH}'"
 step "Generating dependencies and setting makefiles"
 
 if [ "${COMPILE}" == "yes" ]; then
-    perform cd "'${BUILD_PATH}'"
+    cd "${BUILD_PATH}"
     perform $qmake_exe ../QPF.pro
 fi
 
@@ -228,13 +235,16 @@ fi
 perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 
 ## Installing QPF executable and libraries
-step "Installing QPF executable and libraries"
+step "Installing QPF executables and libraries"
 
 install_exe ${QPF_EXE}
+install_exe ${QPFHMI_EXE}
 
 for l in ${QPF_LIBS}; do
     install_lib $l
 done
+
+install_scpt RunQPFHMI.sh
 
 ## Creating QPFDB database
 step "Setting up QPF database"

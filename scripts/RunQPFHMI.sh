@@ -15,6 +15,7 @@
 
 QPFDIR=/home/eucops/qpf
 VERSION=1.0
+QPF=${QPFDIR}/bin/qpf
 QPFHMI=${QPFDIR}/bin/qpfhmi
 
 #- Messages
@@ -30,6 +31,7 @@ TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 LOG_FILE=./qpfhmi_${TIMESTAMP}.log
 CFG_FILE="${QPFDIR}/cfg/qpf_v1_rc1_multihost_eucdev02+eucdev03.json"
 DBG=""
+QPFEXE=${QPF}
 
 ###### Handy functions
 
@@ -43,12 +45,14 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -d ] [ -c <cfg> ]"
+    local opts="[ -h ] [ -d ] [ -H ] [ -c <cfg> ] [ -s <session> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
-    say "  -h         Show this usage message"
-    say "  -d         Debug session"
-    say "  -c <cfg>   Use config. file <cfg>"
+    say "  -h             Show this usage message"
+    say "  -d             Debug session"
+    say "  -H             HMI"
+    say "  -c <cfg>       Use config. file <cfg>"
+    say "  -s <session>   Re-use existing session tag/folder"
     say ""
     exit 1
 }
@@ -66,11 +70,13 @@ die () {
 ###### Start
 
 ## Parse command line
-while getopts :hdc: OPT; do
+while getopts :hdc:s: OPT; do
     case $OPT in
         h|+h) usage ;;
+        H|+H) QPFEXE=${QPFHMI} ;;
         d|+d) DBG="gdb -ex run --args" ;;
-        c|+c) CFG_FILE="$OPTARG" ;;
+        c|+c) CFG_FILE="-c $OPTARG" ;;
+        s|+s) SESSION="-s $OPTARG" ;;
         *)    usage ; exit 2
     esac
 done
@@ -80,6 +86,9 @@ OPTIND=1
 ## Run
 greetings
 
-${DBG} ${QPFHMI} -c ${CFG_FILE} -t 50000 2>&1 || die "Cannot run qpfhmi" | tee ${LOG_FILE}
+${DBG} ${QPFEXE} ${CFG_FILE} ${SESSION} -t 50000 2>&1  | tee ${LOG_FILE}
+if [ $? -ne 0 ]; then
+    die "Cannot run qpfhmi"
+fi
 
 exit 0
