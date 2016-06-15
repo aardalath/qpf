@@ -65,6 +65,7 @@ using LibComm::Log;
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDomDocument>
+#include <QDesktopServices>
 
 #include <thread>
 
@@ -145,6 +146,12 @@ void MainWindow::manualSetupUI()
     createStatusBar();
     updateMenus();
 
+    // Read settings and set title
+    readSettings();
+    setWindowTitle(tr("QLA Processing Framework"));
+    setUnifiedTitleAndToolBarOnMac(true);
+    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
+
     QFrame * frm = new QFrame(0);
     vlyFrmAgents = new QVBoxLayout;
     frm->setLayout(vlyFrmAgents);
@@ -155,6 +162,8 @@ void MainWindow::manualSetupUI()
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
     simInData = new SimInData;
+
+    initArchiveTable();
 
     // Create additional connections
     connect(ui->btnStart, SIGNAL(pressed()), this, SLOT(commandSystem()));
@@ -170,11 +179,6 @@ void MainWindow::manualSetupUI()
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
-    // Read settings and set title
-    readSettings();
-    setWindowTitle(tr("QLA Processing Framework"));
-    setUnifiedTitleAndToolBarOnMac(true);
-    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
 }
 
 //----------------------------------------------------------------------
@@ -882,14 +886,9 @@ void MainWindow::commandSystem()
         ui->tabpgEvtInj->setEnabled(true);
 
         // Activate Archive Monitoring
-//#define OLD_CODE
-#ifdef OLD_CODE
-        archHdl = new ArchiveModel(ui->tblvwArchive, ui->treevwArchive);
-        archHdl->setupModel("products_info");
-#else
-        archHdl = new ArchiveModel();
-        archHdl->setupModel(ui->tblvwArchive, "products_info");
-
+        archHdl = 0;
+//        archHdl = new ArchiveModel();
+//        archHdl->setupModel(ui->tblvwArchive, "products_info");
         ArchiveModel * archTreeHdl = new ArchiveModel();
         QList<QString> headers = QList<QString>()
             << "Signature" << "Prod.Id" << "Prod.Type" << "Version"
@@ -918,7 +917,6 @@ void MainWindow::commandSystem()
                                 "                products_info.signature, '.',  "
                                 "                right(concat('00000000000000000000', products_info.ID), 20));",
                                 headers);
-#endif
 
         transitTo(INITIALISED);
         showState();
@@ -1245,7 +1243,6 @@ void MainWindow::showTaskRes()
         // Set up context menu
         initTasksMonitTree(nCols);
         initAlertsTable();
-        initArchiveTable();
 
         firstTime = false;
     }
@@ -1349,37 +1346,6 @@ void MainWindow::initAlertsTable()
     ui->treeAlerts->setSortingEnabled(false);
     ui->treeAlerts->setColumnCount(5);
     ui->treeAlerts->setHeaderLabels(hdrLabels);
-}
-
-//----------------------------------------------------------------------
-// METHOD: initArchiveTable
-//----------------------------------------------------------------------
-void MainWindow::initArchiveTable()
-{
-    ui->tblvwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    //acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
-    acArchiveOpenExt = new QMenu(tr("Open with external tool..."), ui->tblvwArchive);
-    QAction * acTool1 = new QAction(tr("GEdit"), acArchiveOpenExt);
-    acTool1->setStatusTip(tr("Gnome editor"));
-    acArchiveOpenExt->addAction(acTool1);
-    //acArchiveOpenExtTools.append(acArchiveOpenExt->menu);
-
-//    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
-    connect(acTool1,          SIGNAL(triggered()), this, SLOT(runTool1()));
-
-    connect(ui->tblvwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
-}
-
-void MainWindow::runTool1()
-{
-    QModelIndex item = ui->tblvwArchive->currentIndex();
-    QModelIndex urlItem = item.model()->index(item.row(), 11, item);
-    QString fileName = urlItem.data().toString().replace("file://","");
-    QProcess *process = new QProcess(this);
-    QString program = "gedit";
-    process->start(program, QStringList() << fileName);
 }
 
 //----------------------------------------------------------------------
@@ -1693,21 +1659,104 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 }
 
 //----------------------------------------------------------------------
+// METHOD: initArchiveTable
+//----------------------------------------------------------------------
+void MainWindow::initArchiveTable()
+{
+    // Create pop-up menu with user defined tools
+    ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+
+    acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
+    initArchiveTableContextMenu();
+}
+
+//----------------------------------------------------------------------
+// SLOT: openWithDefaults
+//----------------------------------------------------------------------
+void MainWindow::openWithDefault()
+{
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    qDebug() << m;
+    QString url = m.model()->index(m.row(), 12, m.parent()).data().toString();
+    qDebug() << url;
+    QDesktopServices::openUrl(QUrl(url));
+}
+
+//----------------------------------------------------------------------
+// SLOT: openWith
+//----------------------------------------------------------------------
+void MainWindow::openWith()
+{
+    QAction * ac = qobject_cast<QAction*>(sender());
+    QString key = ac->text();
+    const UserDefTool & udt = userDefTools.value(key);
+
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    qDebug() << m;
+    QString url = m.model()->index(m.row(), 12, m.parent()).data().toString();
+    qDebug() << url;
+
+    QUrl archUrl(url);
+    QString fileName = archUrl.path() + "/" + archUrl.fileName();
+    QString args = udt.args;
+    args.replace("%F", fileName);
+    QString cmd(QString("%1 %2").arg(udt.exe).arg(args));
+    QProcess tool;
+    tool.startDetached(cmd);
+}
+
+//----------------------------------------------------------------------
+// SLOT: initArchiveTableContextMenu
+//----------------------------------------------------------------------
+void MainWindow::initArchiveTableContextMenu()
+{
+    acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
+    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
+
+    acDefault = new QAction("Default app", ui->treevwArchive);
+    connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
+
+    foreach (QString key, userDefTools.keys()) {
+        const UserDefTool & udt = userDefTools.value(key);
+        QAction * ac = new QAction(key, ui->treevwArchive);
+        ac->setStatusTip(udt.desc);
+        connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
+        acUserTools[key] = ac;
+    }
+}
+
+//----------------------------------------------------------------------
 // SLOT: showArchiveTableContextMenu
 //----------------------------------------------------------------------
 void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 {
-    QModelIndex m = ui->tblvwArchive->currentIndex();
-    if (m.parent() != QModelIndex()) { return; }
+    QModelIndex m = ui->treevwArchive->indexAt(p);
+    if (m.parent() == QModelIndex()) { return; }
 
+    QModelIndex m2 = m.model()->index(m.row(), 2, m.parent());
+    if (!m2.data().isValid()) { return; }
+    QString productType = m2.data().toString();
     QList<QAction *> actions;
-    if (ui->tblvwArchive->indexAt(p).isValid()) {
-        //actions.append(acArchiveShow);
-        //actions.append(acArchiveOpenExtTools);
+
+    if (ui->treevwArchive->indexAt(p).isValid()) {
+        foreach (QString key, userDefTools.keys()) {
+            const UserDefTool & udt = userDefTools.value(key);
+            if (udt.prod_types.contains(productType) || true) {
+                QAction * ac = acUserTools[key];
+                actions.append(ac);
+            }
+        }
+        acArchiveOpenExt->addAction(acDefault);
+        acArchiveOpenExt->addSeparator();
+        acArchiveOpenExt->addActions(actions);
         QMenu menu(this);
-        //menu.addAction(acArchiveShow);
+        menu.addAction(acArchiveShow);
+        menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
-        menu.exec(ui->tblvwArchive->mapToGlobal(p));
+        menu.exec(ui->treevwArchive->mapToGlobal(p));
+        //QMenu::exec(actions, ui->treevwArchive->mapToGlobal(p));
     }
 }
 

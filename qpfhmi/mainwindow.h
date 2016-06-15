@@ -115,6 +115,8 @@ protected slots:
     void showAlertsContextMenu(const QPoint & p);
     void showArchiveTableContextMenu(const QPoint & p);
 
+    void initArchiveTableContextMenu();
+
     void showWorkDir();
     void displayTaskInfo();
     void showAlertInfo();
@@ -172,8 +174,8 @@ private slots:
     void showExtToolsDef();
     void showVerbLevel();
     void execTestRun();
-
-    void runTool1();
+    void openWithDefault();
+    void openWith();
 
     void restart();
     void quitApp();
@@ -223,6 +225,7 @@ private:
     QAction *execTestRunAct;
 
     QAction *dbgInfoAct;
+    QAction *acDefault;
 
     QAction *closeAct;
     QAction *closeAllAct;
@@ -271,6 +274,7 @@ private:
     QAction * acArchiveShow;
     QMenu *   acArchiveOpenExt;
     QList<QAction *> acArchiveOpenExtTools;
+    QMap<QString, QAction *> acUserTools;
 
     QVBoxLayout * vlyFrmAgents;
     QSpacerItem * spacerFrmAgents;
