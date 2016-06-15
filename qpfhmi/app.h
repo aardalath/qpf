@@ -58,7 +58,6 @@ class App Q_DECL_FINAL : public QApplication {
 public:
     App(int& argc, char** argv);
     virtual bool notify(QObject *receiver, QEvent *event) Q_DECL_OVERRIDE;
-    virtual bool mustLaunchHMI();
     virtual char * getConfigFileName();
     virtual Configuration * getConfigHandler();
     virtual void restart();
