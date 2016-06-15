@@ -55,12 +55,15 @@
 #include <QStandardItemModel>
 #include <QStringList>
 #include <QTableView>
+#include <QTreeView>
 #include <QFileSystemWatcher>
+#include <QtSql>
 
 //------------------------------------------------------------
 // Topic: Project headers
 //   none
 //------------------------------------------------------------
+#include "archivetree.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -79,28 +82,25 @@ class ArchiveModel : public QObject
 
 public:
     //----------------------------------------------------------------------
-    // Constructor: Deployer
+    // Constructor: ArchiveModel
     //----------------------------------------------------------------------
-    ArchiveModel(QTableView * t);
+    ArchiveModel();
 
-protected:
+public:
     //----------------------------------------------------------------------
     // Method: setupModel
-    // Initialises the underlying data model
+    // Setup a model for a Table View
     //----------------------------------------------------------------------
-    void setupModel();
+    void setupModel(QTableView * t, QString q,
+                    QList<QString> headers = QList<QString>(),
+                    bool isTable = true);
 
     //----------------------------------------------------------------------
-    // Method: setupView
-    // Initialises the view to look at the model data
+    // Method: setupModel
+    // Setup a model for a Tree View
     //----------------------------------------------------------------------
-    void setupView();
-
-    //----------------------------------------------------------------------
-    // Method: setupArchiveWatcher
-    // Initialises the archive watcher to detect updates
-    //----------------------------------------------------------------------
-    void setupArchiveWatcher();
+    void setupModel(QTreeView * tt, QString q,
+                    QList<QString> headers = QList<QString>());
 
 protected slots:
     //----------------------------------------------------------------------
@@ -110,10 +110,35 @@ protected slots:
     void updateView();
 
 private:
-    QStandardItemModel * model;
+    //----------------------------------------------------------------------
+    // Method: initializeDb
+    // Initialize the connection to the database
+    //----------------------------------------------------------------------
+    void initializeDb();
+
+    //----------------------------------------------------------------------
+    // Method: startUpdateTimer
+    // Initialize the connection to the database
+    //----------------------------------------------------------------------
+    void startUpdateTimer();
+
+private:
+    enum ModelMode { Table, Tree };
+
+    //QStandardItemModel * model;
     QTableView *         tblvw;
-    QString              dbFileName;
-    QFileSystemWatcher * fsWatcher;
+    QTreeView *          trvw;
+    QSqlTableModel *     model;
+    QSqlQueryModel *     qmodel;
+    ModelMode            mode;
+    ArchiveTreeModel *   atModel;
+    QList<QVariant>      rootData;
+    QString              request;
+
+    static QSqlDatabase  db;
+    static QString       dbId;
+    static bool          dbInitialized;
+    static QString       connectParams;
 };
 
 }
