@@ -41,19 +41,12 @@
 
 int main(int argc, char *argv[])
 {
-    int exitCode = 0;
-
     QPF::App app(argc, argv);
 
-    QPF::MainWindow * w = 0;
-    if (app.mustLaunchHMI()) {
-        if (w != 0) { delete w; }
-        w = new QPF::MainWindow(0, app.getConfigHandler());
-        w->show();
-    }
+    QPF::MainWindow w(0, app.getConfigHandler());
+    w.show();
 
-    exitCode = app.exec();
-
+    int exitCode = app.exec();
     if (exitCode == QPF::MainWindow::EXIT_CODE_RESTART) {
         app.restart();// Spawn a new instance of application
     }
