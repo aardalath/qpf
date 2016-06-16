@@ -44,6 +44,8 @@
 #include <cerrno>
 #include <poll.h>
 #include <sys/inotify.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 ////////////////////////////////////////////////////////////////////////////
@@ -128,7 +130,6 @@ void DirWatcher::start()
 
             // In case of events, get them and store them into the queue
             const struct inotify_event * event;
-            int i;
             ssize_t len;
             char * ptr;
 
@@ -158,6 +159,19 @@ void DirWatcher::start()
                     dwe.path = watchedDirs[event->wd];
                     dwe.mask = event->mask;
                     dwe.isDir = (event->mask & IN_ISDIR);
+
+                    // Check file size
+                    if (!dwe.isDir) {
+                        struct stat dweStat;
+                        if (stat((dwe.name + "/" + dwe.path).c_str(), &dweStat) != 0) {
+                            perror("stat");
+                            exit(EXIT_FAILURE);
+                        } else {
+                            dwe.size = dweStat.st_size;
+                        }
+                    } else {
+                        dwe.size = -1;
+                    }
 
                     events.push(dwe);
                 }
