@@ -36,7 +36,9 @@ SOURCES += \
     exttoolsdef.cpp \
     verbleveldlg.cpp \
     testrundlg.cpp \
-    dlgalert.cpp
+    dlgalert.cpp \
+    archivetree.cpp \
+    exttooledit.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -60,7 +62,10 @@ HEADERS  += \
     exttoolsdef.h \
     verbleveldlg.h \
     testrundlg.h \
-    dlgalert.h
+    dlgalert.h \
+    archivetree.h \
+    exttooledit.h \
+    hmitypes.h
 
 FORMS    += \
     mainwindow.ui \
@@ -73,7 +78,8 @@ FORMS    += \
     exttoolsdef.ui \
     verbleveldlg.ui \
     testrundlg.ui \
-    dlgalert.ui
+    dlgalert.ui \
+    exttooledit.ui
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
@@ -86,4 +92,5 @@ LIBS += -L../src -lQPF \
         -L/opt/cots/lib -lzmq -lcurl -luuid
 
 RESOURCES += \
-    configtool.qrc
+    configtool.qrc \
+    icon.qrc
