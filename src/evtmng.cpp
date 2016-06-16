@@ -43,6 +43,8 @@ using LibComm::Log;
 #include "tools.h"
 
 #include "urlhdl.h"
+#include "config.h"
+#include "filenamespec.h"
 
 #include <sys/time.h>
 #include <unistd.h>
@@ -94,10 +96,24 @@ void EventManager::fromInitialisedToRunning()
 }
 
 //----------------------------------------------------------------------
+// Method: fromRunningToOperational
+//----------------------------------------------------------------------
+void EventManager::fromRunningToOperational()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    // Install DirWatcher at inbox folder
+    dw = new DirWatcher(cfgInfo.storage.inbox.path);
+}
+
+//----------------------------------------------------------------------
 // Method: fromOperationalToRunning
 //----------------------------------------------------------------------
 void EventManager::fromOperationalToRunning()
 {
+    // stop watching inbox folder
+    dw->stop();
+
     // Broadcast STOP message
     InfoMsg("Broadcasting STOP message . . .");
     PeerMessage * stopMsg = buildPeerMsg("", "Shut down!", MSG_STOP);
@@ -111,6 +127,59 @@ void EventManager::fromOperationalToRunning()
 void EventManager::fromRunningToOff()
 {
     InfoMsg("Ending . . . ");
+}
+
+//----------------------------------------------------------------------
+// Method: execAdditonalLoopTasks
+//----------------------------------------------------------------------
+void EventManager::execAdditonalLoopTasks()
+{
+    // Check DirWatcher events from inbox folder
+    DirWatcher::DirWatchEvent e;
+    if (dw->nextEvent(e)) {
+        std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
+
+        // Process only files
+        // TODO: Process directories that appear at inbox
+        if (! e.isDir) {
+            std::string file(e.path + "/" + e.name);
+            FileNameSpec fs;
+            FileNameSpec::FileNameComponents c = fs.parseFileName(file);
+
+            // Set new content for InData Message
+            ProductMetadata m;
+            m.startTime      = c.dateStart;
+            m.endTime        = c.dateEnd;
+            m.creator        = "UNKNOWN";
+            m.instrument     = c.instrument;
+            m.productId      = c.productId;
+            m.productType    = c.productType;
+            m.productVersion = c.version;
+            m.productStatus  = "OK";
+            m.productSize    = e.size;
+            m.signature      = c.signature;
+            m.url            = "file://" + file;
+            m.urlSpace       = InboxSpace;
+
+            ProductCollection products;
+            products.productList[m.productType] = m;
+
+            // Create message and send it to appropriate targets
+            std::array<std::string,1> fwdRecip = {"DataMng"};
+            for (std::string & recip : fwdRecip) {
+                MessageHeader hdr;
+                buildMsgHeader(MSG_INDATA_IDX, "EvtMng", recip, hdr);
+
+                Message_INDATA msg;
+                buildMsgINDATA(hdr, products, msg);
+
+                // Send message
+                PeerMessage * pmsg = buildPeerMsg(hdr.destination, msg.getDataString(), MSG_INDATA);
+                registerMsg(selfPeer()->name, *pmsg);
+                setTransmissionToPeer(hdr.destination, pmsg);
+            }
+        }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -149,7 +218,6 @@ void EventManager::processINDATA()
         // Forward to recipient
         MessageData msgDataToRecip(new Message_INDATA);
         msgDataToRecip.msg->setData(msgData.msg->getData());
-        Json::StyledWriter w;
         setForwardTo(recip, msgDataToRecip.msg->header);
         PeerMessage * msgForRecip = buildPeerMsg(msgDataToRecip.msg->header.destination,
                                                  msgDataToRecip.msg->getDataString(),

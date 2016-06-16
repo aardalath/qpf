@@ -59,6 +59,7 @@
 //------------------------------------------------------------
 
 #include "component.h"
+#include "dwatcher.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -91,6 +92,11 @@ protected:
     virtual void fromInitialisedToRunning();
 
     //----------------------------------------------------------------------
+    // Method: fromRunningToOperational
+    //----------------------------------------------------------------------
+    virtual void fromRunningToOperational();
+
+    //----------------------------------------------------------------------
     // Method: fromOperationalToRunning
     //----------------------------------------------------------------------
     virtual void fromOperationalToRunning();
@@ -99,6 +105,11 @@ protected:
     // Method: fromRunningToOff
     //----------------------------------------------------------------------
     virtual void fromRunningToOff();
+
+    //----------------------------------------------------------------------
+    // Method: execAdditonalLoopTasks
+    //----------------------------------------------------------------------
+    virtual void execAdditonalLoopTasks();
 
 protected:
 
@@ -119,6 +130,7 @@ protected:
 
 private:
     std::atomic<bool> waitingForGO;
+    DirWatcher * dw;
 };
 
 }
