@@ -81,18 +81,19 @@ public:
     ~DirWatcher();
 
     struct DirWatchEvent {
-        std::string name;
-        std::string path;
+        std::string      name;
+        std::string      path;
         std::uint32_t    mask;
-        bool        isDir;
+        std::int64_t     size;
+        bool             isDir;
     };
 
     void watch(std::string pth);
     bool nextEvent(DirWatchEvent & event);
+    void stop();
 
 private:
     void start();
-    void stop();
 
 private:
     int                         fd;
