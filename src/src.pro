@@ -43,7 +43,8 @@ HEADERS += \
         logmng.h \
         taskagent.h \
         taskmng.h \
-        taskorc.h
+        taskorc.h \
+    dwatcher.h
 
 SOURCES +=  \
         config.cpp \
@@ -64,4 +65,5 @@ SOURCES +=  \
         uuid.cpp \
         filenamespec.cpp \
         str.cpp \
-        datatypes.cpp
+        datatypes.cpp \
+    dwatcher.cpp
