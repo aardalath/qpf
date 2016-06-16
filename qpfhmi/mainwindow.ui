@@ -18,6 +18,10 @@
   <property name="windowTitle">
    <string>QPF HMI</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icon.qrc">
+    <normaloff>:/img/QPF.png</normaloff>:/img/QPF.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_11">
     <item>
@@ -277,8 +281,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>28</height>
+                 <width>66</width>
+                 <height>16</height>
                 </rect>
                </property>
               </widget>
@@ -359,41 +363,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabpgBrowser">
-       <attribute name="title">
-        <string>Browser</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_17">
-          <item>
-           <widget class="QToolButton" name="btnSelectQLAReport">
-            <property name="text">
-             <string>Open QLA report file ...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblQLAReportFileName">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPlainTextEdit" name="textBrowser"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tabpgArchive">
        <attribute name="title">
         <string>Internal/Local Archive</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
+       <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <widget class="QTableView" name="tblvwArchive"/>
+         <widget class="QTreeView" name="treevwArchive"/>
         </item>
        </layout>
       </widget>
@@ -609,7 +585,9 @@ incoming data</string>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icon.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>setDebugInfo(bool)</slot>
