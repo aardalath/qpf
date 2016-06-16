@@ -59,6 +59,8 @@ inline T max(T a, T b) { return (a > b) ? a : b; }
 template<class T>
 inline T min(T a, T b) { return (a < b) ? a : b; }
 
+static std::string specificSessionTag = std::string();
+
 //----------------------------------------------------------------------
 // Function: waitForHeartBeat
 // Wait for a numner of seconds and microseconds
@@ -167,6 +169,26 @@ std::string timeTag()
 
     strftime(buffer, 80, "%Y%m%dT%H%M%S", timeinfo);
     return std::string(buffer);
+}
+
+//----------------------------------------------------------------------
+// Function: sessionTag
+// Returns a new tag for the session, or the one the user specified
+//----------------------------------------------------------------------
+std::string sessionTag()
+{
+    std::string tag(specificSessionTag);
+    if (tag.empty()) { tag = timeTag(); }
+    return tag;
+}
+
+//----------------------------------------------------------------------
+// Function: setSessionTag
+// Sets the session tag to the one specified y the user
+//----------------------------------------------------------------------
+void setSessionTag(std::string userSessionTag)
+{
+    specificSessionTag = userSessionTag;
 }
 
 //----------------------------------------------------------------------
@@ -467,7 +489,7 @@ void SysInfo::computeStats()
         }
         v.resize(numItems);
         percent = min<double>(100.0, max<double>(0.0, percent));
-        if (isnan(percent)) percent = 0.0;
+        if (std::isnan(percent)) percent = 0.0;
     }
 
     // Compute Memory stats

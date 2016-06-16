@@ -198,6 +198,18 @@ void getYMD(char * dateStr, int & year, int & month, int & day);
 std::string timeTag();
 
 //----------------------------------------------------------------------
+// Function: sessionTag
+// Returns a new tag for the session, or the one the user specified
+//----------------------------------------------------------------------
+std::string sessionTag();
+
+//----------------------------------------------------------------------
+// Function: setSessionTag
+// Sets the session tag to the one specified y the user
+//----------------------------------------------------------------------
+void setSessionTag(std::string userSessionTag = std::string());
+
+//----------------------------------------------------------------------
 // Function: preciseTimeTag
 // Build a time tag string from current time with ns precision
 //
