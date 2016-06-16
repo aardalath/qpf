@@ -68,7 +68,8 @@ Deployer::Deployer(int argc, char *argv[]) :
     cfg(0),
     evtMng(0),
     hmiNeeded(false),
-    deploymentCompleted(false)
+    deploymentCompleted(false),
+    userSession(false)
 {
     // Change value for delay between peer nodes launches (default: 50000us)
     if (!processCmdLineOpts(argc, argv)) { exit(EXIT_FAILURE); }
@@ -85,16 +86,6 @@ Deployer::Deployer(int argc, char *argv[]) :
 //----------------------------------------------------------------------
 Deployer::~Deployer()
 {
-}
-
-//----------------------------------------------------------------------
-// Method: mustLaunchHMI
-// Returns true if the application must launch the HMI
-//----------------------------------------------------------------------
-bool Deployer::mustLaunchHMI()
-{
-    while (!deploymentCompleted) { usleep(10000); }
-    return hmiNeeded;
 }
 
 //----------------------------------------------------------------------
@@ -152,7 +143,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     int exitCode = EXIT_FAILURE;
 
     int opt;
-    while ((opt = getopt(argc, argv, "hpvt:c:m:")) != -1) {
+    while ((opt = getopt(argc, argv, "hpvt:c:s:")) != -1) {
         switch (opt) {
         case 'p':
             spawnPeerProcesses = true;
@@ -165,6 +156,10 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
             break;
         case 'c':
             newConfigFile = std::string(optarg);
+            break;
+        case 's':
+            LibComm::setSessionTag(std::string(optarg));
+            userSession = true;
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
@@ -195,11 +190,13 @@ void Deployer::readConfig(const char * configFile)
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     hmiNeeded = cfgInfo.hmiPresent;
-
-    std::cerr << Configuration::PATHBase << std::endl;
-    std::cerr << Configuration::PATHBin << std::endl;
+    if (hmiNeeded) {
+        std::cerr << "ERROR: HMI is not configured to run in the current host." << std::endl;
+    }
 
     // Ensure paths for the execution are available and readu
+    std::cerr << Configuration::PATHBase << std::endl;
+    std::cerr << Configuration::PATHBin << std::endl;
     assert(existsDir(Configuration::PATHBase));
     assert(existsDir(Configuration::PATHBin));
     std::vector<std::string> runPaths {
@@ -210,7 +207,7 @@ void Deployer::readConfig(const char * configFile)
                 Configuration::PATHTsk,
                 Configuration::PATHMsg };
     for (auto & p : runPaths) {
-        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
+        if ((mkdir(p.c_str(), Configuration::PATHMode) != 0) && (!userSession)) {
             std::perror(("mkdir " + p).c_str());
             exit(EXIT_FAILURE);
         }
@@ -262,17 +259,7 @@ void Deployer::launchPeerNodes()
 //----------------------------------------------------------------------
 void Deployer::start()
 {
-    // Send the GO! signal
-    if (hmiNeeded) {
-        L("Waiting for START signal . . .");
-        while (waitingForGoAhead()) { usleep(10000); }
-        L("GO!");
-        usleep(500000);
-        evtMng->go();
-    } else {
-        L("Starting...");
-    }
-
+    L("Starting...");
     while(true) {}
 }
 
@@ -297,18 +284,6 @@ bool Deployer::fexists(const char * name)
 {
     struct stat buffer;
     return (stat(name, &buffer) == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: waitingForGoAhead
-// Returns true if the "Go ahead" message (existence of a given file)
-// is received
-//----------------------------------------------------------------------
-bool Deployer::waitingForGoAhead()
-{
-    bool keepWaiting = !fexists(EvtMngGoFile);
-    if (!keepWaiting) { unlink(EvtMngGoFile); }
-    return keepWaiting;
 }
 
 //----------------------------------------------------------------------
