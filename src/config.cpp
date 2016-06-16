@@ -80,11 +80,7 @@ namespace QPF {
 //----------------------------------------------------------------------
 Configuration::Configuration(std::string fName)
 {
-    if (! fName.empty()) {
-        applyNewConfig(fName);
-    } else {
-        readConfigurationFromDB();
-    }
+    init(fName);
 }
 
 //----------------------------------------------------------------------
@@ -92,8 +88,41 @@ Configuration::Configuration(std::string fName)
 //----------------------------------------------------------------------
 Configuration::Configuration(const char * fName)
 {
-    if (fName != 0) {
-        applyNewConfig(std::string(fName));
+    init(std::string(fName));
+}
+
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
+void Configuration::init(std::string fName)
+{
+    std::cerr << "Provided fName='" << fName << "'" << std::endl;
+    if (fName.compare(0,5,"db://") == 0) {
+        std::cerr << "A database URL!" << std::endl;
+
+        // fName in fact is a db url in the form:
+        //   db://user:pwd@host:port/dbname
+        // So, take the fields
+        std::string url = fName.substr(5);
+        DBUser = url.substr(0, url.find(":")); url.erase(0, url.find(":") + 1); // take username
+        DBPwd  = url.substr(0, url.find("@")); url.erase(0, url.find("@") + 1); // take password
+        DBHost = url.substr(0, url.find(":")); url.erase(0, url.find(":") + 1); // take host
+        DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
+        DBName = url; // take database name
+
+        std::cerr << DBUser << ", "
+                  << DBPwd  << ", "
+                  << DBHost << ", "
+                  << DBPort << ", "
+                  << DBName << std::endl;
+
+
+
+
+        fName = ""; // clear filename, to read from DB
+    }
+    if (! fName.empty()) {
+        applyNewConfig(fName);
     } else {
         readConfigurationFromDB();
     }
@@ -127,7 +156,7 @@ void Configuration::getGeneralInfo(std::string & appName, std::string & appVer, 
     PATHBase = cfg["storage"]["base"]["path"].asString();
 
     PATHBin  = PATHBase + "/bin";
-    PATHRun  = PATHBase + "/" + LibComm::timeTag();
+    PATHRun  = PATHBase + "/" + LibComm::sessionTag();
     PATHLog  = PATHRun + "/log";
     PATHRlog = PATHRun + "/rlog";
     PATHTmp  = PATHRun + "/tmp";
@@ -277,7 +306,7 @@ std::string Configuration::getHMINodeName()
     return cfg["nodes"]["hmi_node"].asString();
 }
 
-//-------------------------------------------------------readConfigurationFromDB---------------
+//----------------------------------------------------------------------
 // Method: getNumMachines
 // Return number of machines in the network
 //----------------------------------------------------------------------
