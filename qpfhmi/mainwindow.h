@@ -50,6 +50,7 @@
 
 #include "hmipxy.h"
 #include "datatypes.h"
+#include "hmitypes.h"
 #include "config.h"
 #include "archivemodel.h"
 #include "dlgalert.h"
@@ -114,6 +115,8 @@ protected slots:
     void showAlertsContextMenu(const QPoint & p);
     void showArchiveTableContextMenu(const QPoint & p);
 
+    void initArchiveTableContextMenu();
+
     void showWorkDir();
     void displayTaskInfo();
     void showAlertInfo();
@@ -166,15 +169,13 @@ private slots:
     void switchLayoutDirection();
     void setActiveSubWindow(QWidget *window);
 
-    void selectQLAReportFile();
-
     void showConfigTool();
     void showDBBrowser();
     void showExtToolsDef();
     void showVerbLevel();
     void execTestRun();
-
-    void runTool1();
+    void openWithDefault();
+    void openWith();
 
     void restart();
     void quitApp();
@@ -186,6 +187,11 @@ private:
     void createStatusBar();
     void readSettings();
     void writeSettings();
+    QVariant getFromSettings(QString name);
+    void putToSettings(QString name, QVariant value);
+    void getUserToolsFromSettings();
+    void putUserToolsToSettings();
+
     TextView *activeTextView();
     QMdiSubWindow *findTextView(const QString &fileName);
 
@@ -219,6 +225,7 @@ private:
     QAction *execTestRunAct;
 
     QAction *dbgInfoAct;
+    QAction *acDefault;
 
     QAction *closeAct;
     QAction *closeAllAct;
@@ -267,12 +274,17 @@ private:
     QAction * acArchiveShow;
     QMenu *   acArchiveOpenExt;
     QList<QAction *> acArchiveOpenExtTools;
+    QMap<QString, QAction *> acUserTools;
 
     QVBoxLayout * vlyFrmAgents;
     QSpacerItem * spacerFrmAgents;
 
     std::map<std::string, TaskAgentInfo*> taskAgentsInfo;
     std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;
+
+    // User Defined Tools
+    MapOfUserDefTools userDefTools;
+    QStringList       userDefProdTypes;
 
 public:
     static int const EXIT_CODE_RESTART;
