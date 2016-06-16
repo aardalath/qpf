@@ -65,6 +65,7 @@ using LibComm::Log;
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDomDocument>
+#include <QDesktopServices>
 
 #include <thread>
 
@@ -78,6 +79,8 @@ using LibComm::Log;
 #include "testrundlg.h"
 
 #include <QProcess>
+
+
 namespace QPF {
 
 // Valid Manager states
@@ -143,6 +146,12 @@ void MainWindow::manualSetupUI()
     createStatusBar();
     updateMenus();
 
+    // Read settings and set title
+    readSettings();
+    setWindowTitle(tr("QLA Processing Framework"));
+    setUnifiedTitleAndToolBarOnMac(true);
+    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
+
     QFrame * frm = new QFrame(0);
     vlyFrmAgents = new QVBoxLayout;
     frm->setLayout(vlyFrmAgents);
@@ -153,6 +162,8 @@ void MainWindow::manualSetupUI()
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
     simInData = new SimInData;
+
+    initArchiveTable();
 
     // Create additional connections
     connect(ui->btnStart, SIGNAL(pressed()), this, SLOT(commandSystem()));
@@ -168,13 +179,6 @@ void MainWindow::manualSetupUI()
 
     connect(ui->btnStopMultInDataEvt, SIGNAL(pressed()), this, SLOT(stopSendingMultInData()));
 
-    connect(ui->btnSelectQLAReport, SIGNAL(clicked()), this, SLOT(selectQLAReportFile()));
-
-    // Read settings and set title
-    readSettings();
-    setWindowTitle(tr("QLA Processing Framework"));
-    setUnifiedTitleAndToolBarOnMac(true);
-    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
 }
 
 //----------------------------------------------------------------------
@@ -513,11 +517,12 @@ void MainWindow::createStatusBar()
 //----------------------------------------------------------------------
 void MainWindow::readSettings()
 {
-    QSettings settings("QPF", "QLA Processing Framework");
+    QSettings settings(APP_SYS_NAME, APP_NAME);
     QPoint pos = settings.value("pos", QPoint(40, 40)).toPoint();
     QSize size = settings.value("size", QSize(800, 600)).toSize();
     move(pos);
     resize(size);
+    getUserToolsFromSettings();
 }
 
 //----------------------------------------------------------------------
@@ -526,9 +531,75 @@ void MainWindow::readSettings()
 //----------------------------------------------------------------------
 void MainWindow::writeSettings()
 {
-//    QSettings settings("QPF", "QLA Processing Framework");
-//    settings.setValue("pos", pos());
-//    settings.setValue("size", size());
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.setValue("pos", pos());
+    settings.setValue("size", size());
+    putUserToolsToSettings();
+}
+
+//----------------------------------------------------------------------
+// Method: getFromSettings
+// Reads settings file and retrieves a given variable
+//----------------------------------------------------------------------
+QVariant MainWindow::getFromSettings(QString name)
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    return settings.value(name);
+}
+
+//----------------------------------------------------------------------
+// Method: putToSettings
+// Stores a given variable to the settings file
+//----------------------------------------------------------------------
+void MainWindow::putToSettings(QString name, QVariant value)
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.setValue(name, value);
+}
+
+//----------------------------------------------------------------------
+// Method: getUserToolsFromSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::getUserToolsFromSettings()
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    int size = settings.beginReadArray("user_tools");
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        UserDefTool udt;
+        udt.name = settings.value("name").toString();
+        udt.desc = settings.value("description").toString();
+        udt.exe  = settings.value("executable").toString();
+        udt.args = settings.value("arguments").toString();
+        udt.prod_types = settings.value("product_types").toStringList();
+        userDefTools[udt.name] = udt;
+    }
+    settings.endArray();
+    userDefProdTypes = settings.value("product_types").toStringList();
+}
+
+//----------------------------------------------------------------------
+// Method: putUserToolsToSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::putUserToolsToSettings()
+{
+    QSettings settings(APP_SYS_NAME, APP_NAME);
+    settings.beginWriteArray("user_tools");
+    int i = 0;
+    foreach (QString key, userDefTools.keys()) {
+        const UserDefTool & udt = userDefTools.value(key);
+        settings.setArrayIndex(i);
+        settings.setValue("name", udt.name);
+        settings.setValue("description", udt.desc);
+        settings.setValue("executable", udt.exe);
+        settings.setValue("arguments", udt.args);
+        settings.setValue("product_types", udt.prod_types);
+        i++;
+    }
+    settings.endArray();
+    settings.setValue("product_types", userDefProdTypes);
 }
 
 //----------------------------------------------------------------------
@@ -571,6 +642,8 @@ void MainWindow::readConfig()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
+    putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfgInfo.cfgFileName)));
+
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
     for (unsigned int i = 0; i < cfgInfo.peersCfg.size(); ++i) {
@@ -595,8 +668,9 @@ void MainWindow::readConfig()
                  << kv.second->failed << kv.second->finished << kv.second->maxnum;
     }
 
-    cfg->setLastAccess(QDateTime::currentDateTime()
-                       .toString("yyyyMMddTHHmmss").toStdString());
+    QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
+    cfg->setLastAccess(lastAccess.toStdString());
+    putToSettings("lastAccess", QVariant(lastAccess));
 
     // Modify HMI with the product datatypes obtained from configuration
     ui->edInboxPath->setText(QString(cfgInfo.storage.inbox.path.c_str()));
@@ -632,9 +706,11 @@ void MainWindow::showDBBrowser()
 void MainWindow::showExtToolsDef()
 {
     ExtToolsDef dlg;
-
-    //dlg.readConfig();
-    dlg.exec();
+    dlg.initialize(userDefTools, userDefProdTypes);
+    if (dlg.exec()) {
+        dlg.getTools(userDefTools);
+        putUserToolsToSettings();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -810,7 +886,37 @@ void MainWindow::commandSystem()
         ui->tabpgEvtInj->setEnabled(true);
 
         // Activate Archive Monitoring
-        archHdl = new ArchiveModel(ui->tblvwArchive);
+        archHdl = 0;
+//        archHdl = new ArchiveModel();
+//        archHdl->setupModel(ui->tblvwArchive, "products_info");
+        ArchiveModel * archTreeHdl = new ArchiveModel();
+        QList<QString> headers = QList<QString>()
+            << "Signature" << "Prod.Id" << "Prod.Type" << "Version"
+            << "Size" << "Status" << "Creator" << "ObsMode"
+            << "Start" << "End" << "RegTime" << "URL";
+        archTreeHdl->setupModel(ui->treevwArchive,
+                                "SELECT  "
+                                "    concat(instruments.instrument, ':', products_info.signature) AS Signature,  "
+                                "    products_info.product_id as Id,  "
+                                "    products_info.product_type as Type,  "
+                                "    products_info.product_version as Version,  "
+                                "    products_info.product_size as Size,  "
+                                "    product_status.status_desc as Status,  "
+                                "    creators.creator_desc as Creator,  "
+                                "    observation_modes.obsmode_desc as ObsMode,  "
+                                "    products_info.start_time as Start,  "
+                                "    products_info.end_time as End,  "
+                                "    products_info.registration_time as RegTime,  "
+                                "    products_info.url as URL "
+                                "FROM products_info  "
+                                "INNER JOIN instruments ON products_info.instrument_id = instruments.instrument_id  "
+                                "INNER JOIN product_status ON products_info.product_status_id = product_status.product_status_id  "
+                                "INNER JOIN creators ON products_info.creator_id = creators.creator_id  "
+                                "INNER JOIN observation_modes ON products_info.obsmode_id = observation_modes.obsmode_id  "
+                                "ORDER BY concat(instruments.instrument, '.',  "
+                                "                products_info.signature, '.',  "
+                                "                right(concat('00000000000000000000', products_info.ID), 20));",
+                                headers);
 
         transitTo(INITIALISED);
         showState();
@@ -1047,6 +1153,16 @@ void MainWindow::selectInboxPath()
     if (dirName.isEmpty()) { return; }
     ui->edInboxPath->setText(dirName);
     inboxDirName = dirName;
+
+    QString metadata;
+    bool ok = simInData->processInbox(inboxDirName, metadata);
+    if (ok) {
+        ui->pltxtInboxProducts->setPlainText(metadata);
+    } else {
+        ui->pltxtInboxProducts->setPlainText(tr("ERROR: Problems when generating "
+                                                "the inbox input files metadata"));
+    }
+
 }
 
 //----------------------------------------------------------------------
@@ -1127,7 +1243,6 @@ void MainWindow::showTaskRes()
         // Set up context menu
         initTasksMonitTree(nCols);
         initAlertsTable();
-        initArchiveTable();
 
         firstTime = false;
     }
@@ -1231,37 +1346,6 @@ void MainWindow::initAlertsTable()
     ui->treeAlerts->setSortingEnabled(false);
     ui->treeAlerts->setColumnCount(5);
     ui->treeAlerts->setHeaderLabels(hdrLabels);
-}
-
-//----------------------------------------------------------------------
-// METHOD: initArchiveTable
-//----------------------------------------------------------------------
-void MainWindow::initArchiveTable()
-{
-    ui->tblvwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    //acArchiveShow    = new QAction(tr("Open task working directory..."), ui->tblvwArchive);
-    acArchiveOpenExt = new QMenu(tr("Open with external tool..."), ui->tblvwArchive);
-    QAction * acTool1 = new QAction(tr("GEdit"), acArchiveOpenExt);
-    acTool1->setStatusTip(tr("Gnome editor"));
-    acArchiveOpenExt->addAction(acTool1);
-    //acArchiveOpenExtTools.append(acArchiveOpenExt->menu);
-
-//    connect(acArchiveShow,    SIGNAL(triggered()), this, SLOT(showArchInfo()));
-    connect(acTool1,          SIGNAL(triggered()), this, SLOT(runTool1()));
-
-    connect(ui->tblvwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
-}
-
-void MainWindow::runTool1()
-{
-    QModelIndex item = ui->tblvwArchive->currentIndex();
-    QModelIndex urlItem = item.model()->index(item.row(), 11, item);
-    QString fileName = urlItem.data().toString().replace("file://","");
-    QProcess *process = new QProcess(this);
-    QString program = "gedit";
-    process->start(program, QStringList() << fileName);
 }
 
 //----------------------------------------------------------------------
@@ -1575,21 +1659,104 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 }
 
 //----------------------------------------------------------------------
+// METHOD: initArchiveTable
+//----------------------------------------------------------------------
+void MainWindow::initArchiveTable()
+{
+    // Create pop-up menu with user defined tools
+    ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+
+    acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
+    initArchiveTableContextMenu();
+}
+
+//----------------------------------------------------------------------
+// SLOT: openWithDefaults
+//----------------------------------------------------------------------
+void MainWindow::openWithDefault()
+{
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    qDebug() << m;
+    QString url = m.model()->index(m.row(), 12, m.parent()).data().toString();
+    qDebug() << url;
+    QDesktopServices::openUrl(QUrl(url));
+}
+
+//----------------------------------------------------------------------
+// SLOT: openWith
+//----------------------------------------------------------------------
+void MainWindow::openWith()
+{
+    QAction * ac = qobject_cast<QAction*>(sender());
+    QString key = ac->text();
+    const UserDefTool & udt = userDefTools.value(key);
+
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    qDebug() << m;
+    QString url = m.model()->index(m.row(), 12, m.parent()).data().toString();
+    qDebug() << url;
+
+    QUrl archUrl(url);
+    QString fileName = archUrl.path() + "/" + archUrl.fileName();
+    QString args = udt.args;
+    args.replace("%F", fileName);
+    QString cmd(QString("%1 %2").arg(udt.exe).arg(args));
+    QProcess tool;
+    tool.startDetached(cmd);
+}
+
+//----------------------------------------------------------------------
+// SLOT: initArchiveTableContextMenu
+//----------------------------------------------------------------------
+void MainWindow::initArchiveTableContextMenu()
+{
+    acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
+    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
+
+    acDefault = new QAction("Default app", ui->treevwArchive);
+    connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
+
+    foreach (QString key, userDefTools.keys()) {
+        const UserDefTool & udt = userDefTools.value(key);
+        QAction * ac = new QAction(key, ui->treevwArchive);
+        ac->setStatusTip(udt.desc);
+        connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
+        acUserTools[key] = ac;
+    }
+}
+
+//----------------------------------------------------------------------
 // SLOT: showArchiveTableContextMenu
 //----------------------------------------------------------------------
 void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 {
-    QModelIndex m = ui->tblvwArchive->currentIndex();
-    if (m.parent() != QModelIndex()) { return; }
+    QModelIndex m = ui->treevwArchive->indexAt(p);
+    if (m.parent() == QModelIndex()) { return; }
 
+    QModelIndex m2 = m.model()->index(m.row(), 2, m.parent());
+    if (!m2.data().isValid()) { return; }
+    QString productType = m2.data().toString();
     QList<QAction *> actions;
-    if (ui->tblvwArchive->indexAt(p).isValid()) {
-        //actions.append(acArchiveShow);
-        //actions.append(acArchiveOpenExtTools);
+
+    if (ui->treevwArchive->indexAt(p).isValid()) {
+        foreach (QString key, userDefTools.keys()) {
+            const UserDefTool & udt = userDefTools.value(key);
+            if (udt.prod_types.contains(productType) || true) {
+                QAction * ac = acUserTools[key];
+                actions.append(ac);
+            }
+        }
+        acArchiveOpenExt->addAction(acDefault);
+        acArchiveOpenExt->addSeparator();
+        acArchiveOpenExt->addActions(actions);
         QMenu menu(this);
-        //menu.addAction(acArchiveShow);
+        menu.addAction(acArchiveShow);
+        menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
-        menu.exec(ui->tblvwArchive->mapToGlobal(p));
+        menu.exec(ui->treevwArchive->mapToGlobal(p));
+        //QMenu::exec(actions, ui->treevwArchive->mapToGlobal(p));
     }
 }
 
@@ -1747,38 +1914,6 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
         t->setData(1, Qt::DisplayRole, s);
     }
 }
-
-//----------------------------------------------------------------------
-// Method: selectQLAReportFile
-// Select QLA report file to browse
-//----------------------------------------------------------------------
-void MainWindow::selectQLAReportFile()
-{
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
-    QString reportsFolder(cfgInfo.storage.base.c_str());
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open QLA Report File"),
-                                                    reportsFolder,
-                                                    tr("QLA Reports (*.xml)"));
-    if (fileName.isEmpty()) {
-        return;
-    }
-
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "ERROR", "Cannot open selected QLA Report file:\n" +
-                                 file.errorString());
-        return;
-    }
-
-    QString content = file.readAll();
-    file.close();
-
-    ui->textBrowser->setPlainText(content);
-    ui->lblQLAReportFileName->setText(fileName);
-}
-
-
 
 //----------------------------------------------------------------------
 // Method: setDebugInfo
