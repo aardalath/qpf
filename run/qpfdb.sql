@@ -28,31 +28,40 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: alarms; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
+-- Name: alerts; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
 --
 
-CREATE TABLE alarms (
-    alarm_id integer NOT NULL,
-    var_name character varying(50),
-    origin character varying(200),
-    severity integer,
-    status integer,
-    curr_severity integer,
-    curr_status integer,
-    creation timestamp without time zone,
-    acknowledged timestamp without time zone,
-    last_update timestamp without time zone,
-    alarm_state integer
+CREATE TYPE alert_group     AS ENUM ('System', 'Diagnostics');
+CREATE TYPE alert_severity  AS ENUM ('Warning', 'Error', 'Fatal');
+CREATE TYPE alert_type      AS ENUM ('Resource', 'OutOfRange', 'Diagnostic');
+CREATE TYPE alert_vartype   AS ENUM ('INT', 'FLOAT', 'DOUBLE');
+CREATE TYPE alert_varvalue  AS (i integer, f float, d double precision);
+CREATE TYPE alert_variable  AS (
+    name   text,
+    x      alert_varvalue,
+    ll     alert_varvalue,
+    ul     alert_varvalue,
+    vtype  alert_vartype
 );
 
+CREATE TABLE alerts (
+    alert_id   integer NOT NULL,
+    creation   timestamp without time zone,
+    grp        alert_group,
+    sev        alert_severity,
+    typ        alert_type,
+    origin     text,
+    msgs       text,
+    var        alert_variable
+);
 
-ALTER TABLE alarms OWNER TO eucops;
+ALTER TABLE alerts OWNER TO eucops;
 
 --
--- Name: alarms_alarm_id_seq; Type: SEQUENCE; Schema: public; Owner: eucops
+-- Name: alerts_alert_id_seq; Type: SEQUENCE; Schema: public; Owner: eucops
 --
 
-CREATE SEQUENCE alarms_alarm_id_seq
+CREATE SEQUENCE alerts_alert_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -60,14 +69,47 @@ CREATE SEQUENCE alarms_alarm_id_seq
     CACHE 1;
 
 
-ALTER TABLE alarms_alarm_id_seq OWNER TO eucops;
+ALTER TABLE alerts_alert_id_seq OWNER TO eucops;
 
 --
--- Name: alarms_alarm_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: eucops
+-- Name: alerts_alert_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: eucops
 --
 
-ALTER SEQUENCE alarms_alarm_id_seq OWNED BY alarms.alarm_id;
+ALTER SEQUENCE alerts_alert_id_seq OWNED BY alerts.alert_id;
 
+--
+-- Name: qpfstates; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
+--
+
+CREATE TYPE qpf_state AS ENUM ('ERROR', 'OFF', 'INITIALISED', 'RUNNING', 'OPERATIONAL');
+
+CREATE TABLE qpfstates (
+    qpfstate_id   integer NOT NULL,
+    timestmp      timestamp without time zone,
+    state         qpf_state
+);
+
+ALTER TABLE qpfstates OWNER TO eucops;
+
+--
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE; Schema: public; Owner: eucops
+--
+
+CREATE SEQUENCE qpfstates_qpfstate_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE qpfstates_qpfstate_id_seq OWNER TO eucops;
+
+--
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: eucops
+--
+
+ALTER SEQUENCE qpfstates_qpfstate_id_seq OWNED BY qpfstates.qpfstate_id;
 
 --
 -- Name: configuration; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
@@ -353,30 +395,18 @@ ALTER TABLE transmissions_id_seq OWNER TO eucops;
 
 ALTER SEQUENCE transmissions_id_seq OWNED BY transmissions.id;
 
-
 --
--- Name: variables; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
---
-
-CREATE TABLE variables (
-    var_name character varying(50) NOT NULL,
-    var_type integer,
-    description character varying(200),
-    smin numeric,
-    smax numeric,
-    hmin numeric,
-    hmax numeric,
-    x numeric
-);
-
-
-ALTER TABLE variables OWNER TO eucops;
-
---
--- Name: alarm_id; Type: DEFAULT; Schema: public; Owner: eucops
+-- Name: alert_id; Type: DEFAULT; Schema: public; Owner: eucops
 --
 
-ALTER TABLE ONLY alarms ALTER COLUMN alarm_id SET DEFAULT nextval('alarms_alarm_id_seq'::regclass);
+ALTER TABLE ONLY alerts ALTER COLUMN alert_id SET DEFAULT nextval('alerts_alert_id_seq'::regclass);
+
+
+--
+-- Name: qpfstate_id; Type: DEFAULT; Schema: public; Owner: eucops
+--
+
+ALTER TABLE ONLY qpfstates ALTER COLUMN qpfstate_id SET DEFAULT nextval('qpfstates_qpfstate_id_seq'::regclass);
 
 
 --
@@ -408,18 +438,22 @@ ALTER TABLE ONLY transmissions ALTER COLUMN id SET DEFAULT nextval('transmission
 
 
 --
--- Data for Name: alarms; Type: TABLE DATA; Schema: public; Owner: eucops
+-- Data for Name: alerts; Type: TABLE DATA; Schema: public; Owner: eucops
 --
-
-COPY alarms (alarm_id, var_name, origin, severity, status, curr_severity, curr_status, creation, acknowledged, last_update, alarm_state) FROM stdin;
-\.
 
 
 --
--- Name: alarms_alarm_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+-- Name: alerts_alert_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
 --
 
-SELECT pg_catalog.setval('alarms_alarm_id_seq', 1, false);
+SELECT pg_catalog.setval('alerts_alert_id_seq', 1, false);
+
+
+--
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+--
+
+SELECT pg_catalog.setval('qpfstates_qpfstate_id_seq', 1, false);
 
 
 --
@@ -581,19 +615,18 @@ SELECT pg_catalog.setval('transmissions_id_seq', 928641, true);
 
 
 --
--- Data for Name: variables; Type: TABLE DATA; Schema: public; Owner: eucops
+-- Name: alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
 --
 
-COPY variables (var_name, var_type, description, smin, smax, hmin, hmax, x) FROM stdin;
-\.
-
+ALTER TABLE ONLY alerts
+    ADD CONSTRAINT alerts_pkey PRIMARY KEY (alert_id);
 
 --
--- Name: alarms_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: qpfstates_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
 --
 
-ALTER TABLE ONLY alarms
-    ADD CONSTRAINT alarms_pkey PRIMARY KEY (alarm_id);
+ALTER TABLE ONLY qpfstates
+ADD CONSTRAINT qpfstates_pkey PRIMARY KEY (qpfstate_id);
 
 
 --
@@ -706,22 +739,6 @@ ALTER TABLE ONLY tasks_info
 
 ALTER TABLE ONLY transmissions
     ADD CONSTRAINT transmissions_pkey PRIMARY KEY (id);
-
-
---
--- Name: variables_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
---
-
-ALTER TABLE ONLY variables
-    ADD CONSTRAINT variables_pkey PRIMARY KEY (var_name);
-
-
---
--- Name: alarms_var_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
---
-
-ALTER TABLE ONLY alarms
-    ADD CONSTRAINT alarms_var_name_fkey FOREIGN KEY (var_name) REFERENCES variables(var_name);
 
 
 --

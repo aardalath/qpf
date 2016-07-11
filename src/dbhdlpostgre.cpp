@@ -45,6 +45,8 @@
 #include "dbg.h"
 #include "str.h"
 
+using namespace LibComm;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -220,7 +222,7 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 {
     bool result = true;
 
-    std::string registrationTime("2004-10-19 10:23:54");
+    std::string registrationTime(tagToTimestamp(preciseTimeTag()));
     std::stringstream ss;
     std::string taskPath = task.taskPath;
     Json::StyledWriter writer;
@@ -368,6 +370,47 @@ bool DBHdlPostgreSQL::retrieveTask(TaskInfo & task)
     UNUSED(task);
 
     return false;
+}
+
+//----------------------------------------------------------------------
+// Method: storeState
+// Stores a new state to the database
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::storeState(std::string newState)
+{
+    bool result = true;
+
+    std::string registrationTime(tagToTimestamp(preciseTimeTag()));
+    std::string cmd("INSERT INTO qpfstates (timestmp, state) VALUES (" +
+                    str::quoted(registrationTime) + ", " + str::quoted(newState) + ");");
+
+    try { result = runCmd(cmd); } catch(...) { throw; }
+
+    PQclear(res);
+
+    return result;
+}
+
+//----------------------------------------------------------------------
+// Method: getCurrentState
+// Stores a new state to the database
+//----------------------------------------------------------------------
+std::string DBHdlPostgreSQL::getCurrentState()
+{
+    bool result = true;
+
+    std::string cmd("SELECT state FROM qpfstates ORDER BY qpfstate_id DESC LIMIT 1;");
+    std::string stateName;
+    try {
+        result = runCmd(cmd);
+        stateName = std::string(PQgetvalue(res, 0, 0));
+    } catch(...) {
+        throw;
+    }
+
+    PQclear(res);
+    UNUSED(result);
+    return stateName;
 }
 
 //----------------------------------------------------------------------

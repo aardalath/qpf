@@ -35,6 +35,7 @@ QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
 QPF_EXE="qpf/qpf"
 QPFHMI_EXE="qpfhmi/qpfhmi"
+QPFGUI_EXE="qpfgui/qpfgui"
 QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 #- Messages
@@ -112,7 +113,7 @@ perform () {
     if [ "${FAKE}" == "yes" ]; then
         say "${_ONRUN}: $*"
     else
-        eval $* 2>&1 | tee -a "${LOG_FILE}"
+        eval $* 2>&1 | tee -a "${LOG_FILE}" && status=$?
     fi
 }
 
@@ -221,12 +222,14 @@ fi
 ## Compiling source code
 step "Compiling source code"
 
+COMPLSTATUS=0
 if [ "${COMPILE}" == "yes" ]; then
     perform make ${MAKE_OPTS}
+    COMPLSTATUS=${status}
 fi
 
 ## Setting up Work Area in /tmp
-step "Setting up Work Area in /tmp"
+step "Setting up Work Area under '${WORK_AREA}'"
 
 if [ ! -d "${WORK_AREA}" ]; then
     perform mkdir -p "'${WORK_AREA}'"
@@ -239,6 +242,7 @@ step "Installing QPF executables and libraries"
 
 install_exe ${QPF_EXE}
 install_exe ${QPFHMI_EXE}
+install_exe ${QPFGUI_EXE}
 
 for l in ${QPF_LIBS}; do
     install_lib $l
@@ -278,4 +282,4 @@ say "last configuration used from internal database)."
 say "-------------------------------------------------------------------------------"
 say ""
 
-exit 0
+exit $COMPLSTATUS

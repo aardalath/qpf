@@ -19,6 +19,7 @@ LIBS += -llibcomm -ljson -lsdc -linfix \
         -L$$PSQLDIR -l$$PSQLLIB -lzmq -lcurl -luuid
 
 HEADERS += \
+        alert.h \
         common.h \
         dbhdl.h \
         error.h \
@@ -44,9 +45,10 @@ HEADERS += \
         taskagent.h \
         taskmng.h \
         taskorc.h \
-    dwatcher.h
+        dwatcher.h
 
 SOURCES +=  \
+        alert.cpp \
         config.cpp \
         component.cpp \
         dbhdlpostgre.cpp \

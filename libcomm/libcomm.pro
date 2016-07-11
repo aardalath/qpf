@@ -20,6 +20,7 @@ LIBS += -lzmq
 HEADERS += \
         commnode.h \
         common.h \
+        counter.h \
         error.h \
         log.h \
         propdef.h \
@@ -27,13 +28,13 @@ HEADERS += \
         statem.h \
         thread.h \
         tools.h \
-        version.h \
-    counter.h
+        version.h
+
 SOURCES += \
         commnode.cpp \
+        counter.cpp \
         log.cpp \
         r2rpeer.cpp \
         statem.cpp \
         thread.cpp \
-        tools.cpp \
-    counter.cpp
+        tools.cpp

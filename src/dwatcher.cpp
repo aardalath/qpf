@@ -163,8 +163,10 @@ void DirWatcher::start()
                     // Check file size
                     if (!dwe.isDir) {
                         struct stat dweStat;
-                        if (stat((dwe.name + "/" + dwe.path).c_str(), &dweStat) != 0) {
+                        std::string file(dwe.path + "/" + dwe.name);
+                        if (stat(file.c_str(), &dweStat) != 0) {
                             perror("stat");
+                            std::cerr << file << std::endl;
                             exit(EXIT_FAILURE);
                         } else {
                             dwe.size = dweStat.st_size;
@@ -173,7 +175,12 @@ void DirWatcher::start()
                         dwe.size = -1;
                     }
 
-                    events.push(dwe);
+                    bool proceed = true;
+                    if (events.size() > 0) {
+                        proceed = events.back().path != dwe.path;
+                    }
+
+                    if (proceed) { events.push(dwe); }
                 }
             }
 

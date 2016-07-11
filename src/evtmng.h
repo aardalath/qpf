@@ -128,6 +128,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void processMONIT_INFO();
 
+    //----------------------------------------------------------------------
+    // Method: afterTransition
+    //----------------------------------------------------------------------
+    virtual void afterTransition(int fromState, int toState);
+
 private:
     std::atomic<bool> waitingForGO;
     DirWatcher * dw;

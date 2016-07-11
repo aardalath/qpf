@@ -14,7 +14,8 @@ SUBDIRS  = \
     infix \
     src \
     qpf \
-    qpfhmi
+    qpfhmi \
+    qpfgui
 
 #SUBDIRS += tests
 
@@ -23,6 +24,7 @@ sdc.depends = json
 qpfhmi.depends = libcomm json sdc infix src
 qpf.depends = libcomm json sdc infix src
 tests.depends = libcomm sdc infix src
+qpfgui.depends = src
 
 OTHER_FILES += \
     defaults.pri

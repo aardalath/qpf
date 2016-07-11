@@ -1334,6 +1334,7 @@ void MainWindow::initAlertsTable()
 
     ui->treeAlerts->header()->setSectionsClickable(true);
     alerts.clear();
+    /*
     Alert sampleAlert;
     sampleAlert.timeStamp = QDateTime::currentDateTime();
     sampleAlert.id = "QPFHMI_1";
@@ -1341,7 +1342,7 @@ void MainWindow::initAlertsTable()
     sampleAlert.component = "QPFHMI";
     sampleAlert.description = "This is just a sample alert";
     alerts.append(sampleAlert);
-
+    */
     ui->treeAlerts->clear();
     ui->treeAlerts->setSortingEnabled(false);
     ui->treeAlerts->setColumnCount(5);
@@ -1517,13 +1518,14 @@ void MainWindow::updateAlertsTree()
 
         for (int i = numOfAlerts; i < alerts.count(); ++i) {
             QTreeWidgetItem * treeItem = new QTreeWidgetItem(ui->treeAlerts);
+/*
             const Alert & alert = alerts.at(i);
-
             treeItem->setText(0, alert.timeStamp.toString("yyyy-MM-dd hh:mm:ss.zzz"));
             treeItem->setText(1, alert.id);
             treeItem->setText(2, alert.severity);
             treeItem->setText(3, alert.component);
             treeItem->setText(4, alert.description);
+*/
             ui->treeAlerts->addTopLevelItem(treeItem);
         }
 
@@ -1803,7 +1805,7 @@ void MainWindow::showAlertInfo()
     QModelIndex idx = ui->treeAlerts->currentIndex();
     Alert alert = alerts[idx.row()];
     DlgAlert dlg;
-    dlg.setAlert(alert);
+    //dlg.setAlert(alert);
     dlg.exec();
 }
 

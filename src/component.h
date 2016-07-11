@@ -55,11 +55,13 @@
 
 //------------------------------------------------------------
 // Topic: Project headers
-//   - datatypes.h
-//   - cfg.h
+//   - propdef.h
+//   - cfginfo.h
+//   - alert.h
 //------------------------------------------------------------
 #include "propdef.h"
 #include "cfginfo.h"
+#include "alert.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -68,6 +70,10 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
+
+#define RaiseSysAlert(a)  raise(a, Alert::System)
+#define RaiseDiagAlert(a) raise(a, Alert::Diagnostics)
+#define RaiseAlert(a)     raise(a)
 
 //==========================================================================
 // Class: Component
@@ -247,6 +253,12 @@ protected:
     void registerMsg(std::string from,
                      Router2RouterPeer::PeerMessage & inPeerMsg,
                      bool isBroadcast = false);
+
+    //----------------------------------------------------------------------
+    // Method: Method: raise
+    // Raise alert, shows it in the log, and stored in DB
+    //----------------------------------------------------------------------
+    void raise(Alert a, Alert::Group grp = Alert::Undefined);
 
     //----------------------------------------------------------------------
     // Method: procMsg

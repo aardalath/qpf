@@ -16,7 +16,7 @@
 QPFDIR=/home/eucops/qpf
 VERSION=1.0
 QPF=${QPFDIR}/bin/qpf
-QPFHMI=${QPFDIR}/bin/qpfhmi
+QPFHMI=${QPFDIR}/bin/qpfgui
 
 #- Messages
 _ONHDR="\e[1;49;93m"
@@ -70,7 +70,7 @@ die () {
 ###### Start
 
 ## Parse command line
-while getopts :hdc:s: OPT; do
+while getopts :hHdc:s: OPT; do
     case $OPT in
         h|+h) usage ;;
         H|+H) QPFEXE=${QPFHMI} ;;

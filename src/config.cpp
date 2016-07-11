@@ -115,10 +115,6 @@ void Configuration::init(std::string fName)
                   << DBHost << ", "
                   << DBPort << ", "
                   << DBName << std::endl;
-
-
-
-
         fName = ""; // clear filename, to read from DB
     }
     if (! fName.empty()) {

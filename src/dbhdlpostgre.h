@@ -67,7 +67,7 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
-  
+
 //==========================================================================
 // Class: DBHdlPostgreSQL
 //==========================================================================
@@ -134,6 +134,18 @@ public:
     // Retrieves a task information from the database
     //----------------------------------------------------------------------
     virtual bool retrieveTask(TaskInfo & task);
+
+    //----------------------------------------------------------------------
+    // Method: storeState
+    // Stores a new state to the database
+    //----------------------------------------------------------------------
+    virtual bool storeState(std::string newState);
+
+    //----------------------------------------------------------------------
+    // Method: getCurrentState
+    // Stores a new state to the database
+    //----------------------------------------------------------------------
+    virtual std::string getCurrentState();
 
     //----------------------------------------------------------------------
     // Method: storeMsg
@@ -209,4 +221,3 @@ private:
 }
 
 #endif  /* DBHDLPOSTGRE_H */
-

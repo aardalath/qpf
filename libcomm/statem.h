@@ -117,7 +117,29 @@ public:
     //----------------------------------------------------------------------
     std::string getStateName(int aState);
 
+    //----------------------------------------------------------------------
+    // Method: getStateIdx
+    // Get integer index of state with provided name
+    //
+    // Parameter:
+    //   aStateName - State name
+    //
+    // Returns:
+    //   Integer value of the corresponding state name
+    //----------------------------------------------------------------------
+    int getStateIdx(std::string aStateName);
+
 protected:
+
+    //----------------------------------------------------------------------
+    // Method: afterTransition
+    // Perform post-transition tasks (default:none)
+    //
+    // Parameter:
+    //   fromState - State before transition
+    //   toState   - State after transition
+    //----------------------------------------------------------------------
+    virtual void afterTransition(int fromState, int toState);
 
     //----------------------------------------------------------------------
     // Method: defineState
@@ -148,6 +170,7 @@ protected:
     //----------------------------------------------------------------------
     std::multimap<int, int> validTransitions;
     std::map<int, std::string> stateNames;
+    std::map<std::string, int> stateIdx;
 };
 
 }
