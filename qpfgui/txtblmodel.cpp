@@ -61,9 +61,6 @@ TxTableModel::TxTableModel(QStringList nodes)
                   << nodes
                   );
 
-    qDebug() << qry.join("");
-    qDebug() << headerLabels;
-
     refresh();
 }
 
