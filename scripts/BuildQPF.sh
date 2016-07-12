@@ -30,6 +30,7 @@ popd  > /dev/null
 QPF_PATH=$(dirname "${SCRIPT_PATH}")
 BUILD_PATH="${QPF_PATH}"/build
 RUN_PATH="${QPF_PATH}"/run
+CONTRIB_PATH="${QPF_PATH}"/contrib
 
 QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
@@ -166,6 +167,13 @@ install_scpt () {
     perform cp "'${SCRIPT_PATH}/${scpt}'" "'${WORK_AREA}/qpf/bin/'"
 }
 
+install_contrib () {
+    local fil=$1
+    local tgtdir=$2
+    say "  - Installing file $fil"
+    perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
+}
+
 ###### Start
 
 ## Parse command line
@@ -202,6 +210,11 @@ searchlib pcre2
 searchlib sodium
 searchlib curl
 searchlib pq
+
+step "Ensuring contributions to COTS are properly installed"
+
+install_contrib cppzmq-master/zmq.hpp opt/zmq/include
+install_contrib pcre2/PCRegEx.h       opt/pcre2/include
 
 ## Creating build folder
 step "Creating build folder"
