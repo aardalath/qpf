@@ -130,6 +130,8 @@ private:
     void initAlertsTables();
     void initTxView();
 
+    void updateAgentsMonitPanel();
+
 private:
     Ui::MainWindow *ui;
 

@@ -224,6 +224,8 @@ void MainWindow::manualSetupUI()
     txModel = new TxTableModel(nodeNames);
     ui->tblvwTx->setModel(txModel);
 
+    // 6. Agents Monit. Panel
+    updateAgentsMonitPanel();
 }
 
 //----------------------------------------------------------------------
@@ -946,15 +948,21 @@ void MainWindow::updateSystemView()
 
     //== 1. Processing tasks
     procTaskStatusModel->refresh();
+    ui->tblvwTaskMonit->resizeColumnsToContents();
 
     //== 2. System Alerts
     sysAlertModel->refresh();
+    ui->tblvwSysAlerts->resizeColumnsToContents();
 
     //== 3. Diagnostics Alerts
     procAlertModel->refresh();
+    ui->tblvwAlerts->resizeColumnsToContents();
 
     //== 3. Local Archive
     productsModel->refresh();
+    for (int i = 0; i < productsModel->columnCount(); ++i) {
+        ui->treevwArchive->resizeColumnToContents(i);
+    }
 
     //== 5. Transmissions
     txModel->refresh();
@@ -1425,6 +1433,99 @@ void MainWindow::displayTxInfo()
 //     dlg.setWindowTitle("Information for task" + taskName);
 //     dlg.setTxInfo(taskInfoString);
 //     dlg.exec();
+}
+
+//======================================================================
+// Agents Monitoring Panel
+//======================================================================
+
+//----------------------------------------------------------------------
+// METHOD: updateAgentsMonitPanel
+//----------------------------------------------------------------------
+void MainWindow::updateAgentsMonitPanel()
+{
+    static const int AgentsCol = 4;
+    static const int StatusCol = 6;
+
+    static int numOfRows = 0;
+
+    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
+
+    if (numOfRows == 0) {
+	for (auto & kv : taskAgentsInfo) {
+	    TaskAgentInfo * taInfo = kv.second;
+	    taInfo->total      = 0;
+	    taInfo->maxnum     = 3;
+	    taInfo->running    = 0;
+	    taInfo->waiting    = 0;
+	    taInfo->paused     = 0;
+	    taInfo->stopped    = 0;
+	    taInfo->failed     = 0;
+	    taInfo->finished   = 0;
+	    taInfo->load1min   = loadAvgs.at(0) * 100;
+	    taInfo->load5min   = loadAvgs.at(1) * 100;
+	    taInfo->load15min  = loadAvgs.at(2) * 100;
+	    taInfo->uptimesecs = 0;
+	}
+    }
+
+    // 2. Count tasks
+    ProcTaskStatusModel * mdl = qobject_cast<ProcTaskStatusModel *>(ui->tblvwTaskMonit->model());
+    int currentNumOfRows = mdl->rowCount();
+    if (currentNumOfRows > numOfRows) {
+	for (int i = numOfRows; i < currentNumOfRows; ++i) {
+	    std::string agent = mdl->index(i, AgentsCol).data().toString().toStdString();
+	    if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
+		TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;
+		std::string status = mdl->index(i, StatusCol).data().toString().toStdString();
+		TaskStatus st = TaskStatusValue[status];
+		switch (st) {
+		case TASK_RUNNING:
+		    taInfo->running++;
+		    break;
+		case TASK_FINISHED:
+		    taInfo->finished++;
+		    break;
+		case TASK_FAILED:
+		    taInfo->failed++;
+		    break;
+		case TASK_SCHEDULED:
+		    taInfo->waiting++;
+		    break;
+		case TASK_PAUSED:
+		    taInfo->paused++;
+		    break;
+		case TASK_STOPPED:
+		    taInfo->stopped++;
+		    break;
+		default:
+		    break;
+		}
+		taInfo->total++;
+	    }
+	}
+	numOfRows = currentNumOfRows;
+    }
+
+    // Process pending events from Qt events loop
+    qApp->processEvents();
+
+    // 3. Update view
+    for (auto & kv : taskAgentsInfo) {
+        TaskAgentInfo * taInfo = kv.second;
+        FrmAgentStatus * panel = 0;
+        std::map<std::string, FrmAgentStatus*>::iterator it = taskAgentsInfoPanel.find(kv.first);
+        if (it == taskAgentsInfoPanel.end()) {
+             panel = new FrmAgentStatus(0);
+             taskAgentsInfoPanel[kv.first] = panel;
+             vlyFrmAgents->removeItem(spacerFrmAgents);
+             vlyFrmAgents->addWidget(panel);
+             vlyFrmAgents->addSpacerItem(spacerFrmAgents);
+        } else {
+             panel = it->second;
+        }
+        panel->updateInfo(*taInfo);
+    }
 }
 
 }
