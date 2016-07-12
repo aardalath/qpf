@@ -170,8 +170,11 @@ install_scpt () {
 install_contrib () {
     local fil=$1
     local tgtdir=$2
+    bn=$(basename "${CONTRIB_PATH}/${fil}")
     say "  - Installing file $fil"
-    perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
+    if [ ! -f "${WORK_AREA}/${tgtdir}/${bn}" ]; then
+	perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
+    fi
 }
 
 ###### Start
