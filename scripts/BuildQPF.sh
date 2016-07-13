@@ -165,6 +165,7 @@ install_scpt () {
     local scpt=$1
     say "  - Installing script $scpt"
     perform cp "'${SCRIPT_PATH}/${scpt}'" "'${WORK_AREA}/qpf/bin/'"
+    chmod ugo+x "${WORK_AREA}/qpf/bin/${scpt}"
 }
 
 install_contrib () {
@@ -264,7 +265,7 @@ for l in ${QPF_LIBS}; do
     install_lib $l
 done
 
-install_scpt RunQPFHMI.sh
+install_scpt RunQPF.sh
 
 ## Creating QPFDB database
 step "Setting up QPF database"
