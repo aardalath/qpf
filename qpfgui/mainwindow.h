@@ -204,6 +204,8 @@ private:
     QAction * acResumeTask;
     QAction * acStopTask;
 
+    QAction * acShowMsgInfo;
+
     QAction * acShowAlert;
     QAction * acAckAlert;
 

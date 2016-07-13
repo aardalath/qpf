@@ -1076,8 +1076,12 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 //----------------------------------------------------------------------
 void MainWindow::showJSONdata(QString title, QString & dataString)
 {
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(dataString.toStdString(), v);
+
     DlgShowTaskInfo dlg;
-    dumpTaskInfoToTree(title, Json::Value(), dlg.getTreeTaskInfo());
+    dumpTaskInfoToTree(title, v, dlg.getTreeTaskInfo());
     dlg.setWindowTitle(title);
     dlg.setTaskInfo(dataString);
     dlg.exec();
@@ -1368,27 +1372,19 @@ void MainWindow::showProcAlertInfo()
 void MainWindow::initTxView()
 {
     ui->tblvwTx->setContextMenuPolicy(Qt::CustomContextMenu);
-    /*
-    acWorkDir      = new QAction(tr("Open task working directory..."), ui->tblvwTx);
-    acShowTaskInfo = new QAction(tr("Display task information"), ui->tblvwTx);
-    acPauseTask    = new QAction(tr("Pause"), ui->tblvwTx);
-    acResumeTask   = new QAction(tr("Resume"), ui->tblvwTx);
-    acStopTask     = new QAction(tr("Stop"), ui->tblvwTx);
 
-    connect(acWorkDir,      SIGNAL(triggered()), this, SLOT(showWorkDir()));
-    connect(acShowTaskInfo, SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
-    connect(acPauseTask,    SIGNAL(triggered()), this, SLOT(pauseTask()));
-    connect(acResumeTask,   SIGNAL(triggered()), this, SLOT(resumeTask()));
-    connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
-    */
+    acShowMsgInfo = new QAction(tr("Display message content"), ui->tblvwTx);
+
+    connect(acShowMsgInfo, SIGNAL(triggered()), this, SLOT(displayTxInfo()));
+
     connect(ui->tblvwTx, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTxContextMenu(const QPoint &)));
 
     connect(ui->tblvwTx->horizontalHeader(), SIGNAL(sectionClicked(int)),
-            this, SLOT(sortTaskViewByColumn(int)));
+            this, SLOT(sortTxViewByColumn(int)));
 
     ui->tblvwTx->horizontalHeader()->setSectionsClickable(true);
-    ui->tblvwTx->setSortingEnabled(false);
+    ui->tblvwTx->setSortingEnabled(true);
     ui->tblvwTx->setItemDelegate(new TxItemDelegate);
 }
 
@@ -1407,13 +1403,8 @@ void MainWindow::showTxContextMenu(const QPoint & p)
 {
     QList<QAction *> actions;
     if (ui->tblvwTx->indexAt(p).isValid()) {
-        /*
-        actions.append(acWorkDir);
-        actions.append(acShowTaskInfo);
-        actions.append(acPauseTask);
-        actions.append(acResumeTask);
-        actions.append(acStopTask);
-        */
+        actions.append(acShowMsgInfo);
+
     }
     if (actions.count() > 0) {
         QMenu::exec(actions, ui->tblvwTx->mapToGlobal(p));
@@ -1441,6 +1432,17 @@ void MainWindow::displayTxInfo()
 //     dlg.setWindowTitle("Information for task" + taskName);
 //     dlg.setTxInfo(taskInfoString);
 //     dlg.exec();
+    QModelIndex idx = ui->tblvwTx->currentIndex();
+    QModelIndex fromIdx = ui->tblvwTx->model()->index(idx.row(), 2);
+    QModelIndex toIdx = ui->tblvwTx->model()->index(idx.row(), 3);
+    QModelIndex typeIdx = ui->tblvwTx->model()->index(idx.row(), 4);
+    QModelIndex dataIdx = ui->tblvwTx->model()->index(idx.row(), 5);
+    QString msgName = (txModel->data(fromIdx).toString() + "::[" +
+                       txModel->data(typeIdx).toString() + "]::" +
+                       txModel->data(toIdx).toString());
+    QString contentString = procTaskStatusModel->data(dataIdx).toString();
+
+    showJSONdata(msgName, contentString);
 }
 
 //======================================================================
