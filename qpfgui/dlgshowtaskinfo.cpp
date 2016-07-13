@@ -43,6 +43,7 @@ DlgShowTaskInfo::DlgShowTaskInfo(QWidget *parent) :
     ui(new Ui::DlgShowTaskInfo)
 {
     ui->setupUi(this);
+    ui->ptxtedTaskInfo->setVisible(false);
 }
 
 DlgShowTaskInfo::~DlgShowTaskInfo()
