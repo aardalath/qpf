@@ -1175,8 +1175,8 @@ void MainWindow::displayTaskInfo()
     QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
     QModelIndex nameExtIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 3);
     QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
-    QString taskName = procTaskStatusModel->data(nameExtIdx).toString();
-    QString taskInfoString = procTaskStatusModel->data(dataIdx).toString();
+    QString taskName = procTaskStatusModel->data(nameExtIdx).toString().trimmed();
+    QString taskInfoString = procTaskStatusModel->data(dataIdx).toString().trimmed();
 
     showJSONdata("Task: " + taskName, taskInfoString);
 }
@@ -1251,15 +1251,16 @@ void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTr
 //----------------------------------------------------------------------
 void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 {
+    t->setExpanded(true);
     if (v.size() > 0) {
 //        if (v.isArray()) {
 //        } else {
         for (Json::ValueIterator i = v.begin(); i != v.end(); ++i) {
             QTreeWidgetItem * chld = new QTreeWidgetItem(t);
-            qDebug() << "Show node key";
-            qDebug() << i.key().asString().c_str();
+            //qDebug() << "Show node key";
+            //qDebug() << i.key().asString().c_str();
             chld->setData(0, Qt::DisplayRole, QString::fromStdString(i.key().asString()));
-            qDebug() << "now dump children...";
+            //qDebug() << "now dump children...";
             dumpToTree(*i, chld);
             t->addChild(chld);
 //            }
@@ -1417,30 +1418,15 @@ void MainWindow::showTxContextMenu(const QPoint & p)
 //----------------------------------------------------------------------
 void MainWindow::displayTxInfo()
 {
-//     QModelIndex idx = ui->tblvwTx->currentIndex();
-//     QModelIndex nameExtIdx = ui->tblvwTx->model()->index(idx.row(), 3);
-//     QString taskName = procTaskStatusModel->data(nameExtIdx).toString();
-// /*
-//     const Json::Value & v = processedTasksInfo.value(treeKey);
-//     Json::StyledWriter jsonWriter;
-//     QString taskName = QString::fromStdString(v["NameExtended"].asString());
-//     QString taskInfoString = QString::fromStdString(jsonWriter.write(v));
-// */
-//     QString taskInfoString = "{}";
-//     DlgShowTxInfo dlg;
-//     dumpTxInfoToTree(taskName, Json::Value(), dlg.getTreeTxInfo());
-//     dlg.setWindowTitle("Information for task" + taskName);
-//     dlg.setTxInfo(taskInfoString);
-//     dlg.exec();
-    QModelIndex idx = ui->tblvwTx->currentIndex();
+    QModelIndex idx     = ui->tblvwTx->currentIndex();
     QModelIndex fromIdx = ui->tblvwTx->model()->index(idx.row(), 2);
-    QModelIndex toIdx = ui->tblvwTx->model()->index(idx.row(), 3);
+    QModelIndex toIdx   = ui->tblvwTx->model()->index(idx.row(), 3);
     QModelIndex typeIdx = ui->tblvwTx->model()->index(idx.row(), 4);
     QModelIndex dataIdx = ui->tblvwTx->model()->index(idx.row(), 5);
-    QString msgName = (txModel->data(fromIdx).toString() + "::[" +
-                       txModel->data(typeIdx).toString() + "]::" +
-                       txModel->data(toIdx).toString());
-    QString contentString = procTaskStatusModel->data(dataIdx).toString();
+    QString msgName = (txModel->data(fromIdx).toString().trimmed() + "::[" +
+                       txModel->data(typeIdx).toString().trimmed() + "]::" +
+                       txModel->data(toIdx).toString().trimmed());
+    QString contentString = txModel->data(dataIdx).toString().trimmed();
 
     showJSONdata(msgName, contentString);
 }
