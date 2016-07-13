@@ -48,11 +48,16 @@ class ProgressBarDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    ProgressBarDelegate(QObject * parent = 0);
+    ProgressBarDelegate(QObject * parent = 0, int col = 0);
     ~ProgressBarDelegate();
     void paint(QPainter *painter,
                const QStyleOptionViewItem &option,
                const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const;
+
+private:
+    int progressColumn;
 };
 
 }

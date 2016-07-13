@@ -43,13 +43,21 @@
 
 namespace QPF {
 
-ProgressBarDelegate::ProgressBarDelegate(QObject * parent)
- : QItemDelegate(parent)
+ProgressBarDelegate::ProgressBarDelegate(QObject * parent, int col)
+    : QItemDelegate(parent), progressColumn(col)
 {
 }
 
 ProgressBarDelegate::~ProgressBarDelegate()
 {
+}
+
+QSize ProgressBarDelegate::sizeHint(const QStyleOptionViewItem &option,
+                                    const QModelIndex &index) const
+{
+    QSize defaultSize(QItemDelegate::sizeHint(option, index));
+    if (index.column() == progressColumn) { defaultSize.setWidth(100); }
+    return defaultSize;
 }
 
 void ProgressBarDelegate::paint(QPainter *painter,
@@ -58,7 +66,7 @@ void ProgressBarDelegate::paint(QPainter *painter,
 {
     //QProgressBar progressbar;
 
-    if (index.column() != 6) {
+    if (index.column() != 7) {
         QItemDelegate::paint(painter, option, index);
         return;
     }
