@@ -47,7 +47,8 @@ DBTableModel::DBTableModel(QString q, QStringList hdr, DBTableModel::TablePalett
     headerLabels(hdr),
     tblPalette(pal),
     rowsFromQuery(-1),
-    headerIsSet(false)
+    headerIsSet(false),
+    fullUpdate(false)
 {
     refresh();
 }
@@ -104,11 +105,17 @@ QVariant DBTableModel::data(const QModelIndex &index, int role) const
     return content;
 }
 
+
+void DBTableModel::setFullUpdate(bool b)
+{
+    fullUpdate = b;
+}
+
 void DBTableModel::refresh()
 {
     if (! queryString.isEmpty()) {
         QSqlQuery qry(queryString, DBManager::getDB());
-        if (rowsFromQuery != qry.size()) {
+        if (fullUpdate || (rowsFromQuery != qry.size())) {
             rowsFromQuery = qry.size();
             setQuery(qry);
             headerIsSet = false;

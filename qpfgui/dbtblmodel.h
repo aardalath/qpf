@@ -67,6 +67,7 @@ public:
     void defineHeaders(QStringList hdr);
     void defineQuery(QString q);
     void defineTablePalette(TablePalette pal);
+    void setFullUpdate(bool b);
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
@@ -78,7 +79,7 @@ protected:
     TablePalette  tblPalette;
     int           rowsFromQuery;
     bool          headerIsSet;
-
+    bool          fullUpdate;
 };
 
 }

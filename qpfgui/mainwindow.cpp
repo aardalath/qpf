@@ -223,9 +223,6 @@ void MainWindow::manualSetupUI()
     // 5. Transmissions Model
     txModel = new TxTableModel(nodeNames);
     ui->tblvwTx->setModel(txModel);
-
-    // 6. Agents Monit. Panel
-    updateAgentsMonitPanel();
 }
 
 //----------------------------------------------------------------------
@@ -949,6 +946,8 @@ void MainWindow::updateSystemView()
     //== 1. Processing tasks
     procTaskStatusModel->refresh();
     ui->tblvwTaskMonit->resizeColumnsToContents();
+    const int TaskDataCol = 9;
+    ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
 
     //== 2. System Alerts
     sysAlertModel->refresh();
@@ -966,6 +965,11 @@ void MainWindow::updateSystemView()
 
     //== 5. Transmissions
     txModel->refresh();
+    const int MsgContentCol = 5;
+    ui->tblvwTx->setColumnHidden(MsgContentCol, true);
+
+    // 6. Agents Monit. Panel
+    updateAgentsMonitPanel();
 }
 
 //======================================================================
@@ -1067,6 +1071,18 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
     }
 }
 
+//----------------------------------------------------------------------
+// SLOT: showJSONdata
+//----------------------------------------------------------------------
+void MainWindow::showJSONdata(QString title, QString & dataString)
+{
+    DlgShowTaskInfo dlg;
+    dumpTaskInfoToTree(title, Json::Value(), dlg.getTreeTaskInfo());
+    dlg.setWindowTitle(title);
+    dlg.setTaskInfo(dataString);
+    dlg.exec();
+}
+
 //======================================================================
 // Processing Tasks Monitoring View configuration
 //======================================================================
@@ -1076,7 +1092,7 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 //----------------------------------------------------------------------
 void MainWindow::initTasksMonitView()
 {
-    static ProgressBarDelegate * progressBarDisplay = new ProgressBarDelegate(this);
+    static ProgressBarDelegate * progressBarDisplay = new ProgressBarDelegate(this, 7);
 
     ui->tblvwTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -1154,19 +1170,11 @@ void MainWindow::displayTaskInfo()
 {
     QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
     QModelIndex nameExtIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 3);
+    QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
     QString taskName = procTaskStatusModel->data(nameExtIdx).toString();
-/*
-    const Json::Value & v = processedTasksInfo.value(treeKey);
-    Json::StyledWriter jsonWriter;
-    QString taskName = QString::fromStdString(v["NameExtended"].asString());
-    QString taskInfoString = QString::fromStdString(jsonWriter.write(v));
-*/
-    QString taskInfoString = "{}";
-    DlgShowTaskInfo dlg;
-    dumpTaskInfoToTree(taskName, Json::Value(), dlg.getTreeTaskInfo());
-    dlg.setWindowTitle("Information for task" + taskName);
-    dlg.setTaskInfo(taskInfoString);
-    dlg.exec();
+    QString taskInfoString = procTaskStatusModel->data(dataIdx).toString();
+
+    showJSONdata("Task: " + taskName, taskInfoString);
 }
 
 //----------------------------------------------------------------------
@@ -1452,63 +1460,60 @@ void MainWindow::updateAgentsMonitPanel()
     QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
 
     if (numOfRows == 0) {
-	for (auto & kv : taskAgentsInfo) {
-	    TaskAgentInfo * taInfo = kv.second;
-	    taInfo->total      = 0;
-	    taInfo->maxnum     = 3;
-	    taInfo->running    = 0;
-	    taInfo->waiting    = 0;
-	    taInfo->paused     = 0;
-	    taInfo->stopped    = 0;
-	    taInfo->failed     = 0;
-	    taInfo->finished   = 0;
-	    taInfo->load1min   = loadAvgs.at(0) * 100;
-	    taInfo->load5min   = loadAvgs.at(1) * 100;
-	    taInfo->load15min  = loadAvgs.at(2) * 100;
-	    taInfo->uptimesecs = 0;
-	}
+        for (auto & kv : taskAgentsInfo) {
+            TaskAgentInfo * taInfo = kv.second;
+            taInfo->total      = 0;
+            taInfo->maxnum     = 3;
+            taInfo->running    = 0;
+            taInfo->waiting    = 0;
+            taInfo->paused     = 0;
+            taInfo->stopped    = 0;
+            taInfo->failed     = 0;
+            taInfo->finished   = 0;
+            taInfo->load1min   = loadAvgs.at(0) * 100;
+            taInfo->load5min   = loadAvgs.at(1) * 100;
+            taInfo->load15min  = loadAvgs.at(2) * 100;
+            taInfo->uptimesecs = 0;
+        }
     }
 
     // 2. Count tasks
     ProcTaskStatusModel * mdl = qobject_cast<ProcTaskStatusModel *>(ui->tblvwTaskMonit->model());
     int currentNumOfRows = mdl->rowCount();
     if (currentNumOfRows > numOfRows) {
-	for (int i = numOfRows; i < currentNumOfRows; ++i) {
-	    std::string agent = mdl->index(i, AgentsCol).data().toString().toStdString();
-	    if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
-		TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;
-		std::string status = mdl->index(i, StatusCol).data().toString().toStdString();
-		TaskStatus st = TaskStatusValue[status];
-		switch (st) {
-		case TASK_RUNNING:
-		    taInfo->running++;
-		    break;
-		case TASK_FINISHED:
-		    taInfo->finished++;
-		    break;
-		case TASK_FAILED:
-		    taInfo->failed++;
-		    break;
-		case TASK_SCHEDULED:
-		    taInfo->waiting++;
-		    break;
-		case TASK_PAUSED:
-		    taInfo->paused++;
-		    break;
-		case TASK_STOPPED:
-		    taInfo->stopped++;
-		    break;
-		default:
-		    break;
-		}
-		taInfo->total++;
-	    }
-	}
-	numOfRows = currentNumOfRows;
+        for (int i = numOfRows; i < currentNumOfRows; ++i) {
+            std::string agent = mdl->index(i, AgentsCol).data().toString().toStdString();
+            if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
+                TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;
+                std::string status = mdl->index(i, StatusCol).data().toString().toStdString();
+                TaskStatus st = TaskStatusValue[status];
+                switch (st) {
+                case TASK_RUNNING:
+                    taInfo->running++;
+                    break;
+                case TASK_FINISHED:
+                    taInfo->finished++;
+                    break;
+                case TASK_FAILED:
+                    taInfo->failed++;
+                    break;
+                case TASK_SCHEDULED:
+                    taInfo->waiting++;
+                    break;
+                case TASK_PAUSED:
+                    taInfo->paused++;
+                    break;
+                case TASK_STOPPED:
+                    taInfo->stopped++;
+                    break;
+                default:
+                    break;
+                }
+                taInfo->total++;
+            }
+        }
+        numOfRows = currentNumOfRows;
     }
-
-    // Process pending events from Qt events loop
-    qApp->processEvents();
 
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {

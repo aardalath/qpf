@@ -51,7 +51,8 @@ ProcTaskStatusModel::ProcTaskStatusModel()
                 "t.task_data#>>'{Args,0}' AS args, "
                 "tt.status_desc AS status, "
                 "t.task_data#>>'{State,Progress}' AS progress, "
-                "t.task_data#>>'{State,ExitCode}' AS exit_code "
+                "t.task_data#>>'{State,ExitCode}' AS exit_code, "
+                "t.task_data AS task_data "
                 "FROM tasks_info t "
                 "INNER JOIN task_status tt "
                 "      ON t.task_data#>>'{State,TaskStatus}' = tt.task_status_id::text "
@@ -59,7 +60,7 @@ ProcTaskStatusModel::ProcTaskStatusModel()
 
     defineHeaders({"ID", "Started at", "Finished at",
                 "Task Name", "Agent", "Proc.Element",
-                "Status", "Progress", "Exit Code"});
+                "Status", "Progress", "Exit Code", "Task Data"});
 
     ColumnPalette statusPalette;
     statusPalette["SCHEDULED"] = FgBgColors(QColor(Qt::gray),  QColor(Qt::white));
@@ -71,6 +72,8 @@ ProcTaskStatusModel::ProcTaskStatusModel()
     tblPalette[6] = statusPalette;
 
     defineTablePalette(tblPalette);
+
+    setFullUpdate(true);
 
     refresh();
 }

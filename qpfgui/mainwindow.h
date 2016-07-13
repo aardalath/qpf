@@ -132,6 +132,8 @@ private:
 
     void updateAgentsMonitPanel();
 
+    void showJSONdata(QString title, QString & dataString);
+
 private:
     Ui::MainWindow *ui;
 
