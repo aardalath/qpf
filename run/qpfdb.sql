@@ -402,6 +402,8 @@ ALTER SEQUENCE transmissions_id_seq OWNED BY transmissions.id;
 CREATE TABLE icommands (
 id integer NOT NULL,
 cmd_date timestamp without time zone,
+cmd_source character varying(32),
+cmd_target character varying(32),
 cmd_executed boolean,
 cmd_content text
 );
