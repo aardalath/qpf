@@ -396,6 +396,40 @@ ALTER TABLE transmissions_id_seq OWNER TO eucops;
 ALTER SEQUENCE transmissions_id_seq OWNED BY transmissions.id;
 
 --
+-- Name: icommands; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
+--
+
+CREATE TABLE icommands (
+id integer NOT NULL,
+cmd_date timestamp without time zone,
+cmd_executed boolean,
+cmd_content text
+);
+
+
+ALTER TABLE icommands OWNER TO eucops;
+
+--
+-- Name: icommands_id_seq; Type: SEQUENCE; Schema: public; Owner: eucops
+--
+
+CREATE SEQUENCE icommands_id_seq
+START WITH 1
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+CACHE 1;
+
+
+ALTER TABLE icommands_id_seq OWNER TO eucops;
+
+--
+-- Name: icommands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: eucops
+--
+
+ALTER SEQUENCE icommands_id_seq OWNED BY icommands.id;
+
+--
 -- Name: alert_id; Type: DEFAULT; Schema: public; Owner: eucops
 --
 
