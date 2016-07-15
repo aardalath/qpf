@@ -51,6 +51,7 @@ namespace LibComm {
 //----------------------------------------------------------------------
 bool StateMachine::transitTo(int newState)
 {
+  int oldState = state;
   bool isValid = false;
   std::pair <std::multimap<int, int>::iterator,
              std::multimap<int, int>::iterator> validFrom;
@@ -77,7 +78,18 @@ bool StateMachine::transitTo(int newState)
     }
   }
 
+  afterTransition(oldState, newState);
+
   return isValid;
+}
+
+//----------------------------------------------------------------------
+// Method: afterTransition
+//----------------------------------------------------------------------
+void StateMachine::afterTransition(int fromState, int toState)
+{
+    (void)(fromState);
+    (void)(toState);
 }
 
 //----------------------------------------------------------------------
@@ -88,6 +100,13 @@ std::string StateMachine::getStateName(int aState)
   return stateNames[aState];
 }
 
+//----------------------------------------------------------------------
+// Method: getStateIdx
+//----------------------------------------------------------------------
+int StateMachine::getStateIdx(std::string aStateName)
+{
+    return stateIdx[aStateName];
+}
 
 //----------------------------------------------------------------------
 // Method: defineState
@@ -96,6 +115,7 @@ std::string StateMachine::getStateName(int aState)
 void StateMachine::defineState(int aState, std::string name)
 {
   stateNames[aState] = name;
+  stateIdx[name]     = aState;
 }
 
 //----------------------------------------------------------------------

@@ -13,14 +13,18 @@ SUBDIRS  = \
     sdc \
     infix \
     src \
-    qpfhmi
+    qpf \
+    qpfhmi \
+    qpfgui
 
 #SUBDIRS += tests
 
 libcomm.depends = json
 sdc.depends = json
 qpfhmi.depends = libcomm json sdc infix src
+qpf.depends = libcomm json sdc infix src
 tests.depends = libcomm sdc infix src
+qpfgui.depends = src
 
 OTHER_FILES += \
     defaults.pri

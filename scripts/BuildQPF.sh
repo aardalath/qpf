@@ -30,10 +30,13 @@ popd  > /dev/null
 QPF_PATH=$(dirname "${SCRIPT_PATH}")
 BUILD_PATH="${QPF_PATH}"/build
 RUN_PATH="${QPF_PATH}"/run
+CONTRIB_PATH="${QPF_PATH}"/contrib
 
 QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
-QPF_EXE="qpfhmi/qpfhmi"
+QPF_EXE="qpf/qpf"
+QPFHMI_EXE="qpfhmi/qpfhmi"
+QPFGUI_EXE="qpfgui/qpfgui"
 QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 #- Messages
@@ -111,7 +114,7 @@ perform () {
     if [ "${FAKE}" == "yes" ]; then
         say "${_ONRUN}: $*"
     else
-        eval $* 2>&1 | tee -a "${LOG_FILE}"
+        eval $* 2>&1 | tee -a "${LOG_FILE}" && status=$?
     fi
 }
 
@@ -162,6 +165,17 @@ install_scpt () {
     local scpt=$1
     say "  - Installing script $scpt"
     perform cp "'${SCRIPT_PATH}/${scpt}'" "'${WORK_AREA}/qpf/bin/'"
+    chmod ugo+x "${WORK_AREA}/qpf/bin/${scpt}"
+}
+
+install_contrib () {
+    local fil=$1
+    local tgtdir=$2
+    bn=$(basename "${CONTRIB_PATH}/${fil}")
+    say "  - Installing file $fil"
+    if [ ! -f "${WORK_AREA}/${tgtdir}/${bn}" ]; then
+	perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
+    fi
 }
 
 ###### Start
@@ -201,6 +215,11 @@ searchlib sodium
 searchlib curl
 searchlib pq
 
+step "Ensuring contributions to COTS are properly installed"
+
+install_contrib cppzmq-master/zmq.hpp opt/zmq/include
+install_contrib pcre2/PCRegEx.h       opt/pcre2/include
+
 ## Creating build folder
 step "Creating build folder"
 
@@ -220,12 +239,14 @@ fi
 ## Compiling source code
 step "Compiling source code"
 
+COMPLSTATUS=0
 if [ "${COMPILE}" == "yes" ]; then
     perform make ${MAKE_OPTS}
+    COMPLSTATUS=${status}
 fi
 
 ## Setting up Work Area in /tmp
-step "Setting up Work Area in /tmp"
+step "Setting up Work Area under '${WORK_AREA}'"
 
 if [ ! -d "${WORK_AREA}" ]; then
     perform mkdir -p "'${WORK_AREA}'"
@@ -234,15 +255,23 @@ fi
 perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 
 ## Installing QPF executable and libraries
-step "Installing QPF executable and libraries"
+step "Installing QPF executables and libraries"
 
 install_exe ${QPF_EXE}
+install_exe ${QPFHMI_EXE}
+install_exe ${QPFGUI_EXE}
 
 for l in ${QPF_LIBS}; do
     install_lib $l
 done
 
-install_scpt RunQPFHMI.sh
+install_scpt RunQPF.sh
+
+QPF_INI="${RUN_PATH}/QPFHMI.conf"
+if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
+    mkdir -p ${HOME}/.config/QPF
+    cp "${QPF_INI}" ${HOME}/.config/QPF
+fi
 
 ## Creating QPFDB database
 step "Setting up QPF database"
@@ -276,4 +305,4 @@ say "last configuration used from internal database)."
 say "-------------------------------------------------------------------------------"
 say ""
 
-exit 0
+exit $COMPLSTATUS

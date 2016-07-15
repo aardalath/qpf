@@ -116,12 +116,6 @@ public:
     int run();
 
     //----------------------------------------------------------------------
-    // Method: mustLaunchHMI
-    // Returns true if the application must launch the HMI
-    //----------------------------------------------------------------------
-    bool mustLaunchHMI();
-
-    //----------------------------------------------------------------------
     // Method: getConfigFileName
     // Returns the name of the configuration file name used
     //----------------------------------------------------------------------
@@ -177,13 +171,6 @@ private:
     // Checks that a file exists
     //----------------------------------------------------------------------
     bool fexists(const char * name);
-
-    //----------------------------------------------------------------------
-    // Function: waitingForGoAhead
-    // Returns true if the "Go ahead" message (existence of a given file)
-    // is received
-    //----------------------------------------------------------------------
-    bool waitingForGoAhead();
 
     //----------------------------------------------------------------------
     // Function: removeOldFiles

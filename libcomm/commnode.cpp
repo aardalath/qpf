@@ -119,7 +119,7 @@ void CommNode::init()
 int CommNode::run()
 {
     while (true) { /* endless loop */ }
-    return 0;
+    return THR_DONE;
 }
 
 //----------------------------------------------------------------------

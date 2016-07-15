@@ -89,16 +89,6 @@ Deployer::~Deployer()
 }
 
 //----------------------------------------------------------------------
-// Method: mustLaunchHMI
-// Returns true if the application must launch the HMI
-//----------------------------------------------------------------------
-bool Deployer::mustLaunchHMI()
-{
-    while (!deploymentCompleted) { usleep(10000); }
-    return hmiNeeded;
-}
-
-//----------------------------------------------------------------------
 // Method: getConfigFileName
 // Returns the name of the configuration file name used
 //----------------------------------------------------------------------
@@ -200,11 +190,13 @@ void Deployer::readConfig(const char * configFile)
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     hmiNeeded = cfgInfo.hmiPresent;
-
-    std::cerr << Configuration::PATHBase << std::endl;
-    std::cerr << Configuration::PATHBin << std::endl;
+    if (hmiNeeded) {
+        std::cerr << "ERROR: HMI is not configured to run in the current host." << std::endl;
+    }
 
     // Ensure paths for the execution are available and readu
+    std::cerr << Configuration::PATHBase << std::endl;
+    std::cerr << Configuration::PATHBin << std::endl;
     assert(existsDir(Configuration::PATHBase));
     assert(existsDir(Configuration::PATHBin));
     std::vector<std::string> runPaths {
@@ -267,17 +259,7 @@ void Deployer::launchPeerNodes()
 //----------------------------------------------------------------------
 void Deployer::start()
 {
-    // Send the GO! signal
-    if (hmiNeeded) {
-        L("Waiting for START signal . . .");
-        while (waitingForGoAhead()) { usleep(10000); }
-        L("GO!");
-        usleep(500000);
-        evtMng->go();
-    } else {
-        L("Starting...");
-    }
-
+    L("Starting...");
     while(true) {}
 }
 
@@ -302,18 +284,6 @@ bool Deployer::fexists(const char * name)
 {
     struct stat buffer;
     return (stat(name, &buffer) == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: waitingForGoAhead
-// Returns true if the "Go ahead" message (existence of a given file)
-// is received
-//----------------------------------------------------------------------
-bool Deployer::waitingForGoAhead()
-{
-    bool keepWaiting = !fexists(EvtMngGoFile);
-    if (!keepWaiting) { unlink(EvtMngGoFile); }
-    return keepWaiting;
 }
 
 //----------------------------------------------------------------------

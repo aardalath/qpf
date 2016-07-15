@@ -51,15 +51,6 @@ App::App(int& argc, char** argv) :
 }
 
 //----------------------------------------------------------------------
-// Method: mustLaunchHMI
-// Returns TRUE is the host is the main host
-//----------------------------------------------------------------------
-bool App::mustLaunchHMI()
-{
-    return deployer->mustLaunchHMI();
-}
-
-//----------------------------------------------------------------------
 // Method: getConfigFileName
 // Returns the name of the configuration file used
 //----------------------------------------------------------------------

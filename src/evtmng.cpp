@@ -42,6 +42,8 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "dbhdlpostgre.h"
+#include "except.h"
 #include "urlhdl.h"
 #include "config.h"
 #include "filenamespec.h"
@@ -104,6 +106,18 @@ void EventManager::fromRunningToOperational()
 
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(cfgInfo.storage.inbox.path);
+
+    Alert a1(Alert::System, Alert::Warning, Alert::Resource,
+             Alert::here(__func__, __LINE__),
+             "Sample alert");
+
+    Alert a2(Alert::System, Alert::Warning, Alert::Resource,
+             Alert::here(__FILE__, __LINE__),
+             "Another sample alert",
+             Alert::createNewVar("myvar", 93.0f, 0.0f, 50.0f));
+
+    RaiseAlert(a1);
+    RaiseAlert(a2);
 }
 
 //----------------------------------------------------------------------
@@ -180,6 +194,33 @@ void EventManager::execAdditonalLoopTasks()
             }
         }
     }
+
+    // 2. Check possible commands in DB
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    std::string cmdSource;
+    std::string cmdContent;
+    int cmdId;
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store new state
+        dbHdl->getICommand(selfPeer()->name, cmdId, cmdSource, cmdContent);
+
+        if (cmdContent == "QUIT") {
+            InfoMsg("Requesting STOP to all components. . .");
+            PeerMessage * msg = buildPeerMsg(selfPeer()->name, "Please, shut down!", MSG_STOP);
+            registerMsg(selfPeer()->name, *msg);
+            setTransmissionToPeer(selfPeer()->name, msg);
+        }
+	
+	// Mark command as executed
+	dbHdl->markICommandAsDone(cmdId);
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------
@@ -212,6 +253,15 @@ void EventManager::processINDATA()
         // TODO: download external products into inbox
     }
 
+    /*
+     * This section of code should be obsolete, since the copy from a
+     * user folder to the Inbox (in case the data is injected from the HMI
+     * or another local application), or the download from a remote URL
+     * into the Inbox (in case the message is coming from elsewhere)
+     * shall be detected by the DirWatcher object, and the processing
+     * started at the execAdditonalLoopTasks() method.
+     *
+
     // Send InData message to DataMng
     std::array<std::string,1> fwdRecip = {"DataMng"};
     for (std::string & recip : fwdRecip) {
@@ -225,6 +275,8 @@ void EventManager::processINDATA()
         registerMsg(selfPeer()->name, *msgForRecip);
         setTransmissionToPeer(recip, msgForRecip);
     }
+
+     */
 }
 
 //----------------------------------------------------------------------
@@ -255,6 +307,28 @@ void EventManager::processTASK_RES()
 //----------------------------------------------------------------------
 void EventManager::processMONIT_INFO()
 {
+}
+
+//----------------------------------------------------------------------
+// Method: afterTransition
+//----------------------------------------------------------------------
+void EventManager::afterTransition(int fromState, int toState)
+{
+    // Save task information in task_info table
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store new state
+        dbHdl->storeState(getStateName(toState));
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 }
