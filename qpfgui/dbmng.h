@@ -60,6 +60,10 @@ public:
         int port;
     };
 
+    enum Cmd {
+        Quit,
+    };
+
     static QSqlError addConnection(const QString &driver, const QString &connectionName,
                                   const QString &dbName, const QString &host,
                                   const QString &user, const QString &passwd, int port);
@@ -69,6 +73,8 @@ public:
 
     static QString getState();
     static int numOfRowsInDbTable(QString tableName);
+
+    static void addICommand(Cmd cmd);
 
     //bool getTasksInfo(QMap<QString, QJsonObject> & newTasks, int offset = 0);
 

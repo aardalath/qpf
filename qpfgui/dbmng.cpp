@@ -112,14 +112,34 @@ QString DBManager::getState()
 
 int DBManager::numOfRowsInDbTable(QString tableName)
 {
-    QSqlQuery qry(QString("SELECT reltuples::bigint AS estimate"
-                          "FROM   pg_class"
+    QSqlQuery qry(QString("SELECT reltuples::bigint AS estimate "
+                          "FROM   pg_class "
                           "WHERE  oid = 'public.%1'::regclass;")
                   .arg(tableName), db);
     if (qry.next()) {
         return qry.value(0).toInt();
     } else {
         return 0L;
+    }
+}
+
+void DBManager::addICommand(Cmd cmd)
+{
+    QDateTime now = QDateTime::currentDateTime();
+
+    QString sqry(QString("INSERT INTO icommands "
+                         "(cmd_date, cmd_source, cmd_target, cmd_executed, cmd_content) "
+                         "VALUES ('%1', '%2', '%3', false, '%4');")
+                 .arg(now.toString())
+                 .arg("QPFHMI")
+                 .arg("EvtMng")
+                 .arg("QUIT"));
+    qDebug() << sqry;
+    QSqlQuery qry(sqry, db);
+
+    if (qry.lastError().type() != QSqlError::NoError) {
+        qErrnoWarning(qPrintable(qry.lastError().nativeErrorCode() + ": " +
+                                 qry.lastError().text()));
     }
 }
 
