@@ -67,6 +67,7 @@ private slots:
     void paste();
     void about();
     void quitApp();
+    void quitAllQPF();
 
     void updateWindowMenu();
 
@@ -82,6 +83,7 @@ private slots:
     void openWithDefault();
     void openWith();
     void showArchiveTableContextMenu(const QPoint & p);
+    void openLocalArchiveElement(QModelIndex idx);
 
     void showAlertsContextMenu(const QPoint & p);
     void showAlertInfo(QTableView * tblvw);
@@ -151,6 +153,7 @@ private:
     QAction *saveAsAct;
     QAction *restartAct;
     QAction *quitAct;
+    QAction *quitAllAct;
 #ifndef QT_NO_CLIPBOARD
     QAction *cutAct;
     QAction *copyAct;

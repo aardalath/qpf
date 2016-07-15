@@ -424,10 +424,15 @@ void MainWindow::createActions()
 //    restartAct->setStatusTip(tr("Restart the application"));
 //    connect(restartAct, SIGNAL(triggered()), this, SLOT(restart()));
 
-    quitAct = new QAction(tr("&Quit"), this);
-    quitAct->setShortcuts(QKeySequence::Quit);
-    quitAct->setStatusTip(tr("Quit the application"));
+    quitAct = new QAction(tr("Close HMI"), this);
+    quitAct->setShortcuts(QKeySequence::Close);
+    quitAct->setStatusTip(tr("Quit the QPF HMI application"));
     connect(quitAct, SIGNAL(triggered()), this, SLOT(quitApp()));
+
+    quitAllAct = new QAction(tr("Quit all"), this);
+    quitAllAct->setShortcuts(QKeySequence::Quit);
+    quitAllAct->setStatusTip(tr("Quit the QLA Processing Framework"));
+    connect(quitAllAct, SIGNAL(triggered()), this, SLOT(quitAllQPF()));
 
     // Edit menu
 #ifndef QT_NO_CLIPBOARD
@@ -531,6 +536,7 @@ void MainWindow::createMenus()
 //    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
     fileMenu->addAction(quitAct);
+    fileMenu->addAction(quitAllAct);
 
     // Edit menu
     editMenu = menuBar()->addMenu(tr("&Edit"));
@@ -779,10 +785,35 @@ void MainWindow::quitApp()
 
     if (ret != QMessageBox::Yes) { return; }
 
-    //transitTo(OFF);
-    showState();
-    statusBar()->showMessage(tr("STOP Signal sent to all elements . . ."),
+    statusBar()->showMessage(tr("Closing HMI . . ."),
                              MessageDelay);
+
+    qApp->closeAllWindows();
+    qApp->quit();
+}
+
+//----------------------------------------------------------------------
+// Method: quitAllQPF
+// Confirme and perform restart of the application
+//----------------------------------------------------------------------
+void MainWindow::quitAllQPF()
+{
+    statusBar()->showMessage(tr("Quit application and end all QPF core instances?"), 
+			     2 * MessageDelay);
+    int ret = QMessageBox::warning(this, tr("Quit " APP_NAME " and Core"),
+                                   tr("Do you really want to quit the QLA Processing "
+				      "Framework HMI and Core instances?"),
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::No);
+
+    if (ret != QMessageBox::Yes) { return; }
+
+    //transitTo(OFF);
+    //showState();
+    statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
+                             MessageDelay);
+
+    DBManager::addICommand(DBManager::Cmd::Quit);
 
     qApp->closeAllWindows();
     qApp->quit();
@@ -983,8 +1014,12 @@ void MainWindow::initLocalArchiveView()
 {
     // Create pop-up menu with user defined tools
     ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->treevwArchive->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+
+    connect(ui->treevwArchive, SIGNAL(doubleClicked(QModelIndex)),
+            this, SLOT(openLocalArchiveElement(QModelIndex)));
 
     acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
 
@@ -1085,6 +1120,50 @@ void MainWindow::showJSONdata(QString title, QString & dataString)
     dlg.setWindowTitle(title);
     dlg.setTaskInfo(dataString);
     dlg.exec();
+}
+
+//----------------------------------------------------------------------
+// SLOT: openLocalArchiveElement
+//----------------------------------------------------------------------
+void MainWindow::openLocalArchiveElement(QModelIndex idx)
+{
+    qDebug() << idx;
+    QModelIndex nameIdx = idx.model()->index(idx.row(), 1, idx.parent());
+    QModelIndex urlIdx = idx.model()->index(idx.row(), 11, idx.parent());
+    QString tabName = nameIdx.data().toString().trimmed();
+    QString url = urlIdx.data().toString().trimmed();
+
+    if (url.left(7) == "file://") { 
+        url.remove(0, 7); 
+    } else if (url.left(7) == "http://") { 
+      // Download file to temporary folder, and set url to temporary file
+    } else if (url.left(8) == "https://") { 
+      // Download file to temporary folder, and set url to temporary file
+    }
+
+    qDebug() << tabName << url;
+
+    QPlainTextEdit * editor = new QPlainTextEdit();
+    QFileInfo fs(url);
+    qDebug() << fs.absoluteFilePath() << fs.suffix();
+    if ((fs.suffix() == "xml") || (fs.suffix() == "json")) {
+        QFile file(fs.absoluteFilePath());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "Cannot open file";
+            return;
+	}
+        QTextStream in(&file);
+        QString content = in.readAll();
+        qDebug() << content;
+        editor->setPlainText(content);
+    }
+
+    // Ensure these tabs are closable (and only these)
+    int tabIdx = ui->tabWidget->addTab(editor, tabName);
+    ui->tabWidget->setTabsClosable(true);
+    for (int i = 0; i < 5; ++i) {
+        ui->tabWidget->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+    }
 }
 
 //======================================================================
