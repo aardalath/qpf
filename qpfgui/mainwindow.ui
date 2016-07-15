@@ -140,6 +140,11 @@
          </item>
          <item>
           <widget class="QLabel" name="lblHosts">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
            <property name="text">
             <string>&lt;hosts&gt;</string>
            </property>
@@ -185,7 +190,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../qpfhmi/icon.qrc">:/img/QPF.png</pixmap>
+          <pixmap resource="icon.qrc">:/img/QPF.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -509,7 +514,7 @@
      <x>0</x>
      <y>0</y>
      <width>997</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
@@ -525,7 +530,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../qpfhmi/icon.qrc"/>
+  <include location="icon.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -474,7 +474,7 @@ void MainWindow::createActions()
 
     execTestRunAct = new QAction(tr("&Execute test run ..."), this);
     execTestRunAct->setStatusTip(tr("Execute a test run processing on dummy data"));
-    connect(execTestRunAct, SIGNAL(triggered()), this, SLOT(execTestRun()));
+    //connect(execTestRunAct, SIGNAL(triggered()), this, SLOT(execTestRun()));
 
     // Window menu
     closeAct = new QAction(tr("Cl&ose"), this);
@@ -808,8 +808,6 @@ void MainWindow::quitAllQPF()
 
     if (ret != QMessageBox::Yes) { return; }
 
-    //transitTo(OFF);
-    //showState();
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
 
@@ -1065,7 +1063,7 @@ void MainWindow::openWith()
     qDebug() << url;
 
     QUrl archUrl(url);
-    QString fileName = archUrl.path() + "/" + archUrl.fileName();
+    QString fileName = archUrl.path();
     QString args = udt.args;
     args.replace("%F", fileName);
     QString cmd(QString("%1 %2").arg(udt.exe).arg(args));
@@ -1128,10 +1126,16 @@ void MainWindow::showJSONdata(QString title, QString & dataString)
 void MainWindow::openLocalArchiveElement(QModelIndex idx)
 {
     qDebug() << idx;
-    QModelIndex nameIdx = idx.model()->index(idx.row(), 1, idx.parent());
-    QModelIndex urlIdx = idx.model()->index(idx.row(), 11, idx.parent());
+    int row = idx.row();
+    const QAbstractItemModel * model = idx.model();
+    QModelIndex nameIdx = model->index(row, 1, idx.parent());
+    QModelIndex urlIdx  = model->index(row, 11, idx.parent());
     QString tabName = nameIdx.data().toString().trimmed();
-    QString url = urlIdx.data().toString().trimmed();
+    QString url     = urlIdx.data().toString().trimmed();
+
+    for (int i = 0; i < 10; ++i) {
+      qDebug() << i << ":  [" << model->index(row, i, idx.parent()).data().toString() << "]";
+    }
 
     if (url.left(7) == "file://") { 
         url.remove(0, 7); 
@@ -1159,7 +1163,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     }
 
     // Ensure these tabs are closable (and only these)
-    int tabIdx = ui->tabWidget->addTab(editor, tabName);
+    int tabIdx = ui->tabMainWgd->addTab(editor, tabName);
     ui->tabWidget->setTabsClosable(true);
     for (int i = 0; i < 5; ++i) {
         ui->tabWidget->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
@@ -1377,7 +1381,7 @@ void MainWindow::initAlertsTables()
 
     acShowAlert = new QAction(tr("Show alert information"), this);
     acAckAlert = new QAction(tr("Acknowledge alert"), this);
-    connect(acShowAlert,     SIGNAL(triggered()), this, SLOT(showAlertInfo()));
+    //    connect(acShowAlert,     SIGNAL(triggered()), this, SLOT(showAlertInfo()));
     // connect(acAckAlert,     SIGNAL(triggered()), this, SLOT(alertAck()));
 
     connect(ui->tblvwAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -1402,7 +1406,7 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
         if (tblvw == ui->tblvwSysAlerts) {
             connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showSysAlertInfo()));
         } else {
-            connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showSysAlertInfo()));
+            connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showProcAlertInfo()));
         }
     }
     if (actions.count() > 0) {
