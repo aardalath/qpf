@@ -195,6 +195,32 @@ void EventManager::execAdditonalLoopTasks()
         }
     }
 
+    // 2. Check possible commands in DB
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    std::string cmdSource;
+    std::string cmdContent;
+    int cmdId;
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store new state
+        dbHdl->getICommand(selfPeer()->name, cmdId, cmdSource, cmdContent);
+
+        if (cmdContent == "QUIT") {
+            InfoMsg("Requesting STOP to all components. . .");
+            PeerMessage * msg = buildPeerMsg(selfPeer()->name, "Please, shut down!", MSG_STOP);
+            registerMsg(selfPeer()->name, *msg);
+            setTransmissionToPeer(selfPeer()->name, msg);
+        }
+	
+	// Mark command as executed
+	dbHdl->markICommandAsDone(cmdId);
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------
