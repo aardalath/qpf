@@ -453,11 +453,9 @@ bool DBHdlPostgreSQL::getICommand(std::string target,
 bool DBHdlPostgreSQL::markICommandAsDone(int id)
 {
     bool result = true;
-
     std::string cmd("UPDATE icommands SET cmd_executed = true "
                     " WHERE id = " + str::quoted(str::toStr<int>(id)) + ";");
 
-    std::cerr << cmd << std::endl;
     try { result = runCmd(cmd); } catch(...) { result = false; }
 
     return result;
