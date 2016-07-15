@@ -474,6 +474,13 @@ ALTER TABLE ONLY transmissions ALTER COLUMN id SET DEFAULT nextval('transmission
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+--
+
+ALTER TABLE ONLY icommands ALTER COLUMN id SET DEFAULT nextval('icommands_id_seq'::regclass);
+
+
+--
 -- Data for Name: alerts; Type: TABLE DATA; Schema: public; Owner: eucops
 --
 
