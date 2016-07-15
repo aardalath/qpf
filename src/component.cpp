@@ -257,7 +257,7 @@ int Component::run()
     InfoMsg("New state: " + getStateName(getState()));
     flushLog();
 
-    return 0;
+    return THR_DONE;
 }
 
 //----------------------------------------------------------------------
