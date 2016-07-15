@@ -83,7 +83,6 @@ QSqlError DBManager::addConnection(const QString &driver, const QString &connect
     } else {
         connections[connectionName] = cCount;
         activeDb = connectionName;
-        qDebug(qPrintable("ActiveDb: " + activeDb));
     }
 
     return err;
@@ -134,7 +133,6 @@ void DBManager::addICommand(Cmd cmd)
                  .arg("QPFHMI")
                  .arg("EvtMng")
                  .arg("QUIT"));
-    qDebug() << sqry;
     QSqlQuery qry(sqry, db);
 
     if (qry.lastError().type() != QSqlError::NoError) {
