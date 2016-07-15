@@ -106,10 +106,7 @@ void DataManager::fromRunningToOff()
 //----------------------------------------------------------------------
 void DataManager::processINDATA()
 {
-    // Save to DB
     Message_INDATA * msg = dynamic_cast<Message_INDATA *>(msgData.msg);
-    saveToDB(msg);
-
     URLHandler urlh;
 
     // Synthetic INDATA messages, that means reading products from folder
@@ -117,6 +114,9 @@ void DataManager::processINDATA()
         urlh.setProduct(md.second);
         md.second = urlh.fromInbox2LocalArch();
     }
+
+    // Save to DB
+    saveToDB(msg);
 
     // Send InData message to TaskOrc
     std::array<std::string,1> fwdRecip = {"TskOrc"};
