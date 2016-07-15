@@ -268,8 +268,10 @@ done
 install_scpt RunQPF.sh
 
 QPF_INI="${RUN_PATH}/QPFHMI.conf"
-mkdir -p ${HOME}/.config/QPF
-cp "${QPF_INI}" ${HOME}/.config/QPF
+if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
+    mkdir -p ${HOME}/.config/QPF
+    cp "${QPF_INI}" ${HOME}/.config/QPF
+fi
 
 ## Creating QPFDB database
 step "Setting up QPF database"
