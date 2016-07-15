@@ -97,6 +97,7 @@ void Thread::bootstrap(void *aThread)
    myThread->mutexThreadStatus.lock();
    myThread->threadStatus = myThreadStatus;
    myThread->mutexThreadStatus.unlock();
+   if (myThreadStatus == THR_DONE) exit(0);
 }
 
 pid_t Thread::spawn(Thread * aThreadObject)
@@ -104,7 +105,8 @@ pid_t Thread::spawn(Thread * aThreadObject)
   pid_t childpid = fork(); /* Spawn process */
   if (childpid >= 0) {
     if (childpid == 0) { /* CHILD */
-      exit(aThreadObject->run());
+      int myThreadStatus = aThreadObject->run();
+      exit((myThreadStatus == THR_DONE) ? 0 : myThreadStatus); 
     } else {
       return childpid;
     }
