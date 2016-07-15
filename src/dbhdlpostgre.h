@@ -148,6 +148,21 @@ public:
     virtual std::string getCurrentState();
 
     //----------------------------------------------------------------------
+    // Method: getICommand
+    // Stores a new state to the database
+    //----------------------------------------------------------------------
+    bool getICommand(std::string target,
+                     int & id,
+                     std::string & source,
+                     std::string & content);
+
+    //----------------------------------------------------------------------
+    // Method: markICommandAsDone
+    // Sets the executed flag to true
+    //----------------------------------------------------------------------
+    bool markICommandAsDone(int id);
+
+    //----------------------------------------------------------------------
     // Method: storeMsg
     // Stores a message into the database
     //----------------------------------------------------------------------

@@ -44,6 +44,7 @@
 #include "config.h"
 #include "dbg.h"
 #include "str.h"
+#include <arpa/inet.h>
 
 using namespace LibComm;
 
@@ -411,6 +412,55 @@ std::string DBHdlPostgreSQL::getCurrentState()
     PQclear(res);
     UNUSED(result);
     return stateName;
+}
+
+//----------------------------------------------------------------------
+// Method: getICommand
+// Stores a new state to the database
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::getICommand(std::string target,
+                                  int & id,
+                                  std::string & source,
+                                  std::string & content)
+{
+    bool result = true;
+
+    std::string cmd("SELECT cmd.id, cmd.cmd_source, cmd.cmd_content "
+                    " FROM icommands cmd "
+                    " WHERE cmd.cmd_target = " + str::quoted(target) +
+                    " AND cmd.cmd_executed = false "
+                    " ORDER BY cmd.id LIMIT 1;");
+
+    try {
+        result = runCmd(cmd);
+        result &= (PQntuples(res) > 0);
+        if (result) {
+            id      = atoi(PQgetvalue(res, 0, 0)); 
+            source  = std::string(PQgetvalue(res, 0, 1));
+            content = std::string(PQgetvalue(res, 0, 2));
+        }
+    } catch(...) {
+        result = false;
+    }
+
+    return result;
+}
+
+//----------------------------------------------------------------------
+// Method: markICommandAsDone
+// Sets the executed flag to true
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::markICommandAsDone(int id)
+{
+    bool result = true;
+
+    std::string cmd("UPDATE icommands SET cmd_executed = true "
+                    " WHERE id = " + str::quoted(str::toStr<int>(id)) + ";");
+
+    std::cerr << cmd << std::endl;
+    try { result = runCmd(cmd); } catch(...) { result = false; }
+
+    return result;
 }
 
 //----------------------------------------------------------------------
