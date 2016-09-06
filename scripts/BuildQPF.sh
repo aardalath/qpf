@@ -1,3 +1,4 @@
+#!/bin/bash
 ##############################################################################
 # File       : BuildQPF.sh - QPF Compilation and Installation script
 # Domain     : QPF.scripts
@@ -38,6 +39,8 @@ QPF_EXE="qpf/qpf"
 QPFHMI_EXE="qpfhmi/qpfhmi"
 QPFGUI_EXE="qpfgui/qpfgui"
 QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
+
+status=0
 
 #- Messages
 _ONHDR="\e[1;49;93m"
@@ -114,7 +117,23 @@ perform () {
     if [ "${FAKE}" == "yes" ]; then
         say "${_ONRUN}: $*"
     else
-        eval $* 2>&1 | tee -a "${LOG_FILE}" && status=$?
+        (((( eval $* 2>&1 ; echo $? >&3) | tee -a "${LOG_FILE}" >&4) 3>&1) | (read xs; echo $xs > /tmp/buildqpf.xs)) 4>&1
+        status=$(cat /tmp/buildqpf.xs)
+        if [ "${LAZY}" != "yes" ]; then 
+            if [ $status -gt 0 ]; then
+                echo "Exiting . . ."
+                exit $status
+            fi
+        fi
+    fi
+}
+
+perform_dontexit () {
+    if [ "${FAKE}" == "yes" ]; then
+        say "${_ONRUN}: $*"
+    else
+        (((( eval $* 2>&1 ; echo $? >&3) | tee -a "${LOG_FILE}" >&4) 3>&1) | (read xs; echo $xs > /tmp/buildqpf.xs)) 4>&1
+        status=$(cat /tmp/buildqpf.xs)
     fi
 }
 
@@ -173,6 +192,9 @@ install_contrib () {
     local tgtdir=$2
     bn=$(basename "${CONTRIB_PATH}/${fil}")
     say "  - Installing file $fil"
+    if [ ! -d "${WORK_AREA}/${tgtdir}" ]; then
+        mkdir -p "${WORK_AREA}/${tgtdir}" 
+    fi
     if [ ! -f "${WORK_AREA}/${tgtdir}/${bn}" ]; then
 	perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
     fi
@@ -258,8 +280,9 @@ perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 step "Installing QPF executables and libraries"
 
 install_exe ${QPF_EXE}
-install_exe ${QPFHMI_EXE}
+#OBSOLETE# install_exe ${QPFHMI_EXE}
 install_exe ${QPFGUI_EXE}
+ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
 
 for l in ${QPF_LIBS}; do
     install_lib $l
@@ -278,7 +301,9 @@ step "Setting up QPF database"
 
 if [ "${RECREATEDB}" == "yes" ]; then
     QPF_DB_LOCATION="-h ${PSQL_HOST} -p ${PSQL_PORT}"
-    perform psql postgres ${QPF_DB_LOCATION} -q -c "'DROP DATABASE qpfdb;'"
+    
+    perform_dontexit psql postgres ${QPF_DB_LOCATION} -q -c "'DROP DATABASE qpfdb;'"
+    
     perform psql postgres ${QPF_DB_LOCATION} -q -c "'CREATE DATABASE qpfdb OWNER eucops;'"
     perform psql qpfdb    ${QPF_DB_LOCATION} -q -f "'${QPF_SQ_SCPT}'" -o "'${LOG_FILE}.sqlout'"
 fi
@@ -292,10 +317,12 @@ say "---------------------------------------------------------------------------
 say "Please, do not forget to:"
 say "  - include the directory ${WORK_AREA}/qpf/bin in the PATH variable, and"
 say "  - include the directory ${WORK_AREA}/qpf/lib in the LD_LIBRARY_PATH variable."
-say ""
+say "To do that, just execute the following commands:"
+say "  export PATH=${WORK_AREA}/qpf/bin:\$PATH"
+say "  export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH"
 say "In order to check that the QPF HMI executable and the libraries were correctly"
 say "installed, you may run:"
-say "  $ qpfhmi -h "
+say "  $ qpfgui -h "
 say "and see if the application shows a help message."
 say ""
 say "Initial configuration files (in JSON) are available at ${WORK_AREA}/qpf/cfg."
