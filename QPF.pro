@@ -2,7 +2,7 @@
 # QPF - Prototype of QLA Processing Framework
 #======================================================================
 # Project file
-# Author: J C Gonzalez - 2015
+# Author: J C Gonzalez - 2015, 2016
 #======================================================================
 
 TEMPLATE = subdirs
@@ -14,8 +14,8 @@ SUBDIRS  = \
     infix \
     src \
     qpf \
-    qpfhmi \
     qpfgui
+#    qpfhmi \
 
 #SUBDIRS += tests
 
