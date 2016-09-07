@@ -200,7 +200,7 @@ std::string preciseTimeTag()
     struct timespec timesp;
     struct tm * timeinfo;
     char buffer[80];
-    char ns[10];
+    char ns[11];
 
     if (clock_gettime(CLOCK_REALTIME_COARSE, &timesp) != 0) {
         perror("clock_gettime");
