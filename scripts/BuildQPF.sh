@@ -55,6 +55,7 @@ COMPILE="no"
 INSTALL="no"
 FAKE="no"
 REMOVE="no"
+HMI="yes"
 RECREATEDB="no"
 WORK_AREA="${HOME}"
 PSQL_HOST="localhost"
@@ -91,6 +92,7 @@ usage () {
     say "  -n         Show the actions without executing them"
     say "  -r         Clear previous build"
     say "  -b         Re-create PostsgreSQL system database"
+    say "  -p         Processing-only node: do not compile QPF HMI"
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
@@ -203,7 +205,7 @@ install_contrib () {
 ###### Start
 
 ## Parse command line
-while getopts :hcinrbw:H:P: OPT; do
+while getopts :hcinrbpw:H:P: OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -211,6 +213,7 @@ while getopts :hcinrbw:H:P: OPT; do
         n|+n) FAKE="yes" ;;
         r|+r) REMOVE="yes" ;;
         b|+b) RECREATEDB="yes" ;;
+        p|+p) HMI="no" ;;
         w|+w) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
@@ -255,7 +258,11 @@ step "Generating dependencies and setting makefiles"
 
 if [ "${COMPILE}" == "yes" ]; then
     cd "${BUILD_PATH}"
-    perform $qmake_exe ../QPF.pro
+    if [ "${HMI}" == "yes" ]; then
+        perform $qmake_exe CONFIG+=hmi ../QPF.pro
+    else
+        perform $qmake_exe ../QPF.pro
+    fi
 fi
 
 ## Compiling source code
@@ -263,7 +270,7 @@ step "Compiling source code"
 
 COMPLSTATUS=0
 if [ "${COMPILE}" == "yes" ]; then
-    perform make ${MAKE_OPTS}
+    perform make ${MAKE_OPTS}        
     COMPLSTATUS=${status}
 fi
 
@@ -280,9 +287,11 @@ perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 step "Installing QPF executables and libraries"
 
 install_exe ${QPF_EXE}
-#OBSOLETE# install_exe ${QPFHMI_EXE}
-install_exe ${QPFGUI_EXE}
-ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
+if [ "$HMI" == "yes" ]; then
+    install_exe ${QPFGUI_EXE}
+    #OBSOLETE# install_exe ${QPFHMI_EXE}
+    ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
+fi
 
 for l in ${QPF_LIBS}; do
     install_lib $l
