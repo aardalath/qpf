@@ -13,8 +13,10 @@ SUBDIRS  = \
     sdc \
     infix \
     src \
-    qpf \
-    qpfgui
+    qpf 
+
+hmi { SUBDIRS += qpfgui }
+
 #    qpfhmi \
 
 #SUBDIRS += tests
