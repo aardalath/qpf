@@ -14,3 +14,4 @@
 
 pg_ctl -D /home/eucops/opt/pgsql/data -l /home/eucops/opt/pgsql/data/log start
 
+ 
