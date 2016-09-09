@@ -44,6 +44,7 @@ ZMQ="no"
 PCRE="no" 
 CURL="no" 
 UUID="no"
+DOCKER="no"
 
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
@@ -64,7 +65,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -A ] [ -a ] [ -q ] [ -p ] [ -z ] [ -r ] [ -c ] [ -u ]"
+    local opts="[ -h ] [ -A ] [ -a ] [ -q ] [ -p ] [ -z ] [ -r ] [ -c ] [ -u ] [ -d ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
     say "  -h         Show this usage message"
@@ -76,6 +77,7 @@ usage () {
     say "  -r         Install PCRE2"
     say "  -c         Install libcurl"
     say "  -u         Install UUID library"
+    say "  -d         Install Docker"
     say ""
     exit 1
 }
@@ -100,7 +102,7 @@ die () {
 #### Parse command line and display grettings
 
 ## Parse command line
-while getopts :hAaqpzrcu OPT; do
+while getopts :hAaqpzrcud OPT; do
     case $OPT in
         h|+h) usage 
               ;;
@@ -110,6 +112,7 @@ while getopts :hAaqpzrcu OPT; do
               PCRE="yes" 
               CURL="yes" 
               UUID="yes" 
+              DOCKER="yes" 
               ;;
         a|+a) QT="no" 
               PGSQL="yes"
@@ -117,10 +120,11 @@ while getopts :hAaqpzrcu OPT; do
               PCRE="yes" 
               CURL="yes" 
               UUID="yes" 
+              DOCKER="yes" 
               ;;
         q|+q) QT="yes" 
               ;;
-        xp|+p) PGSQL="yes" 
+        p|+p) PGSQL="yes" 
               ;;
         z|+z) ZMQ="yes" 
               ;;
@@ -129,6 +133,8 @@ while getopts :hAaqpzrcu OPT; do
         c|+c) CURL="yes" 
               ;;
         u|+u) UUID="yes" 
+              ;;
+        d|+d) DOCKER="yes" 
               ;;
         *)    usage 
               exit 2
@@ -163,22 +169,22 @@ if [ "${PGSQL}" == "yes" ]; then
     # We need to install PostgreSQL and then setup the database
 
     #- 1. Installing PostgreSQL
-    say "Installing packages"
+    say ". Installing packages"
     sudo yum -y install postgresql.x86_64 postgresql-devel.x86_64 postgresql-libs.x86_64 postgresql-server.x86_64
 
     #- 2. Setting up the database
 
     # Give access to internal folder:
-    say "Preparing internal folders"
+    say ". Preparing internal folders"
     sudo chmod 777 /var/run/postgresql
 
     # Then, for the creation of the local folder, initialization and server start, 
     # use the scripts =scripts/pgsql_start_server.sh= and ==scripts/pgsql_initdb.sh=
 
-    say "Initializing database"
+    say ". Initializing database"
     source ${SCRIPT_PATH}/pgsql_initdb.sh
 
-    say "Starting server"
+    say ". Starting server"
     source ${SCRIPT_PATH}/pgsql_start_server.sh
 fi
 
@@ -208,6 +214,16 @@ fi
 if [ "${UUID}" == "yes" ]; then 
     step "Installing UUID library"
     sudo yum -y install uuid-devel.x86_64 libuuid-devel.x86_64
+fi
+
+#### Installing COTS: VII - Install Docker
+
+if [ "${DOCKER}" == "yes" ]; then 
+    step "Installing Docker"
+    say ". Installing packages"
+    sudo yum -y install docker
+    say ". Starting Docker service"
+    sudo service docker start
 fi
 
 #### Finishing
