@@ -82,7 +82,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -p ]"
     opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
