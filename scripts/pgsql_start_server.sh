@@ -12,6 +12,7 @@
 # History    : See <Changelog>
 ###############################################################################
 
+sudo chmod 777 /var/run/postgresql
 pg_ctl -D /home/eucops/opt/pgsql/data -l /home/eucops/opt/pgsql/data/log start
 
  
