@@ -222,6 +222,10 @@ if [ "${DOCKER}" == "yes" ]; then
     step "Installing Docker"
     say ". Installing packages"
     sudo yum -y install docker
+    say ". Creating docker group"
+    sudo groupadd docker
+    say ". Adding user to docker group"
+    sudo usermod -aG docker $(whoami)
     say ". Starting Docker service"
     sudo service docker start
 fi
