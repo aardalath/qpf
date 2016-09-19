@@ -105,6 +105,8 @@ private slots:
     void showTxContextMenu(const QPoint & p);
     void displayTxInfo();
 
+    void closeTab(int n);
+
 private:
     void readConfig(QString dbUrl);
     TextView *createTextView();

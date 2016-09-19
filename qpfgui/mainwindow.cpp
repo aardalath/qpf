@@ -388,6 +388,9 @@ void MainWindow::updateWindowMenu()
         connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
         windowMapper->setMapping(action, windows.at(i));
     }
+
+    connect(ui->tabMainWgd, SIGNAL(tabCloseRequested(int)),
+            this, SLOT(closeTab(int)));
 }
 
 //----------------------------------------------------------------------
@@ -798,7 +801,7 @@ void MainWindow::quitApp()
 //----------------------------------------------------------------------
 void MainWindow::quitAllQPF()
 {
-    statusBar()->showMessage(tr("Quit application and end all QPF core instances?"), 
+    statusBar()->showMessage(tr("Quit application and end all QPF core instances?"),
 			     2 * MessageDelay);
     int ret = QMessageBox::warning(this, tr("Quit " APP_NAME " and Core"),
                                    tr("Do you really want to quit the QLA Processing "
@@ -1137,11 +1140,11 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
       qDebug() << i << ":  [" << model->index(row, i, idx.parent()).data().toString() << "]";
     }
 
-    if (url.left(7) == "file://") { 
-        url.remove(0, 7); 
-    } else if (url.left(7) == "http://") { 
+    if (url.left(7) == "file://") {
+        url.remove(0, 7);
+    } else if (url.left(7) == "http://") {
       // Download file to temporary folder, and set url to temporary file
-    } else if (url.left(8) == "https://") { 
+    } else if (url.left(8) == "https://") {
       // Download file to temporary folder, and set url to temporary file
     }
 
@@ -1164,10 +1167,29 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
 
     // Ensure these tabs are closable (and only these)
     int tabIdx = ui->tabMainWgd->addTab(editor, tabName);
-    ui->tabWidget->setTabsClosable(true);
+    /*
+    QPushButton *closeButton = new QPushButton();
+    QFont fnt;
+    fnt.setPointSize(6);
+    closeButton->setFont(fnt);
+    closeButton->setText("x");
+    ui->tabMainWgd->tabBar()->setTabButton(tabIdx, QTabBar::RightSide, closeButton);
+    connect(closeButton, SIGNAL(clicked()), ui->tabMainWgd->widget(tabIdx), SLOT(close()));
+    */
+    ui->tabMainWgd->setTabsClosable(true);
     for (int i = 0; i < 5; ++i) {
-        ui->tabWidget->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+        ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->hide();
+        ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->resize(0, 0);
     }
+    QWidget * tabbtn = ui->tabMainWgd->tabBar()->tabButton(tabIdx, QTabBar::RightSide);
+    QRect g = tabbtn->geometry();
+    tabbtn->resize(6, 6);
+    tabbtn->move(g.x() + 14, g.y() + 4);
+}
+
+void MainWindow::closeTab(int n)
+{
+    ui->tabMainWgd->removeTab(n);
 }
 
 //======================================================================
