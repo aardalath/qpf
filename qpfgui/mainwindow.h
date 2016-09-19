@@ -137,6 +137,8 @@ private:
     void updateAgentsMonitPanel();
 
     void showJSONdata(QString title, QString & dataString);
+    void binaryGetFITSHeader(QString fileName, QString & tr);
+
 
 private:
     Ui::MainWindow *ui;

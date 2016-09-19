@@ -50,6 +50,7 @@
 #include "tools.h"
 #include "dbhdlpostgre.h"
 #include "except.h"
+#include "filenamespec.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -77,6 +78,8 @@
 #include "exttoolsdef.h"
 #include "verbleveldlg.h"
 //#include "testrundlg.h"
+#include "qjsonmodel.h"
+#include "xmlsyntaxhighlight.h"
 
 #include "dlgalert.h"
 
@@ -319,10 +322,10 @@ void MainWindow::paste()
 //----------------------------------------------------------------------
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About " APP_NAME),
-            tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
-                APP_COMPANY "\n"
-                APP_DATE));
+    QMessageBox::about(this, tr("About " APP_NAME),
+                       tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
+                          APP_COMPANY "\n"
+                          APP_DATE));
 }
 
 //----------------------------------------------------------------------
@@ -1061,14 +1064,87 @@ void MainWindow::openWith()
     const UserDefTool & udt = userDefTools.value(key);
 
     QModelIndex m = ui->treevwArchive->currentIndex();
-    qDebug() << m;
     QString url = m.model()->index(m.row(), 11, m.parent()).data().toString();
-    qDebug() << url;
 
+    // Build arguments by replacing placeholders
+    //   -   %f        Product file name (without path)
+    //   -   %F        Product complete file name (with path)
+    //   -   %p        Path where the product file is located
+    //   -   %i        Product Id
+    //   -   %o        Observation Id
+    //   -   %s        Start time stamp
+    //   -   %e        End time stamp
+    //   -   %t        Product type
+    //   -   %x        Product file extension
+    //   -   %1 - %9   User-requested inputs
     QUrl archUrl(url);
     QString fileName = archUrl.path();
     QString args = udt.args;
+    FileNameSpec fns;
+    FileNameSpec::FileNameComponents c = fns.parseFileName(fileName.toStdString());
+    QFileInfo fs(fileName);
+
+    args.replace("%f", fs.fileName());
     args.replace("%F", fileName);
+    args.replace("%p", fs.absolutePath());
+    args.replace("%i", QString::fromStdString(c.productId));
+    args.replace("%o", QString::fromStdString(c.signature));
+    args.replace("%s", QString::fromStdString(c.dateStart));
+    args.replace("%e", QString::fromStdString(c.dateEnd));
+    args.replace("%t", QString::fromStdString(c.productType));
+    args.replace("%x", fs.suffix());
+
+    // Count how many %n placeholders are
+    int nph = 0;
+    for (int i = 1; i < 10; ++i) {
+        QString ph("%" + QString("%1").arg(i));
+        if (args.contains(ph)) ++nph;
+    }
+
+    if (nph > 0) {
+
+        // Build dialog
+        QDialog dlg;
+        QVBoxLayout vly;
+        vly.addWidget(new QLabel("Current command line is:"));
+        vly.addWidget(new QLabel(QString("\t%1 %2").arg(udt.exe).arg(args)));
+        vly.addWidget(new QLabel("\nSpecify the strings to be used in the additional placeholders:"));
+
+        QVector<QLineEdit*> edPh;
+        for (int i = 1; i <= nph; ++i) {
+            QLabel * l = new QLabel("%" + QString("%1: ").arg(i));
+            QLineEdit * e = new QLineEdit;
+            QHBoxLayout * hly = new QHBoxLayout;
+            hly->addWidget(l);
+            hly->addWidget(e);
+            vly.addLayout(hly);
+            edPh.append(e);
+        }
+        QPushButton * btnOk = new QPushButton("&Ok");
+        QPushButton * btnCancel = new QPushButton("&Cancel");
+        QHBoxLayout * hly = new QHBoxLayout;
+        hly->addSpacerItem(new QSpacerItem(1, 1));
+        hly->addWidget(btnOk);
+        hly->addWidget(btnCancel);
+        vly.addLayout(hly);
+        dlg.setLayout(&vly);
+        connect(btnOk, SIGNAL(pressed()), &dlg, SLOT(accept()));
+        connect(btnCancel, SIGNAL(pressed()), &dlg, SLOT(reject()));
+
+        // Show dialog, and substitute the placeholders %n in args with the
+        // content of the line edit widgets
+        if (dlg.exec()) {
+            for (int i = 1; i <= nph; ++i) {
+                QString ph("%" + QString("%1").arg(i));
+                QLineEdit * e = edPh.at(i - 1);
+                qDebug() << "Trying to substitute '" << ph << "' with '" << e->text() << "'";
+                args.replace(ph, e->text());
+            }
+        }
+
+    }
+
+    //  Build command line and run the tool
     QString cmd(QString("%1 %2").arg(udt.exe).arg(args));
     QProcess tool;
     tool.startDetached(cmd);
@@ -1137,32 +1213,74 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     QString url     = urlIdx.data().toString().trimmed();
 
     for (int i = 0; i < 10; ++i) {
-      qDebug() << i << ":  [" << model->index(row, i, idx.parent()).data().toString() << "]";
+        qDebug() << i << ":  [" << model->index(row, i, idx.parent()).data().toString() << "]";
     }
 
     if (url.left(7) == "file://") {
         url.remove(0, 7);
     } else if (url.left(7) == "http://") {
-      // Download file to temporary folder, and set url to temporary file
+        // Download file to temporary folder, and set url to temporary file
     } else if (url.left(8) == "https://") {
-      // Download file to temporary folder, and set url to temporary file
+        // Download file to temporary folder, and set url to temporary file
     }
 
     qDebug() << tabName << url;
 
-    QPlainTextEdit * editor = new QPlainTextEdit();
+    QWidget * editor = 0;
     QFileInfo fs(url);
     qDebug() << fs.absoluteFilePath() << fs.suffix();
-    if ((fs.suffix() == "xml") || (fs.suffix() == "json")) {
+    if (fs.suffix() == "xml") {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qDebug() << "Cannot open file";
             return;
-	}
+        }
         QTextStream in(&file);
         QString content = in.readAll();
-        qDebug() << content;
-        editor->setPlainText(content);
+        QTextEdit * ed = new QTextEdit;
+        XMLBasicSyntaxHighlighter * highlighter = new XMLBasicSyntaxHighlighter(ed);
+        Q_UNUSED(highlighter);
+        ed->setPlainText(content);
+        ed->setReadOnly(true);
+        //QPlainTextEdit * pltxt = new QPlainTextEdit();
+        //pltxt->setPlainText(content);
+        editor = ed;
+    } else if (fs.suffix() == "json") {
+        QJsonModel * model = new QJsonModel;
+        QTreeView * view = new QTreeView;
+        view->setModel(model);
+        view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        model->load(fs.absoluteFilePath());
+        model->setIcon(QJsonValue::Bool, QIcon(":/img/bullet_black.png"));
+        model->setIcon(QJsonValue::Double, QIcon(":/img/bullet_red.png"));
+        model->setIcon(QJsonValue::String, QIcon(":/img/bullet_blue.png"));
+        model->setIcon(QJsonValue::Array, QIcon(":/img/table.png"));
+        model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
+        editor = view;
+    } else if (fs.suffix() == "fits") {
+        QJsonModel * model = new QJsonModel;
+        QTreeView * view = new QTreeView;
+        view->setModel(model);
+        view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        QString str;
+        binaryGetFITSHeader(fs.absoluteFilePath(), str);
+        QJsonDocument j = QJsonDocument::fromBinaryData(str.toLocal8Bit());
+        if (j.isNull()) {
+            qDebug() << "Null document!";
+        }
+        QFile js("js.json");
+        if (js.open(QIODevice::ReadWrite)) {
+            QTextStream stream(&js);
+            stream << str << endl;
+        }
+        js.close();
+        model->loadJson(str.toLocal8Bit());
+        model->setIcon(QJsonValue::Bool, QIcon(":/img/bullet_black.png"));
+        model->setIcon(QJsonValue::Double, QIcon(":/img/bullet_red.png"));
+        model->setIcon(QJsonValue::String, QIcon(":/img/bullet_blue.png"));
+        model->setIcon(QJsonValue::Array, QIcon(":/img/table.png"));
+        model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
+        editor = view;
     }
 
     // Ensure these tabs are closable (and only these)
@@ -1261,14 +1379,15 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 void MainWindow::showWorkDir()
 {
     QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
-/*
-    QString treeKey = item->data(0, Qt::UserRole).toString();
-    const Json::Value & v  = processedTasksInfo.value(treeKey);
-    QString bind = QString::fromStdString(v["HostConfig"]["Binds"][0].asString());
-    QString localDir = bind.left(bind.indexOf(":"));
-    QString cmdLine = "nautilus " + localDir + " &";
-    system(cmdLine.toStdString().c_str());
-*/
+    Q_UNUSED(idx);
+    /*
+      QString treeKey = item->data(0, Qt::UserRole).toString();
+      const Json::Value & v  = processedTasksInfo.value(treeKey);
+      QString bind = QString::fromStdString(v["HostConfig"]["Binds"][0].asString());
+      QString localDir = bind.left(bind.indexOf(":"));
+      QString cmdLine = "nautilus " + localDir + " &";
+      system(cmdLine.toStdString().c_str());
+    */
 }
 
 //----------------------------------------------------------------------
@@ -1320,10 +1439,11 @@ void MainWindow::stopTask()
 bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)
 {
     /*
-    QString treeKey = item->data(0, Qt::UserRole).toString();
-    const Json::Value & v = processedTasksInfo.value(treeKey);
-    QString dId = QString::fromStdString(v["NameExtended"].asString());
+      QString treeKey = item->data(0, Qt::UserRole).toString();
+      const Json::Value & v = processedTasksInfo.value(treeKey);
+      QString dId = QString::fromStdString(v["NameExtended"].asString());
     */
+    Q_UNUSED(idx);
     QString dId;
     QStringList args;
     args << cmd << dId;
@@ -1358,8 +1478,8 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 {
     t->setExpanded(true);
     if (v.size() > 0) {
-//        if (v.isArray()) {
-//        } else {
+        //        if (v.isArray()) {
+        //        } else {
         for (Json::ValueIterator i = v.begin(); i != v.end(); ++i) {
             QTreeWidgetItem * chld = new QTreeWidgetItem(t);
             //qDebug() << "Show node key";
@@ -1368,7 +1488,7 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
             //qDebug() << "now dump children...";
             dumpToTree(*i, chld);
             t->addChild(chld);
-//            }
+            //            }
         }
     } else {
         QString s;
@@ -1614,16 +1734,100 @@ void MainWindow::updateAgentsMonitPanel()
         FrmAgentStatus * panel = 0;
         std::map<std::string, FrmAgentStatus*>::iterator it = taskAgentsInfoPanel.find(kv.first);
         if (it == taskAgentsInfoPanel.end()) {
-             panel = new FrmAgentStatus(0);
-             taskAgentsInfoPanel[kv.first] = panel;
-             vlyFrmAgents->removeItem(spacerFrmAgents);
-             vlyFrmAgents->addWidget(panel);
-             vlyFrmAgents->addSpacerItem(spacerFrmAgents);
+            panel = new FrmAgentStatus(0);
+            taskAgentsInfoPanel[kv.first] = panel;
+            vlyFrmAgents->removeItem(spacerFrmAgents);
+            vlyFrmAgents->addWidget(panel);
+            vlyFrmAgents->addSpacerItem(spacerFrmAgents);
         } else {
-             panel = it->second;
+            panel = it->second;
         }
         panel->updateInfo(*taInfo);
     }
+}
+
+//======================================================================
+// Utility methods
+//======================================================================
+
+//----------------------------------------------------------------------
+// METHOD: binaryGetFITSHeader
+//----------------------------------------------------------------------
+void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)
+{
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);    // read the data serialized from the file
+    const int BUF_LEN = 80;
+    const int TAG_LEN = 8;
+    char buffer[BUF_LEN];
+    int bytes, tbytes = 0;
+    str = "{ \"Header\": { ";
+    bool inHdr = true;
+    bool isStart = true;
+    int numOfExtensions = 0;
+
+    while (!file.atEnd()) {
+        bytes = in.readRawData(buffer, BUF_LEN);
+        if (bytes < 0) { break; }
+        tbytes += bytes;
+        QString tag = QString::fromLocal8Bit(buffer, TAG_LEN);
+        if (tag == "END     ") {
+            str += "}";
+            inHdr = false;
+        } else {
+            QString content = QString::fromLocal8Bit(buffer + TAG_LEN, BUF_LEN - TAG_LEN);
+            if (content.at(0) == '=') {
+                content.remove(0, 1);
+            } else {
+                content = "\"" + content + "\"";
+            }
+            if (tag == "XTENSION") {
+                inHdr = true;
+                content.replace(QRegExp("[ ]*/ .*$"), "");
+                str += QString((numOfExtensions < 1) ? ", \"Extensions\": [ " : ", ") +
+                    " { \"" + tag + "\": " + content;
+                numOfExtensions++;
+            } else {
+                if (inHdr) {
+                    content.replace(" T ", " true ");
+                    content.replace(" F ", " false ");
+                    content.replace(QRegExp("[ ]*/ .*$"), "");
+                    if (!isStart) { str += ", "; }
+                    str += "\"" + tag + "\": " + content;
+                }
+            }
+        }
+        isStart = false;
+    }
+    file.close();
+
+    str += (numOfExtensions > 0) ? "] }": "}";
+    //str.replace("'", "\"");
+    str.replace(QRegExp("[ ]+\""), "\"");
+    str.replace(QRegExp("[ ]+'"), "'");
+
+    QRegExp * rx = new QRegExp("(\"HISTORY\"):(\".*\"),(\"HISTORY\":)");
+    rx->setMinimal(true);
+    int pos = 0;
+    while ((pos = rx->indexIn(str, pos)) != -1) {
+        QString srx(rx->cap(1) + ":" + rx->cap(2) + ",");
+        str.replace(rx->cap(0), srx);
+    }
+    delete rx;
+    rx = new QRegExp("(\"HISTORY\"):(\".*\")[}]");
+    rx->setMinimal(true);
+    pos = 0;
+    while ((pos = rx->indexIn(str, pos)) != -1) {
+        QString srx(rx->cap(1) + ": [" + rx->cap(2) + "] }");
+        str.replace(rx->cap(0), srx);
+        pos += srx.length();
+    }
+    delete rx;
+
+    str.replace(",\"\":\"\"", "");
+    str.replace("\":'", "\":\"");
+    str.replace(QRegExp("'[ ]*,"), "\",");
 }
 
 }

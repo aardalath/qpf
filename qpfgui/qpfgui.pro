@@ -44,7 +44,10 @@ SOURCES += \
     types.cpp \
     verbleveldlg.cpp \
     txitem.cpp \
-    txitemdlg.cpp
+    txitemdlg.cpp \
+    qjsonitem.cpp \
+    qjsonmodel.cpp \
+    xmlsyntaxhighlight.cpp
 
 HEADERS  += \
     browser.h \
@@ -76,7 +79,10 @@ HEADERS  += \
     verbleveldlg.h \
     version.h \
     txitem.h \
-    txitemdlg.h
+    txitemdlg.h \
+    qjsonitem.h \
+    qjsonmodel.h \
+    xmlsyntaxhighlight.h
 
 FORMS    += \
     mainwindow.ui \
@@ -96,7 +102,8 @@ FORMS    += \
 RESOURCES += \
     configtool.qrc \
     icon.qrc \
-    tx.qrc
+    tx.qrc \
+    jsontree.qrc
 
 INCLUDEPATH += . ../src $$LIBCOMMINC $$SDCINC $$INFIXINC $$JSONCPPINC $$PSQLCPPINC
 
