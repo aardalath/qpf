@@ -12,5 +12,5 @@
 # History    : See <Changelog>
 ###############################################################################
 
-service docker start
+sudo service docker start
 
