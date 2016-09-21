@@ -541,7 +541,20 @@ void Configuration::processConfiguration()
         parsingReFile.open(cfgFilePath + "/" + parsing_regex_str.substr(1),
                 std::ifstream::in);
         if (parsingReFile.good()) {
-            std::getline(parsingReFile, cfgInfo.parsing_regex);
+            std::string fileLine;
+            do {
+                std::getline(parsingReFile, fileLine);
+                std::cout << fileLine << std::endl;
+            } while ((fileLine.length() < 1) || 
+                     ((fileLine.at(0) == '#') || 
+                      (fileLine.at(0) == '%') || 
+                      (fileLine.at(0) == '\'') || 
+                      (fileLine.at(0) == ':') || 
+                      (fileLine.at(0) == '\t') || 
+                      (fileLine.at(0) == ' ') || 
+                      (fileLine.at(0) == '!')));
+            cfgInfo.parsing_regex = fileLine;
+            std::cout << "RegEx: " << cfgInfo.parsing_regex << std::endl;
             parsingReFile.close();
         }
     } else {
