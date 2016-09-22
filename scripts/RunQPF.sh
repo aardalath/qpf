@@ -29,7 +29,7 @@ STEP=0
 
 #- Options
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-LOG_FILE=./qpfhmi_${TIMESTAMP}.log
+LOG_FILE="${QPFDIR}/log/qpfhmi_${TIMESTAMP}.log"
 CFG_FILE="${QPFDIR}/cfg/qpf_v1_rc1_multihost_eucdev02+eucdev03.json"
 DBG=""
 QPFEXE=${QPF}
