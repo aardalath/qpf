@@ -62,6 +62,7 @@ PSQL_HOST="localhost"
 PSQL_PORT="5432"
 
 MAKE_OPTS="-k -j4"
+CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf --graphviz=dependencies.dot "
 
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
@@ -152,7 +153,7 @@ searchlib () {
     wlib=""
     for l in ${LDLIBS}; do
         if [ -z "$wlib" ]; then
-            wlib=$(find $l \( -name "lib${lib}*.so" -o -name "lib${lib}.a" \) -print)
+            wlib=$(find $l \( -name "lib${lib}*.so" -o -name "lib${lib}.a" \) -print 2>/dev/null)
         fi
     done
     if [ -z "${wlib}" ]; then
@@ -254,55 +255,53 @@ fi
 perform mkdir -p "'${BUILD_PATH}'"
 
 ## Generating dependencies and setting makefiles
-step "Generating dependencies and setting makefiles"
-
 if [ "${COMPILE}" == "yes" ]; then
+    step "Generating dependencies and setting makefiles"
     cd "${BUILD_PATH}"
     if [ "${HMI}" == "yes" ]; then
-        perform $qmake_exe CONFIG+=hmi ../QPF.pro
+        perform cmake -D HMI=ON ${CMAKE_OPTS} ..
     else
-        perform $qmake_exe ../QPF.pro
+        perform cmake -D HMI=OFF ${CMAKE_OPTS} ..
     fi
 fi
 
 ## Compiling source code
-step "Compiling source code"
-
 COMPLSTATUS=0
 if [ "${COMPILE}" == "yes" ]; then
+    step "Compiling source code"
     perform make ${MAKE_OPTS}        
     COMPLSTATUS=${status}
 fi
 
 ## Setting up Work Area in /tmp
-step "Setting up Work Area under '${WORK_AREA}'"
+if [ "${INSTALL}" == "yes" ]; then
+    step "Setting up Work Area under '${WORK_AREA}'"
 
-if [ ! -d "${WORK_AREA}" ]; then
-    perform mkdir -p "'${WORK_AREA}'"
+    if [ ! -d "${WORK_AREA}" ]; then
+         perform mkdir -p "'${WORK_AREA}'"
+    fi
+
+    perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 fi
-
-perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
 
 ## Installing QPF executable and libraries
-step "Installing QPF executables and libraries"
+if [ "${INSTALL}" == "yes" ]; then
+    step "Installing QPF executables and libraries"
 
-install_exe ${QPF_EXE}
-if [ "$HMI" == "yes" ]; then
-    install_exe ${QPFGUI_EXE}
-    #OBSOLETE# install_exe ${QPFHMI_EXE}
-    ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
-fi
+    cd "${BUILD_PATH}"
+    make install 
+    ln -s ${WORK_AREA}/qpf/bin/qpfcore ${WORK_AREA}/qpf/bin/qpf
+    if [ "${HMI}" == "yes" ]; then
+        ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
+    fi
+    
+    install_scpt RunQPF.sh
 
-for l in ${QPF_LIBS}; do
-    install_lib $l
-done
-
-install_scpt RunQPF.sh
-
-QPF_INI="${RUN_PATH}/QPFHMI.conf"
-if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
-    mkdir -p ${HOME}/.config/QPF
-    cp "${QPF_INI}" ${HOME}/.config/QPF
+    QPF_INI="${RUN_PATH}/QPFHMI.conf"
+    if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
+        mkdir -p ${HOME}/.config/QPF
+        cp "${QPF_INI}" ${HOME}/.config/QPF
+    fi
 fi
 
 ## Creating QPFDB database
