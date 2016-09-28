@@ -36,7 +36,9 @@ add_subdirectory (qpf)
 if (HMI)
   message ("HMI component will be generated as well")
   add_subdirectory (qpfgui)
-endif()  
+endif()
+
+add_subdirectory (tests)
 
 #== CPack configuration
 set (CPACK_PACKAGE_VERSION_MAJOR ${QPF_MAJOR})
@@ -45,5 +47,3 @@ set (CPACK_PACKAGE_VERSION_PATCH ${QPF_PATCH})
 set (CPACK_GENERATOR "TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "")
 include (CPack)
-
-
