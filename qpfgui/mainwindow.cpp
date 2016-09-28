@@ -1209,22 +1209,22 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     const QAbstractItemModel * model = idx.model();
     QModelIndex nameIdx = model->index(row, 1, idx.parent());
     QModelIndex urlIdx  = model->index(row, 11, idx.parent());
-    QString tabName = nameIdx.data().toString().trimmed();
-    QString url     = urlIdx.data().toString().trimmed();
 
-    for (int i = 0; i < 10; ++i) {
-        qDebug() << i << ":  [" << model->index(row, i, idx.parent()).data().toString() << "]";
+    QString tabName = nameIdx.data().toString().trimmed();
+    QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
+    if (existingWdg != 0) {
+        ui->tabMainWgd->setCurrentIndex(ui->tabMainWgd->indexOf(existingWdg));
+        return;
     }
 
+    QString url = urlIdx.data().toString().trimmed();
     if (url.left(7) == "file://") {
         url.remove(0, 7);
     } else if (url.left(7) == "http://") {
-        // Download file to temporary folder, and set url to temporary file
+        // TODO Download file to temporary folder, and set url to temporary file
     } else if (url.left(8) == "https://") {
-        // Download file to temporary folder, and set url to temporary file
+        // TODO Download file to temporary folder, and set url to temporary file
     }
-
-    qDebug() << tabName << url;
 
     QWidget * editor = 0;
     QFileInfo fs(url);
@@ -1242,8 +1242,6 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         Q_UNUSED(highlighter);
         ed->setPlainText(content);
         ed->setReadOnly(true);
-        //QPlainTextEdit * pltxt = new QPlainTextEdit();
-        //pltxt->setPlainText(content);
         editor = ed;
     } else if (fs.suffix() == "json") {
         QJsonModel * model = new QJsonModel;
@@ -1281,20 +1279,36 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         model->setIcon(QJsonValue::Array, QIcon(":/img/table.png"));
         model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
         editor = view;
+    } else if (fs.suffix() == "log") {
+        QFile file(fs.absoluteFilePath());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "Cannot open file";
+            return;
+        }
+        QTextStream in(&file);
+        QString content = in.readAll();
+        QTextEdit * ed = new QTextEdit;
+        ed->setPlainText(content);
+        ed->setReadOnly(true);
+        editor = ed;
+    } else {
+        QFile file(fs.absoluteFilePath());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "Cannot open file";
+            return;
+        }
+        QTextStream in(&file);
+        QString content = in.readAll();
+        QTextEdit * ed = new QTextEdit;
+        ed->setPlainText(content);
+        ed->setReadOnly(true);
+        editor = ed;
     }
 
     // Ensure these tabs are closable (and only these)
     int tabIdx = ui->tabMainWgd->addTab(editor, tabName);
-    /*
-    QPushButton *closeButton = new QPushButton();
-    QFont fnt;
-    fnt.setPointSize(6);
-    closeButton->setFont(fnt);
-    closeButton->setText("x");
-    ui->tabMainWgd->tabBar()->setTabButton(tabIdx, QTabBar::RightSide, closeButton);
-    connect(closeButton, SIGNAL(clicked()), ui->tabMainWgd->widget(tabIdx), SLOT(close()));
-    */
     ui->tabMainWgd->setTabsClosable(true);
+    editor->setObjectName(tabName);
     for (int i = 0; i < 5; ++i) {
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->hide();
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->resize(0, 0);
