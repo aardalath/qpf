@@ -403,7 +403,7 @@ void Configuration::readConfigurationFromDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        Log::log("SYSTEM", Log::ERROR, e.what());
+        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
 
@@ -471,7 +471,7 @@ void Configuration::saveConfigurationToDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
 
