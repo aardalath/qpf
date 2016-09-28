@@ -270,6 +270,12 @@ private:
   virtual ~Log();
 
   //----------------------------------------------------------------------
+  // Static Method: ensureSystemLogIsInitialized
+  // Initialize the log associated to the entire system if not yet ready
+  //----------------------------------------------------------------------
+  static void ensureSystemLogIsInitialized();
+
+  //----------------------------------------------------------------------
   // Static Method: closeLogStreams
   // Closes streams before exit
   //----------------------------------------------------------------------
@@ -316,6 +322,10 @@ private:
   // Variable: minimumLogLevel
   // Defines the minimum level to display log messages
   static LogLevel minimumLogLevel;
+
+  // Flag: isInitialised
+  // Flag to ensure the system log is properly initialised when needed
+  static bool isInitialised;
 };
 
 }

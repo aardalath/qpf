@@ -68,7 +68,8 @@ static const Log::LogLevel DefaultMinimumLogLevel = Log::INFO;
 Log::LogLevel Log::minimumLogLevel = DefaultMinimumLogLevel;
 
 bool Log::consoleOutput = false;
-bool Log::quietExit = false;
+bool Log::quietExit     = false;
+bool Log::isInitialised = false;
 
 static void showBacktrace(void);
 
@@ -89,6 +90,22 @@ Log::~Log()
 }
 
 //----------------------------------------------------------------------
+// Static Method: ensureSystemLogIsInitialized
+// Initialize the log associated to the entire system if not yet ready
+//----------------------------------------------------------------------
+void Log::ensureSystemLogIsInitialized()
+{
+    std::cerr << "Checking if is initialized . . .\n";
+    if (! isInitialised) {
+        isInitialised = true;
+        std::cerr << "Not initialized, initializing . . .\n";
+        std::string systemLogFile = logBaseDir + "/log/SYSTEM.syslog";
+        defineLogSystem("SYSTEM", systemLogFile);
+        atexit(Log::closeLogStreams);
+    }
+}
+
+//----------------------------------------------------------------------
 // Static Method: log
 // Put message into log stream
 //----------------------------------------------------------------------
@@ -96,23 +113,29 @@ void Log::log(std::string caller, Log::LogLevel level, std::string message)
 {
   static char LogLevelLetters[] = {'T', 'D', 'I', 'W', 'E', 'F'};
 
+  std::string severityTag = "";
+  if (level == Log::ERROR) { severityTag = "ERROR: "; }
+  if (level == Log::FATAL) { severityTag = "FATAL: "; }
+
+  std::string tag = getTimeTag();
+
+  std::string msg = tag + " " + caller
+    + " [" + LogLevelLetters[(int)(level)] + "] " + severityTag + message + "\n";
+
   std::map<std::string, std::fstream *>::iterator logIt;
   logIt = logStream.find(caller);
   if (logIt == logStream.end()) {
-    // Caller not registered
-    std::stringstream msg;
-    msg << "Caller '" 	<< caller << "' not registered in logging system!";
-    log("SYSTEM", Log::WARNING, msg.str());
+    if (caller == "SYSTEM") {
+      std::cerr << "WARNING: Caller '"   << caller << "' not registered in logging system!" << std::endl;
+    } else {
+      log("SYSTEM", Log::WARNING, "Caller '" + caller + "' not registered in logging system!");
+    }
+    std::cerr << msg << std::endl;
+    if (level == Log::FATAL) { exit(1); }
     return;
   }
 
   std::fstream * fs = logIt->second;
-  std::string severityTag = "";
-  if (level == Log::ERROR) { severityTag = "ERROR: "; }
-  if (level == Log::FATAL) { severityTag = "FATAL: "; }
-  std::string tag = getTimeTag();
-  std::string msg = tag + " " + caller
-    + " [" + LogLevelLetters[(int)(level)] + "] " + severityTag + message + "\n";
   if (!dateChangeShown[caller]) {
       (*fs) << tag + " " + caller
                + " [" + LogLevelLetters[(int)(level)] + "] " + dateString + "\n";
@@ -212,16 +235,7 @@ void Log::setQuietExit(bool val)
 //----------------------------------------------------------------------
 void Log::defineLogSystem(std::string caller, std::string logFile, int numOfMsgs)
 {
-  static int recursiveCalls = 0;
-  static bool isInitialised = false;
-  if (!isInitialised) {
-    isInitialised = true;
-    std::string systemLogFile = logBaseDir + "/log/SYSTEM.syslog";
-    recursiveCalls++;
-    if (recursiveCalls > 10) { abort(); }
-    defineLogSystem("SYSTEM", systemLogFile);
-    atexit(Log::closeLogStreams);
-  }
+  if (!isInitialised) { ensureSystemLogIsInitialized(); }
 
   std::fstream * fs = new std::fstream(logFile.c_str(),
                                        std::ios::out | std::ios::trunc);
@@ -335,6 +349,8 @@ Log::LogLevel Log::getMinLogLevel()
     return Log::minimumLogLevel;
 }
 
+#ifdef DEFINE_BACKTRACE_LOG
+
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -364,5 +380,7 @@ void showBacktrace(void)
 
     free(strings);
 }
+
+#endif
 
 }
