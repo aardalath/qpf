@@ -24,12 +24,13 @@ link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib ${PCRE2DIR}/lib)
 
 add_executable(qpfcore ${qpfcoreLib_src})
 add_dependencies (qpfcore qpf libcomm json sdc infix)
-target_include_directories (qpfcore PUBLIC ../src ../libcomm ../json ../sdc ../infix 
+target_include_directories (qpfcore PUBLIC ../src ../libcomm ../json ../sdc ../infix
   ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include ${PCRE2DIR}/include)
-target_link_libraries (qpfcore qpf libcomm json sdc infix ${PSQLLIB} zmq curl uuid pcre2-posix)
+target_link_libraries (qpfcore
+  qpf libcomm json sdc infix
+  ${PSQLLIB} zmq curl uuid pcre2-posix)
 
 install (TARGETS qpfcore
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
-
