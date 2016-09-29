@@ -546,8 +546,6 @@ void Router2RouterPeer::transmissionsHandler()
         //----------------------------------------------
         // 3.2 Retrieves incoming transmissions from clients
         //----------------------------------------------
-        int64_t rcvmore = 0;
-        static size_t type_size = sizeof(int64_t);
         zmq::pollitem_t servers[] = { {skServer, 0, ZMQ_POLLIN, 0} };
         int rc = 0;
 
@@ -566,60 +564,7 @@ void Router2RouterPeer::transmissionsHandler()
         }
 
         if (rc > 0) {
-            PeerMessage * frames = new PeerMessage;
-            frames->clear();
-            Frame frm;
-            if (servers[0].revents & ZMQ_POLLIN) {
-                do {
-                    zmq::message_t message;
-                    if (!skServer.recv(&message, 0)) throw error_t();
-                    frm.assign(static_cast<const char*>(message.data()),
-                               message.size());
-                    frames->push_back(frm);
-                    rcvmore = 0;
-                    skServer.getsockopt(ZMQ_RCVMORE, &rcvmore, &type_size);
-                } while (rcvmore);
-                servers[0].revents = 0;
-
-                if (waitStart) {
-                    if (frames->size() > FRAME_MSG_TYPE) {
-                        if (frames->at(FRAME_MSG_TYPE).compare("START") == 0) {
-                            emitStartSignal();
-                            waitStart = false;
-                        }
-                    }
-                } else {
-                    const PeerName & mpeer = frames->peer();
-                    dumpId(selfPeer()->name.c_str(),
-                           (selfPeer()->name + ": mpeer = " + mpeer).c_str());
-                    std::map<PeerName, int>::iterator it = mapOfPeers.find(mpeer);
-                    if (it != mapOfPeers.end()) {
-                        if (ackInfo.waitAckFrom[mpeer] && frames->isAck()) {
-                            // If we were waiting for ACK from peer, and this is
-                            // an ACK, we remove the flag, and forget about the
-                            // message
-                            dumpId(selfPeer()->name.c_str(),
-                                   ("ACK RECEIVED from " + mpeer).c_str());
-                            ackInfo.waitAckFrom[mpeer] = false;
-                            ackInfo.cycles[mpeer] = 0;
-                            DESTROY_MESSAGE( ackInfo.lastTx[mpeer].second );
-                        } else if (frames->ackRqsted()) {
-                            // If the sender requests an ACK, send it immediately
-                            // and remove the ack flag
-                            Frame msgType = frames->type();
-                            (*frames)[FRAME_MSG_TYPE] = msgType;
-                            inTx.push_back(std::make_pair(peers.at(it->second), frames));
-                            setTransmissionToPeer(mpeer, buildPeerMsg(mpeer, "ACK"));
-                        } else {
-                            // Else, store in the inbox as normal
-                            inTx.push_back(std::make_pair(peers.at(it->second), frames));
-                        }
-                    }
-                }
-                std::string mc;
-                GETMSG(mc, (*frames));
-                dumpId(selfPeer()->name.c_str(),("Recv tx => " + mc).c_str());
-            }
+            processIncommingPeerMsg(servers, waitStart, skServer);
         }
 
         commsActive = communicationsActive;
@@ -632,6 +577,72 @@ void Router2RouterPeer::transmissionsHandler()
     skClient.close();
     skServer.close();
     context.close();
+}
+
+//----------------------------------------------------------------------
+// Method: processIncommingPeerMsg
+// Process incomming transmission
+//----------------------------------------------------------------------
+void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t servers,
+                                                bool waitStart,
+                                                zmq::socket_t skServer)
+{
+    int64_t rcvmore = 0;
+    static size_t type_size = sizeof(int64_t);
+    PeerMessage * frames = new PeerMessage;
+    frames->clear();
+    Frame frm;
+    if (servers[0].revents & ZMQ_POLLIN) {
+        do {
+            zmq::message_t message;
+            if (!skServer.recv(&message, 0)) throw error_t();
+            frm.assign(static_cast<const char*>(message.data()),
+                       message.size());
+            frames->push_back(frm);
+            rcvmore = 0;
+            skServer.getsockopt(ZMQ_RCVMORE, &rcvmore, &type_size);
+        } while (rcvmore);
+        servers[0].revents = 0;
+
+        if (waitStart) {
+            if (frames->size() > FRAME_MSG_TYPE) {
+                if (frames->at(FRAME_MSG_TYPE).compare("START") == 0) {
+                    emitStartSignal();
+                    waitStart = false;
+                }
+            }
+        } else {
+            const PeerName & mpeer = frames->peer();
+            dumpId(selfPeer()->name.c_str(),
+                   (selfPeer()->name + ": mpeer = " + mpeer).c_str());
+            std::map<PeerName, int>::iterator it = mapOfPeers.find(mpeer);
+            if (it != mapOfPeers.end()) {
+                if (ackInfo.waitAckFrom[mpeer] && frames->isAck()) {
+                    // If we were waiting for ACK from peer, and this is
+                    // an ACK, we remove the flag, and forget about the
+                    // message
+                    dumpId(selfPeer()->name.c_str(),
+                           ("ACK RECEIVED from " + mpeer).c_str());
+                    ackInfo.waitAckFrom[mpeer] = false;
+                    ackInfo.cycles[mpeer] = 0;
+                    DESTROY_MESSAGE( ackInfo.lastTx[mpeer].second );
+                } else if (frames->ackRqsted()) {
+                    // If the sender requests an ACK, send it immediately
+                    // and remove the ack flag
+                    Frame msgType = frames->type();
+                    (*frames)[FRAME_MSG_TYPE] = msgType;
+                    inTx.push_back(std::make_pair(peers.at(it->second), frames));
+                    setTransmissionToPeer(mpeer, buildPeerMsg(mpeer, "ACK"));
+                } else {
+                    // Else, store in the inbox as normal
+                    inTx.push_back(std::make_pair(peers.at(it->second), frames));
+                }
+            }
+        }
+        std::string mc;
+        GETMSG(mc, (*frames));
+        dumpId(selfPeer()->name.c_str(),("Recv tx => " + mc).c_str());
+    }
 }
 
 //----------------------------------------------------------------------
