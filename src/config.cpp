@@ -501,6 +501,76 @@ void Configuration::saveConfigurationToDB()
 }
 
 //----------------------------------------------------------------------
+// Method: getRegExFromCfg
+// Retrieves filename regex from cfg or from designated file
+//----------------------------------------------------------------------
+std::string Configuration::getRegExFromCfg(std::string parsing_regex_str)
+{
+    // Regex for parsing file names might be in a separate file pointed by
+    // parsing_regex parameter if the first character is '@'
+    if (parsing_regex_str.at(0) == '@') {
+        std::ifstream parsingReFile;
+        parsingReFile.open(cfgFilePath + "/" + parsing_regex_str.substr(1),
+                std::ifstream::in);
+        if (parsingReFile.good()) {
+            std::string fileLine;
+            do {
+                std::getline(parsingReFile, fileLine);
+            } while ((fileLine.length() < 1) ||
+                    ((fileLine.at(0) == '#') ||
+                    (fileLine.at(0) == '%') ||
+                    (fileLine.at(0) == '\'') ||
+                    (fileLine.at(0) == ':') ||
+                    (fileLine.at(0) == '\t') ||
+                    (fileLine.at(0) == ' ') ||
+                    (fileLine.at(0) == '!')));
+            parsingReFile.close();
+            return fileLine;
+        }
+    } else {
+        return parsing_regex_str;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: createNewComponent
+// Create the appropriate component according to the peer type
+//----------------------------------------------------------------------
+Component * Configuration::createNewComponent(ConfigurationInfo & cfgInfo,
+                                              std::string & peerType,
+                                              const char * cpeerName)
+{
+    Component * component = 0;
+
+    if        (peerType == "evtmng") {
+        component = new EventManager(cpeerName);
+    } else if (peerType == "hmi") {
+        cfgInfo.hmiPresent = true;
+    } else if (peerType == "datamng") {
+        component = new DataManager(cpeerName);
+    } else if (peerType == "logmng") {
+        component = new LogManager(cpeerName);
+    } else if (peerType == "taskmng") {
+        component = new TaskManager(cpeerName);
+    } else if (peerType == "taskorc") {
+        component = new TaskOrchestrator(cpeerName);
+    } else if (peerType == "taskagent") {
+        TaskAgent * ag = new TaskAgent(cpeerName);
+        ag->setSysDir(Configuration::PATHBase);
+        ag->setWorkDir(Configuration::PATHTsk);
+        ag->setAgentAddress(cfgInfo.currentUser + "@" + cfgInfo.currentMachine);
+        ag->setMasterAddress(cfgInfo.currentUser + "@" + cfgInfo.masterMachine);
+        ag->setRemote(!cfgInfo.isMaster);
+        component = ag;
+        cfgInfo.peerAgents.push_back(component);
+    } else {
+        // Do nothing, not yet implemented
+    }
+
+    return component;
+}
+
+//----------------------------------------------------------------------
 // Method: processConfiguration
 // Loads the configuration file content into memory
 //----------------------------------------------------------------------
@@ -533,33 +603,7 @@ void Configuration::processConfiguration()
     cfgInfo.data_ext         = prds["data_ext"].asString();
     cfgInfo.meta_ext         = prds["meta_ext"].asString();
     cfgInfo.log_ext          = prds["log_ext"].asString();
-    // Regex for parsing file names might be in a separate file pointed by
-    // parsing_regex parameter if the first character is '@'
-    std::string parsing_regex_str = prds["parsing_regex"].asString();
-    if (parsing_regex_str.at(0) == '@') {
-        std::ifstream parsingReFile;
-        parsingReFile.open(cfgFilePath + "/" + parsing_regex_str.substr(1),
-                std::ifstream::in);
-        if (parsingReFile.good()) {
-            std::string fileLine;
-            do {
-                std::getline(parsingReFile, fileLine);
-                std::cout << fileLine << std::endl;
-            } while ((fileLine.length() < 1) || 
-                     ((fileLine.at(0) == '#') || 
-                      (fileLine.at(0) == '%') || 
-                      (fileLine.at(0) == '\'') || 
-                      (fileLine.at(0) == ':') || 
-                      (fileLine.at(0) == '\t') || 
-                      (fileLine.at(0) == ' ') || 
-                      (fileLine.at(0) == '!')));
-            cfgInfo.parsing_regex = fileLine;
-            std::cout << "RegEx: " << cfgInfo.parsing_regex << std::endl;
-            parsingReFile.close();
-        }
-    } else {
-        cfgInfo.parsing_regex = parsing_regex_str;
-    }
+    cfgInfo.parsing_regex    = getRegExFromCfg(prds["parsing_regex"].asString());
 
     FileNameSpec fs(cfgInfo.parsing_regex, cfgInfo.parsing_assign);
     fs.setProductIdTpl(cfgInfo.product_id_tpl);
@@ -650,35 +694,8 @@ void Configuration::processConfiguration()
         Peer * peer = cfgInfo.peersCfgByName[machineNodes.at(i)];
         std::string & peerName = peer->name;
         std::string & peerType = peer->type;
-        const char * cpeerName = peerName.c_str();
 
-        Component * component = 0;
-
-        if        (peerType == "evtmng") {
-            component = new EventManager(cpeerName);
-        } else if (peerType == "hmi") {
-            cfgInfo.hmiPresent = true;
-        } else if (peerType == "datamng") {
-            component = new DataManager(cpeerName);
-        } else if (peerType == "logmng") {
-            component = new LogManager(cpeerName);
-        } else if (peerType == "taskmng") {
-            component = new TaskManager(cpeerName);
-        } else if (peerType == "taskorc") {
-            component = new TaskOrchestrator(cpeerName);
-        } else if (peerType == "taskagent") {
-            TaskAgent * ag = new TaskAgent(cpeerName);
-            ag->setSysDir(Configuration::PATHBase);
-            ag->setWorkDir(Configuration::PATHTsk);
-            ag->setAgentAddress(cfgInfo.currentUser + "@" + cfgInfo.currentMachine);
-            ag->setMasterAddress(cfgInfo.currentUser + "@" + cfgInfo.masterMachine);
-            ag->setRemote(!cfgInfo.isMaster);
-            component = ag;
-            cfgInfo.peerAgents.push_back(component);
-        } else {
-            // Do nothing, not yet implemented
-        }
-
+        Component * component = createNewComponent(cfgInfo, peerType, peerName.c_str());
         if (component == 0) { continue; }
 
         component->addPeer(cfgInfo.peersCfgByName[peerName], true);

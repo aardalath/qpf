@@ -222,10 +222,24 @@ private:
     void saveConfigurationToDB();
 
     //----------------------------------------------------------------------
+    // Method: createNewComponent
+    // Create the appropriate component according to the peer type
+    //----------------------------------------------------------------------
+    Component * createNewComponent(ConfigurationInfo & cfgInfo,
+                                   std::string & peerType,
+                                   const char * cpeerName);
+
+    //----------------------------------------------------------------------
     // Method: processConfiguration
     // Convert data in cfg (Json) to cfgInfo structure
     //----------------------------------------------------------------------
     void processConfiguration();
+
+    //----------------------------------------------------------------------
+    // Method: getRegExFromCfg
+    // Retrieves filename regex from cfg or from designated file
+    //----------------------------------------------------------------------
+    std::string getRegExFromCfg(std::string parsing_regex_str);
 
 private:
     std::string           cfgFileName;
