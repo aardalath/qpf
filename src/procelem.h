@@ -139,6 +139,12 @@ protected:
     void monitorProcElemLoop();
 
     //----------------------------------------------------------------------
+    // Method: prepareOutputFile
+    // Prepare the output product file to be retrieved
+    //----------------------------------------------------------------------
+    std::string prepareOutputFile(std::string vd, std::string& dname);
+
+    //----------------------------------------------------------------------
     // Method: retrieveOutputProducts
     // Gets information about output product files for archival purposes
     //----------------------------------------------------------------------

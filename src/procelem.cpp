@@ -539,6 +539,40 @@ void ProcessingElement::monitorProcElemLoop()
 }
 
 //----------------------------------------------------------------------
+// Method: prepareOutputFile
+// Prepare the output product file to be retrieved
+//----------------------------------------------------------------------
+std::string ProcessingElement::prepareOutputFile(std::string vd, std::string& dname)
+{
+    std::string fullName = vd + "/" + dname;
+
+    /**************************************************
+     *** HACK: Simulate FITS output files
+     ***       with hard links to input images
+     **************************************************/
+
+    if (str::getExtension(dname) == "fits") {
+        std::string refName;
+        std::ifstream ifs(fullName);
+        if (ifs.good()) {
+            std::getline(ifs, refName);
+            ifs.close();
+        }
+        if (refName.length() > 0) {
+            std::string origFile = (str::getDirName(vd) + "/in/" +
+                    str::getBaseName(refName));
+            DBG("Converting output file " << fullName << " in a link to " << origFile);
+            unlink(fullName.c_str());
+            if (link(origFile.c_str(), fullName.c_str()) != 0) {
+                perror(std::string("link output product: from " + origFile +
+                        " to " + fullName).c_str());
+            }
+        }
+    }
+    return fullName;
+}
+
+//----------------------------------------------------------------------
 // Method: retrieveOutputProducts
 // Gets information about output product files for archival purposes
 //----------------------------------------------------------------------
@@ -562,34 +596,9 @@ void ProcessingElement::retrieveOutputProducts()
                 if (dirp->d_name[0] != '.') {
                     std::string dname(dirp->d_name);
                     if (dname.substr(0, 3) != "EUC") { continue; }
-                    std::string fullName = vd + "/" + dname;
-
-                    /**************************************************
-                     *** HACK: Simulate FITS output files
-                     ***       with hard links to input images
-                     **************************************************/
-
-                    if (str::getExtension(dname) == "fits") {
-                        std::string refName;
-                        std::ifstream ifs(fullName);
-                        if (ifs.good()) {
-                            std::getline(ifs, refName);
-                            ifs.close();
-                        }
-                        if (refName.length() > 0) {
-                            std::string origFile = (str::getDirName(vd) + "/in/" +
-                                                    str::getBaseName(refName));
-                            DBG("Converting output file " << fullName << " in a link to " << origFile);
-                            unlink(fullName.c_str());
-                            if (link(origFile.c_str(), fullName.c_str()) != 0) {
-                                perror(std::string("link output product: from " + origFile +
-                                                   " to " + fullName).c_str());
-                            }
-                        }
-                    }
-
-                    DBG("Saving outfile " << fullName);
-                    outFiles.push_back(fullName);
+                    std::string outputFile = prepareOutputFile(vd, dname);
+                    DBG("Saving outfile " << outputFile);
+                    outFiles.push_back(outputFile);
                 }
             }
             closedir(dp);
