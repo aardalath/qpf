@@ -583,9 +583,9 @@ void Router2RouterPeer::transmissionsHandler()
 // Method: processIncommingPeerMsg
 // Process incomming transmission
 //----------------------------------------------------------------------
-void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t servers,
+void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t servers[],
                                                 bool waitStart,
-                                                zmq::socket_t skServer)
+                                                zmq::socket_t & skServer)
 {
     int64_t rcvmore = 0;
     static size_t type_size = sizeof(int64_t);

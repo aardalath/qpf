@@ -342,10 +342,6 @@ public:
     //----------------------------------------------------------------------
     void dumpMsgStats(std::string fileName);
 
-    void checkIfAckFromRecip(PeerName recipient, std::deque<Transmission>::iterator outIt, Transmission tx, int64_t timeSpan, PeerMessage* peerMsg);
-    void processIncomingPeerMsg(static size_t type_size, bool waitStart, zmq::pollitem_t servers, int64_t rcvmore, zmq::socket_t skServer);
-    void processIncommingPeerMsg(zmq::pollitem_t servers, bool waitStart, zmq::socket_t skServer);
-
 protected:
 
     //----------------------------------------------------------------------
@@ -370,9 +366,9 @@ protected:
     // Method: processIncommingPeerMsg
     // Process incomming transmission
     //----------------------------------------------------------------------
-    void processIncommingPeerMsg(zmq::pollitem_t servers,
+    void processIncommingPeerMsg(zmq::pollitem_t servers[],
                                  bool waitStart,
-                                 zmq::socket_t skServer);
+                                 zmq::socket_t & skServer);
 
     //----------------------------------------------------------------------
     // Static Method: launchTransmissionsHandler
