@@ -504,13 +504,13 @@ void Configuration::saveConfigurationToDB()
 // Method: getRegExFromCfg
 // Retrieves filename regex from cfg or from designated file
 //----------------------------------------------------------------------
-std::string Configuration::getRegExFromCfg(std::string parsing_regex_str)
+std::string Configuration::getRegExFromCfg(std::string & regexStr)
 {
     // Regex for parsing file names might be in a separate file pointed by
     // parsing_regex parameter if the first character is '@'
-    if (parsing_regex_str.at(0) == '@') {
+    if (regexStr.at(0) == '@') {
         std::ifstream parsingReFile;
-        parsingReFile.open(cfgFilePath + "/" + parsing_regex_str.substr(1),
+        parsingReFile.open(cfgFilePath + "/" + regexStr.substr(1),
                 std::ifstream::in);
         if (parsingReFile.good()) {
             std::string fileLine;
@@ -528,7 +528,7 @@ std::string Configuration::getRegExFromCfg(std::string parsing_regex_str)
             return fileLine;
         }
     } else {
-        return parsing_regex_str;
+        return regexStr;
     }
 }
 
@@ -603,7 +603,9 @@ void Configuration::processConfiguration()
     cfgInfo.data_ext         = prds["data_ext"].asString();
     cfgInfo.meta_ext         = prds["meta_ext"].asString();
     cfgInfo.log_ext          = prds["log_ext"].asString();
-    cfgInfo.parsing_regex    = getRegExFromCfg(prds["parsing_regex"].asString());
+    
+    std::string parsing_regex_str = prds["parsing_regex"].asString();
+    cfgInfo.parsing_regex    = getRegExFromCfg(parsing_regex_str);
 
     FileNameSpec fs(cfgInfo.parsing_regex, cfgInfo.parsing_assign);
     fs.setProductIdTpl(cfgInfo.product_id_tpl);

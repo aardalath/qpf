@@ -239,7 +239,7 @@ private:
     // Method: getRegExFromCfg
     // Retrieves filename regex from cfg or from designated file
     //----------------------------------------------------------------------
-    std::string getRegExFromCfg(std::string parsing_regex_str);
+    std::string getRegExFromCfg(std::string & regexStr);
 
 private:
     std::string           cfgFileName;
