@@ -366,8 +366,8 @@ protected:
     // Method: processIncommingPeerMsg
     // Process incomming transmission
     //----------------------------------------------------------------------
-    void processIncommingPeerMsg(zmq::pollitem_t servers[],
-                                 bool waitStart,
+    void processIncommingPeerMsg(zmq::pollitem_t & server,
+                                 bool & waitStart,
                                  zmq::socket_t & skServer);
 
     //----------------------------------------------------------------------
