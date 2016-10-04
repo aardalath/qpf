@@ -388,10 +388,8 @@ void Router2RouterPeer::transmissionsHandler()
 {
     std::string id = self.load(std::memory_order_relaxed)->name;
     int selfNum = selfIdx;
-    bool waitStart = waitForStart;
 
-    dumpId(selfPeer()->name.c_str(),
-           ("+++++++++ RUNING TRANSMISSIONS HANDLER FOR " + id + "+++++++++").c_str());
+    bool waitStart = waitForStart;
 
     //============================================================
     //==== 1. Create context
@@ -400,9 +398,15 @@ void Router2RouterPeer::transmissionsHandler()
     // Create context
     zmq::context_t context(1);
 
+    dumpId(selfPeer()->name.c_str(), "++++++++++++++++++++++++++++++++++++++++++++++++");
+    dumpId(selfPeer()->name.c_str(), ("+ RUNING TRANSMISSIONS HANDLER FOR " + id).c_str());
+    dumpId(selfPeer()->name.c_str(), "++++++++++++++++++++++++++++++++++++++++++++++++");
+
     //============================================================
     //==== 2. Create and connect sockets
     //============================================================
+    dumpId(selfPeer()->name.c_str(), ("Identity is " + id).c_str());
+
     std::string serverAddr = self.load(std::memory_order_relaxed)->serverAddr;
 
     // Create and Activate server socket
@@ -411,6 +415,8 @@ void Router2RouterPeer::transmissionsHandler()
     zmq::socket_t skServer(context, ZMQ_ROUTER);
     zmq_setsockopt(skServer, ZMQ_IDENTITY, id.c_str(), id.length());
     zmq_setsockopt(skServer, ZMQ_ROUTER_MANDATORY, &routerMand, sizeof(routerMand));
+
+    // Activate server
     skServer.bind(serverAddr.c_str());
 
     // Create and Activate client socket
@@ -421,21 +427,26 @@ void Router2RouterPeer::transmissionsHandler()
     // Connect client socket to peers
     for (unsigned int i = 0; i < peers.size(); ++i) {
         if ((int)(i) == selfNum) continue;
-        dumpId(selfPeer()->name.c_str(), ("connecting to" + peers.at(i)->name +
-                                          "@" + peers.at(i)->clientAddr).c_str());
+        dumpId(selfPeer()->name.c_str(),
+               ("connecting to" + peers.at(i)->name +
+                "@" + peers.at(i)->clientAddr).c_str());
         skClient.connect(peers.at(i)->clientAddr.c_str());
     }
+
 
     //============================================================
     // 3. Loop
     //============================================================
     bool commsActive = communicationsActive;
+
     outTx.clear();
     inTx.clear();
 
     while (commsActive) {
 
-        //== 3.1 Send outgoing transmissions to their recipients
+        //----------------------------------------------
+        // 3.1 Send outgoing transmissions to their recipients
+        //----------------------------------------------
         if (!skClient.connected()) {
             std::cerr << "ERROR: Client socket not connected for "
                       << self.load()->name << std::endl;
@@ -447,6 +458,7 @@ void Router2RouterPeer::transmissionsHandler()
         std::deque<Transmission>::iterator outIt = outTx.begin();
 
         setClock(0);
+
         while ((!outTx.empty()) && (outIt != outTx.end()) &&
                (timeSpan < windowSpan)) {
 
@@ -480,27 +492,36 @@ void Router2RouterPeer::transmissionsHandler()
                 }
             }
 
+            for (unsigned int j = 0; j < peerMsg->size(); ++j) {
+                dumpId(selfPeer()->name.c_str(),
+                       ("Sending FRAME '" + peerMsg->at(j) + "'").c_str());
+            }
+
             int flags = ZMQ_SNDMORE;
             int bytesSent = 0;
             int numFrames = peerMsg->size();
             for (int i = 0; i < numFrames; ++i) {
                 if (i == (numFrames - 1)) { flags = 0; }
                 bytesSent += skClient.send(peerMsg->at(i).c_str(),
-                                           peerMsg->at(i).length(), flags);
+                                           peerMsg->at(i).length(),
+                                           flags);
             }
             std::string mc;
             GETMSG(mc, (*peerMsg));
             char sss[100];
             sprintf(sss, " (%d bytes sent)", bytesSent);
-            dumpId(selfPeer()->name.c_str(), ("Sent tx => " + mc +
-                   std::string(sss) + " to " + peerMsg->peer()).c_str());
+            dumpId(selfPeer()->name.c_str(),
+                   ("Sent tx => " + mc + std::string(sss) + " to " +
+                    peerMsg->peer()).c_str());
 
             // Mark ack from recipient if needed
             ackInfo.waitAckFrom[recipient] = peerMsg->ackRqsted();
             ackInfo.cycles[recipient] = 0;
             ackInfo.lastTx[recipient] = tx;
 
-            if (!ackInfo.waitAckFrom[recipient] ) { DESTROY_MESSAGE( peerMsg ); }
+            if (!ackInfo.waitAckFrom[recipient] ) {
+                DESTROY_MESSAGE( peerMsg );
+            }
 
             if (outIt != outTx.begin()) {
                 std::deque<Transmission>::iterator outItPrev = outIt - 1;
@@ -514,7 +535,9 @@ void Router2RouterPeer::transmissionsHandler()
             timeSpan = setClock(1);
         }
 
-        //== 3.2 Retrieves incoming transmissions from clients
+        //----------------------------------------------
+        // 3.2 Retrieves incoming transmissions from clients
+        //----------------------------------------------
         zmq::pollitem_t servers[] = { {skServer, 0, ZMQ_POLLIN, 0} };
         int rc = 0;
 
@@ -523,14 +546,16 @@ void Router2RouterPeer::transmissionsHandler()
             try {
                 rc = zmq::poll(servers, 1, 100);
             } catch(...) {
-                if ((rc < 0) && (zmq_errno() != EINTR)) { perror("zmq_poll"); }
+                if ((rc < 0) && (zmq_errno() != EINTR)) {
+                    perror("zmq_poll");
+                }
             }
         } else {
             std::cerr << "ERROR: Server socket not connected for "
                       << self.load()->name << std::endl;
         }
 
-        if (rc > 0) { processIncommingPeerMsg(servers, waitStart, skServer); }
+        if (rc > 0) { processIncommingPeerMsg(servers[0], waitStart, skServer); }
 
         commsActive = communicationsActive;
 
@@ -548,16 +573,16 @@ void Router2RouterPeer::transmissionsHandler()
 // Method: processIncommingPeerMsg
 // Process incomming transmission
 //----------------------------------------------------------------------
-void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t servers[],
-                                                bool waitStart,
+void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t & server,
+                                                bool & waitStart,
                                                 zmq::socket_t & skServer)
 {
+    size_t type_size = sizeof(int64_t);
     int64_t rcvmore = 0;
-    static size_t type_size = sizeof(int64_t);
     PeerMessage * frames = new PeerMessage;
     frames->clear();
     Frame frm;
-    if (servers[0].revents & ZMQ_POLLIN) {
+    if (server.revents & ZMQ_POLLIN) {
         do {
             zmq::message_t message;
             if (!skServer.recv(&message, 0)) throw error_t();
@@ -567,7 +592,7 @@ void Router2RouterPeer::processIncommingPeerMsg(zmq::pollitem_t servers[],
             rcvmore = 0;
             skServer.getsockopt(ZMQ_RCVMORE, &rcvmore, &type_size);
         } while (rcvmore);
-        servers[0].revents = 0;
+        server.revents = 0;
 
         if (waitStart) {
             if (frames->size() > FRAME_MSG_TYPE) {
