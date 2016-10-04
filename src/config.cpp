@@ -398,7 +398,7 @@ void Configuration::readConfigurationFromDB()
     dbHdl->setDbName(Configuration::DBName);
     dbHdl->setDbUser(Configuration::DBUser);
     dbHdl->setDbPasswd(Configuration::DBPwd);
-
+    
     // Check that connection with the DB is possible
     try {
         dbHdl->openConnection();
@@ -475,11 +475,16 @@ void Configuration::saveConfigurationToDB()
         return;
     }
 
+    // Modify cfg to store
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    Json::Value dbcfg(cfg);
+    dbcfg["products"]["parsing_regex"] = cfgInfo.parsing_regex;
+    
     // Transfer config from JSON value to DB
     std::string cmd;
     std::string now = LibComm::timeTag();
     Json::FastWriter writer;
-    std::string cfgString = writer.write(cfg);
+    std::string cfgString = writer.write(dbcfg);
 
     cmd = "INSERT INTO configuration (created, last_accessed, cfg) VALUES ";
     cmd += "('" + now + "', '" + now + "', '" + cfgString + "')";
@@ -511,7 +516,7 @@ std::string Configuration::getRegExFromCfg(std::string & regexStr)
     if (regexStr.at(0) == '@') {
         std::ifstream parsingReFile;
         parsingReFile.open(cfgFilePath + "/" + regexStr.substr(1),
-                std::ifstream::in);
+                           std::ifstream::in);
         if (parsingReFile.good()) {
             std::string fileLine;
             do {
