@@ -322,10 +322,21 @@ void MainWindow::paste()
 //----------------------------------------------------------------------
 void MainWindow::about()
 {
+#ifndef BUILD_ID
+#define BUILD_ID ""
+#endif
+    
+    QString buildId(BUILD_ID);
+    if (buildId.isEmpty()) {
+        char buf[20];
+        sprintf(buf, "%ld", (long)(time(0)));
+        buildId = QString(buf);
+    } 
+
     QMessageBox::about(this, tr("About " APP_NAME),
                        tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
                           APP_COMPANY "\n"
-                          APP_DATE));
+                          APP_DATE " - Build ") + buildId);
 }
 
 //----------------------------------------------------------------------
@@ -871,12 +882,27 @@ void MainWindow::setLogWatch()
         QString logDir = QString::fromStdString(Log::getLogBaseDir()) + "/" + logDirName;
         QStringList logFiles;
         logFiles << QDir(logDir).entryList(logExtFilter);
+        
         // Create MDI window with the log file viewer
         foreach (QString logBaseName, logFiles) {
             QString logFileName(logDir + "/" + logBaseName);
+            QString bseName(QFileInfo(logFileName).baseName());
+            
+            // check that the window for this log does not exist
+            QList<QMdiSubWindow *> sws = ui->mdiArea->subWindowList();
+            bool doesExist = false;
+            foreach (QMdiSubWindow * subw, sws) {
+                TextView * tv = qobject_cast<TextView *>(subw->widget());
+                if (tv->logName() == bseName) {
+                    doesExist = true;
+                    break;
+                }
+            }
+            if (doesExist) { continue; }
+            
             TextView * pltxted = new TextView;
             pltxted->setStyleSheet(FixedWidthStyle);
-            pltxted->setLogName(QFileInfo(logFileName).baseName());
+            pltxted->setLogName(bseName);
             LogWatcher * newLog = new LogWatcher(pltxted);
             newLog->setFile(logFileName);
             nodeLogs.append(newLog);

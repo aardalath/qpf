@@ -61,14 +61,20 @@ WORK_AREA="${HOME}"
 PSQL_HOST="localhost"
 PSQL_PORT="5432"
 
-MAKE_OPTS="-k -j4"
-CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf --graphviz=dependencies.dot "
-
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
 LOG_FILE=./build_${DATE}.log
 VERSION=$(cat "${QPF_PATH}/VERSION")
 LDLIBS=$(echo $LD_LIBRARY_PATH | tr ':' ' ')
+
+SVN_REV=$(svn info ${QPF_PATH} | awk '/^Revision:/{print $2;}')
+echo "Revision number: ${SVN_REV}"
+BUILD_ID="${DATE}_${SVN_REV}"
+echo "BUILD_ID: ${BUILD_ID}"
+export BUILD_ID
+
+MAKE_OPTS="-k -j4 "
+CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf --graphviz=dependencies.dot "
 
 ###### Handy functions
 

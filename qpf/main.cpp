@@ -36,10 +36,42 @@
  *
  ******************************************************************************/
 
+#include "version.h"
+
+#ifndef BUILD_ID
+#define BUILD_ID ""
+#endif
+
 #include "deployer.h"
 
+//----------------------------------------------------------------------
+// Function: sayHello
+// Shows a minimal title and build id for the application
+//----------------------------------------------------------------------
+void sayHello()
+{
+    std::string buildId(BUILD_ID);
+    if (buildId.empty()) {
+        char buf[20];
+        sprintf(buf, "%ld", (long)(time(0)));
+        buildId = std::string(buf);
+    } 
+    std::string hline("----------------------------------------"
+                      "--------------------------------------");
+    std::cout << hline << std::endl
+            << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
+            << " " << APP_DATE << " - " 
+            << APP_RELEASE << " Build " << buildId << std::endl
+            << hline << std::endl << std::endl;
+}
+
+//----------------------------------------------------------------------
+// Function: main
+// Creates the application main class, and invokes its run method
+//----------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    sayHello();
     QPF::Deployer deployer(argc, argv);
     return deployer.run();
 }

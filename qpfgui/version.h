@@ -2,7 +2,7 @@
  * File:    version.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.qpfhmi.version
+ * Domain:  QPF.qpfgui.version
  *
  * Version: 1.0
  *
@@ -45,13 +45,13 @@
 #define APP_SYS_NAME     "QPF"
 
 //! Application Name
-#define APP_NAME         "QPFHMI"
+#define APP_NAME         "QPFGUI"
 
 //! Application Release Number
-#define APP_RELEASE      "1.0rc2"
+#define APP_RELEASE      "1.0.1"
 
 //! Application Release Date
-#define APP_DATE         "APR 2016"
+#define APP_DATE         "OCT 2016"
 
 //! Application Developer Company
 #define APP_COMPANY      "Euclid SOC Team"
