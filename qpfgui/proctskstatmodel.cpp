@@ -58,9 +58,13 @@ ProcTaskStatusModel::ProcTaskStatusModel()
                 "      ON t.task_data#>>'{State,TaskStatus}' = tt.task_status_id::text "
                 "ORDER BY id;");
 
+//    defineQuery("SELECT * FROM tasks_info t "
+//                "ORDER BY id;");
+
     defineHeaders({"ID", "Started at", "Finished at",
                 "Task Name", "Agent", "Proc.Element",
-                "Status", "Progress", "Exit Code", "Task Data"});
+                "Status", "Progress", "Exit Code", "Task Info"});
+    
 
     ColumnPalette statusPalette;
     statusPalette["SCHEDULED"] = FgBgColors(QColor(Qt::gray),  QColor(Qt::white));
