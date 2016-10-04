@@ -12,7 +12,6 @@ project (qpfGui)
 find_package (Qt5Widgets)
 find_package (Qt5Sql)
 
-
 set (qpfGuiLib_src
   browser.cpp
   configtool.cpp
