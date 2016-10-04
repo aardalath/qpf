@@ -41,14 +41,17 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+//! Application System Name
+#define APP_SYS_NAME     "QPF"
+
 //! Application name
-#define APP_NAME         "QPF"
+#define APP_NAME         "libQPF"
 
 //! Application release number
-#define APP_RELEASE      "1.0rc2"
+#define APP_RELEASE      "1.0.1"
 
 //! Application release date
-#define APP_DATE         "APR 2016"
+#define APP_DATE         "OCT 2016"
 
 //! Application developer company
 #define APP_COMPANY      "Euclid SOC Team"
