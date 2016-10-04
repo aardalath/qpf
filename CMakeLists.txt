@@ -26,6 +26,9 @@ message (STATUS "Building QPF version ${QPF_VERSION}")
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+set (BUILD_ID $ENV{BUILD_ID})
+add_definitions(-DBUILD_ID="${BUILD_ID}")
+
 add_subdirectory (json)
 add_subdirectory (sdc)
 add_subdirectory (infix)
