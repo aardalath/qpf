@@ -74,7 +74,7 @@ void FileNameSpec::setFileNameSpec(std::string regexp, std::string assign)
 void FileNameSpec::setRegEx(std::string regexp)
 {
     reStr = regexp;
-
+    
 #ifdef USE_CX11_REGEX
     re = std::regex(regexp);
 #else
