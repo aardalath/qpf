@@ -55,7 +55,13 @@ DBManager::DBManager()
 
 DBManager::~DBManager()
 {
+    close();
+}
 
+void DBManager::close()
+{
+    db.removeDatabase(activeDb);
+    db.close();
 }
 
 void DBManager::checkTaskStatusInfo()
@@ -124,12 +130,14 @@ int DBManager::numOfRowsInDbTable(QString tableName)
 
 void DBManager::addICommand(Cmd cmd)
 {
-    QDateTime now = QDateTime::currentDateTime();
-
+    QDateTime now(QDateTime::currentDateTime());
+    QDateTime nowUTC(now);
+    nowUTC.setTimeSpec(Qt::UTC);
+    
     QString sqry(QString("INSERT INTO icommands "
                          "(cmd_date, cmd_source, cmd_target, cmd_executed, cmd_content) "
                          "VALUES ('%1', '%2', '%3', false, '%4');")
-                 .arg(now.toString())
+                 .arg(nowUTC.toString(Qt::ISODate))
                  .arg("QPFHMI")
                  .arg("EvtMng")
                  .arg("QUIT"));

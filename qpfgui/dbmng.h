@@ -75,6 +75,7 @@ public:
     static int numOfRowsInDbTable(QString tableName);
 
     static void addICommand(Cmd cmd);
+    static void close();
 
     //bool getTasksInfo(QMap<QString, QJsonObject> & newTasks, int offset = 0);
 
