@@ -116,29 +116,29 @@ TEST_F(TestTools, StrToTConversionChar)
     EXPECT_EQ(strTo<std::string>(ss), std::string("Hola"));
 }
 
-TEST_F(TestTools, WaitForHeartBeat)
-{
-    int secMsec[][2] = {{0,     100},
-                        {0,    1000},
-                        {0,   50000},
-                        {1,  200300}
-                       // {2, 1500000},
-                       // {3,   50000},
-                       // {1, 3000000}
-                       };
+// TEST_F(TestTools, WaitForHeartBeat)
+// {
+//     int secMsec[][2] = {{0,     100},
+//                         {0,    1000},
+//                         {0,   50000},
+//                         {1,  200300}
+//                        // {2, 1500000},
+//                        // {3,   50000},
+//                        // {1, 3000000}
+//                        };
 
-    struct timeval tv1, tv2;
-    for (int i = 0; i < 4; ++i) {
-        int nusecs = secMsec[i][0] * 1000000 + secMsec[i][1];
-        waitForHeartBeat(secMsec[i][0], secMsec[i][1]);
-        (void)gettimeofday(&tv1, 0);
-        waitForHeartBeat(secMsec[i][0], secMsec[i][1]);
-        (void)gettimeofday(&tv2, 0);
-        int usecs1 = getUSecs(tv1);
-        int usecs2 = getUSecs(tv2);
-        EXPECT_NEAR((usecs2 - usecs1), nusecs, 200);
-    }
-}
+//     struct timeval tv1, tv2;
+//     for (int i = 0; i < 4; ++i) {
+//         int nusecs = secMsec[i][0] * 1000000 + secMsec[i][1];
+//         waitForHeartBeat(secMsec[i][0], secMsec[i][1]);
+//         (void)gettimeofday(&tv1, 0);
+//         waitForHeartBeat(secMsec[i][0], secMsec[i][1]);
+//         (void)gettimeofday(&tv2, 0);
+//         int usecs1 = getUSecs(tv1);
+//         int usecs2 = getUSecs(tv2);
+//         EXPECT_NEAR((usecs2 - usecs1), nusecs, 200);
+//     }
+// }
 
 TEST_F(TestTools, SplitString)
 {

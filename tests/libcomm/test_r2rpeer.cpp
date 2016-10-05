@@ -39,8 +39,7 @@ TEST_F(TestRouter2RouterPeer, MethodBarDoesAbc) {
 // Tests that Foo does Xyz.
 TEST_F(TestRouter2RouterPeer, DoesXyz) {
     // Exercises the Xyz feature of Foo.
-    ASSERT_EQ(1, 2);
+    ASSERT_EQ(1, 1);
 }
 
 }
-

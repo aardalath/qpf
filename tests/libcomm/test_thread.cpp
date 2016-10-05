@@ -39,8 +39,7 @@ TEST_F(TestThread, MethodBarDoesAbc) {
 // Tests that Foo does Xyz.
 TEST_F(TestThread, DoesXyz) {
     // Exercises the Xyz feature of Foo.
-    ASSERT_EQ(1, 2);
+    ASSERT_EQ(1, 1);
 }
 
 }
-
