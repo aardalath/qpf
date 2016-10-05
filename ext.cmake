@@ -32,6 +32,10 @@ elseif (EXISTS /opt)
   set (PCRE2DIR ${COTSDIR})
 endif()
 
+if(EXISTS /usr/pgsql-9.6)
+  set (PSQLDIR /usr/pgsql-9.6)
+endif()
+
 # if (EXISTS ${HOME}/opt)
   # set (GTESTDIR ${HOME}/ws/jcgg/cots/gtest-1.7.0)
   # set (GTESTDIR ${HOME}/ws/cots/gtest-1.7.0)
