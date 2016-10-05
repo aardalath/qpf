@@ -20,7 +20,8 @@ set (qpfcoreLib_src
 
 include (../ext.cmake)
 
-link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib ${PCRE2DIR}/lib)
+link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
+                  ${UUIDDIR}/lib ${PCRE2DIR}/lib)
 
 add_executable(qpfcore ${qpfcoreLib_src})
 add_dependencies (qpfcore qpf libcomm json sdc infix)
