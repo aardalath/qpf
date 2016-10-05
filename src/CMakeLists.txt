@@ -69,11 +69,11 @@ add_library(qpf SHARED ${libqpfLib_src})
 add_dependencies (qpf json sdc infix)
 target_include_directories (qpf PUBLIC
   ../libcomm ../json ../sdc ../infix
-  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include ${PCRE2DIR}/include)
+  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
+  ${UUIDDIR}/include ${PCRE2DIR}/include)
 target_link_libraries (qpf json sdc infix ${PSQLLIB} zmq curl uuid)
 
 install (TARGETS qpf
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
-

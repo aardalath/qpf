@@ -33,8 +33,8 @@ set (qpfGuiLib_src
   proctskstatmodel.cpp
   productsmodel.cpp
   progbardlg.cpp
-  qjsonitem.cpp  
-  qjsonmodel.cpp  
+  qjsonitem.cpp
+  qjsonmodel.cpp
   sysalertmodel.cpp
   textview.cpp
   txtblmodel.cpp
@@ -67,7 +67,7 @@ set (qpfGuiLib_hdr
   proctskstatmodel.h
   productsmodel.h
   progbardlg.h
-  qjsonitem.h  
+  qjsonitem.h
   qjsonmodel.h
   sysalertmodel.h
   textview.h
@@ -78,7 +78,7 @@ set (qpfGuiLib_hdr
   txitem.h
   txitemdlg.h
   xmlsyntaxhighlight.h)
-  
+
 set (qpfGuiLib_ui
   mainwindow.ui
   dlgdataing.ui
@@ -93,7 +93,7 @@ set (qpfGuiLib_ui
   verbleveldlg.ui
   logframe.ui
   txitem.ui)
-  
+
 set (qpfGuiLib_qrc
   configtool.qrc
   icon.qrc
@@ -116,13 +116,15 @@ add_library (qpfGuiLib SHARED
   ${qpfGuiLib_ui_moc})
 #target_link_libraries (qpfGuiLib Qt5::Widgets Qt5::Sql)
 qt5_use_modules(qpfGuiLib Widgets Sql Network Xml)
-target_include_directories (qpfGuiLib PUBLIC ../src ../libcomm ../json ../sdc ../infix 
-  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include ${PCRE2DIR}/include)
+target_include_directories (qpfGuiLib PUBLIC ../src ../libcomm ../json ../sdc ../infix
+  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
+  ${UUIDDIR}/include ${PCRE2DIR}/include)
 
 add_executable(qpfgui ${qpfGuiBin_src})
 add_dependencies (qpfgui qpfGuiLib)
-target_include_directories (qpfgui PUBLIC ../src ../libcomm ../json ../sdc ../infix 
-  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include ${PCRE2DIR}/include)
+target_include_directories (qpfgui PUBLIC ../src ../libcomm ../json ../sdc ../infix
+  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
+  ${UUIDDIR}/include ${PCRE2DIR}/include)
 target_link_libraries (qpfgui qpfGuiLib qpf libcomm json sdc infix ${PSQLLIB} zmq curl uuid pcre2-posix)
 #target_link_libraries (qpfcore qpf libcomm json sdc infix ${PSQLLIB} zmq curl uuid pcre2-posix)
 

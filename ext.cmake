@@ -18,21 +18,23 @@ set (HOME $ENV{HOME})
 
 message (STATUS "Now with ${PRJ_ROOT_DIR} . . .")
 
-if(EXISTS ${HOME}/opt)
+if (EXISTS ${HOME}/opt)
   message (STATUS "Using /opt")
   set (ZMQDIR ${HOME}/opt/zmq)
   set (CURLDIR ${HOME}/opt/curl)
   set (PSQLDIR ${HOME}/opt/pgsql)
   set (PCRE2DIR ${HOME}/opt/pcre2)
+  set (UUIDDIR ${HOME}/opt/uuid)
 elseif (EXISTS /opt)
   message (STATUS "Using ${HOME}/opt")
   set (ZMQDIR ${COTSDIR})
   set (CURLDIR ${COTSDIR})
   set (PSQLDIR /opt/pgsql)
   set (PCRE2DIR ${COTSDIR})
+  set (UUIDDIR ${COTSDIR})
 endif()
 
-if(EXISTS /usr/pgsql-9.6)
+if (EXISTS /usr/pgsql-9.6)
   set (PSQLDIR /usr/pgsql-9.6)
 endif()
 
@@ -59,17 +61,3 @@ set (INFIXINC ${INFIXPATH}/infix)
 set (SDCPATH ${PRJ}_ROOT_DIR)
 set (SDCLIB ${SDCPATH}/${BUILD}_ROOT/sdc)
 set (SDCINC ${SDCPATH}/sdc)
-
-#===== Compilation/Linkage variables =====
-# QMAKE_CXXFLAGS += -g3 -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI=0
-# LIBS += -lpcre2-8
-#
-# INCLUDEPATH += . ${PRJ}_ROOT_DIR/src
-# INCLUDEPATH += ${LIBCOMMINC} ${JSONCPPINC} ${INFIXINC} ${SDCINC}
-# INCLUDEPATH += ${ZMQDIR}/include ${CURLDIR}/include ${PCRE}2DIR/include ${PSQLDIR}/include
-# INCLUDEPATH += ${HOME}/opt
-#
-# OLD_LIBDIR = ${QMAKE}_LIBDIR
-# QMAKE_LIBDIR += ${LIBCOMMLIB} ${JSONCPPLIB} ${INFIXLIB} ${SDCLIB}
-# QMAKE_LIBDIR += ${ZMQDIR}/lib ${CURLDIR}/lib ${PCRE}2DIR/lib ${PSQLDIR}/lib
-# QMAKE_LIBDIR += /usr/lib64 /lib64 ${OLD}_LIBDIR
