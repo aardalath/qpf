@@ -12,7 +12,8 @@ project (tests)
 
 enable_testing()
 
-include_directories($ENV{GTESTDIR}/include)
+set (GTESTDIR $ENV{GTESTDIR})
+include_directories(${GTESTDIR}/include)
 
 set (qpfUnitTests_hdr
     # sdc/test_array.h
