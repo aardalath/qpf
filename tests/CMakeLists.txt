@@ -82,13 +82,15 @@ set (qpfUnitTests_src
     )
 
 include (../ext.cmake)
-link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${GTESTDIR}/lib)
+link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
+                  ${UUIDDIR}/lib ${PCRE2DIR}/lib ${GTESTDIR}/lib)
 
 add_executable(qpfUnitTests ${qpfUnitTests_src})
 add_dependencies (qpfUnitTests json sdc infix qpf libcomm)
 target_include_directories (qpfUnitTests PUBLIC
     ../src ../libcomm ../json ../sdc ../infix
-    ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include ${PCRE2DIR}/include
+    ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
+    ${UUIDDIR}/include ${PCRE2DIR}/include
     ${GTESTDIR}/include)
 target_link_libraries (qpfUnitTests
     qpf libcomm json sdc infix
