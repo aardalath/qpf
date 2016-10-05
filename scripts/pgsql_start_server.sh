@@ -23,7 +23,6 @@ pg_ctl -D /home/eucops/opt/pgsql/data -l /home/eucops/opt/pgsql/data/log start
 status=$(pg_ctl -D /home/eucops/opt/pgsql/data status 2>&1 | head -1 | cut -d" " -f 4)
 if [ "$status" == "running" ]; then
     echo "Server is now running"
-    exit 0
 else
     echo "ERROR: Server could not be started."
     exit 1
