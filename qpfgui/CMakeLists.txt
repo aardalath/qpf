@@ -108,7 +108,8 @@ include (../ext.cmake)
 
 include_directories (${PROJECT_SOURCE_DIR})
 include_directories (${PROJECT_BINARY_DIR})
-link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib ${PCRE2DIR}/lib)
+link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
+                  ${UUIDDIR}/lib ${PCRE2DIR}/lib)
 
 add_library (qpfGuiLib SHARED
   ${qpfGuiLib_src}

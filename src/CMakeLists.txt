@@ -63,7 +63,8 @@ set (libqpfLib_src
   uuid.cpp)
 
 include (../ext.cmake)
-link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib)
+link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
+                  ${UUIDDIR}/lib ${PCRE2DIR}/lib)
 
 add_library(qpf SHARED ${libqpfLib_src})
 add_dependencies (qpf json sdc infix)
