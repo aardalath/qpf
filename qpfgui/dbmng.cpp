@@ -115,6 +115,23 @@ QString DBManager::getState()
     }
 }
 
+void DBManager::setState(QString newState)
+{
+    QDateTime now(QDateTime::currentDateTime());
+    QDateTime nowUTC(now);
+    nowUTC.setTimeSpec(Qt::UTC);
+    
+    QString sqry(QString("INSERT INTO qpfstates (timestmp, state) VALUES ('%1', '%2');")
+                 .arg(nowUTC.toString(Qt::ISODate))
+                 .arg(newState));
+    QSqlQuery qry(sqry, db);
+
+    if (qry.lastError().type() != QSqlError::NoError) {
+        qErrnoWarning(qPrintable(qry.lastError().nativeErrorCode() + ": " +
+                                 qry.lastError().text()));
+    }
+}
+
 int DBManager::numOfRowsInDbTable(QString tableName)
 {
     QSqlQuery qry(QString("SELECT reltuples::bigint AS estimate "
@@ -128,7 +145,7 @@ int DBManager::numOfRowsInDbTable(QString tableName)
     }
 }
 
-void DBManager::addICommand(Cmd cmd)
+void DBManager::addICommand(QString cmd)
 {
     QDateTime now(QDateTime::currentDateTime());
     QDateTime nowUTC(now);
@@ -140,13 +157,56 @@ void DBManager::addICommand(Cmd cmd)
                  .arg(nowUTC.toString(Qt::ISODate))
                  .arg("QPFHMI")
                  .arg("EvtMng")
-                 .arg("QUIT"));
+                 .arg(cmd));
     QSqlQuery qry(sqry, db);
 
     if (qry.lastError().type() != QSqlError::NoError) {
         qErrnoWarning(qPrintable(qry.lastError().nativeErrorCode() + ": " +
                                  qry.lastError().text()));
     }
+}
+
+bool DBManager::getICommand(QString cmd, bool removeCmd)
+{
+    bool result = true;
+    QString sqry(QString("SELECT cmd.id "
+                         " FROM icommands cmd "
+                         " WHERE cmd.cmd_source = '%1' "
+                         "   AND cmd.cmd_target = '%2'"
+                         "   AND cmd.cmd_content = '%3'"
+                         "   AND cmd.cmd_executed = false "
+                         " ORDER BY cmd.id LIMIT 1;")
+                 .arg("EvtMng")
+                 .arg("QPFHMI")
+                 .arg(cmd));
+    QSqlQuery qry(sqry, db);
+    if (qry.next()) {
+        QString id(qry.value(0).toString());
+        if (removeCmd) {
+           // Remove command from table
+            QSqlQuery qry2(QString("DELETE FROM icommands "
+                                   " WHERE id = %1;").arg(id), db);
+        } else {
+            // Deactivate answer, so it doesn't get used again
+            QSqlQuery qry2(QString("UPDATE icommands SET cmd_executed = true "
+                                   " WHERE id = %1;").arg(id), db);
+        } 
+    } else if (qry.lastError().type() != QSqlError::NoError) {
+        qErrnoWarning(qPrintable(qry.lastError().nativeErrorCode() + ": " +
+                                 qry.lastError().text()));
+        result = false;
+    } else {
+        result = false;
+    }
+    
+    return result;
+}
+
+void DBManager::removeICommands(QString cmd)
+{
+    QString sqry(QString("DELETE FROM icommands cmd "
+                         " WHERE cmd.cmd_content = '%1';").arg(cmd));
+    QSqlQuery qry(sqry, db);
 }
 
 /*

@@ -211,10 +211,15 @@ void EventManager::execAdditonalLoopTasks()
             PeerMessage * msg = buildPeerMsg(selfPeer()->name, "Please, shut down!", MSG_STOP);
             registerMsg(selfPeer()->name, *msg);
             setTransmissionToPeer(selfPeer()->name, msg);
-        }
+            // Mark command as executed
+            dbHdl->markICommandAsDone(cmdId);
+        } else if (cmdContent == "PING") {
+            InfoMsg("QPFHMI requests answer. . .");
+            dbHdl->removeICommand(cmdId);
+            // Add answer command
+            dbHdl->addICommand(cmdSource, selfPeer()->name, "PONG");          
+        } 
 	
-	// Mark command as executed
-	dbHdl->markICommandAsDone(cmdId);
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
         return;

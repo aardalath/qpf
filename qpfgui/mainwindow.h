@@ -39,11 +39,18 @@ class MainWindow : public QMainWindow, LibComm::StateMachine
     Q_OBJECT
 
     // Valid Manager states
-    static const int ERROR        = -1;
-    static const int OFF          =  0;
-    static const int INITIALISED  =  1;
-    static const int RUNNING      =  2;
-    static const int OPERATIONAL  =  3;
+    static const int ERROR;
+    static const int OFF;
+    static const int INITIALISED;
+    static const int RUNNING;
+    static const int OPERATIONAL;
+
+    // Valid Manager states
+    static const std::string ERROR_StateName;
+    static const std::string OFF_StateName;
+    static const std::string INITIALISED_StateName;
+    static const std::string RUNNING_StateName;
+    static const std::string OPERATIONAL_StateName;
 
 public:
     explicit MainWindow(QString dbUrl = QString("db://eucops:e314clid@localhost:5432/qpfdb"),
@@ -125,6 +132,7 @@ private:
     void init();
     void setLogWatch();
     void handleFinishedHMI();
+    QString getState();
     void showState();
 
     virtual void defineValidTransitions();
@@ -186,7 +194,9 @@ private:
 
     QVector<LogWatcher*> nodeLogs;
     QStringList nodeNames;
-
+    QVector<QString> activeNodes;
+    bool isThereActiveCores;
+    
     //HMIProxy * hmiNode;
     //std::thread hmiPxyThread;
 

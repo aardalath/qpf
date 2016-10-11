@@ -170,19 +170,33 @@ public:
 
     //----------------------------------------------------------------------
     // Method: getICommand
-    // Stores a new state to the database
+    // Gets a new command into the icommands table
+    //----------------------------------------------------------------------
+    virtual void addICommand(std::string target,
+                             std::string source,
+                             std::string content)=0;
+
+    //----------------------------------------------------------------------
+    // Method: getICommand
+    // Gets a command from the icommands table
     //----------------------------------------------------------------------
     virtual bool getICommand(std::string target,
-			     int & id,
+                             int & id,
                              std::string & source,
                              std::string & content)=0;
 
     //----------------------------------------------------------------------
     // Method: markICommandAsDone
-    // Sets the executed flag to true
+    // Sets the icommands' executed flag to true
     //----------------------------------------------------------------------
     virtual bool markICommandAsDone(int id)=0;
 
+    //----------------------------------------------------------------------
+    // Method: removeICommand
+    // Remove the command using its id
+    //----------------------------------------------------------------------
+    virtual bool removeICommand(int id)=0;
+    
     //----------------------------------------------------------------------
     // Method: storeMsg
     // Stores a message into the database

@@ -59,11 +59,7 @@ public:
         QString hostName;
         int port;
     };
-
-    enum Cmd {
-        Quit,
-    };
-
+   
     static QSqlError addConnection(const QString &driver, const QString &connectionName,
                                   const QString &dbName, const QString &host,
                                   const QString &user, const QString &passwd, int port);
@@ -72,9 +68,14 @@ public:
     inline static QSqlDatabase & getDB() { return db; }
 
     static QString getState();
+    static void setState(QString newState);
+    
     static int numOfRowsInDbTable(QString tableName);
 
-    static void addICommand(Cmd cmd);
+    static void addICommand(QString cmd);
+    static bool getICommand(QString cmd, bool removeCmd = false);
+    static void removeICommands(QString cmd);
+    
     static void close();
 
     //bool getTasksInfo(QMap<QString, QJsonObject> & newTasks, int offset = 0);
@@ -90,7 +91,6 @@ private:
     static QSqlDatabase       db;
     static QString            activeDb;
     static QMap<QString, int> connections;
-
 };
 
 }

@@ -418,6 +418,33 @@ std::string DBHdlPostgreSQL::getCurrentState()
 // Method: getICommand
 // Stores a new state to the database
 //----------------------------------------------------------------------
+void DBHdlPostgreSQL::addICommand(std::string target,
+                                  std::string source,
+                                  std::string content)
+{
+    bool result = true;
+
+    std::string registrationTime(tagToTimestamp(preciseTimeTag()));
+    std::string cmd("INSERT INTO icommands "
+                    "(cmd_date, cmd_source, cmd_target, cmd_executed, cmd_content) "
+                    "VALUES (" + str::quoted(registrationTime) + 
+                    ", " + str::quoted(source) + 
+                    ", " + str::quoted(target) + 
+                    ", false, " + str::quoted(content) + ");");
+    try {
+        result = runCmd(cmd);
+    } catch(...) {
+        throw;
+    }
+
+    PQclear(res);
+    UNUSED(result);
+}
+
+//----------------------------------------------------------------------
+// Method: getICommand
+// Stores a new state to the database
+//----------------------------------------------------------------------
 bool DBHdlPostgreSQL::getICommand(std::string target,
                                   int & id,
                                   std::string & source,
@@ -443,6 +470,7 @@ bool DBHdlPostgreSQL::getICommand(std::string target,
         result = false;
     }
 
+    PQclear(res);
     return result;
 }
 
@@ -454,6 +482,22 @@ bool DBHdlPostgreSQL::markICommandAsDone(int id)
 {
     bool result = true;
     std::string cmd("UPDATE icommands SET cmd_executed = true "
+                    " WHERE id = " + str::quoted(str::toStr<int>(id)) + ";");
+
+    try { result = runCmd(cmd); } catch(...) { result = false; }
+
+    PQclear(res);
+    return result;
+}
+
+//----------------------------------------------------------------------
+// Method: removeICommand
+// Remove the command using its id
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::removeICommand(int id)
+{
+    bool result = true;
+    std::string cmd("DELETE FROM icommands "
                     " WHERE id = " + str::quoted(str::toStr<int>(id)) + ";");
 
     try { result = runCmd(cmd); } catch(...) { result = false; }
