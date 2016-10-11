@@ -73,18 +73,12 @@ void dumpDebugInfo(const char* tag, const char* msg)
     std::stringstream sdump; \
     for (unsigned int _ = 0; _ < m.at(2).length(); ++_) { \
         char __ = m.at(2).at(_); \
-        if ((__ > 31) && (__ < 127)) { \
-            sdump << ' ' << __ << ' '; \
-        } else { \
-            sdump << std::internal << std::setfill('0') \
-                  << std::hex << std::uppercase << std::setw(2) << (int)(__) << ' '; \
-        } \
+        if ((__ > 31) && (__ < 127)) { sdump << ' ' << __ << ' '; } \
+        else { sdump << std::internal << std::setfill('0') << std::hex \
+                     << std::uppercase << std::setw(2) << (int)(__) << ' '; } \
     } \
-    std::string ss; \
-    ss = "{ PEER: " + m.at(0) + \
-         ", TYPE: " + m.at(1) + \
-         ", CONTENT: [" + m.at(2) + "]" + \
-         " }"; \
+    std::string ss( "{ PEER: " + m.at(0) + ", TYPE: " + m.at(1) + \
+                    ", CONTENT: [" + m.at(2) + "] }"); \
     s = ss; \
   } while (0)
 
@@ -356,16 +350,6 @@ void Router2RouterPeer::establishCommunications()
                (std::string((name == thisPeerName) ? " ** > " : "    > ") + name).c_str());
     }
 
-    // Launch transmissions handler thread
-    /*
-    int err = pthread_create(&r2rpeerThreadId, NULL,
-                             launchTransmissionsHandler, (void *)(this));
-    if (err) {
-        errno = err;
-        perror("pthread_create");
-        throw (int)(EXIT_FAILURE);
-    }
-    */
     r2rpeerThread = std::thread(&Router2RouterPeer::transmissionsHandler, this);
 }
 
