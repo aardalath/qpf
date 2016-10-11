@@ -88,12 +88,27 @@ namespace QPF {
 static const int MessageDelay = 2000;
 static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";
 
+// Valid Manager states
+const int MainWindow::ERROR        = -1;
+const int MainWindow::OFF          =  0;
+const int MainWindow::INITIALISED  =  1;
+const int MainWindow::RUNNING      =  2;
+const int MainWindow::OPERATIONAL  =  3;
+
+// Valid Manager state names (strings)
+const std::string MainWindow::ERROR_StateName("ERROR");
+const std::string MainWindow::OFF_StateName("OFF");
+const std::string MainWindow::INITIALISED_StateName("INITIALISED");
+const std::string MainWindow::RUNNING_StateName("RUNNING");
+const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
 MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    isThereActiveCores(true)
 {
     setSessionTag(sessionName.toStdString());
 
@@ -117,11 +132,15 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
                                                databaseName,
                                                userName, password,
                                                hostName, port.toInt() };
+        qDebug() << "Adding DB connection";
         DBManager::addConnection("qpfdb", connection);
+        qDebug() << "Adding DB connection - DONE";
     }
 
     //transitTo(INITIALISED);
+    qDebug() << "Trying to show state";
     showState();
+    qDebug() << "Trying to show state - DONE";
 
     statusBar()->showMessage(tr("QPF HMI Ready . . ."),
                              MessageDelay);
@@ -828,7 +847,7 @@ void MainWindow::quitAllQPF()
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
 
-    DBManager::addICommand(DBManager::Cmd::Quit);
+    DBManager::addICommand("QUIT");
 
     qApp->closeAllWindows();
     qApp->quit();
@@ -900,6 +919,8 @@ void MainWindow::setLogWatch()
             }
             if (doesExist) { continue; }
             
+            activeNodes << bseName;
+            
             TextView * pltxted = new TextView;
             pltxted->setStyleSheet(FixedWidthStyle);
             pltxted->setLogName(bseName);
@@ -939,11 +960,11 @@ void MainWindow::handleFinishedHMI()
 //----------------------------------------------------------------------
 void MainWindow::defineValidTransitions()
 {
-    defineState(ERROR,        "ERROR");
-    defineState(OFF,          "OFF");
-    defineState(INITIALISED,  "INITIALISED");
-    defineState(RUNNING,      "RUNNING");
-    defineState(OPERATIONAL,  "OPERATIONAL");
+    defineState(ERROR,        ERROR_StateName);
+    defineState(OFF,          OFF_StateName);
+    defineState(INITIALISED,  INITIALISED_StateName);
+    defineState(RUNNING,      RUNNING_StateName);
+    defineState(OPERATIONAL,  OPERATIONAL_StateName);
 
     defineValidTransition(ERROR,        OFF);
     defineValidTransition(OFF,          INITIALISED);
@@ -961,15 +982,60 @@ void MainWindow::defineValidTransitions()
 }
 
 //----------------------------------------------------------------------
+// Method: getState
+// Check DB to get the current system's state
+//----------------------------------------------------------------------
+QString MainWindow::getState()
+{
+    static bool firstTime = true;
+    static int numOfPasses = 0;
+    static int maxNumOfIterations = 5;
+    static int msSleepTime = 50; // 50 ms = 50_000 us = 50_000_000 ns
+    static bool pingAnswered = true;
+    
+    struct timespec ts = { msSleepTime / 1000, (msSleepTime % 1000) * 1000 * 1000 };
+    
+    // First, a clean up
+    if (firstTime) {
+        DBManager::removeICommands("PING");
+        DBManager::removeICommands("PONG");
+        firstTime = false;
+    }
+    
+    // Send ping command to EvtMng
+    if (pingAnswered) { DBManager::addICommand("PING"); }
+    bool gotAnswer = false;
+    int numOfIter = 0;
+    while ((!gotAnswer) && (numOfIter < maxNumOfIterations)) {
+        // Wait a bit, and try to get answer Pong command
+        nanosleep(&ts, NULL);
+        gotAnswer = DBManager::getICommand("PONG", true);
+        ++numOfIter;
+    }
+
+    pingAnswered = gotAnswer;
+    isThereActiveCores = gotAnswer;
+    
+    if (!isThereActiveCores) {
+        // No active cores, set state in DB to OFF
+        DBManager::setState(QString::fromStdString(OFF_StateName)); 
+    }
+    
+    QString stateName = DBManager::getState();
+    
+    return stateName;
+}
+
+//----------------------------------------------------------------------
 // Method: showState
 // Define valid state transitions
 //----------------------------------------------------------------------
 void MainWindow::showState()
 {
     // Retrieve system state
-    QString stateName = DBManager::getState();
+    QString stateName = getState();   
     int currentState = getStateIdx(stateName.toStdString());
-
+    
     QString stys;
     switch (currentState) {
     case ERROR:
@@ -1004,6 +1070,8 @@ void MainWindow::updateSystemView()
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
+    quitAllAct->setEnabled(isThereActiveCores);
+        
     //== 1. Processing tasks
     procTaskStatusModel->refresh();
     ui->tblvwTaskMonit->resizeColumnsToContents();
