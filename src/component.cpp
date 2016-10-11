@@ -168,6 +168,9 @@ int Component::run()
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 
+    std::cerr << getCommNodeName() 
+              << (isRemote ? " : REMOTE" : " : LOCAL") << std::endl;
+    
     /* MAIN LOOP */
     while (getState() == OPERATIONAL) {
 
@@ -491,8 +494,8 @@ void Component::writeToFile(Router2RouterPeer::PeerMessage& inPeerMsg)
 // Store content of message into database
 //----------------------------------------------------------------------
 void Component::registerMsg(std::string from,
-                                 Router2RouterPeer::PeerMessage & inPeerMsg,
-                                 bool isBroadcast)
+                            Router2RouterPeer::PeerMessage & inPeerMsg,
+                            bool isBroadcast)
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     DBHandler * db = dbHdl.get();
@@ -505,7 +508,7 @@ void Component::registerMsg(std::string from,
         return;
     }
 
-    // Store message at DB
+    // Store message at DB 
     db->storeMsg(from, inPeerMsg, isBroadcast);
 
     // Close connection
@@ -521,8 +524,8 @@ void Component::sendLogPacketAsDataInfoMsg()
     buildMsgHeader(MSG_DATA_INFO_IDX, selfPeer()->name, "LogMng", msg.header);
     msg.variables.paramList["contents"] = logChunk;
     PeerMessage * dataInfoMsg = buildPeerMsg("LogMng", msg.getDataString(), MSG_DATA_INFO);
-    // DataInfo messages are not registered
-    registerMsg(selfPeer()->name, *dataInfoMsg);
+    // DataInfo messages are not registered (TODO Change this as config)
+    // registerMsg(selfPeer()->name, *dataInfoMsg);
     setTransmissionToPeer("LogMng", dataInfoMsg);
     logChunk = "";
 }
