@@ -103,6 +103,7 @@ set (qpfGuiBin_src main.cpp)
 
 qt5_wrap_cpp(qpfGuiLib_hdr_moc ${qpfGuiLib_hdr})
 qt5_wrap_ui (qpfGuiLib_ui_moc  ${qpfGuiLib_ui})
+qt5_add_resources(qpfGuiLib_ui_qrc ${qpfGuiLib_qrc})
 
 include (../ext.cmake)
 
@@ -114,7 +115,8 @@ link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
 add_library (qpfGuiLib SHARED
   ${qpfGuiLib_src}
   ${qpfGuiLib_hdr_moc}
-  ${qpfGuiLib_ui_moc})
+  ${qpfGuiLib_ui_moc}
+  ${qpfGuiLib_ui_qrc})
 #target_link_libraries (qpfGuiLib Qt5::Widgets Qt5::Sql)
 qt5_use_modules(qpfGuiLib Widgets Sql Network Xml)
 target_include_directories (qpfGuiLib PUBLIC ../src ../libcomm ../json ../sdc ../infix
@@ -126,7 +128,8 @@ add_dependencies (qpfgui qpfGuiLib)
 target_include_directories (qpfgui PUBLIC ../src ../libcomm ../json ../sdc ../infix
   ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
   ${UUIDDIR}/include ${PCRE2DIR}/include)
-target_link_libraries (qpfgui qpfGuiLib qpf libcomm json sdc infix ${PSQLLIB} zmq curl uuid pcre2-posix)
+target_link_libraries (qpfgui qpfGuiLib qpf libcomm json sdc infix 
+  ${PSQLLIB} zmq curl uuid pcre2-posix)
 #target_link_libraries (qpfcore qpf libcomm json sdc infix ${PSQLLIB} zmq curl uuid pcre2-posix)
 
 install (TARGETS qpfGuiLib qpfgui
