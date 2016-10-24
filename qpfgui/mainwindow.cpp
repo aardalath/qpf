@@ -132,15 +132,11 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
                                                databaseName,
                                                userName, password,
                                                hostName, port.toInt() };
-        qDebug() << "Adding DB connection";
         DBManager::addConnection("qpfdb", connection);
-        qDebug() << "Adding DB connection - DONE";
     }
 
     //transitTo(INITIALISED);
-    qDebug() << "Trying to show state";
     showState();
-    qDebug() << "Trying to show state - DONE";
 
     statusBar()->showMessage(tr("QPF HMI Ready . . ."),
                              MessageDelay);
@@ -987,14 +983,10 @@ void MainWindow::defineValidTransitions()
 //----------------------------------------------------------------------
 QString MainWindow::getState()
 {
+    static QString stateName(QString::fromStdString(OFF_StateName));
+    static bool requestState = true;
     static bool firstTime = true;
-    static int numOfPasses = 0;
-    static int maxNumOfIterations = 5;
-    static int msSleepTime = 50; // 50 ms = 50_000 us = 50_000_000 ns
-    static bool pingAnswered = true;
-    
-    struct timespec ts = { msSleepTime / 1000, (msSleepTime % 1000) * 1000 * 1000 };
-    
+
     // First, a clean up
     if (firstTime) {
         DBManager::removeICommands("PING");
@@ -1002,27 +994,21 @@ QString MainWindow::getState()
         firstTime = false;
     }
     
-    // Send ping command to EvtMng
-    if (pingAnswered) { DBManager::addICommand("PING"); }
-    bool gotAnswer = false;
-    int numOfIter = 0;
-    while ((!gotAnswer) && (numOfIter < maxNumOfIterations)) {
-        // Wait a bit, and try to get answer Pong command
-        nanosleep(&ts, NULL);
-        gotAnswer = DBManager::getICommand("PONG", true);
-        ++numOfIter;
+    if (requestState) {
+        requestState = false;
+        DBManager::addICommand("PING"); 
+        return stateName;
     }
-
-    pingAnswered = gotAnswer;
-    isThereActiveCores = gotAnswer;
+    
+    requestState = true;
+    isThereActiveCores = DBManager::getICommand("PONG", true);
     
     if (!isThereActiveCores) {
         // No active cores, set state in DB to OFF
         DBManager::setState(QString::fromStdString(OFF_StateName)); 
     }
     
-    QString stateName = DBManager::getState();
-    
+    stateName = DBManager::getState();   
     return stateName;
 }
 
