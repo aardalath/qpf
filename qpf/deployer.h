@@ -142,6 +142,12 @@ private:
     bool processCmdLineOpts(int argc, char * argv[]);
 
     //----------------------------------------------------------------------
+    // Method: prepareSystem
+    // Prepares environment and do initial checks
+    //----------------------------------------------------------------------
+    void prepareSystem();
+
+    //----------------------------------------------------------------------
     // Function: launchQPFHMI
     // Launches (fork) HMI as a separate process
     //----------------------------------------------------------------------
