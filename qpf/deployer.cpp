@@ -100,7 +100,7 @@ int Deployer::run()
 {
     //===== Prepare system for launch =====
     prepareSystem();
-    
+
     //===== Launch them =====
     launchPeerNodes();
 
@@ -227,7 +227,7 @@ void Deployer::prepareSystem()
 //----------------------------------------------------------------------
 void Deployer::launchPeerNodes()
 {
-   ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     L("Running as " << cfgInfo.currentUser << " @ " << cfgInfo.currentMachine);
 
