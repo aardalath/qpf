@@ -1,3 +1,41 @@
+/******************************************************************************
+ * File:    configtool.cpp
+ *          This file is part of QLA Processing Framework
+ *
+ * Domain:  QPF.qpfgui.configtool
+ *
+ * Version: 1.0
+ *
+ * Date:    2015/09/01
+ *
+ * Copyright (C) 2015, 2016 J C Gonzalez
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Implement ConfigTool UI class
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <Changelog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
 #include "configtool.h"
 #include "ui_configtool.h"
 
@@ -6,8 +44,11 @@
 #include "tools.h"
 using LibComm::join;
 
+#include "exttooledit.h"
+
 #include <QHostInfo>
 #include <QFileInfo>
+#include <QCheckBox>
 
 #define C(x) (x).c_str()
 #define QS(x) QString::fromStdString(x)
@@ -77,6 +118,18 @@ ConfigTool::ConfigTool(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    monitMsgFlags.append(FlagSt({ "START"      , ui->chkMsgsSTARTToDisk     , ui->chkMsgsSTARTToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "INDATA"     , ui->chkMsgsINDATAToDisk    , ui->chkMsgsINDATAToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "DATA_RQST"  , ui->chkMsgsDATARQSTToDisk  , ui->chkMsgsDATARQSTToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "DATA_INFO"  , ui->chkMsgsDATAINFOToDisk  , ui->chkMsgsDATAINFOToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "MONIT_RQST" , ui->chkMsgsMONITRQSTToDisk , ui->chkMsgsMONITRQSTToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "MONIT_INFO" , ui->chkMsgsMONITINFOToDisk , ui->chkMsgsMONITINFOToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "TASK_PROC"  , ui->chkMsgsTASKPROCToDisk  , ui->chkMsgsTASKPROCToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "TASK_RES"   , ui->chkMsgsTASKRESToDisk   , ui->chkMsgsTASKRESToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "CMD"        , ui->chkMsgsCMDToDisk       , ui->chkMsgsCMDToDisk_2 }));
+    monitMsgFlags.append(FlagSt({ "STOP"       , ui->chkMsgsSTOPToDisk      , ui->chkMsgsSTOPToDisk_2 }));
+
+
     // Hide non-yet-implemented widgets
     ui->gpboxInput->hide();
     ui->gpboxOutput->hide();
@@ -86,7 +139,9 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui->btngrpSection->setId(ui->tbtnProdProc      , PageProdProc);
     ui->btngrpSection->setId(ui->tbtnNetwork       , PageNetwork);
     ui->btngrpSection->setId(ui->tbtnOrchestration , PageOrchestration);
+    ui->btngrpSection->setId(ui->tbtnExtTools      , PageExtTools);
     ui->btngrpSection->setId(ui->tbtnStorage       , PageStorage);
+    ui->btngrpSection->setId(ui->tbtnFlags         , PageFlags);
 
     connect(ui->edBasePath, SIGNAL(textChanged(QString)), this, SLOT(setWorkingPaths(QString)));
 }
@@ -98,7 +153,7 @@ ConfigTool::~ConfigTool()
 
 void ConfigTool::readConfig()
 {
-    ConfigurationInfo cfgInfo = ConfigurationInfo::data();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // Generate values for Config. display
     QVector<QStringList> netTable;
@@ -235,11 +290,18 @@ void ConfigTool::readConfig()
     ModelView * mvRules = createTableModelView(ui->tblviewRules, rulesTable, hdr);
     (void)(mvRules);
 
-    // 5. STORAGE
+    // 5. USER DEFINED TOOLS
+
+    // Already set
+
+    // 6. STORAGE
     ui->edBasePath->setText(C(cfgInfo.storage.base));
     ui->nedLocalArchiveFolder->setText(C(cfgInfo.storage.local_archive.path));
     ui->nedInbox->setText(C(cfgInfo.storage.inbox.path));
     ui->nedOutbox->setText(C(cfgInfo.storage.outbox.path));
+
+    // 7. FLAGS
+    transferFlagsFromCfgToGUI();
 }
 
 ModelView * ConfigTool::createListModelView(QAbstractItemView * v,
@@ -277,6 +339,12 @@ void ConfigTool::saveAs()
                                QMessageBox::Ok);
 }
 
+void ConfigTool::apply()
+{
+    transferFlagsFromGUIToCfg();
+    accept();
+}
+
 void ConfigTool::setWorkingPaths(QString newPath)
 {
     QFileInfo fs(newPath);
@@ -287,5 +355,185 @@ void ConfigTool::setWorkingPaths(QString newPath)
     ui->nedOutbox->setText(base + "/data/outbox");
 }
 
+void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
+{
+    ui->tblwdgUserDefTools->clear();
+    ui->tblwdgUserDefTools->setRowCount(userTools.count());
+    ui->tblwdgUserDefTools->setColumnCount(5);
+    ui->tblwdgUserDefTools->setHorizontalHeaderLabels(QStringList()
+                                                      << "Name"
+                                                      << "Description"
+                                                      << "Executable"
+                                                      << "Arguments"
+                                                      << "Product types");
+    int row = 0;
+    foreach (QString key, userTools.keys()) {
+        const QUserDefTool & udt = userTools.value(key);
+        ui->tblwdgUserDefTools->setItem(row, 0, new QTableWidgetItem(udt.name));
+        ui->tblwdgUserDefTools->setItem(row, 1, new QTableWidgetItem(udt.desc));
+        ui->tblwdgUserDefTools->setItem(row, 2, new QTableWidgetItem(udt.exe));
+        ui->tblwdgUserDefTools->setItem(row, 3, new QTableWidgetItem(udt.args));
+        ui->tblwdgUserDefTools->setItem(row, 4, new QTableWidgetItem(udt.prod_types.join(QString("|"))));
+        ++row;
+    }
+    userDefTools = userTools;
+    origDefTools = userTools;
+    prodTypes = pts;
+    connect(ui->tblwdgUserDefTools, SIGNAL(itemChanged(QTableWidgetItem*)),
+            this, SLOT(changeToolWithItem(QTableWidgetItem*)));
+}
+
+void ConfigTool::addNewTool()
+{
+    ExtToolEdit dlg;
+    dlg.setProdTypes(prodTypes);
+    if (dlg.exec()) {
+        // Create new tool and append to list in table
+        QUserDefTool udt;
+        dlg.getToolInfo(udt);
+        int row = ui->tblwdgUserDefTools->rowCount();
+        ui->tblwdgUserDefTools->insertRow(row);
+
+        ui->tblwdgUserDefTools->setItem(row, 0, new QTableWidgetItem(udt.name));
+        ui->tblwdgUserDefTools->setItem(row, 2, new QTableWidgetItem(udt.desc));
+        ui->tblwdgUserDefTools->setItem(row, 1, new QTableWidgetItem(udt.exe));
+        ui->tblwdgUserDefTools->setItem(row, 3, new QTableWidgetItem(udt.args));
+        ui->tblwdgUserDefTools->setItem(row, 4, new QTableWidgetItem(udt.prod_types.join(QString("|"))));
+
+        userDefTools[udt.name] = udt;
+    }
+}
+
+void ConfigTool::editTool(QModelIndex idx)
+{
+    int row = idx.row();
+    editTool(row);
+}
+
+void ConfigTool::editTool()
+{
+    QList<QTableWidgetItem*> items = ui->tblwdgUserDefTools->selectedItems();
+    int row = items.first()->row();
+    editTool(row);
+}
+
+void ConfigTool::editTool(int row)
+{
+    QString name = ui->tblwdgUserDefTools->item(row, 0)->data(0).toString();
+    QUserDefTool udt = userDefTools[name];
+    ExtToolEdit dlg;
+    dlg.setProdTypes(prodTypes);
+    dlg.editTool(udt);
+    if (dlg.exec()) {
+        // Create new tool and append to list in table
+        dlg.getToolInfo(udt);
+
+        ui->tblwdgUserDefTools->item(row, 0)->setData(0, udt.name);
+        ui->tblwdgUserDefTools->item(row, 1)->setData(0, udt.desc);
+        ui->tblwdgUserDefTools->item(row, 2)->setData(0, udt.exe);
+        ui->tblwdgUserDefTools->item(row, 3)->setData(0, udt.args);
+        ui->tblwdgUserDefTools->item(row, 4)->setData(0, udt.prod_types.join(QString("|")));
+
+        userDefTools[udt.name] = udt;
+    }
+}
+
+void ConfigTool::changeToolWithItem(QTableWidgetItem * item)
+{
+    QString content = item->data(0).toString();
+    QString name = ui->tblwdgUserDefTools->item(item->row(), 0)->data(0).toString();
+    QUserDefTool & udt = const_cast<QUserDefTool&>(userDefTools[name]);
+    switch (item->column()) {
+    case 0: udt.name       = content; break;
+    case 1: udt.desc       = content; break;
+    case 2: udt.exe        = content; break;
+    case 3: udt.args       = content; break;
+    case 4: udt.prod_types = content.split("|"); break;
+    default: break;
+    }
+}
+
+void ConfigTool::removeTool()
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Remove tool from list");
+    msgBox.setText("You requested to remove selected user defined tool from the list.");
+    msgBox.setInformativeText("Do you really want to remove this tool?");
+    QPushButton *removeButton = msgBox.addButton(tr("Remove tool"), QMessageBox::ActionRole);
+    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Abort);
+
+    msgBox.exec();
+    if (msgBox.clickedButton() == removeButton) {
+        QList<QTableWidgetItem*> items = ui->tblwdgUserDefTools->selectedItems();
+        int row = items.first()->row();
+        QString name = ui->tblwdgUserDefTools->item(row, 0)->data(0).toString();
+        ui->tblwdgUserDefTools->removeRow(row);
+        userDefTools.remove(name);
+    } else if (msgBox.clickedButton() == cancelButton) {
+        return;
+    }
+}
+
+void ConfigTool::cancelDlg()
+{
+    userDefTools = origDefTools;
+}
+
+void ConfigTool::getExtTools(MapOfUserDefTools & userTools)
+{
+    userTools = userDefTools;
+}
+
+void ConfigTool::transferFlagsFromCfgToGUI()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    std::string msgName;
+
+    std::map<std::string, bool> & fmapDsk = cfgInfo.flags.monit.msgsToDisk;
+    std::map<std::string, bool> & fmapDB  = cfgInfo.flags.monit.msgsToDB;
+
+    for (int i = (int)(MSG_START_IDX); i < (int)(MSG_UNKNOWN_IDX); ++i) {
+        msgName = monitMsgFlags.at(i).msgName;
+        monitMsgFlags.at(i).chkDisk->setChecked(!(fmapDsk.find(msgName) == fmapDsk.end()));
+        monitMsgFlags.at(i).chkDB->setChecked(!(fmapDB.find(msgName) == fmapDB.end()));
+    }
+
+    ui->chkMsgsIncommingInLog->setChecked(cfgInfo.flags.monit.notifyMsgArrival);
+    ui->chkGroupTskAgentLogs->setChecked(cfgInfo.flags.monit.groupTaskAgentLogs);
+
+    ui->chkAllowReproc->setChecked(cfgInfo.flags.proc.allowReprocessing);
+    ui->chkGenerateIntermedProd->setChecked(cfgInfo.flags.proc.intermedProducts);
+
+    ui->chkSendOutputsToArchive->setChecked(cfgInfo.flags.arch.sendOutputsToMainArchive);
+}
+
+void ConfigTool::transferFlagsFromGUIToCfg()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    std::string msgName;
+
+    std::map<std::string, bool> & fmapDsk = cfgInfo.flags.monit.msgsToDisk;
+    std::map<std::string, bool> & fmapDB = cfgInfo.flags.monit.msgsToDB;
+    fmapDsk.clear();
+    fmapDB.clear();
+
+    for (int i = (int)(MSG_START_IDX); i < (int)(MSG_UNKNOWN_IDX); ++i) {
+        msgName = monitMsgFlags.at(i).msgName;
+        if (monitMsgFlags.at(i).chkDisk->isChecked()) { fmapDsk[msgName] = true; }
+        if (monitMsgFlags.at(i).chkDB->isChecked()) { fmapDB[msgName] = true; }
+    }
+
+    cfgInfo.flags.monit.notifyMsgArrival   = ui->chkMsgsIncommingInLog->isChecked();
+    cfgInfo.flags.monit.groupTaskAgentLogs = ui->chkGroupTskAgentLogs->isChecked();
+
+    cfgInfo.flags.proc.allowReprocessing = ui->chkAllowReproc->isChecked();
+    cfgInfo.flags.proc.intermedProducts  = ui->chkGenerateIntermedProd->isChecked();
+
+    cfgInfo.flags.arch.sendOutputsToMainArchive = ui->chkSendOutputsToArchive->isChecked();
+}
+
+QVector<ConfigTool::FlagSt> ConfigTool::monitMsgFlags;
 
 }

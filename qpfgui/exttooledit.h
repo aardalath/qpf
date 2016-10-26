@@ -21,8 +21,8 @@ public:
 
 public:
     void setProdTypes(QStringList pts);
-    void editTool(UserDefTool & udt);
-    void getToolInfo(UserDefTool & udt);
+    void editTool(QUserDefTool & udt);
+    void getToolInfo(QUserDefTool & udt);
 
 private slots:
     void showHelp();

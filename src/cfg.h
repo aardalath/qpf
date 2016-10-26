@@ -124,6 +124,30 @@ struct StorageConfig {
     StorageExternal   outbox;
 };
 
+struct UserDefTool {
+    std::string name;
+    std::string desc;
+    std::string exe;
+    std::string args;
+    std::vector<std::string> prod_types;
+};
+
+struct FlagsConfig {
+    struct MonitoringFlags {
+        std::map<std::string, bool> msgsToDisk;
+        std::map<std::string, bool> msgsToDB;
+        bool notifyMsgArrival;
+        bool groupTaskAgentLogs;
+    } monit;
+    struct ProcessingFlags {
+        bool allowReprocessing;
+        bool intermedProducts;
+    } proc;
+    struct ArchivingFlags {
+        bool sendOutputsToMainArchive;
+    } arch;
+};
+
 }
 
 #endif  /* CFG_H */

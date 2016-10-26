@@ -132,11 +132,15 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
                                                databaseName,
                                                userName, password,
                                                hostName, port.toInt() };
+        qDebug() << "Adding DB connection";
         DBManager::addConnection("qpfdb", connection);
+        qDebug() << "Adding DB connection - DONE";
     }
 
     //transitTo(INITIALISED);
+    qDebug() << "Trying to show state";
     showState();
+    qDebug() << "Trying to show state - DONE";
 
     statusBar()->showMessage(tr("QPF HMI Ready . . ."),
                              MessageDelay);
@@ -340,13 +344,13 @@ void MainWindow::about()
 #ifndef BUILD_ID
 #define BUILD_ID ""
 #endif
-    
+
     QString buildId(BUILD_ID);
     if (buildId.isEmpty()) {
         char buf[20];
         sprintf(buf, "%ld", (long)(time(0)));
         buildId = QString(buf);
-    } 
+    }
 
     QMessageBox::about(this, tr("About " APP_NAME),
                        tr("This is the " APP_PURPOSE " v " APP_RELEASE "\n"
@@ -641,7 +645,6 @@ void MainWindow::readSettings()
     QSize size = settings.value("size", QSize(800, 600)).toSize();
     move(pos);
     resize(size);
-    getUserToolsFromSettings();
 }
 
 //----------------------------------------------------------------------
@@ -653,7 +656,6 @@ void MainWindow::writeSettings()
     QSettings settings(APP_SYS_NAME, APP_NAME);
     settings.setValue("pos", pos());
     settings.setValue("size", size());
-    putUserToolsToSettings();
 }
 
 //----------------------------------------------------------------------
@@ -675,7 +677,7 @@ void MainWindow::putToSettings(QString name, QVariant value)
     QSettings settings(APP_SYS_NAME, APP_NAME);
     settings.setValue(name, value);
 }
-
+/*
 //----------------------------------------------------------------------
 // Method: getUserToolsFromSettings
 // Retrieves user defined tools from settings file
@@ -686,7 +688,7 @@ void MainWindow::getUserToolsFromSettings()
     int size = settings.beginReadArray("user_tools");
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        UserDefTool udt;
+        QUserDefTool udt;
         udt.name = settings.value("name").toString();
         udt.desc = settings.value("description").toString();
         udt.exe  = settings.value("executable").toString();
@@ -708,7 +710,7 @@ void MainWindow::putUserToolsToSettings()
     settings.beginWriteArray("user_tools");
     int i = 0;
     foreach (QString key, userDefTools.keys()) {
-        const UserDefTool & udt = userDefTools.value(key);
+        const QUserDefTool & udt = userDefTools.value(key);
         settings.setArrayIndex(i);
         settings.setValue("name", udt.name);
         settings.setValue("description", udt.desc);
@@ -719,6 +721,45 @@ void MainWindow::putUserToolsToSettings()
     }
     settings.endArray();
     settings.setValue("product_types", userDefProdTypes);
+}
+*/
+//----------------------------------------------------------------------
+// Method: getUserToolsFromSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::getUserToolsFromSettings()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    userDefTools.clear();
+    for (auto && kv : cfgInfo.userDefTools) {
+        UserDefTool & udt = kv.second;
+        QUserDefTool qudt;
+        qudt.name = QString::fromStdString(udt.name);
+        qudt.desc = QString::fromStdString(udt.desc);
+        qudt.exe  = QString::fromStdString(udt.exe);
+        qudt.args = QString::fromStdString(udt.args);
+        for (auto & s : udt.prod_types) {
+            qudt.prod_types.append(QString::fromStdString(s));
+        }
+        userDefTools[qudt.name] = qudt;
+    }
+
+    userDefProdTypes.clear();
+    for (auto & s : cfgInfo.orcParams.productTypes) {
+        userDefProdTypes.append(QString::fromStdString(s));
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: putUserToolsToSettings
+// Retrieves user defined tools from settings file
+//----------------------------------------------------------------------
+void MainWindow::putUserToolsToSettings()
+{
+    /*
+     TODO
+     */
 }
 
 //----------------------------------------------------------------------
@@ -759,10 +800,19 @@ void MainWindow::setActiveSubWindow(QWidget *window)
 //----------------------------------------------------------------------
 void MainWindow::showConfigTool()
 {
-    ConfigTool cfgTool;
+    static ConfigTool cfgTool;
+
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    getUserToolsFromSettings();
 
     cfgTool.readConfig();
-    cfgTool.exec();
+    cfgTool.initExtTools(userDefTools, userDefProdTypes);
+    if (cfgTool.exec()) {
+        std::cerr << "Updating user tools!\n";
+        cfgTool.getExtTools(userDefTools);
+        putUserToolsToSettings();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -897,12 +947,12 @@ void MainWindow::setLogWatch()
         QString logDir = QString::fromStdString(Log::getLogBaseDir()) + "/" + logDirName;
         QStringList logFiles;
         logFiles << QDir(logDir).entryList(logExtFilter);
-        
+
         // Create MDI window with the log file viewer
         foreach (QString logBaseName, logFiles) {
             QString logFileName(logDir + "/" + logBaseName);
             QString bseName(QFileInfo(logFileName).baseName());
-            
+
             // check that the window for this log does not exist
             QList<QMdiSubWindow *> sws = ui->mdiArea->subWindowList();
             bool doesExist = false;
@@ -914,9 +964,9 @@ void MainWindow::setLogWatch()
                 }
             }
             if (doesExist) { continue; }
-            
+
             activeNodes << bseName;
-            
+
             TextView * pltxted = new TextView;
             pltxted->setStyleSheet(FixedWidthStyle);
             pltxted->setLogName(bseName);
@@ -993,22 +1043,22 @@ QString MainWindow::getState()
         DBManager::removeICommands("PONG");
         firstTime = false;
     }
-    
+
     if (requestState) {
         requestState = false;
-        DBManager::addICommand("PING"); 
+        DBManager::addICommand("PING");
         return stateName;
     }
-    
+
     requestState = true;
     isThereActiveCores = DBManager::getICommand("PONG", true);
-    
+
     if (!isThereActiveCores) {
         // No active cores, set state in DB to OFF
-        DBManager::setState(QString::fromStdString(OFF_StateName)); 
+        DBManager::setState(QString::fromStdString(OFF_StateName));
     }
-    
-    stateName = DBManager::getState();   
+
+    stateName = DBManager::getState();
     return stateName;
 }
 
@@ -1019,9 +1069,9 @@ QString MainWindow::getState()
 void MainWindow::showState()
 {
     // Retrieve system state
-    QString stateName = getState();   
+    QString stateName = getState();
     int currentState = getStateIdx(stateName.toStdString());
-    
+
     QString stys;
     switch (currentState) {
     case ERROR:
@@ -1057,7 +1107,7 @@ void MainWindow::updateSystemView()
     showState();
 
     quitAllAct->setEnabled(isThereActiveCores);
-        
+
     //== 1. Processing tasks
     procTaskStatusModel->refresh();
     ui->tblvwTaskMonit->resizeColumnsToContents();
@@ -1114,7 +1164,7 @@ void MainWindow::initLocalArchiveView()
     connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
 
     foreach (QString key, userDefTools.keys()) {
-        const UserDefTool & udt = userDefTools.value(key);
+        const QUserDefTool & udt = userDefTools.value(key);
         QAction * ac = new QAction(key, ui->treevwArchive);
         ac->setStatusTip(udt.desc);
         connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
@@ -1141,7 +1191,7 @@ void MainWindow::openWith()
 {
     QAction * ac = qobject_cast<QAction*>(sender());
     QString key = ac->text();
-    const UserDefTool & udt = userDefTools.value(key);
+    const QUserDefTool & udt = userDefTools.value(key);
 
     QModelIndex m = ui->treevwArchive->currentIndex();
     QString url = m.model()->index(m.row(), 11, m.parent()).data().toString();
@@ -1245,7 +1295,7 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 
     if (ui->treevwArchive->indexAt(p).isValid()) {
         foreach (QString key, userDefTools.keys()) {
-            const UserDefTool & udt = userDefTools.value(key);
+            const QUserDefTool & udt = userDefTools.value(key);
             if (udt.prod_types.contains(productType) || true) {
                 QAction * ac = acUserTools[key];
                 actions.append(ac);

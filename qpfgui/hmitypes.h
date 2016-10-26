@@ -6,7 +6,7 @@
 
 namespace QPF {
 
-struct UserDefTool {
+struct QUserDefTool {
     QString name;
     QString desc;
     QString exe;
@@ -14,7 +14,7 @@ struct UserDefTool {
     QStringList prod_types;
 };
 
-typedef QMap<QString, UserDefTool> MapOfUserDefTools;
+typedef QMap<QString, QUserDefTool> MapOfUserDefTools;
 
 }
 

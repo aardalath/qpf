@@ -123,12 +123,17 @@ public:
     // Storage information
     StorageConfig                       storage;
 
+    // User Defined (external) tools
+    std::map<std::string, UserDefTool>  userDefTools;
+
     // Data Base info
     std::string                         DBHost;
     std::string                         DBPort;
     std::string                         DBName;
     std::string                         DBUser;
     std::string                         DBPwd;
+
+    FlagsConfig                         flags;
 
     void clear();
     void dump();

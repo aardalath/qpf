@@ -31,7 +31,7 @@ void ExtToolsDef::initialize(MapOfUserDefTools & userTools, QStringList pts)
                                                       << "Product types");
     int row = 0;
     foreach (QString key, userTools.keys()) {
-        const UserDefTool & udt = userTools.value(key);
+        const QUserDefTool & udt = userTools.value(key);
         ui->tblwdgUserDefTools->setItem(row, 0, new QTableWidgetItem(udt.name));
         ui->tblwdgUserDefTools->setItem(row, 1, new QTableWidgetItem(udt.desc));
         ui->tblwdgUserDefTools->setItem(row, 2, new QTableWidgetItem(udt.exe));
@@ -52,7 +52,7 @@ void ExtToolsDef::addNewTool()
     dlg.setProdTypes(prodTypes);
     if (dlg.exec()) {
         // Create new tool and append to list in table
-        UserDefTool udt;
+        QUserDefTool udt;
         dlg.getToolInfo(udt);
         int row = ui->tblwdgUserDefTools->rowCount();
         ui->tblwdgUserDefTools->insertRow(row);
@@ -83,7 +83,7 @@ void ExtToolsDef::editTool()
 void ExtToolsDef::editTool(int row)
 {
     QString name = ui->tblwdgUserDefTools->item(row, 0)->data(0).toString();
-    UserDefTool udt = userDefTools[name];
+    QUserDefTool udt = userDefTools[name];
     ExtToolEdit dlg;
     dlg.setProdTypes(prodTypes);
     dlg.editTool(udt);
@@ -105,7 +105,7 @@ void ExtToolsDef::changeToolWithItem(QTableWidgetItem * item)
 {
     QString content = item->data(0).toString();
     QString name = ui->tblwdgUserDefTools->item(item->row(), 0)->data(0).toString();
-    UserDefTool & udt = const_cast<UserDefTool&>(userDefTools[name]);
+    QUserDefTool & udt = const_cast<QUserDefTool&>(userDefTools[name]);
     switch (item->column()) {
     case 0: udt.name       = content; break;
     case 1: udt.desc       = content; break;

@@ -64,7 +64,7 @@ ProcTaskStatusModel::ProcTaskStatusModel()
     defineHeaders({"ID", "Started at", "Finished at",
                 "Task Name", "Agent", "Proc.Element",
                 "Status", "Progress", "Exit Code", "Task Info"});
-    
+
 
     ColumnPalette statusPalette;
     statusPalette["SCHEDULED"] = FgBgColors(QColor(Qt::gray),  QColor(Qt::white));
@@ -77,7 +77,7 @@ ProcTaskStatusModel::ProcTaskStatusModel()
 
     defineTablePalette(tblPalette);
 
-    setFullUpdate(true);
+//    setFullUpdate(true);
 
     refresh();
 }

@@ -26,7 +26,7 @@ void ExtToolEdit::setProdTypes(QStringList pts)
     prodTypes = pts;
 }
 
-void ExtToolEdit::editTool(UserDefTool & udt)
+void ExtToolEdit::editTool(QUserDefTool & udt)
 {
     ui->edName->setText(udt.name);
     ui->edDesc->setText(udt.desc);
@@ -35,7 +35,7 @@ void ExtToolEdit::editTool(UserDefTool & udt)
     ui->edProdTypes->setText(udt.prod_types.join("|"));
 }
 
-void ExtToolEdit::getToolInfo(UserDefTool & udt)
+void ExtToolEdit::getToolInfo(QUserDefTool & udt)
 {
     udt.name       = ui->edName->text();
     udt.desc       = ui->edDesc->text();

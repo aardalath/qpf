@@ -176,6 +176,18 @@ public:
                                std::vector<std::string> & vec);
 
     //----------------------------------------------------------------------
+    // Method: getNumUserDefTools
+    // Return number of user defined tools
+    //----------------------------------------------------------------------
+    int getNumUserDefTools();
+
+    //----------------------------------------------------------------------
+    // Method: getNode
+    // Return node parameters
+    //----------------------------------------------------------------------
+    void getUserDefTool(UserDefTool & t);
+
+    //----------------------------------------------------------------------
     // Method: getEnvVar
     // Returns the content of an environment variable
     //----------------------------------------------------------------------
@@ -250,6 +262,7 @@ private:
     Json::Value::iterator procIt;
     Json::Value::iterator nodeIt;
     Json::Value::iterator machIt;
+    Json::Value::iterator toolIt;
 
     bool hmiPresent;
 
