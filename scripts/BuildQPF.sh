@@ -74,7 +74,7 @@ echo "BUILD_ID: ${BUILD_ID}"
 export BUILD_ID
 
 MAKE_OPTS="-k -j4 "
-CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf --graphviz=dependencies.dot "
+CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf -D CMAKE_BUILD_TYPE=Debug --graphviz=dependencies.dot "
 
 ###### Handy functions
 
@@ -128,7 +128,7 @@ perform () {
     else
         (((( eval $* 2>&1 ; echo $? >&3) | tee -a "${LOG_FILE}" >&4) 3>&1) | (read xs; echo $xs > /tmp/buildqpf.xs)) 4>&1
         status=$(cat /tmp/buildqpf.xs)
-        if [ "${LAZY}" != "yes" ]; then 
+        if [ "${LAZY}" != "yes" ]; then
             if [ $status -gt 0 ]; then
                 echo "Exiting . . ."
                 exit $status
@@ -202,7 +202,7 @@ install_contrib () {
     bn=$(basename "${CONTRIB_PATH}/${fil}")
     say "  - Installing file $fil"
     if [ ! -d "${WORK_AREA}/${tgtdir}" ]; then
-        mkdir -p "${WORK_AREA}/${tgtdir}" 
+        mkdir -p "${WORK_AREA}/${tgtdir}"
     fi
     if [ ! -f "${WORK_AREA}/${tgtdir}/${bn}" ]; then
 	perform cp "'${CONTRIB_PATH}/${fil}'" "'${WORK_AREA}/${tgtdir}'"
@@ -275,7 +275,7 @@ fi
 COMPLSTATUS=0
 if [ "${COMPILE}" == "yes" ]; then
     step "Compiling source code"
-    perform make ${MAKE_OPTS}        
+    perform make ${MAKE_OPTS}
     COMPLSTATUS=${status}
 fi
 
@@ -295,12 +295,12 @@ if [ "${INSTALL}" == "yes" ]; then
     step "Installing QPF executables and libraries"
 
     cd "${BUILD_PATH}"
-    make install 
+    make install
     ln -s ${WORK_AREA}/qpf/bin/qpfcore ${WORK_AREA}/qpf/bin/qpf
     if [ "${HMI}" == "yes" ]; then
         ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
     fi
-    
+
     install_scpt RunQPF.sh
 
     QPF_INI="${RUN_PATH}/QPFHMI.conf"
@@ -315,9 +315,9 @@ step "Setting up QPF database"
 
 if [ "${RECREATEDB}" == "yes" ]; then
     QPF_DB_LOCATION="-h ${PSQL_HOST} -p ${PSQL_PORT}"
-    
+
     perform_dontexit psql postgres ${QPF_DB_LOCATION} -q -c "'DROP DATABASE qpfdb;'"
-    
+
     perform psql postgres ${QPF_DB_LOCATION} -q -c "'CREATE DATABASE qpfdb OWNER eucops;'"
     perform psql qpfdb    ${QPF_DB_LOCATION} -q -f "'${QPF_SQ_SCPT}'" -o "'${LOG_FILE}.sqlout'"
 fi
