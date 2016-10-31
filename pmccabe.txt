@@ -1,0 +1,2388 @@
+Modified McCabe Cyclomatic Complexity
+|   Traditional McCabe Cyclomatic Complexity
+|       |    # Statements in function
+|       |        |   First line of function
+|       |        |       |   # lines in function
+|       |        |       |       |  filename(definition line number):function
+|       |        |       |       |           |
+0	0	0	1	146	./qpfhmi/archivemodel.h
+1	1	4	51	5	./qpfhmi/simindata.cpp(51): QPF::SimInData::SimInData
+1	1	1	61	4	./qpfhmi/simindata.cpp(61): QPF::SimInData::setHmiNode
+1	1	16	70	24	./qpfhmi/simindata.cpp(70): QPF::SimInData::sendInData
+10	10	50	99	93	./qpfhmi/simindata.cpp(99): QPF::SimInData::sendMultInData
+5	5	39	198	61	./qpfhmi/simindata.cpp(198): QPF::SimInData::sendInDataFromFile
+4	4	15	265	30	./qpfhmi/simindata.cpp(265): QPF::SimInData::processInbox
+3	3	16	300	27	./qpfhmi/simindata.cpp(300): QPF::SimInData::readMetaFile
+2	2	28	332	45	./qpfhmi/simindata.cpp(332): QPF::SimInData::generateMetaFile
+6	6	9	383	40	./qpfhmi/simindata.cpp(383): QPF::SimInData::traverseDirectory
+2	2	7	428	15	./qpfhmi/simindata.cpp(428): QPF::SimInData::actualSendMultInData
+2	2	4	449	12	./qpfhmi/simindata.cpp(449): QPF::SimInData::actualSendInDataFromFile
+2	2	5	462	9	./qpfhmi/simindata.cpp(462): QPF::SimInData::stopSendingInData
+1	1	1	476	4	./qpfhmi/simindata.cpp(476): QPF::SimInData::setInjectionFrequency
+40	40	196	1	481	./qpfhmi/simindata.cpp
+1	1	2	69	2	./qpfhmi/types.h(69): QPF::MdataField::MdataField
+1	1	2	1	82	./qpfhmi/types.h
+0	0	0	1	74	./qpfhmi/logwatcher.h
+1	1	1	20	1	./qpfhmi/configtool.h(20): ModelView::getModel
+1	1	1	21	1	./qpfhmi/configtool.h(21): ModelView::getView
+1	1	1	22	1	./qpfhmi/configtool.h(22): ModelView::getSelectionModel
+3	3	5	1	85	./qpfhmi/configtool.h
+0	0	0	1	154	./qpfhmi/hmipxy.h
+1	1	8	9	20	./qpfhmi/verbleveldlg.cpp(9): QPF::VerbLevelDlg::VerbLevelDlg
+1	1	2	30	5	./qpfhmi/verbleveldlg.cpp(30): QPF::VerbLevelDlg::setVerbosityLevel
+1	1	1	36	4	./qpfhmi/verbleveldlg.cpp(36): QPF::VerbLevelDlg::getVerbosityLevelName
+1	1	1	41	4	./qpfhmi/verbleveldlg.cpp(41): QPF::VerbLevelDlg::~VerbLevelDlg
+4	4	14	1	48	./qpfhmi/verbleveldlg.cpp
+1	1	15	39	20	./qpfhmi/connectionwidget.cpp(39): ConnectionWidget::ConnectionWidget
+1	1	0	60	3	./qpfhmi/connectionwidget.cpp(60): ConnectionWidget::~ConnectionWidget
+2	2	6	64	9	./qpfhmi/connectionwidget.cpp(64): qDBCaption
+6	6	23	74	29	./qpfhmi/connectionwidget.cpp(74): ConnectionWidget::refresh
+1	1	1	104	4	./qpfhmi/connectionwidget.cpp(104): ConnectionWidget::currentDatabase
+1	1	3	109	6	./qpfhmi/connectionwidget.cpp(109): qSetBold
+4	4	9	116	13	./qpfhmi/connectionwidget.cpp(116): ConnectionWidget::setActive
+3	3	6	130	12	./qpfhmi/connectionwidget.cpp(130): ConnectionWidget::on_tree_itemActivated
+3	3	5	143	8	./qpfhmi/connectionwidget.cpp(143): ConnectionWidget::showMetaData
+2	2	1	152	4	./qpfhmi/connectionwidget.cpp(152): ConnectionWidget::on_tree_currentItemChanged
+24	24	79	1	156	./qpfhmi/connectionwidget.cpp
+0	0	1	1	39	./qpfhmi/exttooledit.h
+0	0	2	1	63	./qpfhmi/dlgshowtaskinfo.h
+1	1	1	5	4	./qpfhmi/textview.cpp(5): TextView::TextView
+2	2	4	10	8	./qpfhmi/textview.cpp(10): TextView::saveAs
+2	2	9	19	18	./qpfhmi/textview.cpp(19): TextView::saveFile
+1	1	2	38	6	./qpfhmi/textview.cpp(38): TextView::setLogName
+1	1	1	45	4	./qpfhmi/textview.cpp(45): TextView::logName
+1	1	1	50	4	./qpfhmi/textview.cpp(50): TextView::closeEvent
+8	8	24	1	54	./qpfhmi/textview.cpp
+0	0	1	1	49	./qpfhmi/types.cpp
+3	3	9	15	11	./qpfhmi/configtool.cpp(15): ModelView::ModelView
+3	3	9	27	10	./qpfhmi/configtool.cpp(27): ModelView::ModelView
+1	1	1	38	4	./qpfhmi/configtool.cpp(38): ModelView::setHeader
+2	2	4	43	6	./qpfhmi/configtool.cpp(43): ModelView::setHeaders
+2	2	6	50	9	./qpfhmi/configtool.cpp(50): ModelView::setData
+3	3	10	59	12	./qpfhmi/configtool.cpp(59): ModelView::setData
+1	1	12	74	19	./qpfhmi/configtool.cpp(74): QPF::ConfigTool::ConfigTool
+1	1	1	94	4	./qpfhmi/configtool.cpp(94): QPF::ConfigTool::~ConfigTool
+12	12	101	99	145	./qpfhmi/configtool.cpp(99): QPF::ConfigTool::readConfig
+1	1	3	245	9	./qpfhmi/configtool.cpp(245): QPF::ConfigTool::createListModelView
+1	1	3	256	9	./qpfhmi/configtool.cpp(256): QPF::ConfigTool::createTableModelView
+1	1	1	266	6	./qpfhmi/configtool.cpp(266): QPF::ConfigTool::save
+1	1	1	273	6	./qpfhmi/configtool.cpp(273): QPF::ConfigTool::saveAs
+1	1	5	280	9	./qpfhmi/configtool.cpp(280): QPF::ConfigTool::setWorkingPaths
+33	33	174	1	291	./qpfhmi/configtool.cpp
+0	0	0	1	28	./qpfhmi/textview.h
+0	0	0	1	260	./qpfhmi/deployer.h
+0	0	2	1	22	./qpfhmi/dbbrowser.h
+0	0	2	1	32	./qpfhmi/logframe.h
+0	0	1	1	54	./qpfhmi/init.h
+1	1	3	6	6	./qpfhmi/frmagentstatus.cpp(6): QPF::FrmAgentStatus::FrmAgentStatus
+1	1	1	13	4	./qpfhmi/frmagentstatus.cpp(13): QPF::FrmAgentStatus::~FrmAgentStatus
+2	2	25	18	35	./qpfhmi/frmagentstatus.cpp(18): QPF::FrmAgentStatus::updateInfo
+4	4	30	1	54	./qpfhmi/frmagentstatus.cpp
+0	0	0	1	80	./qpfhmi/version.h
+1	1	13	39	31	./qpfhmi/connectionwidget.h(39): QT_FORWARD_DECLARE_CLASS
+1	1	15	1	71	./qpfhmi/connectionwidget.h
+0	0	3	1	33	./qpfhmi/dlgalert.h
+2	2	11	5	22	./qpfhmi/dbbrowser.cpp(5): DBBrowser::DBBrowser
+1	1	1	28	4	./qpfhmi/dbbrowser.cpp(28): DBBrowser::~DBBrowser
+3	3	14	1	31	./qpfhmi/dbbrowser.cpp
+1	1	5	46	8	./qpfhmi/logwatcher.cpp(46): QPF::LogWatcher::LogWatcher
+1	1	3	55	6	./qpfhmi/logwatcher.cpp(55): QPF::LogWatcher::setFile
+1	1	1	62	4	./qpfhmi/logwatcher.cpp(62): QPF::LogWatcher::getFile
+3	3	20	67	28	./qpfhmi/logwatcher.cpp(67): QPF::LogWatcher::updateLogView
+6	6	30	1	96	./qpfhmi/logwatcher.cpp
+0	0	1	1	28	./qpfhmi/testrundlg.h
+0	0	1	1	295	./qpfhmi/mainwindow.h
+0	0	0	1	21	./qpfhmi/hmitypes.h
+0	0	0	1	156	./qpfhmi/simindata.h
+1	1	3	6	6	./qpfhmi/testrundlg.cpp(6): QPF::TestRunDlg::TestRunDlg
+1	1	1	13	4	./qpfhmi/testrundlg.cpp(13): QPF::TestRunDlg::~TestRunDlg
+2	2	5	1	18	./qpfhmi/testrundlg.cpp
+1	1	3	12	6	./qpfhmi/exttooledit.cpp(12): QPF::ExtToolEdit::ExtToolEdit
+1	1	1	19	4	./qpfhmi/exttooledit.cpp(19): QPF::ExtToolEdit::~ExtToolEdit
+1	1	1	24	4	./qpfhmi/exttooledit.cpp(24): QPF::ExtToolEdit::setProdTypes
+1	1	5	29	8	./qpfhmi/exttooledit.cpp(29): QPF::ExtToolEdit::editTool
+1	1	5	38	8	./qpfhmi/exttooledit.cpp(38): QPF::ExtToolEdit::getToolInfo
+1	1	2	47	27	./qpfhmi/exttooledit.cpp(47): QPF::ExtToolEdit::showHelp
+2	2	3	75	10	./qpfhmi/exttooledit.cpp(75): QPF::ExtToolEdit::selectApp
+2	2	26	86	40	./qpfhmi/exttooledit.cpp(86): QPF::ExtToolEdit::selectProdTypes
+10	10	47	1	127	./qpfhmi/exttooledit.cpp
+1	1	3	9	6	./qpfhmi/exttoolsdef.cpp(9): QPF::ExtToolsDef::ExtToolsDef
+1	1	1	16	4	./qpfhmi/exttoolsdef.cpp(16): QPF::ExtToolsDef::~ExtToolsDef
+1	1	16	21	27	./qpfhmi/exttoolsdef.cpp(21): QPF::ExtToolsDef::initialize
+2	2	13	49	20	./qpfhmi/exttoolsdef.cpp(49): QPF::ExtToolsDef::addNewTool
+1	1	2	70	5	./qpfhmi/exttoolsdef.cpp(70): QPF::ExtToolsDef::editTool
+1	1	3	76	6	./qpfhmi/exttoolsdef.cpp(76): QPF::ExtToolsDef::editTool
+2	2	13	83	20	./qpfhmi/exttoolsdef.cpp(83): QPF::ExtToolsDef::editTool
+2	6	14	104	14	./qpfhmi/exttoolsdef.cpp(104): QPF::ExtToolsDef::changeToolWithItem
+3	3	15	119	20	./qpfhmi/exttoolsdef.cpp(119): QPF::ExtToolsDef::removeTool
+1	1	1	140	4	./qpfhmi/exttoolsdef.cpp(140): QPF::ExtToolsDef::cancelDlg
+1	1	1	145	4	./qpfhmi/exttoolsdef.cpp(145): QPF::ExtToolsDef::getTools
+16	20	83	1	150	./qpfhmi/exttoolsdef.cpp
+2	2	7	67	5	./qpfhmi/archivemodel.cpp(67): QPF::ArchiveModel::ArchiveModel
+2	2	14	77	32	./qpfhmi/archivemodel.cpp(77): QPF::ArchiveModel::setupModel
+1	1	8	114	16	./qpfhmi/archivemodel.cpp(114): QPF::ArchiveModel::setupModel
+4	4	12	135	18	./qpfhmi/archivemodel.cpp(135): QPF::ArchiveModel::updateView
+3	3	17	158	27	./qpfhmi/archivemodel.cpp(158): QPF::ArchiveModel::initializeDb
+1	1	3	190	6	./qpfhmi/archivemodel.cpp(190): QPF::ArchiveModel::startUpdateTimer
+13	13	62	1	197	./qpfhmi/archivemodel.cpp
+1	1	1	46	4	./qpfhmi/progbardlg.cpp(46): QPF::ProgressBarDelegate::ProgressBarDelegate
+1	1	0	51	3	./qpfhmi/progbardlg.cpp(51): QPF::ProgressBarDelegate::~ProgressBarDelegate
+3	3	19	55	35	./qpfhmi/progbardlg.cpp(55): QPF::ProgressBarDelegate::paint
+5	5	21	1	91	./qpfhmi/progbardlg.cpp
+2	2	7	42	14	./qpfhmi/main.cpp(42): main
+2	2	8	1	55	./qpfhmi/main.cpp
+0	0	1	1	45	./qpfhmi/exttoolsdef.h
+2	2	14	42	26	./qpfhmi/browser.cpp(42): Browser::Browser
+1	1	0	69	3	./qpfhmi/browser.cpp(69): Browser::~Browser
+3	3	9	73	17	./qpfhmi/browser.cpp(73): Browser::exec
+2	2	12	91	19	./qpfhmi/browser.cpp(91): Browser::addConnection
+2	2	3	111	10	./qpfhmi/browser.cpp(111): Browser::addConnection
+2	2	11	122	18	./qpfhmi/browser.cpp(122): Browser::showTable
+4	4	27	141	38	./qpfhmi/browser.cpp(141): Browser::showMetaData
+3	3	10	180	13	./qpfhmi/browser.cpp(180): Browser::insertRow
+4	4	11	194	17	./qpfhmi/browser.cpp(194): Browser::deleteRow
+3	3	16	212	23	./qpfhmi/browser.cpp(212): Browser::updateActions
+1	1	1	236	6	./qpfhmi/browser.cpp(236): Browser::about
+2	2	3	243	6	./qpfhmi/browser.cpp(243): Browser::on_fieldStrategyAction_triggered
+2	2	3	250	6	./qpfhmi/browser.cpp(250): Browser::on_rowStrategyAction_triggered
+2	2	3	257	6	./qpfhmi/browser.cpp(257): Browser::on_manualStrategyAction_triggered
+2	2	3	264	6	./qpfhmi/browser.cpp(264): Browser::on_submitAction_triggered
+2	2	3	271	6	./qpfhmi/browser.cpp(271): Browser::on_revertAction_triggered
+2	2	3	278	6	./qpfhmi/browser.cpp(278): Browser::on_selectAction_triggered
+39	39	149	1	283	./qpfhmi/browser.cpp
+1	1	3	41	6	./qpfhmi/dlgshowtaskinfo.cpp(41): DlgShowTaskInfo::DlgShowTaskInfo
+1	1	1	48	4	./qpfhmi/dlgshowtaskinfo.cpp(48): DlgShowTaskInfo::~DlgShowTaskInfo
+1	1	1	53	4	./qpfhmi/dlgshowtaskinfo.cpp(53): DlgShowTaskInfo::getTreeTaskInfo
+1	1	1	58	4	./qpfhmi/dlgshowtaskinfo.cpp(58): DlgShowTaskInfo::setTaskInfo
+4	4	10	1	61	./qpfhmi/dlgshowtaskinfo.cpp
+3	3	17	61	22	./qpfhmi/deployer.cpp(61): QPF::Deployer::Deployer
+1	1	0	87	3	./qpfhmi/deployer.cpp(87): QPF::Deployer::~Deployer
+1	1	1	95	4	./qpfhmi/deployer.cpp(95): QPF::Deployer::getConfigFileName
+1	1	1	104	4	./qpfhmi/deployer.cpp(104): QPF::Deployer::getConfigHandler
+1	1	6	118	17	./qpfhmi/deployer.cpp(118): QPF::Deployer::run
+3	8	27	140	42	./qpfhmi/deployer.cpp(140): QPF::Deployer::processCmdLineOpts
+5	5	15	187	30	./qpfhmi/deployer.cpp(187): QPF::Deployer::readConfig
+4	4	21	223	32	./qpfhmi/deployer.cpp(223): QPF::Deployer::launchPeerNodes
+2	2	2	260	5	./qpfhmi/deployer.cpp(260): QPF::Deployer::start
+2	2	5	270	8	./qpfhmi/deployer.cpp(270): QPF::Deployer::cleanUp
+1	1	2	283	5	./qpfhmi/deployer.cpp(283): QPF::Deployer::fexists
+1	1	0	293	3	./qpfhmi/deployer.cpp(293): QPF::Deployer::removeOldFiles
+2	2	2	301	5	./qpfhmi/deployer.cpp(301): QPF::Deployer::existsDir
+27	32	100	1	308	./qpfhmi/deployer.cpp
+1	1	3	4	6	./qpfhmi/dlgalert.cpp(4): DlgAlert::DlgAlert
+1	1	1	11	4	./qpfhmi/dlgalert.cpp(11): DlgAlert::~DlgAlert
+1	1	5	16	8	./qpfhmi/dlgalert.cpp(16): DlgAlert::setAlert
+3	3	12	1	23	./qpfhmi/dlgalert.cpp
+1	1	8	98	16	./qpfhmi/mainwindow.cpp(98): QPF::MainWindow::MainWindow
+1	1	1	118	4	./qpfhmi/mainwindow.cpp(118): QPF::MainWindow::~MainWindow
+1	1	34	127	56	./qpfhmi/mainwindow.cpp(127): QPF::MainWindow::manualSetupUI
+2	2	5	188	10	./qpfhmi/mainwindow.cpp(188): QPF::MainWindow::closeEvent
+3	3	2	203	5	./qpfhmi/mainwindow.cpp(203): QPF::MainWindow::saveAs
+2	2	2	210	4	./qpfhmi/mainwindow.cpp(210): QPF::MainWindow::cut
+2	2	2	215	4	./qpfhmi/mainwindow.cpp(215): QPF::MainWindow::copy
+2	2	2	220	4	./qpfhmi/mainwindow.cpp(220): QPF::MainWindow::paste
+1	1	1	230	7	./qpfhmi/mainwindow.cpp(230): QPF::MainWindow::about
+2	2	13	242	23	./qpfhmi/mainwindow.cpp(242): QPF::MainWindow::updateMenus
+3	3	25	270	32	./qpfhmi/mainwindow.cpp(270): QPF::MainWindow::updateWindowMenu
+1	1	5	307	12	./qpfhmi/mainwindow.cpp(307): QPF::MainWindow::createTextView
+1	1	73	324	112	./qpfhmi/mainwindow.cpp(324): QPF::MainWindow::createActions
+1	1	27	441	46	./qpfhmi/mainwindow.cpp(441): QPF::MainWindow::createMenus
+1	1	0	492	12	./qpfhmi/mainwindow.cpp(492): QPF::MainWindow::createToolBars
+1	1	1	509	4	./qpfhmi/mainwindow.cpp(509): QPF::MainWindow::createStatusBar
+1	1	6	518	9	./qpfhmi/mainwindow.cpp(518): QPF::MainWindow::readSettings
+1	1	4	532	7	./qpfhmi/mainwindow.cpp(532): QPF::MainWindow::writeSettings
+1	1	2	544	5	./qpfhmi/mainwindow.cpp(544): QPF::MainWindow::getFromSettings
+1	1	2	554	5	./qpfhmi/mainwindow.cpp(554): QPF::MainWindow::putToSettings
+2	2	15	564	17	./qpfhmi/mainwindow.cpp(564): QPF::MainWindow::getUserToolsFromSettings
+1	1	13	586	18	./qpfhmi/mainwindow.cpp(586): QPF::MainWindow::putUserToolsToSettings
+2	2	3	609	6	./qpfhmi/mainwindow.cpp(609): QPF::MainWindow::activeTextView
+2	2	3	620	7	./qpfhmi/mainwindow.cpp(620): QPF::MainWindow::switchLayoutDirection
+2	2	3	631	5	./qpfhmi/mainwindow.cpp(631): QPF::MainWindow::setActiveSubWindow
+4	4	19	641	37	./qpfhmi/mainwindow.cpp(641): QPF::MainWindow::readConfig
+1	1	3	683	7	./qpfhmi/mainwindow.cpp(683): QPF::MainWindow::showConfigTool
+1	1	2	695	6	./qpfhmi/mainwindow.cpp(695): QPF::MainWindow::showDBBrowser
+2	2	5	706	9	./qpfhmi/mainwindow.cpp(706): QPF::MainWindow::showExtToolsDef
+1	1	3	720	8	./qpfhmi/mainwindow.cpp(720): QPF::MainWindow::showVerbLevel
+5	5	43	733	116	./qpfhmi/mainwindow.cpp(733): QPF::MainWindow::execTestRun
+3	3	32	855	88	./qpfhmi/mainwindow.cpp(855): QPF::MainWindow::commandSystem
+2	2	5	948	12	./qpfhmi/mainwindow.cpp(948): QPF::MainWindow::restart
+2	2	6	965	13	./qpfhmi/mainwindow.cpp(965): QPF::MainWindow::quitApp
+1	1	0	983	3	./qpfhmi/mainwindow.cpp(983): QPF::MainWindow::transitToOperational
+1	1	23	991	38	./qpfhmi/mainwindow.cpp(991): QPF::MainWindow::init
+2	2	8	1033	10	./qpfhmi/mainwindow.cpp(1033): QPF::MainWindow::initLogWatch
+5	5	26	1047	45	./qpfhmi/mainwindow.cpp(1047): QPF::MainWindow::setLogWatch
+1	1	1	1097	4	./qpfhmi/mainwindow.cpp(1097): QPF::MainWindow::processPendingEvents
+1	1	1	1106	4	./qpfhmi/mainwindow.cpp(1106): QPF::MainWindow::handleFinishedHMI
+2	2	11	1116	21	./qpfhmi/mainwindow.cpp(1116): QPF::MainWindow::processInbox
+4	4	13	1142	25	./qpfhmi/mainwindow.cpp(1142): QPF::MainWindow::selectInboxPath
+1	1	2	1172	6	./qpfhmi/mainwindow.cpp(1172): QPF::MainWindow::sentInData
+1	1	3	1183	8	./qpfhmi/mainwindow.cpp(1183): QPF::MainWindow::endOfInDataMsgs
+1	1	1	1196	5	./qpfhmi/mainwindow.cpp(1196): QPF::MainWindow::stopSendingMultInData
+3	3	13	1206	23	./qpfhmi/mainwindow.cpp(1206): QPF::MainWindow::checkForTaskRes
+4	4	20	1234	39	./qpfhmi/mainwindow.cpp(1234): QPF::MainWindow::showTaskRes
+1	1	24	1277	39	./qpfhmi/mainwindow.cpp(1277): QPF::MainWindow::initTasksMonitTree
+1	1	13	1320	31	./qpfhmi/mainwindow.cpp(1320): QPF::MainWindow::initAlertsTable
+19	24	102	1355	154	./qpfhmi/mainwindow.cpp(1355): QPF::MainWindow::updateTasksMonitTree
+3	3	8	1513	22	./qpfhmi/mainwindow.cpp(1513): QPF::MainWindow::updateAlertsTree
+7	12	50	1539	76	./qpfhmi/mainwindow.cpp(1539): QPF::MainWindow::updateAgentsMonitPanel
+1	1	1	1619	4	./qpfhmi/mainwindow.cpp(1619): QPF::MainWindow::sortTaskViewByColumn
+4	4	12	1627	17	./qpfhmi/mainwindow.cpp(1627): QPF::MainWindow::showTaskMonitContextMenu
+4	4	9	1648	14	./qpfhmi/mainwindow.cpp(1648): QPF::MainWindow::showAlertsContextMenu
+1	1	4	1666	10	./qpfhmi/mainwindow.cpp(1666): QPF::MainWindow::initArchiveTable
+1	1	5	1680	8	./qpfhmi/mainwindow.cpp(1680): QPF::MainWindow::openWithDefault
+1	1	14	1692	19	./qpfhmi/mainwindow.cpp(1692): QPF::MainWindow::openWith
+1	1	9	1715	16	./qpfhmi/mainwindow.cpp(1715): QPF::MainWindow::initArchiveTableContextMenu
+6	6	21	1735	29	./qpfhmi/mainwindow.cpp(1735): QPF::MainWindow::showArchiveTableContextMenu
+1	1	7	1769	10	./qpfhmi/mainwindow.cpp(1769): QPF::MainWindow::showWorkDir
+1	1	11	1784	14	./qpfhmi/mainwindow.cpp(1784): QPF::MainWindow::displayTaskInfo
+1	1	4	1803	8	./qpfhmi/mainwindow.cpp(1803): QPF::MainWindow::showAlertInfo
+1	1	0	1816	3	./qpfhmi/mainwindow.cpp(1816): QPF::MainWindow::showArchInfo
+1	1	1	1824	4	./qpfhmi/mainwindow.cpp(1824): QPF::MainWindow::pauseTask
+1	1	1	1833	4	./qpfhmi/mainwindow.cpp(1833): QPF::MainWindow::resumeTask
+1	1	1	1842	4	./qpfhmi/mainwindow.cpp(1842): QPF::MainWindow::stopTask
+1	1	8	1851	13	./qpfhmi/mainwindow.cpp(1851): QPF::MainWindow::runDockerCmd
+1	1	8	1870	11	./qpfhmi/mainwindow.cpp(1870): QPF::MainWindow::dumpTaskInfoToTree
+8	8	24	1886	33	./qpfhmi/mainwindow.cpp(1886): QPF::MainWindow::dumpToTree
+1	1	1	1924	4	./qpfhmi/mainwindow.cpp(1924): QPF::MainWindow::setDebugInfo
+5	5	10	1933	16	./qpfhmi/mainwindow.cpp(1933): QPF::MainWindow::clearLayout
+1	1	15	1954	20	./qpfhmi/mainwindow.cpp(1954): QPF::MainWindow::defineValidTransitions
+2	5	14	1979	24	./qpfhmi/mainwindow.cpp(1979): QPF::MainWindow::showState
+162	175	871	1	2006	./qpfhmi/mainwindow.cpp
+1	1	2	56	5	./qpfhmi/archivetree.cpp(56): QPF::ArchiveTreeItem::ArchiveTreeItem
+1	1	1	62	4	./qpfhmi/archivetree.cpp(62): QPF::ArchiveTreeItem::~ArchiveTreeItem
+1	1	1	67	4	./qpfhmi/archivetree.cpp(67): QPF::ArchiveTreeItem::appendChild
+1	1	1	72	4	./qpfhmi/archivetree.cpp(72): QPF::ArchiveTreeItem::child
+1	1	1	77	4	./qpfhmi/archivetree.cpp(77): QPF::ArchiveTreeItem::childCount
+1	1	1	82	4	./qpfhmi/archivetree.cpp(82): QPF::ArchiveTreeItem::columnCount
+1	1	1	87	4	./qpfhmi/archivetree.cpp(87): QPF::ArchiveTreeItem::data
+1	1	1	92	4	./qpfhmi/archivetree.cpp(92): QPF::ArchiveTreeItem::parentItem
+2	2	2	97	6	./qpfhmi/archivetree.cpp(97): QPF::ArchiveTreeItem::row
+1	1	8	106	9	./qpfhmi/archivetree.cpp(106): QPF::ArchiveTreeModel::ArchiveTreeModel
+1	1	1	116	4	./qpfhmi/archivetree.cpp(116): QPF::ArchiveTreeModel::~ArchiveTreeModel
+2	2	3	121	7	./qpfhmi/archivetree.cpp(121): QPF::ArchiveTreeModel::columnCount
+3	3	6	129	12	./qpfhmi/archivetree.cpp(129): QPF::ArchiveTreeModel::data
+2	2	3	142	7	./qpfhmi/archivetree.cpp(142): QPF::ArchiveTreeModel::flags
+3	3	3	150	8	./qpfhmi/archivetree.cpp(150): QPF::ArchiveTreeModel::headerData
+4	4	10	159	19	./qpfhmi/archivetree.cpp(159): QPF::ArchiveTreeModel::index
+3	3	7	179	13	./qpfhmi/archivetree.cpp(179): QPF::ArchiveTreeModel::parent
+3	3	7	193	13	./qpfhmi/archivetree.cpp(193): QPF::ArchiveTreeModel::rowCount
+1	1	1	207	4	./qpfhmi/archivetree.cpp(207): QPF::ArchiveTreeModel::setSourceModel
+6	6	26	212	32	./qpfhmi/archivetree.cpp(212): QPF::ArchiveTreeModel::populateModel
+39	39	87	1	245	./qpfhmi/archivetree.cpp
+1	1	3	8	6	./qpfhmi/logframe.cpp(8): LogFrame::LogFrame
+1	1	1	15	4	./qpfhmi/logframe.cpp(15): LogFrame::~LogFrame
+1	1	2	20	5	./qpfhmi/logframe.cpp(20): LogFrame::setMsg
+1	1	1	26	4	./qpfhmi/logframe.cpp(26): LogFrame::clearMsg
+9	9	18	31	22	./qpfhmi/logframe.cpp(31): LogFrame::displayLed
+1	1	4	54	7	./qpfhmi/logframe.cpp(54): LogFrame::clearLed
+1	1	1	62	4	./qpfhmi/logframe.cpp(62): LogFrame::getTextEditor
+15	15	37	1	65	./qpfhmi/logframe.cpp
+0	0	1	1	48	./qpfhmi/taskmonmodel.cpp
+1	1	2	48	4	./qpfhmi/app.cpp(48): QPF::App::App
+1	1	1	57	4	./qpfhmi/app.cpp(57): QPF::App::getConfigFileName
+1	1	1	66	4	./qpfhmi/app.cpp(66): QPF::App::getConfigHandler
+1	1	4	75	17	./qpfhmi/app.cpp(75): QPF::App::notify
+1	1	2	97	5	./qpfhmi/app.cpp(97): QPF::App::restart
+5	5	11	1	103	./qpfhmi/app.cpp
+0	0	1	1	71	./qpfhmi/app.h
+0	0	-1	1	98	./qpfhmi/archivetree.h
+0	0	1	1	97	./qpfhmi/taskmonmodel.h
+0	0	1	1	29	./qpfhmi/frmagentstatus.h
+0	0	1	1	32	./qpfhmi/verbleveldlg.h
+1	1	27	42	65	./qpfhmi/browser.h(42): QT_FORWARD_DECLARE_CLASS
+1	1	1	112	1	./qpfhmi/browser.h(112): CustomModel::CustomModel
+2	2	31	1	121	./qpfhmi/browser.h
+1	1	5	60	9	./qpfhmi/hmipxy.cpp(60): QPF::HMIProxy::HMIProxy
+1	1	1	74	4	./qpfhmi/hmipxy.cpp(74): QPF::HMIProxy::getStartSignal
+1	1	1	83	4	./qpfhmi/hmipxy.cpp(83): QPF::HMIProxy::concurrentRun
+1	1	0	91	4	./qpfhmi/hmipxy.cpp(91): QPF::HMIProxy::fromOperationalToRunning
+1	1	1	99	4	./qpfhmi/hmipxy.cpp(99): QPF::HMIProxy::fromRunningToOff
+1	1	2	107	5	./qpfhmi/hmipxy.cpp(107): QPF::HMIProxy::processTASK_RES
+1	1	9	117	16	./qpfhmi/hmipxy.cpp(117): QPF::HMIProxy::sendInData
+1	1	4	138	7	./qpfhmi/hmipxy.cpp(138): QPF::HMIProxy::requestStop
+4	4	11	150	18	./qpfhmi/hmipxy.cpp(150): QPF::HMIProxy::registerTaskRes
+1	1	1	173	4	./qpfhmi/hmipxy.cpp(173): QPF::HMIProxy::isThereTaskResInfo
+1	1	8	182	12	./qpfhmi/hmipxy.cpp(182): QPF::HMIProxy::getTaskResInfo
+14	14	45	1	195	./qpfhmi/hmipxy.cpp
+0	0	0	1	60	./qpfhmi/progbardlg.h
+1	1	3	43	19	./qpfgui/procalertmodel.cpp(43): QPF::ProcAlertModel::ProcAlertModel
+1	1	4	1	63	./qpfgui/procalertmodel.cpp
+1	1	2	69	2	./qpfgui/types.h(69): QPF::MdataField::MdataField
+1	1	2	1	82	./qpfgui/types.h
+0	0	0	1	74	./qpfgui/logwatcher.h
+1	1	1	20	1	./qpfgui/configtool.h(20): ModelView::getModel
+1	1	1	21	1	./qpfgui/configtool.h(21): ModelView::getView
+1	1	1	22	1	./qpfgui/configtool.h(22): ModelView::getSelectionModel
+3	3	5	1	85	./qpfgui/configtool.h
+0	0	0	1	55	./qpfgui/procalertmodel.h
+1	1	7	45	10	./qpfgui/dbtblmodel.cpp(45): QPF::DBTableModel::DBTableModel
+2	2	4	56	8	./qpfgui/dbtblmodel.cpp(56): QPF::DBTableModel::setHeaders
+1	1	1	65	4	./qpfgui/dbtblmodel.cpp(65): QPF::DBTableModel::defineHeaders
+1	1	1	70	4	./qpfgui/dbtblmodel.cpp(70): QPF::DBTableModel::defineQuery
+1	1	1	75	4	./qpfgui/dbtblmodel.cpp(75): QPF::DBTableModel::defineTablePalette
+7	8	13	80	27	./qpfgui/dbtblmodel.cpp(80): QPF::DBTableModel::data
+1	1	1	109	4	./qpfgui/dbtblmodel.cpp(109): QPF::DBTableModel::setFullUpdate
+6	6	10	114	18	./qpfgui/dbtblmodel.cpp(114): QPF::DBTableModel::refresh
+20	21	39	1	133	./qpfgui/dbtblmodel.cpp
+1	1	8	9	20	./qpfgui/verbleveldlg.cpp(9): QPF::VerbLevelDlg::VerbLevelDlg
+1	1	2	30	5	./qpfgui/verbleveldlg.cpp(30): QPF::VerbLevelDlg::setVerbosityLevel
+1	1	1	36	4	./qpfgui/verbleveldlg.cpp(36): QPF::VerbLevelDlg::getVerbosityLevelName
+1	1	1	41	4	./qpfgui/verbleveldlg.cpp(41): QPF::VerbLevelDlg::~VerbLevelDlg
+4	4	14	1	48	./qpfgui/verbleveldlg.cpp
+1	1	15	39	20	./qpfgui/connectionwidget.cpp(39): ConnectionWidget::ConnectionWidget
+1	1	0	60	3	./qpfgui/connectionwidget.cpp(60): ConnectionWidget::~ConnectionWidget
+2	2	6	64	9	./qpfgui/connectionwidget.cpp(64): qDBCaption
+6	6	23	74	29	./qpfgui/connectionwidget.cpp(74): ConnectionWidget::refresh
+1	1	1	104	4	./qpfgui/connectionwidget.cpp(104): ConnectionWidget::currentDatabase
+1	1	3	109	6	./qpfgui/connectionwidget.cpp(109): qSetBold
+4	4	9	116	13	./qpfgui/connectionwidget.cpp(116): ConnectionWidget::setActive
+3	3	6	130	12	./qpfgui/connectionwidget.cpp(130): ConnectionWidget::on_tree_itemActivated
+3	3	5	143	8	./qpfgui/connectionwidget.cpp(143): ConnectionWidget::showMetaData
+2	2	1	152	4	./qpfgui/connectionwidget.cpp(152): ConnectionWidget::on_tree_currentItemChanged
+24	24	79	1	156	./qpfgui/connectionwidget.cpp
+0	0	1	1	39	./qpfgui/exttooledit.h
+1	1	1	46	4	./qpfgui/txitemdlg.cpp(46): QPF::TxItemDelegate::TxItemDelegate
+5	10	29	51	46	./qpfgui/txitemdlg.cpp(51): QPF::TxItemDelegate::paint
+2	2	4	98	10	./qpfgui/txitemdlg.cpp(98): QPF::TxItemDelegate::sizeHint
+1	1	1	109	16	./qpfgui/txitemdlg.cpp(109): QPF::TxItemDelegate::createEditor
+1	1	1	126	11	./qpfgui/txitemdlg.cpp(126): QPF::TxItemDelegate::setEditorData
+1	1	1	138	10	./qpfgui/txitemdlg.cpp(138): QPF::TxItemDelegate::setModelData
+11	16	38	1	156	./qpfgui/txitemdlg.cpp
+1	1	0	45	3	./qpfgui/txitem.cpp(45): QPF::TxItem::TxItem
+1	1	1	49	4	./qpfgui/txitem.cpp(49): QPF::TxItem::setMode
+1	1	1	54	4	./qpfgui/txitem.cpp(54): QPF::TxItem::setOrientation
+1	1	1	59	4	./qpfgui/txitem.cpp(59): QPF::TxItem::setMsgName
+1	1	1	64	4	./qpfgui/txitem.cpp(64): QPF::TxItem::setContent
+1	1	1	69	4	./qpfgui/txitem.cpp(69): QPF::TxItem::sizeHint
+4	7	33	74	61	./qpfgui/txitem.cpp(74): QPF::TxItem::paint
+10	13	39	1	136	./qpfgui/txitem.cpp
+0	0	2	1	22	./qpfgui/dlgdataing.h
+0	0	2	1	63	./qpfgui/dlgshowtaskinfo.h
+1	1	1	5	4	./qpfgui/textview.cpp(5): TextView::TextView
+2	2	4	10	8	./qpfgui/textview.cpp(10): TextView::saveAs
+2	2	9	19	18	./qpfgui/textview.cpp(19): TextView::saveFile
+1	1	2	38	6	./qpfgui/textview.cpp(38): TextView::setLogName
+1	1	1	45	4	./qpfgui/textview.cpp(45): TextView::logName
+1	1	1	50	4	./qpfgui/textview.cpp(50): TextView::closeEvent
+8	8	24	1	54	./qpfgui/textview.cpp
+0	0	1	1	49	./qpfgui/types.cpp
+3	3	9	15	11	./qpfgui/configtool.cpp(15): ModelView::ModelView
+3	3	9	27	10	./qpfgui/configtool.cpp(27): ModelView::ModelView
+1	1	1	38	4	./qpfgui/configtool.cpp(38): ModelView::setHeader
+2	2	4	43	6	./qpfgui/configtool.cpp(43): ModelView::setHeaders
+2	2	6	50	9	./qpfgui/configtool.cpp(50): ModelView::setData
+3	3	10	59	12	./qpfgui/configtool.cpp(59): ModelView::setData
+1	1	12	74	19	./qpfgui/configtool.cpp(74): QPF::ConfigTool::ConfigTool
+1	1	1	94	4	./qpfgui/configtool.cpp(94): QPF::ConfigTool::~ConfigTool
+12	12	101	99	145	./qpfgui/configtool.cpp(99): QPF::ConfigTool::readConfig
+1	1	3	245	9	./qpfgui/configtool.cpp(245): QPF::ConfigTool::createListModelView
+1	1	3	256	9	./qpfgui/configtool.cpp(256): QPF::ConfigTool::createTableModelView
+1	1	1	266	6	./qpfgui/configtool.cpp(266): QPF::ConfigTool::save
+1	1	1	273	6	./qpfgui/configtool.cpp(273): QPF::ConfigTool::saveAs
+1	1	5	280	9	./qpfgui/configtool.cpp(280): QPF::ConfigTool::setWorkingPaths
+33	33	174	1	291	./qpfgui/configtool.cpp
+0	0	0	1	28	./qpfgui/textview.h
+1	1	3	3	6	./qpfgui/xmlsyntaxhighlight.cpp(3): XMLBasicSyntaxHighlighter::XMLBasicSyntaxHighlighter
+1	1	3	10	6	./qpfgui/xmlsyntaxhighlight.cpp(10): XMLBasicSyntaxHighlighter::XMLBasicSyntaxHighlighter
+1	1	3	17	6	./qpfgui/xmlsyntaxhighlight.cpp(17): XMLBasicSyntaxHighlighter::XMLBasicSyntaxHighlighter
+3	3	16	24	25	./qpfgui/xmlsyntaxhighlight.cpp(24): XMLBasicSyntaxHighlighter::highlightBlock
+2	2	5	50	13	./qpfgui/xmlsyntaxhighlight.cpp(50): XMLBasicSyntaxHighlighter::highlightByRegex
+1	1	5	64	11	./qpfgui/xmlsyntaxhighlight.cpp(64): XMLBasicSyntaxHighlighter::setRegexes
+1	1	9	76	16	./qpfgui/xmlsyntaxhighlight.cpp(76): XMLBasicSyntaxHighlighter::setFormats
+10	10	51	1	92	./qpfgui/xmlsyntaxhighlight.cpp
+0	0	0	1	83	./qpfgui/txitemdlg.h
+0	0	2	1	22	./qpfgui/dbbrowser.h
+0	0	2	1	32	./qpfgui/logframe.h
+0	0	0	1	60	./qpfgui/txtblmodel.h
+0	0	0	1	55	./qpfgui/productsmodel.h
+0	0	1	1	54	./qpfgui/init.h
+0	0	0	1	58	./qpfgui/sysalertmodel.h
+1	1	3	6	6	./qpfgui/frmagentstatus.cpp(6): QPF::FrmAgentStatus::FrmAgentStatus
+1	1	1	13	4	./qpfgui/frmagentstatus.cpp(13): QPF::FrmAgentStatus::~FrmAgentStatus
+2	2	25	18	35	./qpfgui/frmagentstatus.cpp(18): QPF::FrmAgentStatus::updateInfo
+4	4	30	1	54	./qpfgui/frmagentstatus.cpp
+0	0	0	1	80	./qpfgui/version.h
+0	0	0	1	55	./qpfgui/proctskstatmodel.h
+0	0	-1	1	85	./qpfgui/proctskmng.h
+1	1	13	39	31	./qpfgui/connectionwidget.h(39): QT_FORWARD_DECLARE_CLASS
+1	1	15	1	71	./qpfgui/connectionwidget.h
+2	2	2	47	8	./qpfgui/dbmng.cpp(47): QPF::DBManager::DBManager
+1	1	0	56	4	./qpfgui/dbmng.cpp(56): QPF::DBManager::~DBManager
+1	1	0	61	4	./qpfgui/dbmng.cpp(61): QPF::DBManager::checkTaskStatusInfo
+2	2	15	66	24	./qpfgui/dbmng.cpp(66): QPF::DBManager::addConnection
+2	2	3	91	10	./qpfgui/dbmng.cpp(91): QPF::DBManager::addConnection
+2	2	4	102	9	./qpfgui/dbmng.cpp(102): QPF::DBManager::getState
+2	2	4	112	12	./qpfgui/dbmng.cpp(112): QPF::DBManager::numOfRowsInDbTable
+2	2	5	125	18	./qpfgui/dbmng.cpp(125): QPF::DBManager::addICommand
+14	14	34	1	191	./qpfgui/dbmng.cpp
+0	0	1	1	30	./qpfgui/dlgalert.h
+2	2	3	43	8	./qpfgui/proctskmng.cpp(43): QPF::ProcTaskManager::ProcTaskManager
+1	1	0	52	4	./qpfgui/proctskmng.cpp(52): QPF::ProcTaskManager::~ProcTaskManager
+1	1	0	57	4	./qpfgui/proctskmng.cpp(57): QPF::ProcTaskManager::checkTaskStatusInfo
+2	2	16	62	25	./qpfgui/proctskmng.cpp(62): QPF::ProcTaskManager::addConnection
+2	2	3	88	10	./qpfgui/proctskmng.cpp(88): QPF::ProcTaskManager::addConnection
+2	2	4	99	9	./qpfgui/proctskmng.cpp(99): QPF::ProcTaskManager::getState
+3	3	12	110	45	./qpfgui/proctskmng.cpp(110): QPF::ProcTaskManager::getTasksInfo
+13	13	39	1	157	./qpfgui/proctskmng.cpp
+2	2	11	5	22	./qpfgui/dbbrowser.cpp(5): DBBrowser::DBBrowser
+1	1	1	28	4	./qpfgui/dbbrowser.cpp(28): DBBrowser::~DBBrowser
+3	3	14	1	31	./qpfgui/dbbrowser.cpp
+1	1	5	46	8	./qpfgui/logwatcher.cpp(46): QPF::LogWatcher::LogWatcher
+1	1	3	55	6	./qpfgui/logwatcher.cpp(55): QPF::LogWatcher::setFile
+1	1	1	62	4	./qpfgui/logwatcher.cpp(62): QPF::LogWatcher::getFile
+3	3	20	67	28	./qpfgui/logwatcher.cpp(67): QPF::LogWatcher::updateLogView
+6	6	30	1	96	./qpfgui/logwatcher.cpp
+0	0	1	1	245	./qpfgui/mainwindow.h
+1	1	4	46	7	./qpfgui/dbtreemodel.cpp(46): QPF::DBTreeModel::DBTreeModel
+2	2	4	54	8	./qpfgui/dbtreemodel.cpp(54): QPF::DBTreeModel::setHeaders
+1	1	1	63	4	./qpfgui/dbtreemodel.cpp(63): QPF::DBTreeModel::defineHeaders
+1	1	1	68	4	./qpfgui/dbtreemodel.cpp(68): QPF::DBTreeModel::defineQuery
+2	2	2	73	6	./qpfgui/dbtreemodel.cpp(73): QPF::DBTreeModel::refresh
+7	7	35	80	41	./qpfgui/dbtreemodel.cpp(80): QPF::DBTreeModel::execQuery
+14	14	48	1	122	./qpfgui/dbtreemodel.cpp
+1	1	0	43	3	./qpfgui/taskstatmng.cpp(43): TaskStatusManager::TaskStatusManager
+1	1	0	47	4	./qpfgui/taskstatmng.cpp(47): TaskStatusManager::~TaskStatusManager
+1	1	0	52	4	./qpfgui/taskstatmng.cpp(52): TaskStatusManager::checkTaskStatusInfo
+3	3	3	1	57	./qpfgui/taskstatmng.cpp
+1	1	9	45	21	./qpfgui/txtblmodel.cpp(45): QPF::TxTableModel::TxTableModel
+10	10	27	67	38	./qpfgui/txtblmodel.cpp(67): QPF::TxTableModel::data
+11	11	37	1	106	./qpfgui/txtblmodel.cpp
+1	1	1	72	1	./qpfgui/dbmng.h(72): QPF::DBManager::getDB
+1	1	0	1	97	./qpfgui/dbmng.h
+0	0	0	1	21	./qpfgui/hmitypes.h
+1	1	3	12	6	./qpfgui/exttooledit.cpp(12): QPF::ExtToolEdit::ExtToolEdit
+1	1	1	19	4	./qpfgui/exttooledit.cpp(19): QPF::ExtToolEdit::~ExtToolEdit
+1	1	1	24	4	./qpfgui/exttooledit.cpp(24): QPF::ExtToolEdit::setProdTypes
+1	1	5	29	8	./qpfgui/exttooledit.cpp(29): QPF::ExtToolEdit::editTool
+1	1	5	38	8	./qpfgui/exttooledit.cpp(38): QPF::ExtToolEdit::getToolInfo
+1	1	2	47	27	./qpfgui/exttooledit.cpp(47): QPF::ExtToolEdit::showHelp
+2	2	3	75	10	./qpfgui/exttooledit.cpp(75): QPF::ExtToolEdit::selectApp
+2	2	26	86	40	./qpfgui/exttooledit.cpp(86): QPF::ExtToolEdit::selectProdTypes
+10	10	47	1	127	./qpfgui/exttooledit.cpp
+1	1	12	43	37	./qpfgui/proctskstatmodel.cpp(43): QPF::ProcTaskStatusModel::ProcTaskStatusModel
+1	1	13	1	81	./qpfgui/proctskstatmodel.cpp
+1	1	4	28	9	./qpfgui/qjsonmodel.cpp(28): QJsonModel::QJsonModel
+2	2	7	38	12	./qpfgui/qjsonmodel.cpp(38): QJsonModel::load
+1	1	1	51	4	./qpfgui/qjsonmodel.cpp(51): QJsonModel::load
+3	3	9	56	17	./qpfgui/qjsonmodel.cpp(56): QJsonModel::loadJson
+7	7	11	75	30	./qpfgui/qjsonmodel.cpp(75): QJsonModel::data
+3	3	5	106	12	./qpfgui/qjsonmodel.cpp(106): QJsonModel::headerData
+4	4	10	119	18	./qpfgui/qjsonmodel.cpp(119): QJsonModel::index
+3	3	7	138	13	./qpfgui/qjsonmodel.cpp(138): QJsonModel::parent
+3	3	7	152	13	./qpfgui/qjsonmodel.cpp(152): QJsonModel::rowCount
+1	1	1	166	5	./qpfgui/qjsonmodel.cpp(166): QJsonModel::columnCount
+1	1	1	172	4	./qpfgui/qjsonmodel.cpp(172): QJsonModel::setIcon
+29	29	74	1	175	./qpfgui/qjsonmodel.cpp
+0	0	1	1	61	./qpfgui/taskstatmng.h
+1	1	3	9	6	./qpfgui/exttoolsdef.cpp(9): QPF::ExtToolsDef::ExtToolsDef
+1	1	1	16	4	./qpfgui/exttoolsdef.cpp(16): QPF::ExtToolsDef::~ExtToolsDef
+1	1	16	21	27	./qpfgui/exttoolsdef.cpp(21): QPF::ExtToolsDef::initialize
+2	2	13	49	20	./qpfgui/exttoolsdef.cpp(49): QPF::ExtToolsDef::addNewTool
+1	1	2	70	5	./qpfgui/exttoolsdef.cpp(70): QPF::ExtToolsDef::editTool
+1	1	3	76	6	./qpfgui/exttoolsdef.cpp(76): QPF::ExtToolsDef::editTool
+2	2	13	83	20	./qpfgui/exttoolsdef.cpp(83): QPF::ExtToolsDef::editTool
+2	6	14	104	14	./qpfgui/exttoolsdef.cpp(104): QPF::ExtToolsDef::changeToolWithItem
+3	3	15	119	20	./qpfgui/exttoolsdef.cpp(119): QPF::ExtToolsDef::removeTool
+1	1	1	140	4	./qpfgui/exttoolsdef.cpp(140): QPF::ExtToolsDef::cancelDlg
+1	1	1	145	4	./qpfgui/exttoolsdef.cpp(145): QPF::ExtToolsDef::getTools
+16	20	83	1	150	./qpfgui/exttoolsdef.cpp
+0	0	1	1	40	./qpfgui/txitem.h
+1	1	2	46	4	./qpfgui/progbardlg.cpp(46): QPF::ProgressBarDelegate::ProgressBarDelegate
+1	1	0	51	3	./qpfgui/progbardlg.cpp(51): QPF::ProgressBarDelegate::~ProgressBarDelegate
+2	2	4	55	7	./qpfgui/progbardlg.cpp(55): QPF::ProgressBarDelegate::sizeHint
+3	3	19	63	35	./qpfgui/progbardlg.cpp(63): QPF::ProgressBarDelegate::paint
+7	7	26	1	99	./qpfgui/progbardlg.cpp
+1	1	3	5	9	./qpfgui/main.cpp(5): usage
+7	7	23	15	36	./qpfgui/main.cpp(15): main
+8	8	28	1	50	./qpfgui/main.cpp
+0	0	1	1	45	./qpfgui/exttoolsdef.h
+0	0	0	1	72	./qpfgui/dbtreemodel.h
+2	2	14	42	26	./qpfgui/browser.cpp(42): Browser::Browser
+1	1	0	69	3	./qpfgui/browser.cpp(69): Browser::~Browser
+3	3	9	73	17	./qpfgui/browser.cpp(73): Browser::exec
+2	2	12	91	19	./qpfgui/browser.cpp(91): Browser::addConnection
+2	2	3	111	10	./qpfgui/browser.cpp(111): Browser::addConnection
+2	2	11	122	18	./qpfgui/browser.cpp(122): Browser::showTable
+4	4	27	141	38	./qpfgui/browser.cpp(141): Browser::showMetaData
+3	3	10	180	13	./qpfgui/browser.cpp(180): Browser::insertRow
+4	4	11	194	17	./qpfgui/browser.cpp(194): Browser::deleteRow
+3	3	16	212	23	./qpfgui/browser.cpp(212): Browser::updateActions
+1	1	1	236	6	./qpfgui/browser.cpp(236): Browser::about
+2	2	3	243	6	./qpfgui/browser.cpp(243): Browser::on_fieldStrategyAction_triggered
+2	2	3	250	6	./qpfgui/browser.cpp(250): Browser::on_rowStrategyAction_triggered
+2	2	3	257	6	./qpfgui/browser.cpp(257): Browser::on_manualStrategyAction_triggered
+2	2	3	264	6	./qpfgui/browser.cpp(264): Browser::on_submitAction_triggered
+2	2	3	271	6	./qpfgui/browser.cpp(271): Browser::on_revertAction_triggered
+2	2	3	278	6	./qpfgui/browser.cpp(278): Browser::on_selectAction_triggered
+39	39	149	1	283	./qpfgui/browser.cpp
+1	1	4	41	7	./qpfgui/dlgshowtaskinfo.cpp(41): DlgShowTaskInfo::DlgShowTaskInfo
+1	1	1	49	4	./qpfgui/dlgshowtaskinfo.cpp(49): DlgShowTaskInfo::~DlgShowTaskInfo
+1	1	1	54	4	./qpfgui/dlgshowtaskinfo.cpp(54): DlgShowTaskInfo::getTreeTaskInfo
+1	1	1	59	4	./qpfgui/dlgshowtaskinfo.cpp(59): DlgShowTaskInfo::setTaskInfo
+4	4	11	1	62	./qpfgui/dlgshowtaskinfo.cpp
+1	1	3	43	30	./qpfgui/productsmodel.cpp(43): QPF::ProductsModel::ProductsModel
+1	1	4	1	74	./qpfgui/productsmodel.cpp
+1	1	3	4	6	./qpfgui/dlgdataing.cpp(4): DlgDataIngestion::DlgDataIngestion
+1	1	1	11	4	./qpfgui/dlgdataing.cpp(11): DlgDataIngestion::~DlgDataIngestion
+2	2	6	1	14	./qpfgui/dlgdataing.cpp
+1	1	10	43	29	./qpfgui/sysalertmodel.cpp(43): QPF::SysAlertModel::SysAlertModel
+1	1	5	73	13	./qpfgui/sysalertmodel.cpp(73): QPF::SysAlertModel::getAlertAt
+2	2	16	1	87	./qpfgui/sysalertmodel.cpp
+1	1	3	6	6	./qpfgui/dlgalert.cpp(6): QPF::DlgAlert::DlgAlert
+1	1	1	13	4	./qpfgui/dlgalert.cpp(13): QPF::DlgAlert::~DlgAlert
+1	1	5	18	8	./qpfgui/dlgalert.cpp(18): QPF::DlgAlert::setAlert
+3	3	10	1	27	./qpfgui/dlgalert.cpp
+1	1	2	53	1	./qpfgui/dbtblmodel.h(53): QPF::DBTableModel::FgBgColors::FgBgColors
+1	1	1	1	87	./qpfgui/dbtblmodel.h
+1	1	1	22	7	./qpfgui/qjsonitem.cpp(22): QJsonTreeItem::QJsonTreeItem
+1	1	1	30	5	./qpfgui/qjsonitem.cpp(30): QJsonTreeItem::~QJsonTreeItem
+1	1	1	36	4	./qpfgui/qjsonitem.cpp(36): QJsonTreeItem::appendChild
+1	1	1	41	4	./qpfgui/qjsonitem.cpp(41): QJsonTreeItem::child
+1	1	1	46	4	./qpfgui/qjsonitem.cpp(46): QJsonTreeItem::parent
+1	1	1	51	4	./qpfgui/qjsonitem.cpp(51): QJsonTreeItem::childCount
+2	2	3	56	7	./qpfgui/qjsonitem.cpp(56): QJsonTreeItem::row
+1	1	1	64	4	./qpfgui/qjsonitem.cpp(64): QJsonTreeItem::setKey
+1	1	1	69	4	./qpfgui/qjsonitem.cpp(69): QJsonTreeItem::setValue
+1	1	1	74	4	./qpfgui/qjsonitem.cpp(74): QJsonTreeItem::setType
+1	1	1	79	4	./qpfgui/qjsonitem.cpp(79): QJsonTreeItem::key
+1	1	1	84	4	./qpfgui/qjsonitem.cpp(84): QJsonTreeItem::value
+1	1	1	89	4	./qpfgui/qjsonitem.cpp(89): QJsonTreeItem::type
+3	3	18	94	43	./qpfgui/qjsonitem.cpp(94): QJsonTreeItem::load
+17	17	47	1	137	./qpfgui/qjsonitem.cpp
+2	2	20	94	41	./qpfgui/mainwindow.cpp(94): QPF::MainWindow::MainWindow
+1	1	1	136	4	./qpfgui/mainwindow.cpp(136): QPF::MainWindow::~MainWindow
+5	5	48	145	85	./qpfgui/mainwindow.cpp(145): QPF::MainWindow::manualSetupUI
+3	3	19	235	41	./qpfgui/mainwindow.cpp(235): QPF::MainWindow::readConfig
+2	2	5	281	10	./qpfgui/mainwindow.cpp(281): QPF::MainWindow::closeEvent
+3	3	2	296	5	./qpfgui/mainwindow.cpp(296): QPF::MainWindow::saveAs
+2	2	2	303	4	./qpfgui/mainwindow.cpp(303): QPF::MainWindow::cut
+2	2	2	308	4	./qpfgui/mainwindow.cpp(308): QPF::MainWindow::copy
+2	2	2	313	4	./qpfgui/mainwindow.cpp(313): QPF::MainWindow::paste
+1	1	1	323	7	./qpfgui/mainwindow.cpp(323): QPF::MainWindow::about
+2	2	13	335	23	./qpfgui/mainwindow.cpp(335): QPF::MainWindow::updateMenus
+3	3	26	363	35	./qpfgui/mainwindow.cpp(363): QPF::MainWindow::updateWindowMenu
+1	1	5	403	12	./qpfgui/mainwindow.cpp(403): QPF::MainWindow::createTextView
+1	1	66	420	109	./qpfgui/mainwindow.cpp(420): QPF::MainWindow::createActions
+1	1	25	534	46	./qpfgui/mainwindow.cpp(534): QPF::MainWindow::createMenus
+1	1	0	585	12	./qpfgui/mainwindow.cpp(585): QPF::MainWindow::createToolBars
+1	1	1	602	4	./qpfgui/mainwindow.cpp(602): QPF::MainWindow::createStatusBar
+1	1	6	611	9	./qpfgui/mainwindow.cpp(611): QPF::MainWindow::readSettings
+1	1	4	625	7	./qpfgui/mainwindow.cpp(625): QPF::MainWindow::writeSettings
+1	1	2	637	5	./qpfgui/mainwindow.cpp(637): QPF::MainWindow::getFromSettings
+1	1	2	647	5	./qpfgui/mainwindow.cpp(647): QPF::MainWindow::putToSettings
+2	2	15	657	17	./qpfgui/mainwindow.cpp(657): QPF::MainWindow::getUserToolsFromSettings
+1	1	13	679	18	./qpfgui/mainwindow.cpp(679): QPF::MainWindow::putUserToolsToSettings
+2	2	3	702	6	./qpfgui/mainwindow.cpp(702): QPF::MainWindow::activeTextView
+2	2	3	713	7	./qpfgui/mainwindow.cpp(713): QPF::MainWindow::switchLayoutDirection
+2	2	3	724	5	./qpfgui/mainwindow.cpp(724): QPF::MainWindow::setActiveSubWindow
+1	1	3	734	7	./qpfgui/mainwindow.cpp(734): QPF::MainWindow::showConfigTool
+1	1	2	746	6	./qpfgui/mainwindow.cpp(746): QPF::MainWindow::showDBBrowser
+2	2	5	757	9	./qpfgui/mainwindow.cpp(757): QPF::MainWindow::showExtToolsDef
+1	1	3	771	8	./qpfgui/mainwindow.cpp(771): QPF::MainWindow::showVerbLevel
+2	2	7	784	16	./qpfgui/mainwindow.cpp(784): QPF::MainWindow::quitApp
+2	2	8	805	20	./qpfgui/mainwindow.cpp(805): QPF::MainWindow::quitAllQPF
+1	1	0	830	3	./qpfgui/mainwindow.cpp(830): QPF::MainWindow::transitToOperational
+1	1	3	838	11	./qpfgui/mainwindow.cpp(838): QPF::MainWindow::init
+2	2	23	853	38	./qpfgui/mainwindow.cpp(853): QPF::MainWindow::setLogWatch
+1	1	1	896	4	./qpfgui/mainwindow.cpp(896): QPF::MainWindow::processPendingEvents
+1	1	1	905	4	./qpfgui/mainwindow.cpp(905): QPF::MainWindow::handleFinishedHMI
+1	1	17	914	22	./qpfgui/mainwindow.cpp(914): QPF::MainWindow::defineValidTransitions
+2	6	16	941	29	./qpfgui/mainwindow.cpp(941): QPF::MainWindow::showState
+2	2	18	976	33	./qpfgui/mainwindow.cpp(976): QPF::MainWindow::updateSystemView
+1	1	14	1017	27	./qpfgui/mainwindow.cpp(1017): QPF::MainWindow::initLocalArchiveView
+1	1	5	1048	8	./qpfgui/mainwindow.cpp(1048): QPF::MainWindow::openWithDefault
+7	7	65	1060	92	./qpfgui/mainwindow.cpp(1060): QPF::MainWindow::openWith
+6	6	21	1156	29	./qpfgui/mainwindow.cpp(1156): QPF::MainWindow::showArchiveTableContextMenu
+1	1	8	1189	12	./qpfgui/mainwindow.cpp(1189): QPF::MainWindow::showJSONdata
+12	12	77	1205	102	./qpfgui/mainwindow.cpp(1205): QPF::MainWindow::openLocalArchiveElement
+1	1	1	1308	4	./qpfgui/mainwindow.cpp(1308): QPF::MainWindow::closeTab
+1	1	17	1320	28	./qpfgui/mainwindow.cpp(1320): QPF::MainWindow::initTasksMonitView
+1	1	1	1352	4	./qpfgui/mainwindow.cpp(1352): QPF::MainWindow::sortTaskViewByColumn
+3	3	9	1360	14	./qpfgui/mainwindow.cpp(1360): QPF::MainWindow::showTaskMonitContextMenu
+1	1	2	1379	13	./qpfgui/mainwindow.cpp(1379): QPF::MainWindow::showWorkDir
+1	1	6	1397	10	./qpfgui/mainwindow.cpp(1397): QPF::MainWindow::displayTaskInfo
+1	1	1	1412	4	./qpfgui/mainwindow.cpp(1412): QPF::MainWindow::pauseTask
+1	1	1	1421	4	./qpfgui/mainwindow.cpp(1421): QPF::MainWindow::resumeTask
+1	1	1	1430	4	./qpfgui/mainwindow.cpp(1430): QPF::MainWindow::stopTask
+1	1	7	1439	16	./qpfgui/mainwindow.cpp(1439): QPF::MainWindow::runDockerCmd
+1	1	8	1461	11	./qpfgui/mainwindow.cpp(1461): QPF::MainWindow::dumpTaskInfoToTree
+8	8	22	1477	34	./qpfgui/mainwindow.cpp(1477): QPF::MainWindow::dumpToTree
+1	1	8	1519	18	./qpfgui/mainwindow.cpp(1519): QPF::MainWindow::initAlertsTables
+4	4	10	1541	17	./qpfgui/mainwindow.cpp(1541): QPF::MainWindow::showAlertsContextMenu
+1	1	6	1563	9	./qpfgui/mainwindow.cpp(1563): QPF::MainWindow::showAlertInfo
+1	1	1	1577	4	./qpfgui/mainwindow.cpp(1577): QPF::MainWindow::showSysAlertInfo
+1	1	1	1586	4	./qpfgui/mainwindow.cpp(1586): QPF::MainWindow::showProcAlertInfo
+1	1	8	1598	18	./qpfgui/mainwindow.cpp(1598): QPF::MainWindow::initTxView
+1	1	1	1620	4	./qpfgui/mainwindow.cpp(1620): QPF::MainWindow::sortTxViewByColumn
+3	3	5	1628	11	./qpfgui/mainwindow.cpp(1628): QPF::MainWindow::showTxContextMenu
+1	1	8	1644	14	./qpfgui/mainwindow.cpp(1644): QPF::MainWindow::displayTxInfo
+9	14	57	1666	82	./qpfgui/mainwindow.cpp(1666): QPF::MainWindow::updateAgentsMonitPanel
+12	12	61	1756	76	./qpfgui/mainwindow.cpp(1756): QPF::MainWindow::binaryGetFITSHeader
+150	159	829	1	1833	./qpfgui/mainwindow.cpp
+0	0	1	1	41	./qpfgui/qjsonitem.h
+1	1	3	8	6	./qpfgui/logframe.cpp(8): LogFrame::LogFrame
+1	1	1	15	4	./qpfgui/logframe.cpp(15): LogFrame::~LogFrame
+1	1	2	20	5	./qpfgui/logframe.cpp(20): LogFrame::setMsg
+1	1	1	26	4	./qpfgui/logframe.cpp(26): LogFrame::clearMsg
+9	9	18	31	22	./qpfgui/logframe.cpp(31): LogFrame::displayLed
+1	1	4	54	7	./qpfgui/logframe.cpp(54): LogFrame::clearLed
+1	1	1	62	4	./qpfgui/logframe.cpp(62): LogFrame::getTextEditor
+15	15	37	1	65	./qpfgui/logframe.cpp
+0	0	1	1	29	./qpfgui/frmagentstatus.h
+0	0	1	1	32	./qpfgui/verbleveldlg.h
+1	1	27	42	65	./qpfgui/browser.h(42): QT_FORWARD_DECLARE_CLASS
+1	1	1	112	1	./qpfgui/browser.h(112): CustomModel::CustomModel
+2	2	31	1	121	./qpfgui/browser.h
+0	0	1	1	36	./qpfgui/qjsonmodel.h
+0	0	1	1	39	./qpfgui/xmlsyntaxhighlight.h
+0	0	0	1	65	./qpfgui/progbardlg.h
+1	1	1	1188	2	./json/json/json.h(1189): std::swap
+1	1	8	1	2031	./json/json/json.h
+0	0	2	1	255	./json/json/json-forwards.h
+5	5	20	99	27	./json/jsoncpp.cpp(99): Json::codePointToUTF8
+2	2	1	128	1	./json/jsoncpp.cpp(128): Json::isControlCharacter
+2	2	5	144	7	./json/jsoncpp.cpp(144): Json::uintToString
+3	3	4	157	8	./json/jsoncpp.cpp(157): Json::fixNumericLocale
+1	1	4	226	3	./json/jsoncpp.cpp(226): Json::Features::Features
+1	1	1	230	1	./json/jsoncpp.cpp(230): Json::Features::all
+1	1	6	232	8	./json/jsoncpp.cpp(232): Json::Features::strictMode
+4	4	6	244	6	./json/jsoncpp.cpp(244): Json::containsNewLine
+1	1	10	254	4	./json/jsoncpp.cpp(254): Json::Reader::Reader
+1	1	10	259	4	./json/jsoncpp.cpp(259): Json::Reader::Reader
+1	1	4	265	6	./json/jsoncpp.cpp(265): Json::Reader::parse
+1	1	3	272	12	./json/jsoncpp.cpp(272): Json::Reader::parse
+8	8	27	285	41	./json/jsoncpp.cpp(285): Json::Reader::parse
+7	16	49	327	83	./json/jsoncpp.cpp(327): Json::Reader::readValue
+3	3	5	411	9	./json/jsoncpp.cpp(411): Json::Reader::skipCommentTokens
+3	25	42	421	70	./json/jsoncpp.cpp(421): Json::Reader::readToken
+6	6	5	492	9	./json/jsoncpp.cpp(492): Json::Reader::skipSpaces
+4	4	8	502	10	./json/jsoncpp.cpp(502): Json::Reader::match
+9	9	16	513	22	./json/jsoncpp.cpp(513): Json::Reader::readComment
+5	5	11	536	18	./json/jsoncpp.cpp(536): Json::normalizeEOL
+2	2	6	556	10	./json/jsoncpp.cpp(556): Json::Reader::addComment
+4	4	5	567	8	./json/jsoncpp.cpp(567): Json::Reader::readCStyleComment
+6	6	9	576	15	./json/jsoncpp.cpp(576): Json::Reader::readCppStyleComment
+18	18	20	592	21	./json/jsoncpp.cpp(592): Json::Reader::readNumber
+4	4	8	614	11	./json/jsoncpp.cpp(614): Json::Reader::readString
+22	22	41	626	55	./json/jsoncpp.cpp(626): Json::Reader::readObject
+10	10	28	682	37	./json/jsoncpp.cpp(682): Json::Reader::readArray
+2	2	7	720	9	./json/jsoncpp.cpp(720): Json::Reader::decodeNumber
+14	14	25	730	41	./json/jsoncpp.cpp(730): Json::Reader::decodeNumber
+2	2	7	772	9	./json/jsoncpp.cpp(772): Json::Reader::decodeDouble
+2	2	7	782	11	./json/jsoncpp.cpp(782): Json::Reader::decodeDouble
+2	2	8	794	10	./json/jsoncpp.cpp(794): Json::Reader::decodeString
+7	15	35	805	52	./json/jsoncpp.cpp(805): Json::Reader::decodeString
+8	8	12	858	28	./json/jsoncpp.cpp(858): Json::Reader::decodeUnicodeCodePoint
+9	9	16	887	27	./json/jsoncpp.cpp(887): Json::Reader::decodeUnicodeEscapeSequence
+1	1	6	916	8	./json/jsoncpp.cpp(916): Json::Reader::addError
+5	5	11	925	12	./json/jsoncpp.cpp(925): Json::Reader::recoverFromError
+1	1	2	938	6	./json/jsoncpp.cpp(938): Json::Reader::addErrorAndRecover
+1	1	1	945	1	./json/jsoncpp.cpp(945): Json::Reader::currentValue
+2	2	3	947	5	./json/jsoncpp.cpp(947): Json::Reader::getNextChar
+6	6	15	953	22	./json/jsoncpp.cpp(953): Json::Reader::getLocationLineAndColumn
+1	1	7	976	15	./json/jsoncpp.cpp(976): Json::Reader::getLocationLineAndColumn
+1	1	1	993	3	./json/jsoncpp.cpp(993): Json::Reader::getFormatedErrorMessages
+3	3	10	997	15	./json/jsoncpp.cpp(997): Json::Reader::getFormattedErrorMessages
+2	2	11	1013	14	./json/jsoncpp.cpp(1013): Json::Reader::getStructuredErrors
+3	3	13	1028	16	./json/jsoncpp.cpp(1028): Json::Reader::pushError
+4	4	13	1045	17	./json/jsoncpp.cpp(1045): Json::Reader::pushError
+1	1	1	1063	3	./json/jsoncpp.cpp(1063): Json::Reader::good
+1	1	6	1085	7	./json/jsoncpp.cpp(1085): Json::OurFeatures::OurFeatures
+1	1	1	1093	1	./json/jsoncpp.cpp(1093): Json::OurFeatures::all
+1	1	10	1215	4	./json/jsoncpp.cpp(1215): Json::OurReader::OurReader
+11	11	31	1220	47	./json/jsoncpp.cpp(1220): Json::OurReader::parse
+7	16	49	1268	78	./json/jsoncpp.cpp(1268): Json::OurReader::readValue
+3	3	5	1347	9	./json/jsoncpp.cpp(1347): Json::OurReader::skipCommentTokens
+4	27	46	1357	76	./json/jsoncpp.cpp(1357): Json::OurReader::readToken
+6	6	5	1434	9	./json/jsoncpp.cpp(1434): Json::OurReader::skipSpaces
+4	4	8	1444	10	./json/jsoncpp.cpp(1444): Json::OurReader::match
+9	9	16	1455	22	./json/jsoncpp.cpp(1455): Json::OurReader::readComment
+2	2	6	1479	10	./json/jsoncpp.cpp(1479): Json::OurReader::addComment
+4	4	5	1490	8	./json/jsoncpp.cpp(1490): Json::OurReader::readCStyleComment
+6	6	9	1499	15	./json/jsoncpp.cpp(1499): Json::OurReader::readCppStyleComment
+18	18	20	1515	21	./json/jsoncpp.cpp(1515): Json::OurReader::readNumber
+4	4	8	1536	11	./json/jsoncpp.cpp(1536): Json::OurReader::readString
+4	4	8	1549	11	./json/jsoncpp.cpp(1549): Json::OurReader::readStringSingleQuote
+25	25	46	1561	61	./json/jsoncpp.cpp(1561): Json::OurReader::readObject
+10	10	28	1623	37	./json/jsoncpp.cpp(1623): Json::OurReader::readArray
+2	2	7	1661	9	./json/jsoncpp.cpp(1661): Json::OurReader::decodeNumber
+12	12	23	1671	39	./json/jsoncpp.cpp(1671): Json::OurReader::decodeNumber
+2	2	7	1711	9	./json/jsoncpp.cpp(1711): Json::OurReader::decodeDouble
+4	4	18	1721	35	./json/jsoncpp.cpp(1721): Json::OurReader::decodeDouble
+2	2	8	1757	10	./json/jsoncpp.cpp(1757): Json::OurReader::decodeString
+7	15	35	1768	52	./json/jsoncpp.cpp(1768): Json::OurReader::decodeString
+8	8	12	1821	28	./json/jsoncpp.cpp(1821): Json::OurReader::decodeUnicodeCodePoint
+9	9	16	1850	27	./json/jsoncpp.cpp(1850): Json::OurReader::decodeUnicodeEscapeSequence
+1	1	6	1879	8	./json/jsoncpp.cpp(1879): Json::OurReader::addError
+5	5	11	1888	12	./json/jsoncpp.cpp(1888): Json::OurReader::recoverFromError
+1	1	2	1901	6	./json/jsoncpp.cpp(1901): Json::OurReader::addErrorAndRecover
+1	1	1	1908	1	./json/jsoncpp.cpp(1908): Json::OurReader::currentValue
+2	2	3	1910	5	./json/jsoncpp.cpp(1910): Json::OurReader::getNextChar
+6	6	15	1916	22	./json/jsoncpp.cpp(1916): Json::OurReader::getLocationLineAndColumn
+1	1	7	1939	15	./json/jsoncpp.cpp(1939): Json::OurReader::getLocationLineAndColumn
+3	3	10	1955	15	./json/jsoncpp.cpp(1955): Json::OurReader::getFormattedErrorMessages
+2	2	11	1971	14	./json/jsoncpp.cpp(1971): Json::OurReader::getStructuredErrors
+3	3	13	1986	16	./json/jsoncpp.cpp(1986): Json::OurReader::pushError
+4	4	13	2003	17	./json/jsoncpp.cpp(2003): Json::OurReader::pushError
+1	1	1	2021	3	./json/jsoncpp.cpp(2021): Json::OurReader::good
+1	1	2	2030	6	./json/jsoncpp.cpp(2030): Json::OurCharReader::OurCharReader
+2	2	4	2036	9	./json/jsoncpp.cpp(2036): Json::OurCharReader::parse
+1	1	1	2047	4	./json/jsoncpp.cpp(2047): Json::CharReaderBuilder::CharReaderBuilder
+1	1	0	2051	2	./json/jsoncpp.cpp(2051): Json::CharReaderBuilder::~CharReaderBuilder
+1	1	11	2053	14	./json/jsoncpp.cpp(2053): Json::CharReaderBuilder::newCharReader
+1	1	10	2067	13	./json/jsoncpp.cpp(2067): Json::getValidReaderKeys
+4	4	15	2080	17	./json/jsoncpp.cpp(2080): Json::CharReaderBuilder::validate
+1	1	1	2097	4	./json/jsoncpp.cpp(2097): Json::CharReaderBuilder::operator[]
+1	1	7	2102	12	./json/jsoncpp.cpp(2102): Json::CharReaderBuilder::strictMode
+1	1	9	2115	14	./json/jsoncpp.cpp(2115): Json::CharReaderBuilder::setDefaults
+1	1	7	2133	13	./json/jsoncpp.cpp(2133): Json::parseFromStream
+2	2	7	2147	13	./json/jsoncpp.cpp(2147): Json::operator
+1	1	2	2193	3	./json/jsoncpp.cpp(2193): Json::ValueIteratorBase::ValueIteratorBase
+1	1	2	2197	3	./json/jsoncpp.cpp(2197): Json::ValueIteratorBase::ValueIteratorBase
+1	1	1	2201	3	./json/jsoncpp.cpp(2201): Json::ValueIteratorBase::deref
+1	1	1	2205	3	./json/jsoncpp.cpp(2205): Json::ValueIteratorBase::increment
+1	1	1	2209	3	./json/jsoncpp.cpp(2209): Json::ValueIteratorBase::decrement
+4	4	9	2213	27	./json/jsoncpp.cpp(2214): Json::ValueIteratorBase::computeDistance
+2	2	3	2241	6	./json/jsoncpp.cpp(2241): Json::ValueIteratorBase::isEqual
+1	1	2	2248	4	./json/jsoncpp.cpp(2248): Json::ValueIteratorBase::copy
+3	3	6	2253	9	./json/jsoncpp.cpp(2253): Json::ValueIteratorBase::key
+2	2	4	2263	6	./json/jsoncpp.cpp(2263): Json::ValueIteratorBase::index
+2	2	6	2270	7	./json/jsoncpp.cpp(2270): Json::ValueIteratorBase::name
+2	2	3	2278	4	./json/jsoncpp.cpp(2278): Json::ValueIteratorBase::memberName
+2	2	6	2283	9	./json/jsoncpp.cpp(2283): Json::ValueIteratorBase::memberName
+1	1	0	2301	1	./json/jsoncpp.cpp(2301): Json::ValueConstIterator::ValueConstIterator
+1	1	1	2303	3	./json/jsoncpp.cpp(2303): Json::ValueConstIterator::ValueConstIterator
+1	1	2	2307	5	./json/jsoncpp.cpp(2308): Json::ValueConstIterator::operator=
+1	1	0	2321	1	./json/jsoncpp.cpp(2321): Json::ValueIterator::ValueIterator
+1	1	1	2323	2	./json/jsoncpp.cpp(2323): Json::ValueIterator::ValueIterator
+1	1	1	2326	2	./json/jsoncpp.cpp(2326): Json::ValueIterator::ValueIterator
+1	1	1	2329	2	./json/jsoncpp.cpp(2329): Json::ValueIterator::ValueIterator
+1	1	2	2332	4	./json/jsoncpp.cpp(2332): Json::ValueIterator::operator=
+1	1	0	2385	1	./json/jsoncpp.cpp(2385): Json::ALIGNAS
+2	2	1	2407	4	./json/jsoncpp.cpp(2408): Json::InRange
+1	1	1	2412	3	./json/jsoncpp.cpp(2412): Json::integerToDouble
+1	1	1	2416	3	./json/jsoncpp.cpp(2416): Json::integerToDouble
+2	2	1	2420	4	./json/jsoncpp.cpp(2421): Json::InRange
+3	3	8	2433	17	./json/jsoncpp.cpp(2433): Json::duplicateStringValue
+2	2	9	2453	32	./json/jsoncpp.cpp(2453): Json::duplicateAndPrefixStringValue
+2	2	5	2485	12	./json/jsoncpp.cpp(2485): Json::decodePrefixedString
+1	1	1	2499	1	./json/jsoncpp.cpp(2499): Json::releaseStringValue
+1	1	1	2517	3	./json/jsoncpp.cpp(2517): Json::Exception::Exception
+1	1	0	2520	2	./json/jsoncpp.cpp(2520): Json::Exception::~Exception
+472	551	1248	1	5113	./json/jsoncpp.cpp
+0	0	6	1	143	./misc/synchronizer.h
+2	2	6	75	10	./infix/infixeval.tcc(75): InFix::split
+25	36	58	92	102	./infix/infixeval.tcc(92): InFix::getToken
+3	3	17	221	25	./infix/infixeval.tcc(221): InFix::getValue
+4	4	15	255	24	./infix/infixeval.tcc(255): InFix::eval
+7	9	18	287	38	./infix/infixeval.tcc(287): InFix::processToken
+2	2	6	332	11	./infix/infixeval.tcc(332): InFix::getTop
+2	2	6	350	11	./infix/infixeval.tcc(350): InFix::getTopSymbol
+20	20	45	369	58	./infix/infixeval.tcc(369): InFix::binaryOp
+65	78	172	1	431	./infix/infixeval.tcc
+1	1	3	142	2	./infix/infixeval.h(142): InFix::Token::Token
+1	1	1	145	1	./infix/infixeval.h(145): InFix::Token::getType
+1	1	1	146	1	./infix/infixeval.h(146): InFix::Token::getValue
+1	1	1	147	1	./infix/infixeval.h(147): InFix::Token::getSymbol
+1	1	1	158	1	./infix/infixeval.h(158): InFix::TokensList::TokensList
+1	1	1	170	1	./infix/infixeval.h(170): InFix::Evaluator::Evaluator
+1	1	1	174	1	./infix/infixeval.h(174): InFix::Evaluator::getStatus
+1	1	1	175	1	./infix/infixeval.h(175): InFix::Evaluator::set
+1	1	1	176	1	./infix/infixeval.h(176): InFix::Evaluator::clear
+9	9	14	1	209	./infix/infixeval.h
+1	1	3	15	1	./contrib/pcre2/PCRegEx.h(15): PCRegEx::PCRegEx
+1	1	4	16	1	./contrib/pcre2/PCRegEx.h(16): PCRegEx::PCRegEx
+1	1	1	17	1	./contrib/pcre2/PCRegEx.h(17): PCRegEx::~PCRegEx
+3	3	6	19	10	./contrib/pcre2/PCRegEx.h(19): PCRegEx::clear
+1	1	1	30	1	./contrib/pcre2/PCRegEx.h(30): PCRegEx::global
+2	2	12	32	23	./contrib/pcre2/PCRegEx.h(32): PCRegEx::set
+4	4	14	56	29	./contrib/pcre2/PCRegEx.h(56): PCRegEx::match
+2	2	10	86	12	./contrib/pcre2/PCRegEx.h(86): PCRegEx::get
+15	15	52	1	114	./contrib/pcre2/PCRegEx.h
+0	0	0	1	282	./src/config.h
+1	1	1	68	3	./src/alert.cpp(68): QPF::Alert::Alert
+1	1	7	72	10	./src/alert.cpp(72): QPF::Alert::Alert
+1	1	9	83	13	./src/alert.cpp(83): QPF::Alert::Alert
+1	1	6	97	9	./src/alert.cpp(97): QPF::Alert::createNewVar
+1	1	6	107	9	./src/alert.cpp(107): QPF::Alert::createNewVar
+1	1	6	117	9	./src/alert.cpp(117): QPF::Alert::createNewVar
+3	5	13	127	23	./src/alert.cpp(127): QPF::Alert::what
+3	5	13	151	29	./src/alert.cpp(151): QPF::Alert::varAsTuple
+1	1	4	181	7	./src/alert.cpp(181): QPF::Alert::now
+1	1	3	189	6	./src/alert.cpp(189): QPF::Alert::here
+1	1	3	196	6	./src/alert.cpp(196): QPF::Alert::timeStampString
+2	2	6	203	8	./src/alert.cpp(203): QPF::Alert::allMessages
+1	1	1	212	6	./src/alert.cpp(212): QPF::Alert::dump
+18	22	79	1	219	./src/alert.cpp
+1	1	1	82	3	./src/datatypes.cpp(82): QPF::JsonStruct::JsonStruct
+1	1	0	86	3	./src/datatypes.cpp(86): QPF::JsonStruct::~JsonStruct
+2	2	5	90	9	./src/datatypes.cpp(90): QPF::JsonStruct::operator=
+1	1	2	100	6	./src/datatypes.cpp(100): QPF::JsonStruct::setData
+1	1	2	107	4	./src/datatypes.cpp(107): QPF::JsonStruct::setData
+1	1	3	112	5	./src/datatypes.cpp(112): QPF::JsonStruct::setDataString
+1	1	2	118	4	./src/datatypes.cpp(118): QPF::JsonStruct::getData
+1	1	3	123	5	./src/datatypes.cpp(123): QPF::JsonStruct::getDataString
+1	1	2	131	4	./src/datatypes.cpp(131): QPF::operator
+1	1	13	138	15	./src/datatypes.cpp(138): QPF::ProductMetadata::toFields
+1	1	13	154	15	./src/datatypes.cpp(154): QPF::ProductMetadata::toData
+2	2	9	172	10	./src/datatypes.cpp(172): QPF::ProductCollection::toFields
+2	2	6	183	10	./src/datatypes.cpp(183): QPF::ProductCollection::toData
+2	2	8	196	9	./src/datatypes.cpp(196): QPF::ProductList::toFields
+2	2	5	206	6	./src/datatypes.cpp(206): QPF::ProductList::toData
+2	2	5	215	6	./src/datatypes.cpp(215): QPF::StringList::toFields
+2	2	5	222	6	./src/datatypes.cpp(222): QPF::StringList::toData
+2	2	6	235	7	./src/datatypes.cpp(235): QPF::ParameterList::toFields
+2	2	5	243	8	./src/datatypes.cpp(243): QPF::ParameterList::toData
+1	1	1	254	3	./src/datatypes.cpp(254): QPF::TaskInfo::TaskInfo
+1	1	10	258	12	./src/datatypes.cpp(258): QPF::TaskInfo::toFields
+1	1	10	271	12	./src/datatypes.cpp(271): QPF::TaskInfo::toData
+1	1	12	286	15	./src/datatypes.cpp(286): QPF::TaskAgentInfo::TaskAgentInfo
+1	1	13	302	15	./src/datatypes.cpp(302): QPF::TaskAgentInfo::toFields
+1	1	13	318	15	./src/datatypes.cpp(318): QPF::TaskAgentInfo::toData
+1	1	9	340	11	./src/datatypes.cpp(340): QPF::MessageHeader::toFields
+1	1	9	352	11	./src/datatypes.cpp(352): QPF::MessageHeader::toData
+1	1	0	366	3	./src/datatypes.cpp(366): QPF::Message::toFields
+1	1	0	370	3	./src/datatypes.cpp(370): QPF::Message::toData
+1	1	2	376	4	./src/datatypes.cpp(376): QPF::Message_INDATA::toFields
+1	1	2	381	4	./src/datatypes.cpp(381): QPF::Message_INDATA::toData
+1	1	2	388	4	./src/datatypes.cpp(388): QPF::Message_DATA_Exchange::toFields
+1	1	2	393	4	./src/datatypes.cpp(393): QPF::Message_DATA_Exchange::toData
+1	1	3	400	5	./src/datatypes.cpp(400): QPF::Message_TASK_Processing::toFields
+1	1	3	406	5	./src/datatypes.cpp(406): QPF::Message_TASK_Processing::toData
+1	1	1	414	3	./src/datatypes.cpp(414): QPF::MessageData::MessageData
+1	1	1	418	4	./src/datatypes.cpp(418): QPF::MessageData::~MessageData
+1	1	2	423	5	./src/datatypes.cpp(423): QPF::MessageData::assign
+2	2	3	429	5	./src/datatypes.cpp(429): QPF::MessageData::reset
+49	49	194	1	435	./src/datatypes.cpp
+1	1	0	85	1	./src/component.h(85): QPF::Component::~Component
+1	1	0	122	1	./src/component.h(122): QPF::Component::execAdditonalLoopTasks
+1	1	0	129	1	./src/component.h(129): QPF::Component::processSTART
+1	1	0	134	1	./src/component.h(134): QPF::Component::processINDATA
+1	1	0	139	1	./src/component.h(139): QPF::Component::processDATA_RQST
+1	1	0	144	1	./src/component.h(144): QPF::Component::processDATA_INFO
+1	1	0	149	1	./src/component.h(149): QPF::Component::processMONIT_RQST
+1	1	0	154	1	./src/component.h(154): QPF::Component::processMONIT_INFO
+1	1	0	159	1	./src/component.h(159): QPF::Component::processTASK_PROC
+1	1	0	164	1	./src/component.h(164): QPF::Component::processTASK_RES
+1	1	0	169	1	./src/component.h(169): QPF::Component::processCMD
+1	1	0	174	1	./src/component.h(174): QPF::Component::processSTOP
+1	1	0	179	1	./src/component.h(179): QPF::Component::processUNKNOWN
+13	13	0	1	298	./src/component.h
+1	1	2	49	2	./src/except.cpp(49): QPF::Exception::Exception
+1	1	0	52	2	./src/except.cpp(52): QPF::Exception::~Exception
+1	1	1	61	6	./src/except.cpp(65): QPF::RuntimeException::RuntimeException
+1	1	1	68	2	./src/except.cpp(68): QPF::LogicException::LogicException
+1	1	1	71	2	./src/except.cpp(71): QPF::Error::Error
+5	5	6	1	76	./src/except.cpp
+1	1	1	114	1	./src/alert.h(114): QPF::Alert::Variable::Variable
+1	1	-1	1	157	./src/alert.h
+1	1	4	60	7	./src/taskmng.cpp(60): QPF::TaskManager::TaskManager
+3	3	14	71	18	./src/taskmng.cpp(71): QPF::TaskManager::fromRunningToOperational
+1	1	1	93	4	./src/taskmng.cpp(93): QPF::TaskManager::fromRunningToOff
+1	1	4	101	10	./src/taskmng.cpp(101): QPF::TaskManager::processTASK_PROC
+1	1	2	115	6	./src/taskmng.cpp(115): QPF::TaskManager::processTASK_RES
+3	3	8	125	19	./src/taskmng.cpp(125): QPF::TaskManager::processMONIT_INFO
+2	2	7	149	16	./src/taskmng.cpp(149): QPF::TaskManager::exeRule
+1	1	1	166	1	./src/taskmng.cpp(166): QPF::weightFunc
+4	4	13	173	32	./src/taskmng.cpp(173): QPF::TaskManager::selectAgent
+1	1	7	211	14	./src/taskmng.cpp(211): QPF::TaskManager::sendTaskAgMsg
+2	2	9	230	17	./src/taskmng.cpp(230): QPF::TaskManager::sendTaskRes
+2	2	8	252	17	./src/taskmng.cpp(252): QPF::TaskManager::sendMonitInfo
+22	22	80	1	270	./src/taskmng.cpp
+0	0	1	1	173	./src/datamng.h
+0	0	0	1	107	./src/uuid.h
+1	1	4	58	8	./src/taskagent.cpp(58): QPF::TaskAgent::TaskAgent
+1	1	7	70	12	./src/taskagent.cpp(70): QPF::TaskAgent::fromRunningToOperational
+1	1	3	86	7	./src/taskagent.cpp(86): QPF::TaskAgent::fromRunningToOff
+1	1	13	97	26	./src/taskagent.cpp(97): QPF::TaskAgent::processTASK_PROC
+1	1	0	127	4	./src/taskagent.cpp(127): QPF::TaskAgent::processCMD
+3	3	14	135	22	./src/taskagent.cpp(135): QPF::TaskAgent::execAdditonalLoopTasks
+1	1	2	162	6	./src/taskagent.cpp(162): QPF::TaskAgent::procElemFinished
+6	6	19	173	42	./src/taskagent.cpp(173): QPF::TaskAgent::checkProcessingElements
+1	1	9	221	13	./src/taskagent.cpp(221): QPF::TaskAgent::sendTaskResMsg
+1	1	1	235	3	./src/taskagent.cpp(235): QPF::dbl2IntStr
+3	3	24	244	42	./src/taskagent.cpp(244): QPF::TaskAgent::sendMonitInfo
+20	20	98	1	287	./src/taskagent.cpp
+2	2	5	66	10	./src/str.cpp(66): QPF::str::split
+1	1	3	82	6	./src/str.cpp(82): QPF::str::split
+2	3	9	94	18	./src/str.cpp(94): QPF::str::join
+2	2	5	117	9	./src/str.cpp(117): QPF::str::replaceAll
+1	1	4	131	11	./src/str.cpp(131): QPF::str::mid
+1	1	4	147	11	./src/str.cpp(147): QPF::str::mid
+1	1	1	163	4	./src/str.cpp(163): QPF::str::quoted
+3	3	5	172	7	./src/str.cpp(172): QPF::str::getExtension
+1	1	1	184	4	./src/str.cpp(184): QPF::str::getBaseName
+1	1	1	193	4	./src/str.cpp(193): QPF::str::getBaseName
+1	1	1	202	4	./src/str.cpp(202): QPF::str::getDirName
+1	1	1	211	4	./src/str.cpp(211): QPF::str::getDirName
+4	4	6	220	14	./src/str.cpp(220): QPF::str::tagToTimestamp
+21	22	47	1	237	./src/str.cpp
+1	1	1	61	12	./src/except.h(61): QPF::Exception::~Exception
+1	1	-1	1	89	./src/except.h
+1	1	19	6	36	./src/main-alert.cpp(6): main
+1	1	21	1	41	./src/main-alert.cpp
+1	1	2	84	5	./src/component.cpp(84): QPF::Component::Component
+2	2	5	93	12	./src/component.cpp(93): QPF::Component::fromInitialisedToRunning
+1	1	0	109	4	./src/component.cpp(109): QPF::Component::fromRunningToOperational
+1	1	0	117	4	./src/component.cpp(117): QPF::Component::fromOperationalToRunning
+1	1	1	125	4	./src/component.cpp(125): QPF::Component::fromRunningToOff
+2	2	6	134	15	./src/component.cpp(134): QPF::Component::init
+10	19	52	154	108	./src/component.cpp(154): QPF::Component::run
+1	1	1	267	4	./src/component.cpp(267): QPF::Component::canProcessMessage
+1	1	1	276	6	./src/component.cpp(276): QPF::Component::is
+1	1	1	287	5	./src/component.cpp(287): QPF::Component::is
+6	15	34	297	72	./src/component.cpp(297): QPF::Component::process
+1	1	10	374	16	./src/component.cpp(374): QPF::Component::buildMsgHeader
+1	1	3	395	8	./src/component.cpp(395): QPF::Component::buildMsgINDATA
+1	1	4	408	10	./src/component.cpp(408): QPF::Component::buildMsgTASKPROC
+1	1	3	422	7	./src/component.cpp(423): QPF::Component::procMsg
+1	1	5	434	9	./src/component.cpp(434): QPF::Component::setForwardTo
+1	1	7	448	12	./src/component.cpp(448): QPF::Component::convertTo
+2	2	14	465	23	./src/component.cpp(465): QPF::Component::writeToFile
+1	1	7	493	21	./src/component.cpp(493): QPF::Component::registerMsg
+1	1	7	518	11	./src/component.cpp(518): QPF::Component::sendLogPacketAsDataInfoMsg
+8	8	27	534	50	./src/component.cpp(534): QPF::Component::raise
+1	1	2	589	5	./src/component.cpp(589): QPF::Component::setHeartBeatPeriod
+46	64	195	1	596	./src/component.cpp
+0	0	0	1	77	./src/version.h
+1	1	1	49	4	./src/uuid.cpp(49): QPF::UUID::UUID
+1	1	1	55	4	./src/uuid.cpp(55): QPF::UUID::clear
+1	1	1	62	4	./src/uuid.cpp(62): QPF::UUID::compare
+1	1	1	69	4	./src/uuid.cpp(69): QPF::UUID::copy
+1	1	1	76	4	./src/uuid.cpp(76): QPF::UUID::generate
+1	1	1	81	4	./src/uuid.cpp(81): QPF::UUID::generate_random
+1	1	1	86	4	./src/uuid.cpp(86): QPF::UUID::generate_time
+1	1	1	91	4	./src/uuid.cpp(91): QPF::UUID::generate_time_safe
+1	1	1	98	4	./src/uuid.cpp(98): QPF::UUID::is_null
+1	1	1	105	4	./src/uuid.cpp(105): QPF::UUID::parse
+1	1	1	110	4	./src/uuid.cpp(110): QPF::UUID::parse
+1	1	1	117	4	./src/uuid.cpp(117): QPF::UUID::unparse
+1	1	1	122	4	./src/uuid.cpp(122): QPF::UUID::unparse_lower
+1	1	1	127	4	./src/uuid.cpp(127): QPF::UUID::unparse_upper
+1	1	3	132	6	./src/uuid.cpp(132): QPF::UUID::asString
+1	1	3	139	6	./src/uuid.cpp(139): QPF::UUID::asLowerString
+1	1	3	146	6	./src/uuid.cpp(146): QPF::UUID::asUpperString
+1	1	1	155	4	./src/uuid.cpp(155): QPF::UUID::time
+1	1	1	160	4	./src/uuid.cpp(160): QPF::UUID::type
+1	1	1	165	4	./src/uuid.cpp(165): QPF::UUID::variant
+1	1	1	170	4	./src/uuid.cpp(170): QPF::UUID::uuid
+21	21	28	1	175	./src/uuid.cpp
+1	1	1	81	4	./src/config.cpp(81): QPF::Configuration::Configuration
+1	1	1	89	4	./src/config.cpp(89): QPF::Configuration::Configuration
+3	3	18	97	29	./src/config.cpp(97): QPF::Configuration::init
+1	1	1	131	4	./src/config.cpp(131): QPF::Configuration::getCfgInfo
+1	1	16	140	22	./src/config.cpp(140): QPF::Configuration::getGeneralInfo
+1	1	1	167	4	./src/config.cpp(167): QPF::Configuration::setLastAccess
+1	1	4	176	7	./src/config.cpp(176): QPF::Configuration::reset
+2	2	6	188	8	./src/config.cpp(188): QPF::Configuration::getProductTypes
+1	1	1	201	4	./src/config.cpp(201): QPF::Configuration::getNumOrchRules
+2	2	9	210	16	./src/config.cpp(210): QPF::Configuration::getOrchRule
+1	1	1	231	4	./src/config.cpp(231): QPF::Configuration::getNumProcs
+2	2	8	240	14	./src/config.cpp(240): QPF::Configuration::getProc
+1	1	1	259	4	./src/config.cpp(259): QPF::Configuration::getNumNodes
+2	2	8	268	14	./src/config.cpp(268): QPF::Configuration::getNode
+1	1	4	287	8	./src/config.cpp(287): QPF::Configuration::getNodeByName
+1	1	1	300	4	./src/config.cpp(300): QPF::Configuration::getHMINodeName
+1	1	1	309	4	./src/config.cpp(309): QPF::Configuration::getNumMachines
+3	3	11	318	17	./src/config.cpp(318): QPF::Configuration::getMachine
+2	2	6	340	9	./src/config.cpp(340): QPF::Configuration::getConnectionsForNode
+1	1	3	354	6	./src/config.cpp(354): QPF::Configuration::applyNewConfig
+1	1	2	365	5	./src/config.cpp(365): QPF::Configuration::setConfigFile
+2	2	8	375	13	./src/config.cpp(375): QPF::Configuration::readConfigurationFromFile
+1	1	31	393	63	./src/config.cpp(393): QPF::Configuration::readConfigurationFromDB
+1	1	21	461	41	./src/config.cpp(461): QPF::Configuration::saveConfigurationToDB
+27	27	133	507	197	./src/config.cpp(507): QPF::Configuration::processConfiguration
+1	1	6	710	10	./src/config.cpp(710): QPF::Configuration::getExternalStorage
+2	2	3	725	5	./src/config.cpp(725): QPF::Configuration::getEnvVar
+3	3	1	735	6	./src/config.cpp(735): QPF::isLE1Product
+3	3	1	746	6	./src/config.cpp(746): QPF::isLE1Metadata
+2	2	2	757	6	./src/config.cpp(757): QPF::isValidExtension
+72	72	312	1	781	./src/config.cpp
+1	1	6	66	9	./src/evtmng.cpp(66): QPF::EventManager::EventManager
+1	1	1	79	4	./src/evtmng.cpp(79): QPF::EventManager::go
+2	2	6	87	12	./src/evtmng.cpp(87): QPF::EventManager::fromInitialisedToRunning
+1	1	6	103	19	./src/evtmng.cpp(103): QPF::EventManager::fromRunningToOperational
+1	1	5	126	11	./src/evtmng.cpp(126): QPF::EventManager::fromOperationalToRunning
+1	1	1	141	4	./src/evtmng.cpp(141): QPF::EventManager::fromRunningToOff
+6	6	47	149	76	./src/evtmng.cpp(149): QPF::EventManager::execAdditonalLoopTasks
+3	3	9	229	52	./src/evtmng.cpp(229): QPF::EventManager::processINDATA
+2	2	9	285	19	./src/evtmng.cpp(285): QPF::EventManager::processTASK_RES
+1	1	0	308	3	./src/evtmng.cpp(308): QPF::EventManager::processMONIT_INFO
+1	1	6	315	18	./src/evtmng.cpp(315): QPF::EventManager::afterTransition
+20	20	98	1	334	./src/evtmng.cpp
+1	1	3	89	7	./src/str.h(90): QPF::str::toStr
+1	1	4	108	8	./src/str.h(109): QPF::str::strTo
+2	2	8	1	233	./src/str.h
+1	1	3	122	10	./src/dbg.h(122): mid
+1	1	6	1	134	./src/dbg.h
+1	1	0	49	3	./src/cfginfo.cpp(49): QPF::ConfigurationInfo::ConfigurationInfo
+1	1	11	53	14	./src/cfginfo.cpp(53): QPF::ConfigurationInfo::clear
+1	1	2	68	4	./src/cfginfo.cpp(68): QPF::ConfigurationInfo::data
+1	1	43	73	82	./src/cfginfo.cpp(73): QPF::ConfigurationInfo::dump
+4	4	57	1	156	./src/cfginfo.cpp
+0	0	0	1	76	./src/common.h
+1	1	1	65	3	./src/urlhdl.cpp(65): QPF::URLHandler::URLHandler
+1	1	9	72	25	./src/urlhdl.cpp(72): QPF::URLHandler::fromExternal2Inbox
+1	1	1	101	7	./src/urlhdl.cpp(101): QPF::URLHandler::fromOutbox2External
+1	1	13	112	26	./src/urlhdl.cpp(112): QPF::URLHandler::fromFolder2Inbox
+1	1	14	142	31	./src/urlhdl.cpp(142): QPF::URLHandler::fromInbox2LocalArch
+2	2	15	177	31	./src/urlhdl.cpp(177): QPF::URLHandler::fromLocalArch2Gateway
+2	2	15	212	30	./src/urlhdl.cpp(212): QPF::URLHandler::fromGateway2Processing
+3	3	19	246	36	./src/urlhdl.cpp(246): QPF::URLHandler::fromProcessing2Gateway
+1	1	14	286	31	./src/urlhdl.cpp(286): QPF::URLHandler::fromGateway2LocalArch
+7	12	30	321	50	./src/urlhdl.cpp(321): QPF::URLHandler::relocate
+1	1	8	375	16	./src/urlhdl.cpp(375): QPF::URLHandler::copyfile
+2	2	9	395	16	./src/urlhdl.cpp(395): QPF::URLHandler::rcopyfile
+1	1	4	415	7	./src/urlhdl.cpp(415): QPF::URLHandler::setRemoteCopyParams
+1	1	4	426	8	./src/urlhdl.cpp(426): QPF::URLHandler::setProcElemRunDir
+25	30	157	1	435	./src/urlhdl.cpp
+1	1	1	93	1	./src/dbhdl.h(93): QPF::DBHandler::DBHandler
+1	1	0	98	1	./src/dbhdl.h(98): QPF::DBHandler::~DBHandler
+2	2	2	1	251	./src/dbhdl.h
+0	0	0	1	88	./src/propdef.h
+0	0	0	1	95	./src/logmng.h
+0	0	0	1	60	./src/error.h
+0	0	0	1	163	./src/taskagent.h
+0	0	-1	1	107	./src/dwatcher.h
+1	1	1	63	3	./src/filetransfer.cpp(63): QPF::FileTransfer::FileTransfer
+6	6	20	67	32	./src/filetransfer.cpp(67): QPF::FileTransfer::download
+5	5	10	100	17	./src/filetransfer.cpp(100): QPF::FileTransfer::download
+1	1	1	118	4	./src/filetransfer.cpp(118): QPF::FileTransfer::str
+1	1	1	123	4	./src/filetransfer.cpp(123): QPF::FileTransfer::mode
+1	1	1	128	4	./src/filetransfer.cpp(128): QPF::FileTransfer::setMode
+1	1	1	133	4	./src/filetransfer.cpp(133): QPF::FileTransfer::writeData
+3	3	12	138	18	./src/filetransfer.cpp(138): QPF::FileTransfer::writeDataImpl
+19	19	48	1	157	./src/filetransfer.cpp
+1	1	1	62	3	./src/dbhdlpostgre.cpp(62): QPF::DBHdlPostgreSQL::DBHdlPostgreSQL
+5	5	23	70	38	./src/dbhdlpostgre.cpp(70): QPF::DBHdlPostgreSQL::openConnection
+1	1	3	113	7	./src/dbhdlpostgre.cpp(113): QPF::DBHdlPostgreSQL::closeConnection
+2	2	13	125	39	./src/dbhdlpostgre.cpp(125): QPF::DBHdlPostgreSQL::storeProducts
+2	2	27	170	47	./src/dbhdlpostgre.cpp(170): QPF::DBHdlPostgreSQL::retrieveProducts
+2	2	14	222	32	./src/dbhdlpostgre.cpp(222): QPF::DBHdlPostgreSQL::storeTask
+1	1	7	259	13	./src/dbhdlpostgre.cpp(259): QPF::DBHdlPostgreSQL::checkTask
+1	1	1	277	6	./src/dbhdlpostgre.cpp(278): QPF::int
+1	1	1	288	6	./src/dbhdlpostgre.cpp(289): QPF::double
+1	1	1	299	6	./src/dbhdlpostgre.cpp(300): QPF::std::string
+1	1	2	310	7	./src/dbhdlpostgre.cpp(311): QPF::Json::Value
+5	5	17	322	42	./src/dbhdlpostgre.cpp(322): QPF::DBHdlPostgreSQL::updateTask
+1	1	2	369	6	./src/dbhdlpostgre.cpp(369): QPF::DBHdlPostgreSQL::retrieveTask
+1	1	7	380	14	./src/dbhdlpostgre.cpp(380): QPF::DBHdlPostgreSQL::storeState
+1	1	9	399	17	./src/dbhdlpostgre.cpp(399): QPF::DBHdlPostgreSQL::getCurrentState
+2	2	10	421	27	./src/dbhdlpostgre.cpp(421): QPF::DBHdlPostgreSQL::getICommand
+1	1	5	453	10	./src/dbhdlpostgre.cpp(453): QPF::DBHdlPostgreSQL::markICommandAsDone
+3	3	8	468	21	./src/dbhdlpostgre.cpp(468): QPF::DBHdlPostgreSQL::storeMsg
+2	2	18	495	28	./src/dbhdlpostgre.cpp(495): QPF::DBHdlPostgreSQL::retrieveMsgs
+2	2	1	528	5	./src/dbhdlpostgre.cpp(528): QPF::DBHdlPostgreSQL::getTable
+2	2	1	538	5	./src/dbhdlpostgre.cpp(538): QPF::DBHdlPostgreSQL::getQuery
+2	2	5	548	9	./src/dbhdlpostgre.cpp(548): QPF::DBHdlPostgreSQL::getNumRowsInTable
+3	3	7	562	14	./src/dbhdlpostgre.cpp(562): QPF::DBHdlPostgreSQL::runCmd
+3	3	14	582	17	./src/dbhdlpostgre.cpp(582): QPF::DBHdlPostgreSQL::fillWithResult
+2	2	4	604	9	./src/dbhdlpostgre.cpp(604): QPF::DBHdlPostgreSQL::updTable
+48	48	203	1	614	./src/dbhdlpostgre.cpp
+3	3	9	62	17	./src/dwatcher.cpp(62): QPF::DirWatcher::DirWatcher
+1	1	0	83	3	./src/dwatcher.cpp(83): QPF::DirWatcher::~DirWatcher
+2	2	6	90	11	./src/dwatcher.cpp(90): QPF::DirWatcher::watch
+15	15	51	105	88	./src/dwatcher.cpp(105): QPF::DirWatcher::start
+1	1	1	197	4	./src/dwatcher.cpp(197): QPF::DirWatcher::stop
+2	2	5	205	9	./src/dwatcher.cpp(205): QPF::DirWatcher::nextEvent
+24	24	73	1	215	./src/dwatcher.cpp
+0	0	-17	1	343	./src/datatypes.h
+0	0	0	1	109	./src/filetransfer.h
+0	0	-1	1	152	./src/taskmng.h
+1	1	2	63	5	./src/taskorc.cpp(63): QPF::TaskOrchestrator::TaskOrchestrator
+5	5	18	72	23	./src/taskorc.cpp(72): QPF::TaskOrchestrator::defineOrchestrationParams
+2	2	13	99	21	./src/taskorc.cpp(99): QPF::TaskOrchestrator::fromRunningToOperational
+1	1	1	124	4	./src/taskorc.cpp(124): QPF::TaskOrchestrator::fromRunningToOff
+5	5	10	132	24	./src/taskorc.cpp(132): QPF::TaskOrchestrator::processINDATA
+9	9	60	162	126	./src/taskorc.cpp(162): QPF::TaskOrchestrator::checkRulesForProductType
+4	4	35	294	50	./src/taskorc.cpp(294): QPF::TaskOrchestrator::sendTaskProcMsg
+27	27	141	1	345	./src/taskorc.cpp
+1	1	9	66	14	./src/procelem.cpp(66): QPF::ProcessingElement::ProcessingElement
+1	1	0	84	4	./src/procelem.cpp(84): QPF::ProcessingElement::~ProcessingElement
+1	1	3	93	6	./src/procelem.cpp(93): QPF::ProcessingElement::setTaskInfo
+1	1	1	104	4	./src/procelem.cpp(104): QPF::ProcessingElement::getStatus
+1	1	1	113	4	./src/procelem.cpp(113): QPF::ProcessingElement::getTask
+1	1	1	122	4	./src/procelem.cpp(122): QPF::ProcessingElement::start
+1	1	1	131	4	./src/procelem.cpp(131): QPF::ProcessingElement::end
+2	2	7	140	24	./src/procelem.cpp(140): QPF::ProcessingElement::exec
+2	2	9	169	34	./src/procelem.cpp(169): QPF::ProcessingElement::executeProcessor
+1	1	34	208	59	./src/procelem.cpp(208): QPF::ProcessingElement::initTaskInfo
+7	7	40	272	121	./src/procelem.cpp(272): QPF::ProcessingElement::configureProcElem
+3	3	13	398	24	./src/procelem.cpp(398): QPF::ProcessingElement::forkProcess
+3	3	10	427	13	./src/procelem.cpp(427): QPF::ProcessingElement::obtainProcElemId
+14	14	53	445	95	./src/procelem.cpp(445): QPF::ProcessingElement::monitorProcElemLoop
+12	12	62	545	138	./src/procelem.cpp(545): QPF::ProcessingElement::retrieveOutputProducts
+9	9	10	688	23	./src/procelem.cpp(688): QPF::ProcessingElement::sendUpdatedInfo
+1	1	6	716	10	./src/procelem.cpp(716): QPF::ProcessingElement::cleanup
+3	3	14	731	28	./src/procelem.cpp(731): QPF::ProcessingElement::getMonitoringInfo
+3	3	8	764	13	./src/procelem.cpp(764): QPF::ProcessingElement::updateProgress
+1	1	2	782	11	./src/procelem.cpp(782): QPF::ProcessingElement::getSimplifiedDateTime
+1	1	1	798	9	./src/procelem.cpp(798): QPF::ProcessingElement::getExpandedDateTime
+1	1	3	812	6	./src/procelem.cpp(812): QPF::ProcessingElement::goIdle
+70	70	289	1	819	./src/procelem.cpp
+2	2	2	57	4	./src/filenamespec.cpp(57): QPF::FileNameSpec::FileNameSpec
+1	1	1	62	4	./src/filenamespec.cpp(62): QPF::FileNameSpec::FileNameSpec
+1	1	3	67	6	./src/filenamespec.cpp(67): QPF::FileNameSpec::setFileNameSpec
+1	1	4	74	11	./src/filenamespec.cpp(74): QPF::FileNameSpec::setRegEx
+5	5	15	86	36	./src/filenamespec.cpp(86): QPF::FileNameSpec::setAssignations
+1	1	1	123	4	./src/filenamespec.cpp(123): QPF::FileNameSpec::setProductIdTpl
+9	15	56	128	96	./src/filenamespec.cpp(128): QPF::FileNameSpec::parseFileName
+1	1	1	225	7	./src/filenamespec.cpp(225): QPF::FileNameSpec::buildProductId
+1	1	8	233	25	./src/filenamespec.cpp(233): QPF::FileNameSpec::buildProductId
+22	28	92	1	272	./src/filenamespec.cpp
+3	3	14	67	24	./src/dbg.cpp(67): showBacktrace
+3	3	15	1	92	./src/dbg.cpp
+0	0	0	1	162	./src/urlhdl.h
+0	0	-5	1	129	./src/cfg.h
+1	1	4	72	7	./src/datamng.cpp(72): QPF::DataManager::DataManager
+1	1	1	83	4	./src/datamng.cpp(83): QPF::DataManager::fromRunningToOperational
+1	1	0	91	4	./src/datamng.cpp(91): QPF::DataManager::fromOperationalToRunning
+1	1	1	99	4	./src/datamng.cpp(99): QPF::DataManager::fromRunningToOff
+3	3	15	107	29	./src/datamng.cpp(107): QPF::DataManager::processINDATA
+1	1	2	140	5	./src/datamng.cpp(140): QPF::DataManager::processTASK_PROC
+1	1	2	149	5	./src/datamng.cpp(149): QPF::DataManager::processTASK_RES
+1	1	5	160	15	./src/datamng.cpp(160): QPF::DataManager::initializeDB
+1	1	1	181	5	./src/datamng.cpp(181): QPF::DataManager::saveToDB
+4	4	26	191	54	./src/datamng.cpp(191): QPF::DataManager::saveTaskToDB
+1	1	7	251	19	./src/datamng.cpp(251): QPF::DataManager::saveProductsToDB
+11	12	49	276	84	./src/datamng.cpp(276): QPF::DataManager::archiveDSSnEAS
+1	1	2	365	7	./src/datamng.cpp(365): QPF::DataManager::isProductAvailable
+2	2	13	377	29	./src/datamng.cpp(377): QPF::DataManager::getProductLatest
+30	31	130	1	407	./src/datamng.cpp
+0	0	0	1	153	./src/cfginfo.h
+0	0	0	1	242	./src/procelem.h
+1	1	0	86	1	./src/dbhdlpostgre.h(86): QPF::DBHdlPostgreSQL::~DBHdlPostgreSQL
+1	1	0	1	238	./src/dbhdlpostgre.h
+0	0	0	1	143	./src/evtmng.h
+0	0	0	1	130	./src/taskorc.h
+1	1	3	55	6	./src/logmng.cpp(55): QPF::LogManager::LogManager
+2	2	9	65	15	./src/logmng.cpp(65): QPF::LogManager::processDATA_INFO
+1	1	0	84	4	./src/logmng.cpp(84): QPF::LogManager::execAdditonalLoopTasks
+4	4	14	1	89	./src/logmng.cpp
+1	1	13	105	15	./src/filenamespec.h(105): QPF::FileNameSpec::FileNameComponents::dump
+1	1	12	1	156	./src/filenamespec.h
+5	5	17	52	33	./libcomm/statem.cpp(52): LibComm::StateMachine::transitTo
+1	1	2	89	5	./libcomm/statem.cpp(89): LibComm::StateMachine::afterTransition
+1	1	1	98	4	./libcomm/statem.cpp(98): LibComm::StateMachine::getStateName
+1	1	1	106	4	./libcomm/statem.cpp(106): LibComm::StateMachine::getStateIdx
+1	1	2	115	5	./libcomm/statem.cpp(115): LibComm::StateMachine::defineState
+1	1	1	125	4	./libcomm/statem.cpp(125): LibComm::StateMachine::defineValidTransition
+10	10	25	1	130	./libcomm/statem.cpp
+1	1	4	83	7	./libcomm/commnode.cpp(83): LibComm::CommNode::CommNode
+1	1	0	95	3	./libcomm/commnode.cpp(95): LibComm::CommNode::~CommNode
+1	1	0	103	3	./libcomm/commnode.cpp(103): LibComm::CommNode::dump
+1	1	0	111	3	./libcomm/commnode.cpp(111): LibComm::CommNode::init
+2	2	2	119	5	./libcomm/commnode.cpp(119): LibComm::CommNode::run
+4	4	5	130	11	./libcomm/commnode.cpp(130): LibComm::CommNode::logMsg
+2	2	8	146	14	./libcomm/commnode.cpp(146): LibComm::CommNode::flushLog
+1	1	17	165	22	./libcomm/commnode.cpp(165): LibComm::CommNode::defineValidTransitions
+13	13	38	1	188	./libcomm/commnode.cpp
+1	1	1	49	4	./libcomm/thread.cpp(49): LibComm::Thread::Thread
+1	1	0	54	3	./libcomm/thread.cpp(54): LibComm::Thread::~Thread
+1	1	1	58	4	./libcomm/thread.cpp(58): LibComm::Thread::create
+1	1	3	63	6	./libcomm/thread.cpp(63): LibComm::Thread::stop
+1	1	2	70	5	./libcomm/thread.cpp(70): LibComm::Thread::wait
+1	1	4	76	7	./libcomm/thread.cpp(76): LibComm::Thread::getThreadStatus
+1	1	4	84	7	./libcomm/thread.cpp(84): LibComm::Thread::getGlobalStatus
+2	2	7	92	10	./libcomm/thread.cpp(92): LibComm::Thread::bootstrap
+4	4	9	103	15	./libcomm/thread.cpp(103): LibComm::Thread::spawn
+13	13	32	1	123	./libcomm/thread.cpp
+0	0	0	1	121	./libcomm/counter.h
+2	2	7	61	9	./libcomm/r2rpeer.cpp(61): LibComm::dumpDebugInfo
+1	1	5	104	8	./libcomm/r2rpeer.cpp(104): LibComm::Router2RouterPeer::Router2RouterPeer
+1	1	1	117	4	./libcomm/r2rpeer.cpp(117): LibComm::Router2RouterPeer::~Router2RouterPeer
+2	2	11	126	15	./libcomm/r2rpeer.cpp(126): LibComm::Router2RouterPeer::addPeer
+1	1	1	146	4	./libcomm/r2rpeer.cpp(146): LibComm::Router2RouterPeer::selfPeer
+3	3	6	155	7	./libcomm/r2rpeer.cpp(155): LibComm::Router2RouterPeer::isPeer
+3	3	15	167	21	./libcomm/r2rpeer.cpp(167): LibComm::Router2RouterPeer::broadcast
+2	2	5	193	9	./libcomm/r2rpeer.cpp(193): LibComm::Router2RouterPeer::setTransmissionToPeer
+5	5	15	207	28	./libcomm/r2rpeer.cpp(207): LibComm::Router2RouterPeer::setTransmissionToPeer
+1	1	9	240	15	./libcomm/r2rpeer.cpp(240): LibComm::Router2RouterPeer::getNewTransmission
+1	1	2	260	5	./libcomm/r2rpeer.cpp(260): LibComm::Router2RouterPeer::thereArePendingTransmissions
+1	1	4	269	7	./libcomm/r2rpeer.cpp(269): LibComm::Router2RouterPeer::storeAtBuffer
+1	1	6	280	12	./libcomm/r2rpeer.cpp(281): LibComm::Router2RouterPeer::buildPeerMsg
+1	1	0	296	3	./libcomm/r2rpeer.cpp(296): LibComm::Router2RouterPeer::dump
+1	1	1	303	4	./libcomm/r2rpeer.cpp(303): LibComm::Router2RouterPeer::deactivateCommunications
+1	1	1	311	4	./libcomm/r2rpeer.cpp(311): LibComm::Router2RouterPeer::waitForStartSignal
+1	1	2	319	5	./libcomm/r2rpeer.cpp(319): LibComm::Router2RouterPeer::emitStartSignal
+3	3	10	328	13	./libcomm/r2rpeer.cpp(328): LibComm::Router2RouterPeer::startSignalReceived
+3	3	10	346	25	./libcomm/r2rpeer.cpp(346): LibComm::Router2RouterPeer::establishCommunications
+1	1	3	376	6	./libcomm/r2rpeer.cpp(376): LibComm::Router2RouterPeer::launchTransmissionsHandler
+30	30	139	387	249	./libcomm/r2rpeer.cpp(387): LibComm::Router2RouterPeer::transmissionsHandler
+2	2	7	641	13	./libcomm/r2rpeer.cpp(641): LibComm::Router2RouterPeer::setClock
+1	1	1	659	4	./libcomm/r2rpeer.cpp(659): LibComm::Router2RouterPeer::setDebugInfo
+1	1	1	668	4	./libcomm/r2rpeer.cpp(668): LibComm::Router2RouterPeer::getDebugInfo
+3	3	10	677	16	./libcomm/r2rpeer.cpp(677): LibComm::Router2RouterPeer::dumpMsgStats
+72	72	273	1	694	./libcomm/r2rpeer.cpp
+1	1	2	88	1	./libcomm/statem.h(88): LibComm::StateMachine::StateMachine
+1	1	0	94	1	./libcomm/statem.h(94): LibComm::StateMachine::~StateMachine
+2	2	2	1	178	./libcomm/statem.h
+2	2	2	56	2	./libcomm/tools.cpp(57): LibComm::max
+2	2	2	59	2	./libcomm/tools.cpp(60): LibComm::min
+1	1	6	68	10	./libcomm/tools.cpp(68): LibComm::waitForHeartBeat
+2	2	5	84	10	./libcomm/tools.cpp(84): LibComm::split
+1	1	3	100	6	./libcomm/tools.cpp(100): LibComm::split
+2	3	9	112	19	./libcomm/tools.cpp(112): LibComm::join
+2	2	5	136	9	./libcomm/tools.cpp(136): LibComm::replaceAll
+1	1	3	150	6	./libcomm/tools.cpp(150): LibComm::getYMD
+1	1	7	161	12	./libcomm/tools.cpp(161): LibComm::timeTag
+2	2	4	178	6	./libcomm/tools.cpp(178): LibComm::sessionTag
+1	1	1	189	4	./libcomm/tools.cpp(189): LibComm::setSessionTag
+2	2	11	198	18	./libcomm/tools.cpp(198): LibComm::preciseTimeTag
+2	2	3	221	10	./libcomm/tools.cpp(221): LibComm::tagToTimestamp
+3	3	6	236	10	./libcomm/tools.cpp(236): LibComm::waitUntilNextSecond
+2	2	4	251	10	./libcomm/tools.cpp(251): LibComm::getLoadAvgs
+3	3	8	262	11	./libcomm/tools.cpp(262): LibComm::getUptime
+11	14	29	274	42	./libcomm/tools.cpp(274): LibComm::scanMemoryInfo
+5	5	55	317	85	./libcomm/tools.cpp(317): LibComm::scanCPUTime
+7	7	32	403	47	./libcomm/tools.cpp(403): LibComm::SysInfo::update
+6	6	45	453	58	./libcomm/tools.cpp(453): LibComm::SysInfo::computeStats
+58	62	241	1	512	./libcomm/tools.cpp
+1	1	3	83	7	./libcomm/tools.h(84): LibComm::toStr
+1	1	4	102	8	./libcomm/tools.h(103): LibComm::strTo
+1	1	2	291	3	./libcomm/tools.h(291): LibComm::SysInfo::SysInfo
+3	3	6	1	339	./libcomm/tools.h
+0	0	0	1	90	./libcomm/version.h
+0	0	0	1	194	./libcomm/thread.h
+1	1	1	119	34	./libcomm/commnode.h(119): LibComm::CommNode::Property
+1	1	1	1	215	./libcomm/commnode.h
+0	0	0	1	107	./libcomm/common.h
+0	0	0	1	89	./libcomm/propdef.h
+1	1	0	123	1	./libcomm/r2rpeer.h(123): LibComm::Router2RouterPeer::PeerMessage::PeerMessage
+1	1	1	125	1	./libcomm/r2rpeer.h(125): LibComm::Router2RouterPeer::PeerMessage::size
+1	1	1	126	1	./libcomm/r2rpeer.h(126): LibComm::Router2RouterPeer::PeerMessage::clear
+1	1	1	128	1	./libcomm/r2rpeer.h(128): LibComm::Router2RouterPeer::PeerMessage::push_back
+1	1	1	130	1	./libcomm/r2rpeer.h(130): LibComm::Router2RouterPeer::PeerMessage::at
+1	1	1	131	1	./libcomm/r2rpeer.h(131): LibComm::Router2RouterPeer::PeerMessage::at
+1	1	1	133	1	./libcomm/r2rpeer.h(133): LibComm::Router2RouterPeer::PeerMessage::operator[]
+1	1	1	134	1	./libcomm/r2rpeer.h(134): LibComm::Router2RouterPeer::PeerMessage::operator[]
+1	1	1	136	1	./libcomm/r2rpeer.h(136): LibComm::Router2RouterPeer::PeerMessage::peer
+2	2	3	137	4	./libcomm/r2rpeer.h(137): LibComm::Router2RouterPeer::PeerMessage::type
+1	1	1	141	1	./libcomm/r2rpeer.h(141): LibComm::Router2RouterPeer::PeerMessage::content
+1	1	1	142	1	./libcomm/r2rpeer.h(142): LibComm::Router2RouterPeer::PeerMessage::isAck
+1	1	2	143	4	./libcomm/r2rpeer.h(143): LibComm::Router2RouterPeer::PeerMessage::ackRqsted
+1	1	4	174	2	./libcomm/r2rpeer.h(174): LibComm::Router2RouterPeer::MsgStats::MsgStats
+15	15	18	1	443	./libcomm/r2rpeer.h
+0	0	0	1	85	./libcomm/error.h
+1	1	0	259	1	./libcomm/log.h(259): LibComm::Log::Log
+1	1	0	264	1	./libcomm/log.h(264): LibComm::Log::operator=
+2	2	0	1	323	./libcomm/log.h
+1	1	6	55	8	./libcomm/counter.cpp(55): LibComm::Counter::Counter
+1	1	1	68	4	./libcomm/counter.cpp(68): LibComm::Counter::reset
+2	2	3	77	5	./libcomm/counter.cpp(77): LibComm::Counter::incr
+2	2	3	87	5	./libcomm/counter.cpp(87): LibComm::Counter::decr
+3	3	9	97	11	./libcomm/counter.cpp(97): LibComm::Counter::encode
+2	2	8	113	10	./libcomm/counter.cpp(113): LibComm::Counter::decode
+1	1	1	128	4	./libcomm/counter.cpp(128): LibComm::Counter::getValue
+1	1	1	137	4	./libcomm/counter.cpp(137): LibComm::Counter::setValue
+1	1	2	146	5	./libcomm/counter.cpp(146): LibComm::Counter::getString
+1	1	2	156	5	./libcomm/counter.cpp(156): LibComm::Counter::setString
+1	1	0	166	3	./libcomm/counter.cpp(166): LibComm::Counter::toFields
+16	16	37	1	172	./libcomm/counter.cpp
+1	1	0	79	3	./libcomm/log.cpp(79): LibComm::Log::Log
+1	1	0	87	3	./libcomm/log.cpp(87): LibComm::Log::~Log
+9	9	35	95	48	./libcomm/log.cpp(95): LibComm::Log::log
+1	1	2	148	5	./libcomm/log.cpp(148): LibComm::Log::getLastLogMsgs
+3	3	24	161	38	./libcomm/log.cpp(161): LibComm::Log::getTimeTag
+1	1	1	204	4	./libcomm/log.cpp(204): LibComm::Log::setQuietExit
+3	3	15	213	21	./libcomm/log.cpp(213): LibComm::Log::defineLogSystem
+1	1	1	242	4	./libcomm/log.cpp(242): LibComm::Log::getLogFileName
+1	1	1	254	4	./libcomm/log.cpp(254): LibComm::Log::getRemoteLogFileName
+1	1	2	263	5	./libcomm/log.cpp(263): LibComm::Log::defineSizeOfLogBuffer
+4	4	9	273	13	./libcomm/log.cpp(273): LibComm::Log::closeLogStreams
+1	1	1	291	4	./libcomm/log.cpp(291): LibComm::Log::setConsoleOutput
+1	1	1	300	4	./libcomm/log.cpp(300): LibComm::Log::setLogBaseDir
+1	1	1	309	4	./libcomm/log.cpp(309): LibComm::Log::getLogBaseDir
+1	1	1	321	4	./libcomm/log.cpp(321): LibComm::Log::setMinLogLevel
+1	1	1	333	4	./libcomm/log.cpp(333): LibComm::Log::getMinLogLevel
+3	3	14	343	24	./libcomm/log.cpp(343): LibComm::showBacktrace
+34	34	110	1	368	./libcomm/log.cpp
+0	0	0	1	8	./sdc/sdc.h
+1	1	1	13	1	./sdc/dict.cpp(13): SDC::Dict::Dict
+1	1	1	15	1	./sdc/dict.cpp(15): SDC::Dict::~Dict
+3	3	10	17	12	./sdc/dict.cpp(17): SDC::Dict::dump
+1	1	1	30	3	./sdc/dict.cpp(30): SDC::Dict::has
+6	6	14	1	35	./sdc/dict.cpp
+1	1	0	16	1	./sdc/valueio.h(16): SDC::ValueIO::ValueIO
+1	1	0	17	1	./sdc/valueio.h(17): SDC::ValueIO::~ValueIO
+2	2	0	1	28	./sdc/valueio.h
+1	1	1	13	1	./sdc/array.cpp(13): SDC::Array::Array
+1	1	1	15	1	./sdc/array.cpp(15): SDC::Array::~Array
+3	3	8	17	8	./sdc/array.cpp(17): SDC::Array::dump
+5	5	11	1	27	./sdc/array.cpp
+1	1	2	32	4	./sdc/dict.h(32): SDC::Dict::operator<<
+1	1	3	1	41	./sdc/dict.h
+1	1	2	19	1	./sdc/value.cpp(19): SDC::Value::Value
+1	1	2	21	1	./sdc/value.cpp(21): SDC::Value::Value
+1	1	2	22	1	./sdc/value.cpp(22): SDC::Value::Value
+1	1	2	23	1	./sdc/value.cpp(23): SDC::Value::Value
+1	1	2	24	1	./sdc/value.cpp(24): SDC::Value::Value
+1	1	2	25	1	./sdc/value.cpp(25): SDC::Value::Value
+1	1	2	26	1	./sdc/value.cpp(26): SDC::Value::Value
+1	1	2	27	1	./sdc/value.cpp(27): SDC::Value::Value
+1	1	2	28	1	./sdc/value.cpp(28): SDC::Value::Value
+1	1	1	30	1	./sdc/value.cpp(30): SDC::Value::~Value
+2	2	4	32	11	./sdc/value.cpp(32): SDC::Value::clear
+1	1	3	44	6	./sdc/value.cpp(44): SDC::Value::set
+1	1	3	50	6	./sdc/value.cpp(50): SDC::Value::set
+1	1	3	56	6	./sdc/value.cpp(56): SDC::Value::set
+1	1	3	62	6	./sdc/value.cpp(62): SDC::Value::set
+1	1	3	68	6	./sdc/value.cpp(68): SDC::Value::set
+1	1	3	74	6	./sdc/value.cpp(74): SDC::Value::set
+2	7	15	80	27	./sdc/value.cpp(80): SDC::Value::set
+1	1	2	107	5	./sdc/value.cpp(107): SDC::Value::set
+1	1	1	113	1	./sdc/value.cpp(113): SDC::Value::type
+3	8	17	114	28	./sdc/value.cpp(114): SDC::Value::setType
+1	1	1	143	1	./sdc/value.cpp(143): SDC::Value::getData
+2	7	15	145	27	./sdc/value.cpp(145): SDC::Value::getSizeOfData
+1	1	2	173	5	./sdc/value.cpp(173): SDC::Value::operator=
+1	1	2	178	5	./sdc/value.cpp(178): SDC::Value::operator=
+1	1	2	183	5	./sdc/value.cpp(183): SDC::Value::operator=
+1	1	2	188	5	./sdc/value.cpp(188): SDC::Value::operator=
+1	1	2	193	5	./sdc/value.cpp(193): SDC::Value::operator=
+1	1	2	198	5	./sdc/value.cpp(198): SDC::Value::operator=
+1	1	2	203	5	./sdc/value.cpp(203): SDC::Value::operator=
+1	1	2	208	5	./sdc/value.cpp(208): SDC::Value::operator=
+2	2	3	213	5	./sdc/value.cpp(213): SDC::Value::operator=
+2	2	3	218	5	./sdc/value.cpp(218): SDC::Value::operator=
+2	2	3	224	6	./sdc/value.cpp(224): SDC::Value::operator<<
+2	2	3	231	6	./sdc/value.cpp(231): SDC::Value::operator<<
+1	1	3	238	6	./sdc/value.cpp(238): SDC::Value::operator<<
+1	1	3	245	6	./sdc/value.cpp(245): SDC::Value::operator<<
+1	1	1	254	1	./sdc/value.cpp(254): SDC::Value::asBool
+1	1	1	255	1	./sdc/value.cpp(255): SDC::Value::asInt
+1	1	1	256	1	./sdc/value.cpp(256): SDC::Value::asDbl
+1	1	1	257	1	./sdc/value.cpp(257): SDC::Value::asString
+1	1	1	258	1	./sdc/value.cpp(258): SDC::Value::asArray
+1	1	1	259	1	./sdc/value.cpp(259): SDC::Value::asDict
+1	1	1	261	1	./sdc/value.cpp(261): SDC::Value::asString
+1	1	1	262	1	./sdc/value.cpp(262): SDC::Value::asArray
+1	1	1	263	1	./sdc/value.cpp(263): SDC::Value::asDict
+1	1	1	265	1	./sdc/value.cpp(265): SDC::Value::isBool
+1	1	1	266	1	./sdc/value.cpp(266): SDC::Value::isInt
+1	1	1	267	1	./sdc/value.cpp(267): SDC::Value::isDbl
+1	1	1	268	1	./sdc/value.cpp(268): SDC::Value::isStr
+1	1	1	269	1	./sdc/value.cpp(269): SDC::Value::isArray
+1	1	1	270	1	./sdc/value.cpp(270): SDC::Value::isDict
+2	2	1	272	1	./sdc/value.cpp(272): SDC::Value::isNull
+3	3	6	274	7	./sdc/value.cpp(274): SDC::Value::operator[]
+1	1	2	282	5	./sdc/value.cpp(282): SDC::Value::operator[]
+4	4	10	288	12	./sdc/value.cpp(288): SDC::Value::operator[]
+3	3	5	301	10	./sdc/value.cpp(301): SDC::Value::size
+1	1	3	312	6	./sdc/value.cpp(312): SDC::Value::begin
+1	1	3	319	6	./sdc/value.cpp(319): SDC::Value::end
+3	8	14	326	25	./sdc/value.cpp(326): SDC::Value::dump
+1	1	3	352	6	./sdc/value.cpp(352): SDC::Value::readFrom
+1	1	3	359	6	./sdc/value.cpp(359): SDC::Value::saveTo
+1	1	3	366	6	./sdc/value.cpp(366): SDC::Value::deserialize
+2	2	5	373	8	./sdc/value.cpp(373): SDC::Value::serialize
+1	1	3	382	6	./sdc/value.cpp(382): SDC::Value::asSerialized
+11	15	26	389	39	./sdc/value.cpp(389): SDC::Value::prettyFormat
+1	1	1	429	1	./sdc/value.cpp(429): SDC::operator
+1	1	1	430	4	./sdc/value.cpp(430): SDC::operator
+1	1	1	435	1	./sdc/value.cpp(435): SDC::operator
+1	1	1	436	4	./sdc/value.cpp(436): SDC::operator
+1	1	1	441	1	./sdc/value.cpp(441): SDC::operator
+1	1	1	442	4	./sdc/value.cpp(442): SDC::operator
+1	1	1	447	1	./sdc/value.cpp(447): SDC::operator
+1	1	1	448	4	./sdc/value.cpp(448): SDC::operator
+1	1	1	453	1	./sdc/value.cpp(453): SDC::operator
+2	2	4	454	6	./sdc/value.cpp(454): SDC::operator
+1	1	1	461	1	./sdc/value.cpp(461): SDC::operator
+2	2	4	462	6	./sdc/value.cpp(462): SDC::operator
+1	1	1	469	1	./sdc/value.cpp(469): SDC::operator
+3	8	16	470	27	./sdc/value.cpp(470): SDC::operator
+1	1	1	498	4	./sdc/value.cpp(498): SDC::Value::setDefaultType
+115	144	266	1	506	./sdc/value.cpp
+1	1	2	112	4	./sdc/value.h(112): SDC::Value::operator<<
+1	1	3	1	162	./sdc/value.h
+1	1	2	29	4	./sdc/array.h(29): SDC::Array::operator<<
+1	1	3	1	37	./sdc/array.h
+1	1	0	18	1	./sdc/valueiojsoncpp.h(18): SDC::ValueIOJsonCpp::ValueIOJsonCpp
+1	1	0	19	1	./sdc/valueiojsoncpp.h(19): SDC::ValueIOJsonCpp::~ValueIOJsonCpp
+2	2	0	1	34	./sdc/valueiojsoncpp.h
+2	2	9	20	15	./sdc/valueiojsoncpp.cpp(20): SDC::ValueIOJsonCpp::readFrom
+2	2	7	36	12	./sdc/valueiojsoncpp.cpp(36): SDC::ValueIOJsonCpp::saveTo
+1	1	4	49	7	./sdc/valueiojsoncpp.cpp(49): SDC::ValueIOJsonCpp::deserialize
+1	1	4	57	7	./sdc/valueiojsoncpp.cpp(57): SDC::ValueIOJsonCpp::serialize
+10	10	28	65	35	./sdc/valueiojsoncpp.cpp(65): SDC::ValueIOJsonCpp::importData
+9	9	29	101	36	./sdc/valueiojsoncpp.cpp(101): SDC::ValueIOJsonCpp::exportData
+25	25	83	1	139	./sdc/valueiojsoncpp.cpp
+1	1	0	18	1	./tests/qpfhmi/test_app.h(18): TestQPF::TestApp::TestApp
+1	1	0	21	1	./tests/qpfhmi/test_app.h(21): TestQPF::TestApp::~TestApp
+1	1	0	28	1	./tests/qpfhmi/test_app.h(28): TestQPF::TestApp::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_app.h(32): TestQPF::TestApp::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_app.h(45): TestQPF::TestAppExit::TestAppExit
+1	1	0	48	1	./tests/qpfhmi/test_app.h(48): TestQPF::TestAppExit::~TestAppExit
+1	1	0	55	1	./tests/qpfhmi/test_app.h(55): TestQPF::TestAppExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_app.h(59): TestQPF::TestAppExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_app.h
+1	1	0	18	1	./tests/qpfhmi/test_progbardlg.h(18): TestQPF::TestProgressBarDelegate::TestProgressBarDelegate
+1	1	0	21	1	./tests/qpfhmi/test_progbardlg.h(21): TestQPF::TestProgressBarDelegate::~TestProgressBarDelegate
+1	1	0	28	1	./tests/qpfhmi/test_progbardlg.h(28): TestQPF::TestProgressBarDelegate::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_progbardlg.h(32): TestQPF::TestProgressBarDelegate::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_progbardlg.h(45): TestQPF::TestProgressBarDelegateExit::TestProgressBarDelegateExit
+1	1	0	48	1	./tests/qpfhmi/test_progbardlg.h(48): TestQPF::TestProgressBarDelegateExit::~TestProgressBarDelegateExit
+1	1	0	55	1	./tests/qpfhmi/test_progbardlg.h(55): TestQPF::TestProgressBarDelegateExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_progbardlg.h(59): TestQPF::TestProgressBarDelegateExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_progbardlg.h
+1	1	1	5	3	./tests/qpfhmi/test_logwatcher.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_logwatcher.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_logwatcher.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_logwatcher.cpp(17): TestQPF::TEST_F
+1	1	2	22	5	./tests/qpfhmi/test_logwatcher.cpp(22): TestQPF::TEST_F
+5	5	7	1	28	./tests/qpfhmi/test_logwatcher.cpp
+0	0	1	1	6	./tests/qpfhmi/test_main.cpp
+1	1	1	5	3	./tests/qpfhmi/test_progbardlg.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_progbardlg.cpp(9): TestQPF::TEST_F
+1	1	2	14	5	./tests/qpfhmi/test_progbardlg.cpp(14): TestQPF::TEST_F
+3	3	5	1	20	./tests/qpfhmi/test_progbardlg.cpp
+1	1	0	18	1	./tests/qpfhmi/test_hmipxy.h(18): TestQPF::TestHMIProxy::TestHMIProxy
+1	1	0	21	1	./tests/qpfhmi/test_hmipxy.h(21): TestQPF::TestHMIProxy::~TestHMIProxy
+1	1	0	28	1	./tests/qpfhmi/test_hmipxy.h(28): TestQPF::TestHMIProxy::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_hmipxy.h(32): TestQPF::TestHMIProxy::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_hmipxy.h(45): TestQPF::TestHMIProxyExit::TestHMIProxyExit
+1	1	0	48	1	./tests/qpfhmi/test_hmipxy.h(48): TestQPF::TestHMIProxyExit::~TestHMIProxyExit
+1	1	0	55	1	./tests/qpfhmi/test_hmipxy.h(55): TestQPF::TestHMIProxyExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_hmipxy.h(59): TestQPF::TestHMIProxyExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_hmipxy.h
+1	1	0	18	1	./tests/qpfhmi/test_mainwindow.h(18): TestQPF::TestMainWindow::TestMainWindow
+1	1	0	21	1	./tests/qpfhmi/test_mainwindow.h(21): TestQPF::TestMainWindow::~TestMainWindow
+1	1	0	28	1	./tests/qpfhmi/test_mainwindow.h(28): TestQPF::TestMainWindow::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_mainwindow.h(32): TestQPF::TestMainWindow::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_mainwindow.h(45): TestQPF::TestMainWindowExit::TestMainWindowExit
+1	1	0	48	1	./tests/qpfhmi/test_mainwindow.h(48): TestQPF::TestMainWindowExit::~TestMainWindowExit
+1	1	0	55	1	./tests/qpfhmi/test_mainwindow.h(55): TestQPF::TestMainWindowExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_mainwindow.h(59): TestQPF::TestMainWindowExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_mainwindow.h
+0	0	2	1	13	./tests/qpfhmi/test_taskmonmodel.h
+0	0	1	1	6	./tests/qpfhmi/test_taskmonmodel.cpp
+0	0	2	1	13	./tests/qpfhmi/test_logframe.h
+1	1	0	18	1	./tests/qpfhmi/test_configtool.h(18): TestQPF::TestConfigTool::TestConfigTool
+1	1	0	21	1	./tests/qpfhmi/test_configtool.h(21): TestQPF::TestConfigTool::~TestConfigTool
+1	1	0	28	1	./tests/qpfhmi/test_configtool.h(28): TestQPF::TestConfigTool::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_configtool.h(32): TestQPF::TestConfigTool::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_configtool.h(45): TestQPF::TestConfigToolExit::TestConfigToolExit
+1	1	0	48	1	./tests/qpfhmi/test_configtool.h(48): TestQPF::TestConfigToolExit::~TestConfigToolExit
+1	1	0	55	1	./tests/qpfhmi/test_configtool.h(55): TestQPF::TestConfigToolExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_configtool.h(59): TestQPF::TestConfigToolExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_configtool.h
+1	1	0	18	1	./tests/qpfhmi/test_logwatcher.h(18): TestQPF::TestLogWatcher::TestLogWatcher
+1	1	0	21	1	./tests/qpfhmi/test_logwatcher.h(21): TestQPF::TestLogWatcher::~TestLogWatcher
+1	1	0	28	1	./tests/qpfhmi/test_logwatcher.h(28): TestQPF::TestLogWatcher::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_logwatcher.h(32): TestQPF::TestLogWatcher::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_logwatcher.h(45): TestQPF::TestLogWatcherExit::TestLogWatcherExit
+1	1	0	48	1	./tests/qpfhmi/test_logwatcher.h(48): TestQPF::TestLogWatcherExit::~TestLogWatcherExit
+1	1	0	55	1	./tests/qpfhmi/test_logwatcher.h(55): TestQPF::TestLogWatcherExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_logwatcher.h(59): TestQPF::TestLogWatcherExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_logwatcher.h
+0	0	2	1	13	./tests/qpfhmi/test_textview.h
+1	1	0	18	1	./tests/qpfhmi/test_deployer.h(18): TestQPF::TestDeployer::TestDeployer
+1	1	0	21	1	./tests/qpfhmi/test_deployer.h(21): TestQPF::TestDeployer::~TestDeployer
+1	1	0	28	1	./tests/qpfhmi/test_deployer.h(28): TestQPF::TestDeployer::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_deployer.h(32): TestQPF::TestDeployer::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_deployer.h(45): TestQPF::TestDeployerExit::TestDeployerExit
+1	1	0	48	1	./tests/qpfhmi/test_deployer.h(48): TestQPF::TestDeployerExit::~TestDeployerExit
+1	1	0	55	1	./tests/qpfhmi/test_deployer.h(55): TestQPF::TestDeployerExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_deployer.h(59): TestQPF::TestDeployerExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_deployer.h
+1	1	0	18	1	./tests/qpfhmi/test_simindata.h(18): TestQPF::TestSimInData::TestSimInData
+1	1	0	21	1	./tests/qpfhmi/test_simindata.h(21): TestQPF::TestSimInData::~TestSimInData
+1	1	0	28	1	./tests/qpfhmi/test_simindata.h(28): TestQPF::TestSimInData::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_simindata.h(32): TestQPF::TestSimInData::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_simindata.h(45): TestQPF::TestSimInDataExit::TestSimInDataExit
+1	1	0	48	1	./tests/qpfhmi/test_simindata.h(48): TestQPF::TestSimInDataExit::~TestSimInDataExit
+1	1	0	55	1	./tests/qpfhmi/test_simindata.h(55): TestQPF::TestSimInDataExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_simindata.h(59): TestQPF::TestSimInDataExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_simindata.h
+1	1	1	5	3	./tests/qpfhmi/test_frmagentstatus.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_frmagentstatus.cpp(9): TestQPF::TEST_F
+1	1	2	14	5	./tests/qpfhmi/test_frmagentstatus.cpp(14): TestQPF::TEST_F
+3	3	5	1	20	./tests/qpfhmi/test_frmagentstatus.cpp
+0	0	2	1	13	./tests/qpfhmi/test_types.h
+1	1	0	18	1	./tests/qpfhmi/test_frmagentstatus.h(18): TestQPF::TestFrmAgentStatus::TestFrmAgentStatus
+1	1	0	21	1	./tests/qpfhmi/test_frmagentstatus.h(21): TestQPF::TestFrmAgentStatus::~TestFrmAgentStatus
+1	1	0	28	1	./tests/qpfhmi/test_frmagentstatus.h(28): TestQPF::TestFrmAgentStatus::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_frmagentstatus.h(32): TestQPF::TestFrmAgentStatus::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_frmagentstatus.h(45): TestQPF::TestFrmAgentStatusExit::TestFrmAgentStatusExit
+1	1	0	48	1	./tests/qpfhmi/test_frmagentstatus.h(48): TestQPF::TestFrmAgentStatusExit::~TestFrmAgentStatusExit
+1	1	0	55	1	./tests/qpfhmi/test_frmagentstatus.h(55): TestQPF::TestFrmAgentStatusExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_frmagentstatus.h(59): TestQPF::TestFrmAgentStatusExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_frmagentstatus.h
+1	1	1	5	3	./tests/qpfhmi/test_mainwindow.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_mainwindow.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_mainwindow.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_mainwindow.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_mainwindow.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/qpfhmi/test_mainwindow.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/qpfhmi/test_mainwindow.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/qpfhmi/test_mainwindow.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/qpfhmi/test_mainwindow.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/qpfhmi/test_mainwindow.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/qpfhmi/test_mainwindow.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/qpfhmi/test_mainwindow.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/qpfhmi/test_mainwindow.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/qpfhmi/test_mainwindow.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/qpfhmi/test_mainwindow.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/qpfhmi/test_mainwindow.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/qpfhmi/test_mainwindow.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/qpfhmi/test_mainwindow.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/qpfhmi/test_mainwindow.cpp(77): TestQPF::TEST_F
+1	1	1	81	3	./tests/qpfhmi/test_mainwindow.cpp(81): TestQPF::TEST_F
+1	1	1	85	3	./tests/qpfhmi/test_mainwindow.cpp(85): TestQPF::TEST_F
+1	1	1	89	3	./tests/qpfhmi/test_mainwindow.cpp(89): TestQPF::TEST_F
+1	1	1	93	3	./tests/qpfhmi/test_mainwindow.cpp(93): TestQPF::TEST_F
+1	1	1	97	3	./tests/qpfhmi/test_mainwindow.cpp(97): TestQPF::TEST_F
+1	1	1	101	3	./tests/qpfhmi/test_mainwindow.cpp(101): TestQPF::TEST_F
+1	1	1	105	3	./tests/qpfhmi/test_mainwindow.cpp(105): TestQPF::TEST_F
+1	1	1	109	3	./tests/qpfhmi/test_mainwindow.cpp(109): TestQPF::TEST_F
+1	1	1	113	3	./tests/qpfhmi/test_mainwindow.cpp(113): TestQPF::TEST_F
+1	1	1	117	3	./tests/qpfhmi/test_mainwindow.cpp(117): TestQPF::TEST_F
+1	1	1	121	3	./tests/qpfhmi/test_mainwindow.cpp(121): TestQPF::TEST_F
+1	1	1	125	3	./tests/qpfhmi/test_mainwindow.cpp(125): TestQPF::TEST_F
+1	1	1	129	3	./tests/qpfhmi/test_mainwindow.cpp(129): TestQPF::TEST_F
+1	1	1	133	3	./tests/qpfhmi/test_mainwindow.cpp(133): TestQPF::TEST_F
+1	1	1	137	3	./tests/qpfhmi/test_mainwindow.cpp(137): TestQPF::TEST_F
+1	1	1	141	3	./tests/qpfhmi/test_mainwindow.cpp(141): TestQPF::TEST_F
+1	1	1	145	3	./tests/qpfhmi/test_mainwindow.cpp(145): TestQPF::TEST_F
+1	1	1	149	3	./tests/qpfhmi/test_mainwindow.cpp(149): TestQPF::TEST_F
+1	1	1	153	3	./tests/qpfhmi/test_mainwindow.cpp(153): TestQPF::TEST_F
+1	1	1	157	3	./tests/qpfhmi/test_mainwindow.cpp(157): TestQPF::TEST_F
+1	1	1	161	3	./tests/qpfhmi/test_mainwindow.cpp(161): TestQPF::TEST_F
+1	1	1	165	3	./tests/qpfhmi/test_mainwindow.cpp(165): TestQPF::TEST_F
+1	1	1	169	3	./tests/qpfhmi/test_mainwindow.cpp(169): TestQPF::TEST_F
+1	1	1	173	3	./tests/qpfhmi/test_mainwindow.cpp(173): TestQPF::TEST_F
+1	1	1	177	3	./tests/qpfhmi/test_mainwindow.cpp(177): TestQPF::TEST_F
+1	1	1	181	3	./tests/qpfhmi/test_mainwindow.cpp(181): TestQPF::TEST_F
+1	1	1	185	3	./tests/qpfhmi/test_mainwindow.cpp(185): TestQPF::TEST_F
+1	1	1	189	3	./tests/qpfhmi/test_mainwindow.cpp(189): TestQPF::TEST_F
+1	1	1	193	3	./tests/qpfhmi/test_mainwindow.cpp(193): TestQPF::TEST_F
+1	1	1	197	3	./tests/qpfhmi/test_mainwindow.cpp(197): TestQPF::TEST_F
+1	1	1	201	3	./tests/qpfhmi/test_mainwindow.cpp(201): TestQPF::TEST_F
+1	1	1	205	3	./tests/qpfhmi/test_mainwindow.cpp(205): TestQPF::TEST_F
+1	1	1	209	3	./tests/qpfhmi/test_mainwindow.cpp(209): TestQPF::TEST_F
+1	1	1	213	3	./tests/qpfhmi/test_mainwindow.cpp(213): TestQPF::TEST_F
+1	1	1	217	3	./tests/qpfhmi/test_mainwindow.cpp(217): TestQPF::TEST_F
+1	1	1	221	3	./tests/qpfhmi/test_mainwindow.cpp(221): TestQPF::TEST_F
+1	1	2	226	5	./tests/qpfhmi/test_mainwindow.cpp(226): TestQPF::TEST_F
+56	56	58	1	232	./tests/qpfhmi/test_mainwindow.cpp
+1	1	1	5	3	./tests/qpfhmi/test_hmipxy.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_hmipxy.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_hmipxy.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_hmipxy.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_hmipxy.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/qpfhmi/test_hmipxy.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/qpfhmi/test_hmipxy.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/qpfhmi/test_hmipxy.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/qpfhmi/test_hmipxy.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/qpfhmi/test_hmipxy.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/qpfhmi/test_hmipxy.cpp(45): TestQPF::TEST_F
+1	1	2	50	5	./tests/qpfhmi/test_hmipxy.cpp(50): TestQPF::TEST_F
+12	12	14	1	56	./tests/qpfhmi/test_hmipxy.cpp
+0	0	2	1	13	./tests/qpfhmi/test_dlgshowtaskinfo.h
+0	0	1	1	6	./tests/qpfhmi/test_logframe.cpp
+0	0	1	1	6	./tests/qpfhmi/test_textview.cpp
+0	0	1	1	6	./tests/qpfhmi/test_types.cpp
+1	1	1	5	3	./tests/qpfhmi/test_deployer.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_deployer.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_deployer.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_deployer.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_deployer.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/qpfhmi/test_deployer.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/qpfhmi/test_deployer.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/qpfhmi/test_deployer.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/qpfhmi/test_deployer.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/qpfhmi/test_deployer.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/qpfhmi/test_deployer.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/qpfhmi/test_deployer.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/qpfhmi/test_deployer.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/qpfhmi/test_deployer.cpp(57): TestQPF::TEST_F
+1	1	2	62	5	./tests/qpfhmi/test_deployer.cpp(62): TestQPF::TEST_F
+15	15	17	1	68	./tests/qpfhmi/test_deployer.cpp
+1	1	1	5	3	./tests/qpfhmi/test_app.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_app.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_app.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_app.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_app.cpp(21): TestQPF::TEST_F
+1	1	2	26	5	./tests/qpfhmi/test_app.cpp(26): TestQPF::TEST_F
+6	6	8	1	32	./tests/qpfhmi/test_app.cpp
+1	1	1	5	3	./tests/qpfhmi/test_configtool.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_configtool.cpp(9): TestQPF::TEST_F
+1	1	2	14	5	./tests/qpfhmi/test_configtool.cpp(14): TestQPF::TEST_F
+3	3	5	1	20	./tests/qpfhmi/test_configtool.cpp
+0	0	1	1	6	./tests/qpfhmi/test_dlgshowtaskinfo.cpp
+1	1	1	5	3	./tests/qpfhmi/test_archivemodel.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_archivemodel.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_archivemodel.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_archivemodel.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_archivemodel.cpp(21): TestQPF::TEST_F
+1	1	2	26	5	./tests/qpfhmi/test_archivemodel.cpp(26): TestQPF::TEST_F
+6	6	8	1	32	./tests/qpfhmi/test_archivemodel.cpp
+1	1	1	5	3	./tests/qpfhmi/test_simindata.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/qpfhmi/test_simindata.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/qpfhmi/test_simindata.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/qpfhmi/test_simindata.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/qpfhmi/test_simindata.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/qpfhmi/test_simindata.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/qpfhmi/test_simindata.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/qpfhmi/test_simindata.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/qpfhmi/test_simindata.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/qpfhmi/test_simindata.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/qpfhmi/test_simindata.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/qpfhmi/test_simindata.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/qpfhmi/test_simindata.cpp(53): TestQPF::TEST_F
+1	1	2	58	5	./tests/qpfhmi/test_simindata.cpp(58): TestQPF::TEST_F
+14	14	16	1	64	./tests/qpfhmi/test_simindata.cpp
+0	0	2	1	13	./tests/qpfhmi/test_main.h
+1	1	0	18	1	./tests/qpfhmi/test_archivemodel.h(18): TestQPF::TestArchiveModel::TestArchiveModel
+1	1	0	21	1	./tests/qpfhmi/test_archivemodel.h(21): TestQPF::TestArchiveModel::~TestArchiveModel
+1	1	0	28	1	./tests/qpfhmi/test_archivemodel.h(28): TestQPF::TestArchiveModel::SetUp
+1	1	0	32	1	./tests/qpfhmi/test_archivemodel.h(32): TestQPF::TestArchiveModel::TearDown
+1	1	0	45	1	./tests/qpfhmi/test_archivemodel.h(45): TestQPF::TestArchiveModelExit::TestArchiveModelExit
+1	1	0	48	1	./tests/qpfhmi/test_archivemodel.h(48): TestQPF::TestArchiveModelExit::~TestArchiveModelExit
+1	1	0	55	1	./tests/qpfhmi/test_archivemodel.h(55): TestQPF::TestArchiveModelExit::SetUp
+1	1	0	59	1	./tests/qpfhmi/test_archivemodel.h(59): TestQPF::TestArchiveModelExit::TearDown
+8	8	0	1	66	./tests/qpfhmi/test_archivemodel.h
+6	6	16	6	22	./tests/dwe/dwe_test.cpp(6): main
+6	6	18	1	27	./tests/dwe/dwe_test.cpp
+0	0	1	1	6	./tests/infix/test_infixeval.cpp
+0	0	2	1	13	./tests/infix/test_infixeval.h
+1	1	0	18	1	./tests/src/test_str.h(18): TestQPF::TestStr::TestStr
+1	1	0	21	1	./tests/src/test_str.h(21): TestQPF::TestStr::~TestStr
+1	1	0	28	1	./tests/src/test_str.h(28): TestQPF::TestStr::SetUp
+1	1	0	32	1	./tests/src/test_str.h(32): TestQPF::TestStr::TearDown
+4	4	1	1	39	./tests/src/test_str.h
+1	1	1	5	3	./tests/src/test_logmng.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_logmng.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_logmng.cpp(13): TestQPF::TEST_F
+1	1	2	18	5	./tests/src/test_logmng.cpp(18): TestQPF::TEST_F
+4	4	6	1	24	./tests/src/test_logmng.cpp
+1	1	0	18	1	./tests/src/test_datatypes.h(18): TestQPF::TestJsonStruct::TestJsonStruct
+1	1	0	21	1	./tests/src/test_datatypes.h(21): TestQPF::TestJsonStruct::~TestJsonStruct
+1	1	0	28	1	./tests/src/test_datatypes.h(28): TestQPF::TestJsonStruct::SetUp
+1	1	0	32	1	./tests/src/test_datatypes.h(32): TestQPF::TestJsonStruct::TearDown
+1	1	0	45	1	./tests/src/test_datatypes.h(45): TestQPF::TestJsonStructExit::TestJsonStructExit
+1	1	0	48	1	./tests/src/test_datatypes.h(48): TestQPF::TestJsonStructExit::~TestJsonStructExit
+1	1	0	55	1	./tests/src/test_datatypes.h(55): TestQPF::TestJsonStructExit::SetUp
+1	1	0	59	1	./tests/src/test_datatypes.h(59): TestQPF::TestJsonStructExit::TearDown
+1	1	0	71	1	./tests/src/test_datatypes.h(71): TestQPF::TestMessage::TestMessage
+1	1	0	74	1	./tests/src/test_datatypes.h(74): TestQPF::TestMessage::~TestMessage
+1	1	0	81	1	./tests/src/test_datatypes.h(81): TestQPF::TestMessage::SetUp
+1	1	0	85	1	./tests/src/test_datatypes.h(85): TestQPF::TestMessage::TearDown
+1	1	0	98	1	./tests/src/test_datatypes.h(98): TestQPF::TestMessageExit::TestMessageExit
+1	1	0	101	1	./tests/src/test_datatypes.h(101): TestQPF::TestMessageExit::~TestMessageExit
+1	1	0	108	1	./tests/src/test_datatypes.h(108): TestQPF::TestMessageExit::SetUp
+1	1	0	112	1	./tests/src/test_datatypes.h(112): TestQPF::TestMessageExit::TearDown
+1	1	0	124	1	./tests/src/test_datatypes.h(124): TestQPF::TestMessageData::TestMessageData
+1	1	0	127	1	./tests/src/test_datatypes.h(127): TestQPF::TestMessageData::~TestMessageData
+1	1	0	134	1	./tests/src/test_datatypes.h(134): TestQPF::TestMessageData::SetUp
+1	1	0	138	1	./tests/src/test_datatypes.h(138): TestQPF::TestMessageData::TearDown
+1	1	0	151	1	./tests/src/test_datatypes.h(151): TestQPF::TestMessageDataExit::TestMessageDataExit
+1	1	0	154	1	./tests/src/test_datatypes.h(154): TestQPF::TestMessageDataExit::~TestMessageDataExit
+1	1	0	161	1	./tests/src/test_datatypes.h(161): TestQPF::TestMessageDataExit::SetUp
+1	1	0	165	1	./tests/src/test_datatypes.h(165): TestQPF::TestMessageDataExit::TearDown
+1	1	0	177	1	./tests/src/test_datatypes.h(177): TestQPF::TestMessage_DATA_Exchange::TestMessage_DATA_Exchange
+1	1	0	180	1	./tests/src/test_datatypes.h(180): TestQPF::TestMessage_DATA_Exchange::~TestMessage_DATA_Exchange
+1	1	0	187	1	./tests/src/test_datatypes.h(187): TestQPF::TestMessage_DATA_Exchange::SetUp
+1	1	0	191	1	./tests/src/test_datatypes.h(191): TestQPF::TestMessage_DATA_Exchange::TearDown
+1	1	0	204	1	./tests/src/test_datatypes.h(204): TestQPF::TestMessage_DATA_ExchangeExit::TestMessage_DATA_ExchangeExit
+1	1	0	207	1	./tests/src/test_datatypes.h(207): TestQPF::TestMessage_DATA_ExchangeExit::~TestMessage_DATA_ExchangeExit
+1	1	0	214	1	./tests/src/test_datatypes.h(214): TestQPF::TestMessage_DATA_ExchangeExit::SetUp
+1	1	0	218	1	./tests/src/test_datatypes.h(218): TestQPF::TestMessage_DATA_ExchangeExit::TearDown
+1	1	0	230	1	./tests/src/test_datatypes.h(230): TestQPF::TestMessageHeader::TestMessageHeader
+1	1	0	233	1	./tests/src/test_datatypes.h(233): TestQPF::TestMessageHeader::~TestMessageHeader
+1	1	0	240	1	./tests/src/test_datatypes.h(240): TestQPF::TestMessageHeader::SetUp
+1	1	0	244	1	./tests/src/test_datatypes.h(244): TestQPF::TestMessageHeader::TearDown
+1	1	0	257	1	./tests/src/test_datatypes.h(257): TestQPF::TestMessageHeaderExit::TestMessageHeaderExit
+1	1	0	260	1	./tests/src/test_datatypes.h(260): TestQPF::TestMessageHeaderExit::~TestMessageHeaderExit
+1	1	0	267	1	./tests/src/test_datatypes.h(267): TestQPF::TestMessageHeaderExit::SetUp
+1	1	0	271	1	./tests/src/test_datatypes.h(271): TestQPF::TestMessageHeaderExit::TearDown
+1	1	0	283	1	./tests/src/test_datatypes.h(283): TestQPF::TestMessage_INDATA::TestMessage_INDATA
+1	1	0	286	1	./tests/src/test_datatypes.h(286): TestQPF::TestMessage_INDATA::~TestMessage_INDATA
+1	1	0	293	1	./tests/src/test_datatypes.h(293): TestQPF::TestMessage_INDATA::SetUp
+1	1	0	297	1	./tests/src/test_datatypes.h(297): TestQPF::TestMessage_INDATA::TearDown
+1	1	0	310	1	./tests/src/test_datatypes.h(310): TestQPF::TestMessage_INDATAExit::TestMessage_INDATAExit
+1	1	0	313	1	./tests/src/test_datatypes.h(313): TestQPF::TestMessage_INDATAExit::~TestMessage_INDATAExit
+1	1	0	320	1	./tests/src/test_datatypes.h(320): TestQPF::TestMessage_INDATAExit::SetUp
+1	1	0	324	1	./tests/src/test_datatypes.h(324): TestQPF::TestMessage_INDATAExit::TearDown
+1	1	0	336	1	./tests/src/test_datatypes.h(336): TestQPF::TestMessage_TASK_Processing::TestMessage_TASK_Processing
+1	1	0	339	1	./tests/src/test_datatypes.h(339): TestQPF::TestMessage_TASK_Processing::~TestMessage_TASK_Processing
+1	1	0	346	1	./tests/src/test_datatypes.h(346): TestQPF::TestMessage_TASK_Processing::SetUp
+1	1	0	350	1	./tests/src/test_datatypes.h(350): TestQPF::TestMessage_TASK_Processing::TearDown
+1	1	0	363	1	./tests/src/test_datatypes.h(363): TestQPF::TestMessage_TASK_ProcessingExit::TestMessage_TASK_ProcessingExit
+1	1	0	366	1	./tests/src/test_datatypes.h(366): TestQPF::TestMessage_TASK_ProcessingExit::~TestMessage_TASK_ProcessingExit
+1	1	0	373	1	./tests/src/test_datatypes.h(373): TestQPF::TestMessage_TASK_ProcessingExit::SetUp
+1	1	0	377	1	./tests/src/test_datatypes.h(377): TestQPF::TestMessage_TASK_ProcessingExit::TearDown
+1	1	0	389	1	./tests/src/test_datatypes.h(389): TestQPF::TestParameterList::TestParameterList
+1	1	0	392	1	./tests/src/test_datatypes.h(392): TestQPF::TestParameterList::~TestParameterList
+1	1	0	399	1	./tests/src/test_datatypes.h(399): TestQPF::TestParameterList::SetUp
+1	1	0	403	1	./tests/src/test_datatypes.h(403): TestQPF::TestParameterList::TearDown
+1	1	0	416	1	./tests/src/test_datatypes.h(416): TestQPF::TestParameterListExit::TestParameterListExit
+1	1	0	419	1	./tests/src/test_datatypes.h(419): TestQPF::TestParameterListExit::~TestParameterListExit
+1	1	0	426	1	./tests/src/test_datatypes.h(426): TestQPF::TestParameterListExit::SetUp
+1	1	0	430	1	./tests/src/test_datatypes.h(430): TestQPF::TestParameterListExit::TearDown
+1	1	0	442	1	./tests/src/test_datatypes.h(442): TestQPF::TestProductCollection::TestProductCollection
+1	1	0	445	1	./tests/src/test_datatypes.h(445): TestQPF::TestProductCollection::~TestProductCollection
+1	1	0	452	1	./tests/src/test_datatypes.h(452): TestQPF::TestProductCollection::SetUp
+1	1	0	456	1	./tests/src/test_datatypes.h(456): TestQPF::TestProductCollection::TearDown
+1	1	0	469	1	./tests/src/test_datatypes.h(469): TestQPF::TestProductCollectionExit::TestProductCollectionExit
+1	1	0	472	1	./tests/src/test_datatypes.h(472): TestQPF::TestProductCollectionExit::~TestProductCollectionExit
+1	1	0	479	1	./tests/src/test_datatypes.h(479): TestQPF::TestProductCollectionExit::SetUp
+1	1	0	483	1	./tests/src/test_datatypes.h(483): TestQPF::TestProductCollectionExit::TearDown
+1	1	0	495	1	./tests/src/test_datatypes.h(495): TestQPF::TestProductList::TestProductList
+1	1	0	498	1	./tests/src/test_datatypes.h(498): TestQPF::TestProductList::~TestProductList
+1	1	0	505	1	./tests/src/test_datatypes.h(505): TestQPF::TestProductList::SetUp
+1	1	0	509	1	./tests/src/test_datatypes.h(509): TestQPF::TestProductList::TearDown
+1	1	0	522	1	./tests/src/test_datatypes.h(522): TestQPF::TestProductListExit::TestProductListExit
+1	1	0	525	1	./tests/src/test_datatypes.h(525): TestQPF::TestProductListExit::~TestProductListExit
+1	1	0	532	1	./tests/src/test_datatypes.h(532): TestQPF::TestProductListExit::SetUp
+1	1	0	536	1	./tests/src/test_datatypes.h(536): TestQPF::TestProductListExit::TearDown
+1	1	0	548	1	./tests/src/test_datatypes.h(548): TestQPF::TestProductMetadata::TestProductMetadata
+1	1	0	551	1	./tests/src/test_datatypes.h(551): TestQPF::TestProductMetadata::~TestProductMetadata
+1	1	0	558	1	./tests/src/test_datatypes.h(558): TestQPF::TestProductMetadata::SetUp
+1	1	0	562	1	./tests/src/test_datatypes.h(562): TestQPF::TestProductMetadata::TearDown
+1	1	0	575	1	./tests/src/test_datatypes.h(575): TestQPF::TestProductMetadataExit::TestProductMetadataExit
+1	1	0	578	1	./tests/src/test_datatypes.h(578): TestQPF::TestProductMetadataExit::~TestProductMetadataExit
+1	1	0	585	1	./tests/src/test_datatypes.h(585): TestQPF::TestProductMetadataExit::SetUp
+1	1	0	589	1	./tests/src/test_datatypes.h(589): TestQPF::TestProductMetadataExit::TearDown
+1	1	0	601	1	./tests/src/test_datatypes.h(601): TestQPF::TestStringList::TestStringList
+1	1	0	604	1	./tests/src/test_datatypes.h(604): TestQPF::TestStringList::~TestStringList
+1	1	0	611	1	./tests/src/test_datatypes.h(611): TestQPF::TestStringList::SetUp
+1	1	0	615	1	./tests/src/test_datatypes.h(615): TestQPF::TestStringList::TearDown
+1	1	0	628	1	./tests/src/test_datatypes.h(628): TestQPF::TestStringListExit::TestStringListExit
+1	1	0	631	1	./tests/src/test_datatypes.h(631): TestQPF::TestStringListExit::~TestStringListExit
+1	1	0	638	1	./tests/src/test_datatypes.h(638): TestQPF::TestStringListExit::SetUp
+1	1	0	642	1	./tests/src/test_datatypes.h(642): TestQPF::TestStringListExit::TearDown
+1	1	0	654	1	./tests/src/test_datatypes.h(654): TestQPF::TestTaskAgentInfo::TestTaskAgentInfo
+1	1	0	657	1	./tests/src/test_datatypes.h(657): TestQPF::TestTaskAgentInfo::~TestTaskAgentInfo
+1	1	0	664	1	./tests/src/test_datatypes.h(664): TestQPF::TestTaskAgentInfo::SetUp
+1	1	0	668	1	./tests/src/test_datatypes.h(668): TestQPF::TestTaskAgentInfo::TearDown
+1	1	0	681	1	./tests/src/test_datatypes.h(681): TestQPF::TestTaskAgentInfoExit::TestTaskAgentInfoExit
+1	1	0	684	1	./tests/src/test_datatypes.h(684): TestQPF::TestTaskAgentInfoExit::~TestTaskAgentInfoExit
+1	1	0	691	1	./tests/src/test_datatypes.h(691): TestQPF::TestTaskAgentInfoExit::SetUp
+1	1	0	695	1	./tests/src/test_datatypes.h(695): TestQPF::TestTaskAgentInfoExit::TearDown
+1	1	0	707	1	./tests/src/test_datatypes.h(707): TestQPF::TestTaskInfo::TestTaskInfo
+1	1	0	710	1	./tests/src/test_datatypes.h(710): TestQPF::TestTaskInfo::~TestTaskInfo
+1	1	0	717	1	./tests/src/test_datatypes.h(717): TestQPF::TestTaskInfo::SetUp
+1	1	0	721	1	./tests/src/test_datatypes.h(721): TestQPF::TestTaskInfo::TearDown
+1	1	0	734	1	./tests/src/test_datatypes.h(734): TestQPF::TestTaskInfoExit::TestTaskInfoExit
+1	1	0	737	1	./tests/src/test_datatypes.h(737): TestQPF::TestTaskInfoExit::~TestTaskInfoExit
+1	1	0	744	1	./tests/src/test_datatypes.h(744): TestQPF::TestTaskInfoExit::SetUp
+1	1	0	748	1	./tests/src/test_datatypes.h(748): TestQPF::TestTaskInfoExit::TearDown
+112	112	-26	1	755	./tests/src/test_datatypes.h
+1	1	1	5	3	./tests/src/test_dbhdlpostgre.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_dbhdlpostgre.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_dbhdlpostgre.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_dbhdlpostgre.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_dbhdlpostgre.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_dbhdlpostgre.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_dbhdlpostgre.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_dbhdlpostgre.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_dbhdlpostgre.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_dbhdlpostgre.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_dbhdlpostgre.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_dbhdlpostgre.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_dbhdlpostgre.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_dbhdlpostgre.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_dbhdlpostgre.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_dbhdlpostgre.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_dbhdlpostgre.cpp(69): TestQPF::TEST_F
+1	1	2	74	5	./tests/src/test_dbhdlpostgre.cpp(74): TestQPF::TEST_F
+18	18	20	1	80	./tests/src/test_dbhdlpostgre.cpp
+1	1	1	5	3	./tests/src/test_datatypes.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_datatypes.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_datatypes.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_datatypes.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_datatypes.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_datatypes.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_datatypes.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_datatypes.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_datatypes.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_datatypes.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_datatypes.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_datatypes.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_datatypes.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_datatypes.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_datatypes.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_datatypes.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_datatypes.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/src/test_datatypes.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/src/test_datatypes.cpp(77): TestQPF::TEST_F
+1	1	1	81	3	./tests/src/test_datatypes.cpp(81): TestQPF::TEST_F
+1	1	1	85	3	./tests/src/test_datatypes.cpp(85): TestQPF::TEST_F
+1	1	1	89	3	./tests/src/test_datatypes.cpp(89): TestQPF::TEST_F
+1	1	1	93	3	./tests/src/test_datatypes.cpp(93): TestQPF::TEST_F
+1	1	1	97	3	./tests/src/test_datatypes.cpp(97): TestQPF::TEST_F
+1	1	1	101	3	./tests/src/test_datatypes.cpp(101): TestQPF::TEST_F
+1	1	1	105	3	./tests/src/test_datatypes.cpp(105): TestQPF::TEST_F
+1	1	1	109	3	./tests/src/test_datatypes.cpp(109): TestQPF::TEST_F
+1	1	1	113	3	./tests/src/test_datatypes.cpp(113): TestQPF::TEST_F
+1	1	1	117	3	./tests/src/test_datatypes.cpp(117): TestQPF::TEST_F
+1	1	1	121	3	./tests/src/test_datatypes.cpp(121): TestQPF::TEST_F
+1	1	1	125	3	./tests/src/test_datatypes.cpp(125): TestQPF::TEST_F
+1	1	1	129	3	./tests/src/test_datatypes.cpp(129): TestQPF::TEST_F
+1	1	1	133	3	./tests/src/test_datatypes.cpp(133): TestQPF::TEST_F
+1	1	1	137	3	./tests/src/test_datatypes.cpp(137): TestQPF::TEST_F
+1	1	1	141	3	./tests/src/test_datatypes.cpp(141): TestQPF::TEST_F
+1	1	2	146	5	./tests/src/test_datatypes.cpp(146): TestQPF::TEST_F
+1	1	2	152	5	./tests/src/test_datatypes.cpp(152): TestQPF::TEST_F
+1	1	2	158	5	./tests/src/test_datatypes.cpp(158): TestQPF::TEST_F
+1	1	2	164	5	./tests/src/test_datatypes.cpp(164): TestQPF::TEST_F
+1	1	2	170	5	./tests/src/test_datatypes.cpp(170): TestQPF::TEST_F
+1	1	2	176	5	./tests/src/test_datatypes.cpp(176): TestQPF::TEST_F
+1	1	2	182	5	./tests/src/test_datatypes.cpp(182): TestQPF::TEST_F
+1	1	2	188	5	./tests/src/test_datatypes.cpp(188): TestQPF::TEST_F
+1	1	2	194	5	./tests/src/test_datatypes.cpp(194): TestQPF::TEST_F
+1	1	2	200	5	./tests/src/test_datatypes.cpp(200): TestQPF::TEST_F
+1	1	2	206	5	./tests/src/test_datatypes.cpp(206): TestQPF::TEST_F
+1	1	2	212	5	./tests/src/test_datatypes.cpp(212): TestQPF::TEST_F
+1	1	2	218	5	./tests/src/test_datatypes.cpp(218): TestQPF::TEST_F
+1	1	2	224	5	./tests/src/test_datatypes.cpp(224): TestQPF::TEST_F
+49	49	64	1	230	./tests/src/test_datatypes.cpp
+1	1	1	5	3	./tests/src/test_filetransfer.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_filetransfer.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_filetransfer.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_filetransfer.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_filetransfer.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_filetransfer.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_filetransfer.cpp(29): TestQPF::TEST_F
+1	1	2	34	5	./tests/src/test_filetransfer.cpp(34): TestQPF::TEST_F
+8	8	10	1	40	./tests/src/test_filetransfer.cpp
+1	1	0	18	1	./tests/src/test_procelem.h(18): TestQPF::TestProcessingElement::TestProcessingElement
+1	1	0	21	1	./tests/src/test_procelem.h(21): TestQPF::TestProcessingElement::~TestProcessingElement
+1	1	0	28	1	./tests/src/test_procelem.h(28): TestQPF::TestProcessingElement::SetUp
+1	1	0	32	1	./tests/src/test_procelem.h(32): TestQPF::TestProcessingElement::TearDown
+1	1	0	45	1	./tests/src/test_procelem.h(45): TestQPF::TestProcessingElementExit::TestProcessingElementExit
+1	1	0	48	1	./tests/src/test_procelem.h(48): TestQPF::TestProcessingElementExit::~TestProcessingElementExit
+1	1	0	55	1	./tests/src/test_procelem.h(55): TestQPF::TestProcessingElementExit::SetUp
+1	1	0	59	1	./tests/src/test_procelem.h(59): TestQPF::TestProcessingElementExit::TearDown
+8	8	0	1	66	./tests/src/test_procelem.h
+1	1	0	18	1	./tests/src/test_filenamespec.h(18): TestQPF::TestFileNameSpec::TestFileNameSpec
+1	1	0	21	1	./tests/src/test_filenamespec.h(21): TestQPF::TestFileNameSpec::~TestFileNameSpec
+1	1	0	28	1	./tests/src/test_filenamespec.h(28): TestQPF::TestFileNameSpec::SetUp
+1	1	0	32	1	./tests/src/test_filenamespec.h(32): TestQPF::TestFileNameSpec::TearDown
+1	1	0	45	1	./tests/src/test_filenamespec.h(45): TestQPF::TestFileNameSpecExit::TestFileNameSpecExit
+1	1	0	48	1	./tests/src/test_filenamespec.h(48): TestQPF::TestFileNameSpecExit::~TestFileNameSpecExit
+1	1	0	55	1	./tests/src/test_filenamespec.h(55): TestQPF::TestFileNameSpecExit::SetUp
+1	1	0	59	1	./tests/src/test_filenamespec.h(59): TestQPF::TestFileNameSpecExit::TearDown
+8	8	0	1	66	./tests/src/test_filenamespec.h
+1	1	1	5	3	./tests/src/test_taskmng.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_taskmng.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_taskmng.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_taskmng.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_taskmng.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_taskmng.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_taskmng.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_taskmng.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_taskmng.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_taskmng.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_taskmng.cpp(45): TestQPF::TEST_F
+1	1	2	50	5	./tests/src/test_taskmng.cpp(50): TestQPF::TEST_F
+12	12	14	1	56	./tests/src/test_taskmng.cpp
+1	1	1	5	3	./tests/src/test_datamng.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_datamng.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_datamng.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_datamng.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_datamng.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_datamng.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_datamng.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_datamng.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_datamng.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_datamng.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_datamng.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_datamng.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_datamng.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_datamng.cpp(57): TestQPF::TEST_F
+1	1	2	62	5	./tests/src/test_datamng.cpp(62): TestQPF::TEST_F
+15	15	17	1	68	./tests/src/test_datamng.cpp
+1	1	0	18	1	./tests/src/test_component.h(18): TestQPF::TestComponent::TestComponent
+1	1	0	21	1	./tests/src/test_component.h(21): TestQPF::TestComponent::~TestComponent
+1	1	0	28	1	./tests/src/test_component.h(28): TestQPF::TestComponent::SetUp
+1	1	0	32	1	./tests/src/test_component.h(32): TestQPF::TestComponent::TearDown
+1	1	0	45	1	./tests/src/test_component.h(45): TestQPF::TestComponentExit::TestComponentExit
+1	1	0	48	1	./tests/src/test_component.h(48): TestQPF::TestComponentExit::~TestComponentExit
+1	1	0	55	1	./tests/src/test_component.h(55): TestQPF::TestComponentExit::SetUp
+1	1	0	59	1	./tests/src/test_component.h(59): TestQPF::TestComponentExit::TearDown
+8	8	0	1	66	./tests/src/test_component.h
+1	1	1	5	3	./tests/src/test_except.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_except.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_except.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_except.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_except.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_except.cpp(25): TestQPF::TEST_F
+1	1	2	30	5	./tests/src/test_except.cpp(30): TestQPF::TEST_F
+1	1	2	36	5	./tests/src/test_except.cpp(36): TestQPF::TEST_F
+1	1	2	42	5	./tests/src/test_except.cpp(42): TestQPF::TEST_F
+1	1	2	48	5	./tests/src/test_except.cpp(48): TestQPF::TEST_F
+10	10	15	1	54	./tests/src/test_except.cpp
+1	1	0	18	1	./tests/src/test_taskmng.h(18): TestQPF::TestTaskManager::TestTaskManager
+1	1	0	21	1	./tests/src/test_taskmng.h(21): TestQPF::TestTaskManager::~TestTaskManager
+1	1	0	28	1	./tests/src/test_taskmng.h(28): TestQPF::TestTaskManager::SetUp
+1	1	0	32	1	./tests/src/test_taskmng.h(32): TestQPF::TestTaskManager::TearDown
+1	1	0	45	1	./tests/src/test_taskmng.h(45): TestQPF::TestTaskManagerExit::TestTaskManagerExit
+1	1	0	48	1	./tests/src/test_taskmng.h(48): TestQPF::TestTaskManagerExit::~TestTaskManagerExit
+1	1	0	55	1	./tests/src/test_taskmng.h(55): TestQPF::TestTaskManagerExit::SetUp
+1	1	0	59	1	./tests/src/test_taskmng.h(59): TestQPF::TestTaskManagerExit::TearDown
+8	8	0	1	66	./tests/src/test_taskmng.h
+1	1	1	5	3	./tests/src/test_str.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_str.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_str.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_str.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_str.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_str.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_str.cpp(29): TestQPF::TEST_F
+7	7	8	1	33	./tests/src/test_str.cpp
+1	1	0	18	1	./tests/src/test_urlhdl.h(18): TestQPF::TestURLHandler::TestURLHandler
+1	1	0	21	1	./tests/src/test_urlhdl.h(21): TestQPF::TestURLHandler::~TestURLHandler
+1	1	0	28	1	./tests/src/test_urlhdl.h(28): TestQPF::TestURLHandler::SetUp
+1	1	0	32	1	./tests/src/test_urlhdl.h(32): TestQPF::TestURLHandler::TearDown
+1	1	0	45	1	./tests/src/test_urlhdl.h(45): TestQPF::TestURLHandlerExit::TestURLHandlerExit
+1	1	0	48	1	./tests/src/test_urlhdl.h(48): TestQPF::TestURLHandlerExit::~TestURLHandlerExit
+1	1	0	55	1	./tests/src/test_urlhdl.h(55): TestQPF::TestURLHandlerExit::SetUp
+1	1	0	59	1	./tests/src/test_urlhdl.h(59): TestQPF::TestURLHandlerExit::TearDown
+8	8	0	1	66	./tests/src/test_urlhdl.h
+1	1	0	18	1	./tests/src/test_logmng.h(18): TestQPF::TestLogManager::TestLogManager
+1	1	0	21	1	./tests/src/test_logmng.h(21): TestQPF::TestLogManager::~TestLogManager
+1	1	0	28	1	./tests/src/test_logmng.h(28): TestQPF::TestLogManager::SetUp
+1	1	0	32	1	./tests/src/test_logmng.h(32): TestQPF::TestLogManager::TearDown
+1	1	0	45	1	./tests/src/test_logmng.h(45): TestQPF::TestLogManagerExit::TestLogManagerExit
+1	1	0	48	1	./tests/src/test_logmng.h(48): TestQPF::TestLogManagerExit::~TestLogManagerExit
+1	1	0	55	1	./tests/src/test_logmng.h(55): TestQPF::TestLogManagerExit::SetUp
+1	1	0	59	1	./tests/src/test_logmng.h(59): TestQPF::TestLogManagerExit::TearDown
+8	8	0	1	66	./tests/src/test_logmng.h
+1	1	1	5	3	./tests/src/test_evtmng.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_evtmng.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_evtmng.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_evtmng.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_evtmng.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_evtmng.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_evtmng.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_evtmng.cpp(33): TestQPF::TEST_F
+1	1	2	38	5	./tests/src/test_evtmng.cpp(38): TestQPF::TEST_F
+9	9	11	1	44	./tests/src/test_evtmng.cpp
+1	1	1	5	3	./tests/src/test_taskagent.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_taskagent.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_taskagent.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_taskagent.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_taskagent.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_taskagent.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_taskagent.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_taskagent.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_taskagent.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_taskagent.cpp(41): TestQPF::TEST_F
+1	1	2	46	5	./tests/src/test_taskagent.cpp(46): TestQPF::TEST_F
+11	11	13	1	52	./tests/src/test_taskagent.cpp
+1	1	0	18	1	./tests/src/test_filetransfer.h(18): TestQPF::TestFileTransfer::TestFileTransfer
+1	1	0	21	1	./tests/src/test_filetransfer.h(21): TestQPF::TestFileTransfer::~TestFileTransfer
+1	1	0	28	1	./tests/src/test_filetransfer.h(28): TestQPF::TestFileTransfer::SetUp
+1	1	0	32	1	./tests/src/test_filetransfer.h(32): TestQPF::TestFileTransfer::TearDown
+1	1	0	45	1	./tests/src/test_filetransfer.h(45): TestQPF::TestFileTransferExit::TestFileTransferExit
+1	1	0	48	1	./tests/src/test_filetransfer.h(48): TestQPF::TestFileTransferExit::~TestFileTransferExit
+1	1	0	55	1	./tests/src/test_filetransfer.h(55): TestQPF::TestFileTransferExit::SetUp
+1	1	0	59	1	./tests/src/test_filetransfer.h(59): TestQPF::TestFileTransferExit::TearDown
+8	8	0	1	66	./tests/src/test_filetransfer.h
+1	1	0	18	1	./tests/src/test_taskorc.h(18): TestQPF::TestTaskOrchestrator::TestTaskOrchestrator
+1	1	0	21	1	./tests/src/test_taskorc.h(21): TestQPF::TestTaskOrchestrator::~TestTaskOrchestrator
+1	1	0	28	1	./tests/src/test_taskorc.h(28): TestQPF::TestTaskOrchestrator::SetUp
+1	1	0	32	1	./tests/src/test_taskorc.h(32): TestQPF::TestTaskOrchestrator::TearDown
+1	1	0	45	1	./tests/src/test_taskorc.h(45): TestQPF::TestTaskOrchestratorExit::TestTaskOrchestratorExit
+1	1	0	48	1	./tests/src/test_taskorc.h(48): TestQPF::TestTaskOrchestratorExit::~TestTaskOrchestratorExit
+1	1	0	55	1	./tests/src/test_taskorc.h(55): TestQPF::TestTaskOrchestratorExit::SetUp
+1	1	0	59	1	./tests/src/test_taskorc.h(59): TestQPF::TestTaskOrchestratorExit::TearDown
+8	8	0	1	66	./tests/src/test_taskorc.h
+1	1	1	5	3	./tests/src/test_urlhdl.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_urlhdl.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_urlhdl.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_urlhdl.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_urlhdl.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_urlhdl.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_urlhdl.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_urlhdl.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_urlhdl.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_urlhdl.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_urlhdl.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_urlhdl.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_urlhdl.cpp(53): TestQPF::TEST_F
+1	1	2	58	5	./tests/src/test_urlhdl.cpp(58): TestQPF::TEST_F
+14	14	16	1	64	./tests/src/test_urlhdl.cpp
+1	1	0	18	1	./tests/src/test_except.h(18): TestQPF::TestError::TestError
+1	1	0	21	1	./tests/src/test_except.h(21): TestQPF::TestError::~TestError
+1	1	0	28	1	./tests/src/test_except.h(28): TestQPF::TestError::SetUp
+1	1	0	32	1	./tests/src/test_except.h(32): TestQPF::TestError::TearDown
+1	1	0	44	1	./tests/src/test_except.h(44): TestQPF::TestErrorExit::TestErrorExit
+1	1	0	47	1	./tests/src/test_except.h(47): TestQPF::TestErrorExit::~TestErrorExit
+1	1	0	54	1	./tests/src/test_except.h(54): TestQPF::TestErrorExit::SetUp
+1	1	0	58	1	./tests/src/test_except.h(58): TestQPF::TestErrorExit::TearDown
+1	1	0	70	1	./tests/src/test_except.h(70): TestQPF::TestException::TestException
+1	1	0	73	1	./tests/src/test_except.h(73): TestQPF::TestException::~TestException
+1	1	0	80	1	./tests/src/test_except.h(80): TestQPF::TestException::SetUp
+1	1	0	84	1	./tests/src/test_except.h(84): TestQPF::TestException::TearDown
+1	1	0	96	1	./tests/src/test_except.h(96): TestQPF::TestExceptionExit::TestExceptionExit
+1	1	0	99	1	./tests/src/test_except.h(99): TestQPF::TestExceptionExit::~TestExceptionExit
+1	1	0	106	1	./tests/src/test_except.h(106): TestQPF::TestExceptionExit::SetUp
+1	1	0	110	1	./tests/src/test_except.h(110): TestQPF::TestExceptionExit::TearDown
+1	1	0	122	1	./tests/src/test_except.h(122): TestQPF::TestLogicException::TestLogicException
+1	1	0	125	1	./tests/src/test_except.h(125): TestQPF::TestLogicException::~TestLogicException
+1	1	0	132	1	./tests/src/test_except.h(132): TestQPF::TestLogicException::SetUp
+1	1	0	136	1	./tests/src/test_except.h(136): TestQPF::TestLogicException::TearDown
+1	1	0	148	1	./tests/src/test_except.h(148): TestQPF::TestLogicExceptionExit::TestLogicExceptionExit
+1	1	0	151	1	./tests/src/test_except.h(151): TestQPF::TestLogicExceptionExit::~TestLogicExceptionExit
+1	1	0	158	1	./tests/src/test_except.h(158): TestQPF::TestLogicExceptionExit::SetUp
+1	1	0	162	1	./tests/src/test_except.h(162): TestQPF::TestLogicExceptionExit::TearDown
+1	1	0	174	1	./tests/src/test_except.h(174): TestQPF::TestRuntimeException::TestRuntimeException
+1	1	0	177	1	./tests/src/test_except.h(177): TestQPF::TestRuntimeException::~TestRuntimeException
+1	1	0	184	1	./tests/src/test_except.h(184): TestQPF::TestRuntimeException::SetUp
+1	1	0	188	1	./tests/src/test_except.h(188): TestQPF::TestRuntimeException::TearDown
+1	1	0	200	1	./tests/src/test_except.h(200): TestQPF::TestRuntimeExceptionExit::TestRuntimeExceptionExit
+1	1	0	203	1	./tests/src/test_except.h(203): TestQPF::TestRuntimeExceptionExit::~TestRuntimeExceptionExit
+1	1	0	210	1	./tests/src/test_except.h(210): TestQPF::TestRuntimeExceptionExit::SetUp
+1	1	0	214	1	./tests/src/test_except.h(214): TestQPF::TestRuntimeExceptionExit::TearDown
+32	32	-6	1	221	./tests/src/test_except.h
+1	1	1	5	3	./tests/src/test_cfginfo.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_cfginfo.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_cfginfo.cpp(13): TestQPF::TEST_F
+1	1	2	18	5	./tests/src/test_cfginfo.cpp(18): TestQPF::TEST_F
+4	4	6	1	24	./tests/src/test_cfginfo.cpp
+1	1	1	5	3	./tests/src/test_procelem.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_procelem.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_procelem.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_procelem.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_procelem.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_procelem.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_procelem.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_procelem.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_procelem.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_procelem.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_procelem.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_procelem.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_procelem.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_procelem.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_procelem.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_procelem.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_procelem.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/src/test_procelem.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/src/test_procelem.cpp(77): TestQPF::TEST_F
+1	1	1	81	3	./tests/src/test_procelem.cpp(81): TestQPF::TEST_F
+1	1	1	85	3	./tests/src/test_procelem.cpp(85): TestQPF::TEST_F
+1	1	2	90	5	./tests/src/test_procelem.cpp(90): TestQPF::TEST_F
+22	22	24	1	96	./tests/src/test_procelem.cpp
+1	1	0	18	1	./tests/src/test_uuid.h(18): TestQPF::TestUUID::TestUUID
+1	1	0	21	1	./tests/src/test_uuid.h(21): TestQPF::TestUUID::~TestUUID
+1	1	0	28	1	./tests/src/test_uuid.h(28): TestQPF::TestUUID::SetUp
+1	1	0	32	1	./tests/src/test_uuid.h(32): TestQPF::TestUUID::TearDown
+1	1	0	45	1	./tests/src/test_uuid.h(45): TestQPF::TestUUIDExit::TestUUIDExit
+1	1	0	48	1	./tests/src/test_uuid.h(48): TestQPF::TestUUIDExit::~TestUUIDExit
+1	1	0	55	1	./tests/src/test_uuid.h(55): TestQPF::TestUUIDExit::SetUp
+1	1	0	59	1	./tests/src/test_uuid.h(59): TestQPF::TestUUIDExit::TearDown
+8	8	0	1	66	./tests/src/test_uuid.h
+1	1	0	18	1	./tests/src/test_evtmng.h(18): TestQPF::TestEventManager::TestEventManager
+1	1	0	21	1	./tests/src/test_evtmng.h(21): TestQPF::TestEventManager::~TestEventManager
+1	1	0	28	1	./tests/src/test_evtmng.h(28): TestQPF::TestEventManager::SetUp
+1	1	0	32	1	./tests/src/test_evtmng.h(32): TestQPF::TestEventManager::TearDown
+1	1	0	45	1	./tests/src/test_evtmng.h(45): TestQPF::TestEventManagerExit::TestEventManagerExit
+1	1	0	48	1	./tests/src/test_evtmng.h(48): TestQPF::TestEventManagerExit::~TestEventManagerExit
+1	1	0	55	1	./tests/src/test_evtmng.h(55): TestQPF::TestEventManagerExit::SetUp
+1	1	0	59	1	./tests/src/test_evtmng.h(59): TestQPF::TestEventManagerExit::TearDown
+8	8	0	1	66	./tests/src/test_evtmng.h
+1	1	1	5	3	./tests/src/test_uuid.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_uuid.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_uuid.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_uuid.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_uuid.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_uuid.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_uuid.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_uuid.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_uuid.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_uuid.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_uuid.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_uuid.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_uuid.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_uuid.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_uuid.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_uuid.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_uuid.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/src/test_uuid.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/src/test_uuid.cpp(77): TestQPF::TEST_F
+1	1	1	81	3	./tests/src/test_uuid.cpp(81): TestQPF::TEST_F
+1	1	2	86	5	./tests/src/test_uuid.cpp(86): TestQPF::TEST_F
+21	21	23	1	92	./tests/src/test_uuid.cpp
+1	1	0	18	1	./tests/src/test_taskagent.h(18): TestQPF::TestTaskAgent::TestTaskAgent
+1	1	0	21	1	./tests/src/test_taskagent.h(21): TestQPF::TestTaskAgent::~TestTaskAgent
+1	1	0	28	1	./tests/src/test_taskagent.h(28): TestQPF::TestTaskAgent::SetUp
+1	1	0	32	1	./tests/src/test_taskagent.h(32): TestQPF::TestTaskAgent::TearDown
+1	1	0	45	1	./tests/src/test_taskagent.h(45): TestQPF::TestTaskAgentExit::TestTaskAgentExit
+1	1	0	48	1	./tests/src/test_taskagent.h(48): TestQPF::TestTaskAgentExit::~TestTaskAgentExit
+1	1	0	55	1	./tests/src/test_taskagent.h(55): TestQPF::TestTaskAgentExit::SetUp
+1	1	0	59	1	./tests/src/test_taskagent.h(59): TestQPF::TestTaskAgentExit::TearDown
+8	8	0	1	66	./tests/src/test_taskagent.h
+1	1	0	18	1	./tests/src/test_cfginfo.h(18): TestQPF::TestConfigurationInfo::TestConfigurationInfo
+1	1	0	21	1	./tests/src/test_cfginfo.h(21): TestQPF::TestConfigurationInfo::~TestConfigurationInfo
+1	1	0	28	1	./tests/src/test_cfginfo.h(28): TestQPF::TestConfigurationInfo::SetUp
+1	1	0	32	1	./tests/src/test_cfginfo.h(32): TestQPF::TestConfigurationInfo::TearDown
+1	1	0	44	1	./tests/src/test_cfginfo.h(44): TestQPF::TestConfigurationInfoExit::TestConfigurationInfoExit
+1	1	0	47	1	./tests/src/test_cfginfo.h(47): TestQPF::TestConfigurationInfoExit::~TestConfigurationInfoExit
+1	1	0	54	1	./tests/src/test_cfginfo.h(54): TestQPF::TestConfigurationInfoExit::SetUp
+1	1	0	58	1	./tests/src/test_cfginfo.h(58): TestQPF::TestConfigurationInfoExit::TearDown
+8	8	0	1	65	./tests/src/test_cfginfo.h
+1	1	0	18	1	./tests/src/test_datamng.h(18): TestQPF::TestDataManager::TestDataManager
+1	1	0	21	1	./tests/src/test_datamng.h(21): TestQPF::TestDataManager::~TestDataManager
+1	1	0	28	1	./tests/src/test_datamng.h(28): TestQPF::TestDataManager::SetUp
+1	1	0	32	1	./tests/src/test_datamng.h(32): TestQPF::TestDataManager::TearDown
+1	1	0	45	1	./tests/src/test_datamng.h(45): TestQPF::TestDataManagerExit::TestDataManagerExit
+1	1	0	48	1	./tests/src/test_datamng.h(48): TestQPF::TestDataManagerExit::~TestDataManagerExit
+1	1	0	55	1	./tests/src/test_datamng.h(55): TestQPF::TestDataManagerExit::SetUp
+1	1	0	59	1	./tests/src/test_datamng.h(59): TestQPF::TestDataManagerExit::TearDown
+8	8	0	1	66	./tests/src/test_datamng.h
+1	1	1	5	3	./tests/src/test_taskorc.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_taskorc.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_taskorc.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_taskorc.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_taskorc.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_taskorc.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_taskorc.cpp(29): TestQPF::TEST_F
+1	1	2	34	5	./tests/src/test_taskorc.cpp(34): TestQPF::TEST_F
+8	8	10	1	40	./tests/src/test_taskorc.cpp
+1	1	1	5	3	./tests/src/test_filenamespec.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_filenamespec.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_filenamespec.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_filenamespec.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_filenamespec.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_filenamespec.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_filenamespec.cpp(29): TestQPF::TEST_F
+1	1	2	34	5	./tests/src/test_filenamespec.cpp(34): TestQPF::TEST_F
+8	8	10	1	40	./tests/src/test_filenamespec.cpp
+1	1	1	5	3	./tests/src/test_component.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_component.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_component.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_component.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_component.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_component.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_component.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_component.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_component.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_component.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_component.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_component.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_component.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_component.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_component.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_component.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_component.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/src/test_component.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/src/test_component.cpp(77): TestQPF::TEST_F
+1	1	2	82	5	./tests/src/test_component.cpp(82): TestQPF::TEST_F
+20	20	22	1	88	./tests/src/test_component.cpp
+0	0	1	1	11	./tests/src/test_dbg.h
+1	1	0	18	1	./tests/src/test_dbhdlpostgre.h(18): TestQPF::TestDBHdlPostgreSQL::TestDBHdlPostgreSQL
+1	1	0	21	1	./tests/src/test_dbhdlpostgre.h(21): TestQPF::TestDBHdlPostgreSQL::~TestDBHdlPostgreSQL
+1	1	0	28	1	./tests/src/test_dbhdlpostgre.h(28): TestQPF::TestDBHdlPostgreSQL::SetUp
+1	1	0	32	1	./tests/src/test_dbhdlpostgre.h(32): TestQPF::TestDBHdlPostgreSQL::TearDown
+1	1	0	45	1	./tests/src/test_dbhdlpostgre.h(45): TestQPF::TestDBHdlPostgreSQLExit::TestDBHdlPostgreSQLExit
+1	1	0	48	1	./tests/src/test_dbhdlpostgre.h(48): TestQPF::TestDBHdlPostgreSQLExit::~TestDBHdlPostgreSQLExit
+1	1	0	55	1	./tests/src/test_dbhdlpostgre.h(55): TestQPF::TestDBHdlPostgreSQLExit::SetUp
+1	1	0	59	1	./tests/src/test_dbhdlpostgre.h(59): TestQPF::TestDBHdlPostgreSQLExit::TearDown
+8	8	0	1	66	./tests/src/test_dbhdlpostgre.h
+1	1	1	5	3	./tests/src/test_config.cpp(5): TestQPF::TEST_F
+1	1	1	9	3	./tests/src/test_config.cpp(9): TestQPF::TEST_F
+1	1	1	13	3	./tests/src/test_config.cpp(13): TestQPF::TEST_F
+1	1	1	17	3	./tests/src/test_config.cpp(17): TestQPF::TEST_F
+1	1	1	21	3	./tests/src/test_config.cpp(21): TestQPF::TEST_F
+1	1	1	25	3	./tests/src/test_config.cpp(25): TestQPF::TEST_F
+1	1	1	29	3	./tests/src/test_config.cpp(29): TestQPF::TEST_F
+1	1	1	33	3	./tests/src/test_config.cpp(33): TestQPF::TEST_F
+1	1	1	37	3	./tests/src/test_config.cpp(37): TestQPF::TEST_F
+1	1	1	41	3	./tests/src/test_config.cpp(41): TestQPF::TEST_F
+1	1	1	45	3	./tests/src/test_config.cpp(45): TestQPF::TEST_F
+1	1	1	49	3	./tests/src/test_config.cpp(49): TestQPF::TEST_F
+1	1	1	53	3	./tests/src/test_config.cpp(53): TestQPF::TEST_F
+1	1	1	57	3	./tests/src/test_config.cpp(57): TestQPF::TEST_F
+1	1	1	61	3	./tests/src/test_config.cpp(61): TestQPF::TEST_F
+1	1	1	65	3	./tests/src/test_config.cpp(65): TestQPF::TEST_F
+1	1	1	69	3	./tests/src/test_config.cpp(69): TestQPF::TEST_F
+1	1	1	73	3	./tests/src/test_config.cpp(73): TestQPF::TEST_F
+1	1	1	77	3	./tests/src/test_config.cpp(77): TestQPF::TEST_F
+1	1	1	81	3	./tests/src/test_config.cpp(81): TestQPF::TEST_F
+1	1	1	85	3	./tests/src/test_config.cpp(85): TestQPF::TEST_F
+1	1	1	89	3	./tests/src/test_config.cpp(89): TestQPF::TEST_F
+1	1	1	93	3	./tests/src/test_config.cpp(93): TestQPF::TEST_F
+1	1	1	97	3	./tests/src/test_config.cpp(97): TestQPF::TEST_F
+1	1	2	102	5	./tests/src/test_config.cpp(102): TestQPF::TEST_F
+25	25	27	1	108	./tests/src/test_config.cpp
+1	1	0	18	1	./tests/src/test_config.h(18): TestQPF::TestConfiguration::TestConfiguration
+1	1	0	21	1	./tests/src/test_config.h(21): TestQPF::TestConfiguration::~TestConfiguration
+1	1	0	28	1	./tests/src/test_config.h(28): TestQPF::TestConfiguration::SetUp
+1	1	0	32	1	./tests/src/test_config.h(32): TestQPF::TestConfiguration::TearDown
+1	1	0	45	1	./tests/src/test_config.h(45): TestQPF::TestConfigurationExit::TestConfigurationExit
+1	1	0	48	1	./tests/src/test_config.h(48): TestQPF::TestConfigurationExit::~TestConfigurationExit
+1	1	0	55	1	./tests/src/test_config.h(55): TestQPF::TestConfigurationExit::SetUp
+1	1	0	59	1	./tests/src/test_config.h(59): TestQPF::TestConfigurationExit::TearDown
+8	8	0	1	66	./tests/src/test_config.h
+0	0	1	1	6	./tests/src/test_dbg.cpp
+1	1	2	3	5	./tests/main.cpp(3): main
+1	1	3	1	7	./tests/main.cpp
+0	0	1	1	39	./tests/libcomm/test_r2rpeer.h
+0	0	1	1	39	./tests/libcomm/test_thread.h
+1	1	0	18	1	./tests/libcomm/test_log.h(18): LibCommTests::TestLog::TestLog
+1	1	0	21	1	./tests/libcomm/test_log.h(21): LibCommTests::TestLog::~TestLog
+1	1	0	28	1	./tests/libcomm/test_log.h(28): LibCommTests::TestLog::SetUp
+1	1	0	32	1	./tests/libcomm/test_log.h(32): LibCommTests::TestLog::TearDown
+1	1	0	44	1	./tests/libcomm/test_log.h(44): LibCommTests::TestLogExit::TestLogExit
+1	1	0	47	1	./tests/libcomm/test_log.h(47): LibCommTests::TestLogExit::~TestLogExit
+1	1	0	54	1	./tests/libcomm/test_log.h(54): LibCommTests::TestLogExit::SetUp
+1	1	0	58	1	./tests/libcomm/test_log.h(58): LibCommTests::TestLogExit::TearDown
+8	8	0	1	65	./tests/libcomm/test_log.h
+1	1	0	7	4	./tests/libcomm/test_statem.cpp(7): LibCommTests::TestStateMachine::TestStateMachine
+1	1	0	12	4	./tests/libcomm/test_statem.cpp(12): LibCommTests::TestStateMachine::~TestStateMachine
+1	1	6	20	12	./tests/libcomm/test_statem.cpp(20): LibCommTests::TestStateMachine::SetUp
+1	1	0	33	5	./tests/libcomm/test_statem.cpp(33): LibCommTests::TestStateMachine::TearDown
+1	1	3	39	5	./tests/libcomm/test_statem.cpp(39): LibCommTests::TEST_F
+1	1	5	45	7	./tests/libcomm/test_statem.cpp(45): LibCommTests::TEST_F
+1	1	15	53	21	./tests/libcomm/test_statem.cpp(53): LibCommTests::TEST_F
+7	7	30	1	76	./tests/libcomm/test_statem.cpp
+0	0	1	1	39	./tests/libcomm/test_tools.h
+1	1	2	17	4	./tests/libcomm/test_statem.h(17): LibCommTests::TestStateMachine::MyStateMachine::MyStateMachine
+1	1	1	22	2	./tests/libcomm/test_statem.h(22): LibCommTests::TestStateMachine::MyStateMachine::defState
+1	1	1	25	2	./tests/libcomm/test_statem.h(25): LibCommTests::TestStateMachine::MyStateMachine::defValidTransition
+3	3	4	1	58	./tests/libcomm/test_statem.h
+1	1	0	7	4	./tests/libcomm/test_commnode.cpp(7): LibCommTests::TestCommNode::TestCommNode
+1	1	0	12	4	./tests/libcomm/test_commnode.cpp(12): LibCommTests::TestCommNode::~TestCommNode
+1	1	0	20	5	./tests/libcomm/test_commnode.cpp(20): LibCommTests::TestCommNode::SetUp
+1	1	0	26	5	./tests/libcomm/test_commnode.cpp(26): LibCommTests::TestCommNode::TearDown
+1	1	3	33	5	./tests/libcomm/test_commnode.cpp(33): LibCommTests::TEST_F
+1	1	1	40	4	./tests/libcomm/test_commnode.cpp(40): LibCommTests::TEST_F
+6	6	5	1	46	./tests/libcomm/test_commnode.cpp
+1	1	1	8	3	./tests/libcomm/test_tools.cpp(8): getUSecs
+1	1	0	14	4	./tests/libcomm/test_tools.cpp(14): LibCommTests::TestTools::TestTools
+1	1	0	19	4	./tests/libcomm/test_tools.cpp(19): LibCommTests::TestTools::~TestTools
+1	1	0	27	5	./tests/libcomm/test_tools.cpp(27): LibCommTests::TestTools::SetUp
+1	1	0	33	5	./tests/libcomm/test_tools.cpp(33): LibCommTests::TestTools::TearDown
+1	1	24	39	42	./tests/libcomm/test_tools.cpp(39): LibCommTests::TEST_F
+1	1	20	82	36	./tests/libcomm/test_tools.cpp(82): LibCommTests::TEST_F
+2	2	13	119	23	./tests/libcomm/test_tools.cpp(119): LibCommTests::TEST_F
+1	1	8	143	12	./tests/libcomm/test_tools.cpp(143): LibCommTests::TEST_F
+1	1	6	156	11	./tests/libcomm/test_tools.cpp(156): LibCommTests::TEST_F
+1	1	16	168	22	./tests/libcomm/test_tools.cpp(168): LibCommTests::TEST_F
+1	1	19	191	27	./tests/libcomm/test_tools.cpp(191): LibCommTests::TEST_F
+1	1	4	219	7	./tests/libcomm/test_tools.cpp(219): LibCommTests::TEST_F
+14	14	113	1	227	./tests/libcomm/test_tools.cpp
+1	1	2	16	5	./tests/libcomm/test_log.cpp(16): LibCommTests::ignoreline
+3	3	10	22	16	./tests/libcomm/test_log.cpp(22): LibCommTests::getLastLine
+1	1	4	39	6	./tests/libcomm/test_log.cpp(39): LibCommTests::TEST_F
+1	1	5	46	8	./tests/libcomm/test_log.cpp(46): LibCommTests::TEST_F
+2	2	16	55	20	./tests/libcomm/test_log.cpp(55): LibCommTests::TEST_F
+2	2	13	76	15	./tests/libcomm/test_log.cpp(76): LibCommTests::TEST_F
+1	1	12	92	16	./tests/libcomm/test_log.cpp(92): LibCommTests::TEST_F
+1	1	2	109	5	./tests/libcomm/test_log.cpp(109): LibCommTests::TEST_F
+12	12	66	1	116	./tests/libcomm/test_log.cpp
+1	1	0	7	4	./tests/libcomm/test_thread.cpp(7): LibCommTests::TestThread::TestThread
+1	1	0	12	4	./tests/libcomm/test_thread.cpp(12): LibCommTests::TestThread::~TestThread
+1	1	0	20	5	./tests/libcomm/test_thread.cpp(20): LibCommTests::TestThread::SetUp
+1	1	0	26	5	./tests/libcomm/test_thread.cpp(26): LibCommTests::TestThread::TearDown
+1	1	3	33	5	./tests/libcomm/test_thread.cpp(33): LibCommTests::TEST_F
+1	1	1	40	4	./tests/libcomm/test_thread.cpp(40): LibCommTests::TEST_F
+6	6	5	1	46	./tests/libcomm/test_thread.cpp
+0	0	1	1	39	./tests/libcomm/test_commnode.h
+1	1	0	7	4	./tests/libcomm/test_r2rpeer.cpp(7): LibCommTests::TestRouter2RouterPeer::TestRouter2RouterPeer
+1	1	0	12	4	./tests/libcomm/test_r2rpeer.cpp(12): LibCommTests::TestRouter2RouterPeer::~TestRouter2RouterPeer
+1	1	0	20	5	./tests/libcomm/test_r2rpeer.cpp(20): LibCommTests::TestRouter2RouterPeer::SetUp
+1	1	0	26	5	./tests/libcomm/test_r2rpeer.cpp(26): LibCommTests::TestRouter2RouterPeer::TearDown
+1	1	3	33	5	./tests/libcomm/test_r2rpeer.cpp(33): LibCommTests::TEST_F
+1	1	1	40	4	./tests/libcomm/test_r2rpeer.cpp(40): LibCommTests::TEST_F
+6	6	5	1	46	./tests/libcomm/test_r2rpeer.cpp
+1	1	10	7	15	./tests/sdc/test_array.cpp(7): TestSDC::TEST_F
+1	1	11	23	17	./tests/sdc/test_array.cpp(23): TestSDC::TEST_F
+2	2	22	1	41	./tests/sdc/test_array.cpp
+1	1	0	18	1	./tests/sdc/test_value.h(18): TestSDC::TestValue::TestValue
+1	1	0	21	1	./tests/sdc/test_value.h(21): TestSDC::TestValue::~TestValue
+1	1	0	28	1	./tests/sdc/test_value.h(28): TestSDC::TestValue::SetUp
+1	1	0	32	1	./tests/sdc/test_value.h(32): TestSDC::TestValue::TearDown
+1	1	0	45	1	./tests/sdc/test_value.h(45): TestSDC::TestValueExit::TestValueExit
+1	1	0	48	1	./tests/sdc/test_value.h(48): TestSDC::TestValueExit::~TestValueExit
+1	1	0	55	1	./tests/sdc/test_value.h(55): TestSDC::TestValueExit::SetUp
+1	1	0	59	1	./tests/sdc/test_value.h(59): TestSDC::TestValueExit::TearDown
+8	8	0	1	66	./tests/sdc/test_value.h
+1	1	0	18	1	./tests/sdc/test_valueiojsoncpp.h(18): TestSDC::TestValueIOJsonCpp::TestValueIOJsonCpp
+1	1	0	21	1	./tests/sdc/test_valueiojsoncpp.h(21): TestSDC::TestValueIOJsonCpp::~TestValueIOJsonCpp
+1	1	0	28	1	./tests/sdc/test_valueiojsoncpp.h(28): TestSDC::TestValueIOJsonCpp::SetUp
+1	1	0	32	1	./tests/sdc/test_valueiojsoncpp.h(32): TestSDC::TestValueIOJsonCpp::TearDown
+1	1	0	45	1	./tests/sdc/test_valueiojsoncpp.h(45): TestSDC::TestValueIOJsonCppExit::TestValueIOJsonCppExit
+1	1	0	48	1	./tests/sdc/test_valueiojsoncpp.h(48): TestSDC::TestValueIOJsonCppExit::~TestValueIOJsonCppExit
+1	1	0	55	1	./tests/sdc/test_valueiojsoncpp.h(55): TestSDC::TestValueIOJsonCppExit::SetUp
+1	1	0	59	1	./tests/sdc/test_valueiojsoncpp.h(59): TestSDC::TestValueIOJsonCppExit::TearDown
+8	8	0	1	66	./tests/sdc/test_valueiojsoncpp.h
+1	1	0	20	1	./tests/sdc/test_dict.h(20): TestSDC::TestDict::TestDict
+1	1	0	23	1	./tests/sdc/test_dict.h(23): TestSDC::TestDict::~TestDict
+1	1	0	30	1	./tests/sdc/test_dict.h(30): TestSDC::TestDict::SetUp
+1	1	0	34	1	./tests/sdc/test_dict.h(34): TestSDC::TestDict::TearDown
+4	4	1	1	41	./tests/sdc/test_dict.h
+1	1	0	20	1	./tests/sdc/test_array.h(20): TestSDC::TestArray::TestArray
+1	1	0	23	1	./tests/sdc/test_array.h(23): TestSDC::TestArray::~TestArray
+1	1	0	30	1	./tests/sdc/test_array.h(30): TestSDC::TestArray::SetUp
+1	1	0	34	1	./tests/sdc/test_array.h(34): TestSDC::TestArray::TearDown
+4	4	1	1	41	./tests/sdc/test_array.h
+1	1	17	7	23	./tests/sdc/test_dict.cpp(7): TestSDC::TEST_F
+1	1	12	31	18	./tests/sdc/test_dict.cpp(31): TestSDC::TEST_F
+1	1	7	50	13	./tests/sdc/test_dict.cpp(50): TestSDC::TEST_F
+3	3	37	1	64	./tests/sdc/test_dict.cpp
+1	1	1	5	3	./tests/sdc/test_value.cpp(5): TestSDC::TEST_F
+1	1	1	9	3	./tests/sdc/test_value.cpp(9): TestSDC::TEST_F
+1	1	1	13	3	./tests/sdc/test_value.cpp(13): TestSDC::TEST_F
+1	1	1	17	3	./tests/sdc/test_value.cpp(17): TestSDC::TEST_F
+1	1	1	21	3	./tests/sdc/test_value.cpp(21): TestSDC::TEST_F
+1	1	1	25	3	./tests/sdc/test_value.cpp(25): TestSDC::TEST_F
+1	1	1	29	3	./tests/sdc/test_value.cpp(29): TestSDC::TEST_F
+1	1	1	33	3	./tests/sdc/test_value.cpp(33): TestSDC::TEST_F
+1	1	1	37	3	./tests/sdc/test_value.cpp(37): TestSDC::TEST_F
+1	1	1	41	3	./tests/sdc/test_value.cpp(41): TestSDC::TEST_F
+1	1	1	45	3	./tests/sdc/test_value.cpp(45): TestSDC::TEST_F
+1	1	1	49	3	./tests/sdc/test_value.cpp(49): TestSDC::TEST_F
+1	1	1	53	3	./tests/sdc/test_value.cpp(53): TestSDC::TEST_F
+1	1	1	57	3	./tests/sdc/test_value.cpp(57): TestSDC::TEST_F
+1	1	1	61	3	./tests/sdc/test_value.cpp(61): TestSDC::TEST_F
+1	1	1	65	3	./tests/sdc/test_value.cpp(65): TestSDC::TEST_F
+1	1	1	69	3	./tests/sdc/test_value.cpp(69): TestSDC::TEST_F
+1	1	1	73	3	./tests/sdc/test_value.cpp(73): TestSDC::TEST_F
+1	1	1	77	3	./tests/sdc/test_value.cpp(77): TestSDC::TEST_F
+1	1	1	81	3	./tests/sdc/test_value.cpp(81): TestSDC::TEST_F
+1	1	1	85	3	./tests/sdc/test_value.cpp(85): TestSDC::TEST_F
+1	1	1	89	3	./tests/sdc/test_value.cpp(89): TestSDC::TEST_F
+1	1	1	93	3	./tests/sdc/test_value.cpp(93): TestSDC::TEST_F
+1	1	1	97	3	./tests/sdc/test_value.cpp(97): TestSDC::TEST_F
+1	1	1	101	3	./tests/sdc/test_value.cpp(101): TestSDC::TEST_F
+1	1	1	105	3	./tests/sdc/test_value.cpp(105): TestSDC::TEST_F
+1	1	1	109	3	./tests/sdc/test_value.cpp(109): TestSDC::TEST_F
+1	1	1	113	3	./tests/sdc/test_value.cpp(113): TestSDC::TEST_F
+1	1	1	117	3	./tests/sdc/test_value.cpp(117): TestSDC::TEST_F
+1	1	1	121	3	./tests/sdc/test_value.cpp(121): TestSDC::TEST_F
+1	1	1	125	3	./tests/sdc/test_value.cpp(125): TestSDC::TEST_F
+1	1	1	129	3	./tests/sdc/test_value.cpp(129): TestSDC::TEST_F
+1	1	1	133	3	./tests/sdc/test_value.cpp(133): TestSDC::TEST_F
+1	1	1	137	3	./tests/sdc/test_value.cpp(137): TestSDC::TEST_F
+1	1	2	142	5	./tests/sdc/test_value.cpp(142): TestSDC::TEST_F
+35	35	37	1	148	./tests/sdc/test_value.cpp
+1	1	1	5	3	./tests/sdc/test_valueiojsoncpp.cpp(5): TestSDC::TEST_F
+1	1	1	9	3	./tests/sdc/test_valueiojsoncpp.cpp(9): TestSDC::TEST_F
+1	1	1	13	3	./tests/sdc/test_valueiojsoncpp.cpp(13): TestSDC::TEST_F
+1	1	1	17	3	./tests/sdc/test_valueiojsoncpp.cpp(17): TestSDC::TEST_F
+1	1	1	21	3	./tests/sdc/test_valueiojsoncpp.cpp(21): TestSDC::TEST_F
+1	1	1	25	3	./tests/sdc/test_valueiojsoncpp.cpp(25): TestSDC::TEST_F
+1	1	2	30	5	./tests/sdc/test_valueiojsoncpp.cpp(30): TestSDC::TEST_F
+7	7	9	1	36	./tests/sdc/test_valueiojsoncpp.cpp
+0	0	0	1	279	./qpf/deployer.h
+0	0	1	1	54	./qpf/init.h
+1	1	2	41	5	./qpf/main.cpp(41): main
+1	1	3	1	45	./qpf/main.cpp
+3	3	17	61	21	./qpf/deployer.cpp(61): QPF::Deployer::Deployer
+1	1	0	86	3	./qpf/deployer.cpp(86): QPF::Deployer::~Deployer
+1	1	6	99	17	./qpf/deployer.cpp(99): QPF::Deployer::run
+4	9	33	121	49	./qpf/deployer.cpp(121): QPF::Deployer::processCmdLineOpts
+3	3	13	175	28	./qpf/deployer.cpp(175): QPF::Deployer::readConfig
+4	4	21	209	32	./qpf/deployer.cpp(209): QPF::Deployer::launchPeerNodes
+5	5	9	246	17	./qpf/deployer.cpp(246): QPF::Deployer::start
+2	2	5	268	8	./qpf/deployer.cpp(268): QPF::Deployer::cleanUp
+1	1	2	281	5	./qpf/deployer.cpp(281): QPF::Deployer::fexists
+2	2	4	292	6	./qpf/deployer.cpp(292): QPF::Deployer::waitingForGoAhead
+1	1	0	303	3	./qpf/deployer.cpp(303): QPF::Deployer::removeOldFiles
+2	2	2	311	5	./qpf/deployer.cpp(311): QPF::Deployer::existsDir
+29	34	113	1	318	./qpf/deployer.cpp
+3445	3654	10308	n/a	46702	Total
