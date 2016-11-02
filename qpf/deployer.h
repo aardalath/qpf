@@ -2,9 +2,9 @@
  * File:    deployer.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.Deployer
+ * Domain:  QPF.QPF.Deployer
  *
- * Version: 1.0
+ * Version: 1.0.1
  *
  * Date:    2015/07/01
  *

@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.QPF.Deployer
  *
- * Version: 0.0.1
+ * Version: 1.0.1
  *
  * Date:    2015/07/01
  *
@@ -185,7 +185,7 @@ void Deployer::readConfig(const char * configFile)
     assert(existsDir(Configuration::PATHBase));
     assert(existsDir(Configuration::PATHBin));
     std::vector<std::string> runPaths {
-                Configuration::PATHRun,
+                Configuration::PATHSession,
                 Configuration::PATHLog,
                 Configuration::PATHRlog,
                 Configuration::PATHTmp,
@@ -197,7 +197,7 @@ void Deployer::readConfig(const char * configFile)
             exit(EXIT_FAILURE);
         }
     }
-    LibComm::Log::setLogBaseDir(Configuration::PATHRun);
+    LibComm::Log::setLogBaseDir(Configuration::PATHSession);
 }
 
 //----------------------------------------------------------------------

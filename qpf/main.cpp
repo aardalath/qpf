@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.QPF.main
  *
- * Version: 1.0
+ * Version: 1.0.1
  *
  * Date:    2015/07/01
  *
@@ -55,12 +55,12 @@ void sayHello()
         char buf[20];
         sprintf(buf, "%ld", (long)(time(0)));
         buildId = std::string(buf);
-    } 
+    }
     std::string hline("----------------------------------------"
                       "--------------------------------------");
     std::cout << hline << std::endl
             << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
-            << " " << APP_DATE << " - " 
+            << " " << APP_DATE << " - "
             << APP_RELEASE << " Build " << buildId << std::endl
             << hline << std::endl << std::endl;
 }
