@@ -116,6 +116,7 @@ struct StorageLocal {
 
 struct StorageConfig {
     std::string       base;
+    std::string       run;
     std::string       tasks;
     StorageExternal   inbox;
     StorageLocal      local_archive;

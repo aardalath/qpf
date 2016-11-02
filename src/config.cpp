@@ -150,14 +150,15 @@ void Configuration::getGeneralInfo(std::string & appName, std::string & appVer, 
     DBPwd  = cfg["db"]["pwd"].asString();
 
     PATHBase = cfg["storage"]["base"]["path"].asString();
+    PATHRun  = cfg["storage"]["run"]["path"].asString();
 
-    PATHBin  = PATHBase + "/bin";
-    PATHRun  = PATHBase + "/" + LibComm::sessionTag();
-    PATHLog  = PATHRun + "/log";
-    PATHRlog = PATHRun + "/rlog";
-    PATHTmp  = PATHRun + "/tmp";
-    PATHTsk  = PATHRun + "/tsk";
-    PATHMsg  = PATHRun + "/msg";
+    PATHBin     = PATHRun + "/bin";
+    PATHSession = PATHRun + "/" + LibComm::sessionTag();
+    PATHLog     = PATHSession + "/log";
+    PATHRlog    = PATHSession + "/rlog";
+    PATHTmp     = PATHSession + "/tmp";
+    PATHTsk     = PATHSession + "/tsk";
+    PATHMsg     = PATHSession + "/msg";
 }
 
 //----------------------------------------------------------------------
@@ -595,7 +596,7 @@ Component * Configuration::createNewComponent(ConfigurationInfo & cfgInfo,
         component = new TaskOrchestrator(cpeerName);
     } else if (peerType == "taskagent") {
         TaskAgent * ag = new TaskAgent(cpeerName);
-        ag->setSysDir(Configuration::PATHBase);
+        ag->setSysDir(Configuration::PATHRun);
         ag->setWorkDir(Configuration::PATHTsk);
         ag->setAgentAddress(cfgInfo.currentUser + "@" + cfgInfo.currentMachine);
         ag->setMasterAddress(cfgInfo.currentUser + "@" + cfgInfo.masterMachine);
@@ -713,6 +714,7 @@ void Configuration::processConfiguration()
     // Storage areas information
     const Json::Value & stge             = cfg["storage"];
     const Json::Value & stgeBase         = stge["base"];
+    const Json::Value & stgeRun          = stge["run"];
     const Json::Value & stgeIn           = stge["incoming"];
     const Json::Value & stgeLocal        = stge["local_archive"];
     const Json::Value & stgeGatew        = stge["gateway"];
@@ -720,6 +722,7 @@ void Configuration::processConfiguration()
     const Json::Value & stgeOut          = stge["outgoing"];
 
     cfgInfo.storage.base                 = stgeBase["path"].asString();
+    cfgInfo.storage.run                  = stgeRun["path"].asString();
     cfgInfo.storage.local_archive.path   = stgeLocal["path"].asString();
     cfgInfo.storage.gateway.path         = stgeGatew["path"].asString();
 
@@ -866,8 +869,9 @@ std::string Configuration::DBUser;
 std::string Configuration::DBPwd;
 
 std::string Configuration::PATHBase;
-std::string Configuration::PATHBin;
 std::string Configuration::PATHRun;
+std::string Configuration::PATHBin;
+std::string Configuration::PATHSession;
 std::string Configuration::PATHLog;
 std::string Configuration::PATHRlog;
 std::string Configuration::PATHTmp;

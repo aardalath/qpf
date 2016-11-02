@@ -121,6 +121,7 @@ void ConfigurationInfo::dump()
 
     // Storage information
     std::cerr << "storage.base               : " << storage.base << std::endl;
+    std::cerr << "storage.run                : " << storage.run << std::endl;
     std::cerr << "storage.tasks              : " << storage.tasks << std::endl;
     std::cerr << "storage.inbox.protocol     : " << storage.inbox.protocol << std::endl;
     std::cerr << "storage.inbox.address      : " << storage.inbox.address << std::endl;

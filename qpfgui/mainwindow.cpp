@@ -275,10 +275,9 @@ void MainWindow::readConfig(QString dbUrl)
         }
     }
 
-    Log::setLogBaseDir(Configuration::PATHRun);
-/*
-    qDebug() << QString::fromStdString(Configuration::PATHRun);
+    Log::setLogBaseDir(Configuration::PATHSession);
 
+/*
     for (auto & kv : taskAgentsInfo ) {
         qDebug() << kv.first.c_str()
                  << kv.second->name.c_str()

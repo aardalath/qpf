@@ -46,6 +46,29 @@
 
 #include "exttooledit.h"
 
+namespace Ui {
+class ConfigTool;
+}
+
+namespace QPF {
+
+class Model : public QAbstractItemModel {
+};
+
+class StandardItemModel : public QStandardItemModel {
+public:
+    StandardItemModel(int rows, int columns, QObject *parent = Q_NULLPTR) :
+      QStandardItemModel(rows, columns, parent) {}
+    Qt::ItemFlags flags(const QModelIndex&index) const;
+};
+
+class StringListModel : public QStringListModel {
+public:
+    StringListModel(QObject *parent = Q_NULLPTR) :
+      QStringListModel(parent) {}
+    Qt::ItemFlags flags(const QModelIndex&index) const;
+};
+
 class ModelView : public QWidget {
     Q_OBJECT
 public:
@@ -78,12 +101,6 @@ private:
     Type type;
 };
 
-namespace Ui {
-class ConfigTool;
-}
-
-namespace QPF {
-
 class ConfigTool : public QDialog
 {
     Q_OBJECT
@@ -112,9 +129,24 @@ public slots:
     void save();
     void saveAs();
     void apply();
+    void selectBasePath();
     void setWorkingPaths(QString newPath);
 
 private slots:
+    void addHost();
+    void removeHost();
+
+    void addProduct();
+    void removeProduct();
+
+    void addProcessor();
+    void removeProcessor();
+
+    void addRule();
+    void removeRule();
+
+    void removeFromTable(QAbstractItemView * vw, QString item);
+
     void addNewTool();
     void editTool(QModelIndex idx);
     void editTool();
@@ -147,6 +179,8 @@ private:
     MapOfUserDefTools userDefTools;
     MapOfUserDefTools origDefTools;
     QStringList       prodTypes;
+
+    static QMap<QPushButton *, QPair<QAbstractItemView *, ModelView::Type> > signalSender;
 
     static QVector<FlagSt> monitMsgFlags;
 };

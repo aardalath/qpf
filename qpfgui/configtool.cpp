@@ -45,13 +45,41 @@
 using LibComm::join;
 
 #include "exttooledit.h"
+#include "config.h"
 
 #include <QHostInfo>
 #include <QFileInfo>
 #include <QCheckBox>
+#include <qt5/QtWidgets/qabstractitemview.h>
+#include <qt5/QtWidgets/qmessagebox.h>
+#include <QtCore/qnamespace.h>
 
 #define C(x) (x).c_str()
 #define QS(x) QString::fromStdString(x)
+
+namespace QPF {
+
+Qt::ItemFlags StandardItemModel::flags(const QModelIndex&index) const
+{
+    Qt::ItemFlags flags;
+    if (index.isValid()) {
+        flags =  Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    } else {
+        flags =  Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled  | Qt::ItemIsEnabled;
+    }
+    return flags;
+}
+
+Qt::ItemFlags StringListModel::flags(const QModelIndex&index) const
+{
+    Qt::ItemFlags flags;
+    if (index.isValid()) {
+        flags =  Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    } else {
+        flags =  Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled  | Qt::ItemIsEnabled;
+    }
+    return flags;
+}
 
 ModelView::ModelView(QVector<QStringList> & vdlist,
                      QAbstractItemView  * v,
@@ -59,7 +87,7 @@ ModelView::ModelView(QVector<QStringList> & vdlist,
     : view(v), model(m), type(Table)
 {
     if (view  == 0) { view = new QTableView(0); }
-    if (model == 0) { model = new QStandardItemModel(vdlist.count(),
+    if (model == 0) { model = new StandardItemModel(vdlist.count(),
                                                      vdlist.at(0).count()); }
     setData(vdlist);
     view->setModel(model);
@@ -71,8 +99,8 @@ ModelView::ModelView(QStringList & dlist,
     : view(v), model(m), type(List)
 {
     if (view  == 0) { view  = new QListView(0); }
-    if (model == 0) { model = new QStringListModel(); }
-    dynamic_cast<QStringListModel*>(model)->setStringList(dlist);
+    if (model == 0) { model = new StringListModel(); }
+    dynamic_cast<StringListModel*>(model)->setStringList(dlist);
     view->setModel(model);
 }
 
@@ -110,8 +138,6 @@ void ModelView::setData(QVector<QStringList> & vdlist)
     }
 }
 
-namespace QPF {
-
 ConfigTool::ConfigTool(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigTool)
@@ -142,8 +168,15 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui->btngrpSection->setId(ui->tbtnExtTools      , PageExtTools);
     ui->btngrpSection->setId(ui->tbtnStorage       , PageStorage);
     ui->btngrpSection->setId(ui->tbtnFlags         , PageFlags);
-
-    connect(ui->edBasePath, SIGNAL(textChanged(QString)), this, SLOT(setWorkingPaths(QString)));
+    
+    signalSender[ui->btnAddHost]         = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewHosts, ModelView::Table);
+    signalSender[ui->btnRemoveHost]      = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewHosts, ModelView::Table);
+    signalSender[ui->btnAddProduct]      = QPair<QAbstractItemView *, ModelView::Type>(ui->listProductTypes, ModelView::List);
+    signalSender[ui->btnRemoveProduct]   = QPair<QAbstractItemView *, ModelView::Type>(ui->listProductTypes, ModelView::List);
+    signalSender[ui->btnAddProcessor]    = QPair<QAbstractItemView *, ModelView::Type>(ui->listProcs, ModelView::List);
+    signalSender[ui->btnRemoveProcessor] = QPair<QAbstractItemView *, ModelView::Type>(ui->listProcs, ModelView::List);
+    signalSender[ui->btnAddRule]         = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewRules, ModelView::Table);
+    signalSender[ui->btnRemoveRule]      = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewRules, ModelView::Table);
 }
 
 ConfigTool::~ConfigTool()
@@ -289,9 +322,9 @@ void ConfigTool::readConfig()
     hdr << "Rule name" << "Inputs" << "Condition" << "Processor" << "Outputs";
     ModelView * mvRules = createTableModelView(ui->tblviewRules, rulesTable, hdr);
     (void)(mvRules);
-
+    
     // 5. USER DEFINED TOOLS
-
+    
     // Already set
 
     // 6. STORAGE
@@ -299,7 +332,7 @@ void ConfigTool::readConfig()
     ui->nedLocalArchiveFolder->setText(C(cfgInfo.storage.local_archive.path));
     ui->nedInbox->setText(C(cfgInfo.storage.inbox.path));
     ui->nedOutbox->setText(C(cfgInfo.storage.outbox.path));
-
+    
     // 7. FLAGS
     transferFlagsFromCfgToGUI();
 }
@@ -345,14 +378,86 @@ void ConfigTool::apply()
     accept();
 }
 
+void ConfigTool::selectBasePath()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    QString pathName(QString::fromStdString(cfgInfo.storage.base));
+    pathName = QFileDialog::getExistingDirectory(this,
+                                                 tr("Select QPF base path"),
+                                                 pathName);
+    QFileInfo fs(pathName);
+    if (fs.exists()) {
+        ui->edBasePath->setText(pathName);
+    }
+
+}
+
 void ConfigTool::setWorkingPaths(QString newPath)
 {
-    QFileInfo fs(newPath);
+    ui->nedLocalArchiveFolder->setText(newPath + "/data/archive");
+    ui->nedInbox->setText(newPath + "/data/inbox");
+    ui->nedOutbox->setText(newPath + "/data/outbox");
+    ui->nedUserReprocArea->setText(newPath + "/data/user");
+}
 
-    QString base = fs.path();
-    ui->nedLocalArchiveFolder->setText(base + "/data/archive");
-    ui->nedInbox->setText(base + "/data/inbox");
-    ui->nedOutbox->setText(base + "/data/outbox");
+void ConfigTool::addHost()
+{
+    QTableView * vw = ui->tblviewHosts;
+    vw->model()->insertRow(vw->model()->rowCount()); 
+}
+
+void ConfigTool::removeHost()
+{  
+    removeFromTable(ui->tblviewHosts, "host");
+}
+
+void ConfigTool::addProduct()
+{   
+    QListView * vw = ui->listProductTypes;
+    vw->model()->insertRow(vw->model()->rowCount()); 
+}
+
+void ConfigTool::removeProduct()
+{   
+    removeFromTable(ui->listProductTypes, "product type");
+}
+
+void ConfigTool::addProcessor()
+{
+    QListView * vw = ui->listProcs;
+    vw->model()->insertRow(vw->model()->rowCount()); 
+}
+
+void ConfigTool::removeProcessor()
+{
+    removeFromTable(ui->listProcs, "processor");
+}
+
+void ConfigTool::addRule()
+{
+    QTableView * vw = ui->tblviewRules;
+    vw->model()->insertRow(vw->model()->rowCount()); 
+}
+
+void ConfigTool::removeRule()
+{   
+    removeFromTable(ui->tblviewRules, "rule");
+}
+
+void ConfigTool::removeFromTable(QAbstractItemView * vw, QString item)
+{   
+    QMessageBox msgBox;
+    msgBox.setText(QString("Yoy requested to remove a host from the list.").arg(item));
+    msgBox.setInformativeText(QString("Do you really want to delete the selected %1? "
+                                      " Its information will be lost.").arg(item));
+    QPushButton *removeButton = msgBox.addButton(QString("Remove %1").arg(item), QMessageBox::ActionRole);
+    QPushButton *discardtButton = msgBox.addButton(QMessageBox::Discard);
+    msgBox.setDefaultButton(discardtButton);
+    msgBox.exec();
+    if (msgBox.clickedButton() == removeButton) {
+        vw->model()->removeRow(vw->currentIndex().row()); 
+    }
 }
 
 void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
@@ -459,8 +564,8 @@ void ConfigTool::removeTool()
     msgBox.setWindowTitle("Remove tool from list");
     msgBox.setText("You requested to remove selected user defined tool from the list.");
     msgBox.setInformativeText("Do you really want to remove this tool?");
-    QPushButton *removeButton = msgBox.addButton(tr("Remove tool"), QMessageBox::ActionRole);
-    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Abort);
+    QPushButton * removeButton = msgBox.addButton(tr("Remove tool"), QMessageBox::ActionRole);
+    QPushButton * cancelButton = msgBox.addButton(QMessageBox::Abort);
 
     msgBox.exec();
     if (msgBox.clickedButton() == removeButton) {
@@ -489,7 +594,7 @@ void ConfigTool::transferFlagsFromCfgToGUI()
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     std::string msgName;
-
+    
     std::map<std::string, bool> & fmapDsk = cfgInfo.flags.monit.msgsToDisk;
     std::map<std::string, bool> & fmapDB  = cfgInfo.flags.monit.msgsToDB;
 
@@ -535,5 +640,7 @@ void ConfigTool::transferFlagsFromGUIToCfg()
 }
 
 QVector<ConfigTool::FlagSt> ConfigTool::monitMsgFlags;
-
+QMap<QPushButton *, QPair<QAbstractItemView *, 
+                          ModelView::Type> > ConfigTool::signalSender;
+    
 }

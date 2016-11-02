@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>990</width>
-    <height>588</height>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,11 +15,49 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="lblConfigName">
-     <property name="text">
-      <string>TextLabel</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_35">
+     <property name="spacing">
+      <number>20</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>48</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>48</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="configtool.qrc">:/img/img/QPF.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblConfigName">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
@@ -272,11 +310,8 @@ Processors</string>
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <property name="lineWidth">
-        <number>2</number>
-       </property>
        <property name="currentIndex">
-        <number>7</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pageGeneral">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -305,7 +340,11 @@ Processors</string>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="edAppName"/>
+               <widget class="QLineEdit" name="edAppName">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_3">
@@ -341,7 +380,11 @@ Processors</string>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="edAppVersion"/>
+               <widget class="QLineEdit" name="edAppVersion">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_4">
@@ -377,7 +420,11 @@ Processors</string>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="edLastAccess"/>
+               <widget class="QLineEdit" name="edLastAccess">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_5">
@@ -395,7 +442,7 @@ Processors</string>
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,28,5">
+             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,28,0">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -413,14 +460,24 @@ Processors</string>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="edWorkArea"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="tbtnGetRunArea">
-                <property name="text">
-                 <string>...</string>
+               <widget class="QLineEdit" name="edWorkArea">
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -650,11 +707,87 @@ Processors</string>
            <item>
             <widget class="QGroupBox" name="gpboxHosts">
              <property name="title">
-              <string>Hosts</string>
+              <string>Host machines</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_9">
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item>
-               <widget class="QTableView" name="tblviewHosts"/>
+               <widget class="QTableView" name="tblviewHosts">
+                <property name="dragEnabled">
+                 <bool>true</bool>
+                </property>
+                <property name="dragDropOverwriteMode">
+                 <bool>false</bool>
+                </property>
+                <property name="dragDropMode">
+                 <enum>QAbstractItemView::InternalMove</enum>
+                </property>
+                <property name="defaultDropAction">
+                 <enum>Qt::TargetMoveAction</enum>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="gridStyle">
+                 <enum>Qt::SolidLine</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_18">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="btnAddHost">
+                  <property name="toolTip">
+                   <string>Add new host to list</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configtool.qrc">
+                    <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnRemoveHost">
+                  <property name="toolTip">
+                   <string>Remove host from list</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configtool.qrc">
+                    <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -759,9 +892,70 @@ Processors</string>
            <property name="title">
             <string>Product Types</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QListView" name="listProductTypes"/>
+             <widget class="QListView" name="listProductTypes">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_31">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="btnAddProduct">
+                <property name="toolTip">
+                 <string>Add new host to list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRemoveProduct">
+                <property name="toolTip">
+                 <string>Remove host from list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_12">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -771,9 +965,70 @@ Processors</string>
            <property name="title">
             <string>Processors</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <layout class="QVBoxLayout" name="verticalLayout_22">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QListView" name="listProcs"/>
+             <widget class="QListView" name="listProcs">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_30">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="btnAddProcessor">
+                <property name="toolTip">
+                 <string>Add new host to list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRemoveProcessor">
+                <property name="toolTip">
+                 <string>Remove host from list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_16">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -789,7 +1044,29 @@ Processors</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_10">
             <item>
-             <widget class="QTableView" name="tblviewNet"/>
+             <widget class="QTableView" name="tblviewNet">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::TargetMoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -803,9 +1080,85 @@ Processors</string>
            <property name="title">
             <string>Orchestration Rules</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QTableView" name="tblviewRules"/>
+             <widget class="QTableView" name="tblviewRules">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::TargetMoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="btnAddRule">
+                <property name="toolTip">
+                 <string>Add new host to list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRemoveRule">
+                <property name="toolTip">
+                 <string>Remove host from list</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -819,7 +1172,10 @@ Processors</string>
            <property name="title">
             <string>User-defined External Tools</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QTableWidget" name="tblwdgUserDefTools">
               <attribute name="horizontalHeaderStretchLastSection">
@@ -859,37 +1215,65 @@ Processors</string>
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_12">
+             <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="2,2,1,2,50">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item>
-               <widget class="QPushButton" name="btnAddNew">
+               <widget class="QPushButton" name="btnAddNewUdefTool">
                 <property name="text">
-                 <string>&amp;Add new</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="btnEdit">
+               <widget class="QPushButton" name="btnRemoveUdefTool">
                 <property name="text">
-                 <string>&amp;Edit</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="btnRemove">
-                <property name="text">
-                 <string>&amp;Remove</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_3">
+               <spacer name="horizontalSpacer_21">
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnEditUdefTool">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="configtool.qrc">
+                  <normaloff>:/img/img/general.png</normaloff>:/img/img/general.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_20">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
                  </size>
                 </property>
                </spacer>
@@ -910,15 +1294,25 @@ Processors</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="nedInbox">
-                <property name="enabled">
-                 <bool>false</bool>
+             <layout class="QGridLayout" name="gridLayout" columnstretch="20,79,1" columnminimumwidth="0,0,0">
+              <item row="0" column="2">
+               <widget class="QToolButton" name="tbtnSetBasePath">
+                <property name="text">
+                 <string>...</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="nedInbox">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
                <widget class="QLabel" name="label_30">
                 <property name="text">
                  <string>User reproc. area</string>
@@ -935,52 +1329,71 @@ Processors</string>
               <item row="0" column="1">
                <widget class="QLineEdit" name="edBasePath"/>
               </item>
-              <item row="0" column="2">
-               <widget class="QToolButton" name="tbtnSetBasePath">
-                <property name="text">
-                 <string>...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_27">
                 <property name="text">
                  <string>Local Archive Folder</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QLineEdit" name="nedLocalArchiveFolder">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="label_28">
                 <property name="text">
                  <string>Inbox</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <widget class="QLineEdit" name="nedOutbox">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_29">
                 <property name="text">
                  <string>Outbox</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QLineEdit" name="nedUserReprocArea">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_31">
+                <property name="text">
+                 <string>Exec.Sessions</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="nedRunFolder">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -1828,6 +2241,7 @@ Processors</string>
  </tabstops>
  <resources>
   <include location="configtool.qrc"/>
+  <include location="../../../../.designer/backup/configtool.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -1895,14 +2309,14 @@ Processors</string>
    </hints>
   </connection>
   <connection>
-   <sender>btnAddNew</sender>
+   <sender>btnAddNewUdefTool</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
    <slot>addNewTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>68</y>
+     <x>899</x>
+     <y>71</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1911,14 +2325,14 @@ Processors</string>
    </hints>
   </connection>
   <connection>
-   <sender>btnEdit</sender>
+   <sender>btnEditUdefTool</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
    <slot>editTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>70</y>
+     <x>899</x>
+     <y>99</y>
     </hint>
     <hint type="destinationlabel">
      <x>941</x>
@@ -1927,14 +2341,14 @@ Processors</string>
    </hints>
   </connection>
   <connection>
-   <sender>btnRemove</sender>
+   <sender>btnRemoveUdefTool</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
    <slot>removeTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>72</y>
+     <x>899</x>
+     <y>127</y>
     </hint>
     <hint type="destinationlabel">
      <x>925</x>
@@ -1949,8 +2363,8 @@ Processors</string>
    <slot>editTool(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>218</x>
-     <y>67</y>
+     <x>220</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>517</x>
@@ -1971,6 +2385,166 @@ Processors</string>
     <hint type="destinationlabel">
      <x>984</x>
      <y>546</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edBasePath</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>setWorkingPaths(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>402</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbtnSetBasePath</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>selectBasePath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>945</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>994</x>
+     <y>21</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddHost</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>addHost()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>930</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>664</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemoveHost</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>removeHost()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>903</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>776</x>
+     <y>-4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddRule</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>addRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>914</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>431</x>
+     <y>568</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemoveRule</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>removeRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>893</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>568</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddProduct</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>addProduct()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>499</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>550</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemoveProduct</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>removeProduct()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>567</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddProcessor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>addProcessor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>908</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>985</x>
+     <y>63</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemoveProcessor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>removeProcessor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>928</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>986</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -2004,6 +2578,16 @@ Processors</string>
   <slot>removeTool()</slot>
   <slot>editTool(QModelIndex)</slot>
   <slot>apply()</slot>
+  <slot>setWorkingPaths(QString)</slot>
+  <slot>selectBasePath()</slot>
+  <slot>addHost()</slot>
+  <slot>removeHost()</slot>
+  <slot>addRule()</slot>
+  <slot>removeRule()</slot>
+  <slot>addProduct()</slot>
+  <slot>removeProduct()</slot>
+  <slot>addProcessor()</slot>
+  <slot>removeProcessor()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="btngrpSection"/>
