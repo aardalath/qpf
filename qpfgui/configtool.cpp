@@ -50,8 +50,8 @@ using LibComm::join;
 #include <QHostInfo>
 #include <QFileInfo>
 #include <QCheckBox>
-#include <qt5/QtWidgets/qabstractitemview.h>
-#include <qt5/QtWidgets/qmessagebox.h>
+#include <QAbstractItemView>
+#include <QMessageBox>
 #include <QtCore/qnamespace.h>
 
 #define C(x) (x).c_str()
@@ -59,6 +59,10 @@ using LibComm::join;
 
 namespace QPF {
 
+//----------------------------------------------------------------------
+// Method: flags
+// Overwrites QAbstractItemModel::flags
+//----------------------------------------------------------------------
 Qt::ItemFlags StandardItemModel::flags(const QModelIndex&index) const
 {
     Qt::ItemFlags flags;
@@ -70,6 +74,10 @@ Qt::ItemFlags StandardItemModel::flags(const QModelIndex&index) const
     return flags;
 }
 
+//----------------------------------------------------------------------
+// Method: flags
+// Overwrites QAbstractItemModel::flags
+//----------------------------------------------------------------------
 Qt::ItemFlags StringListModel::flags(const QModelIndex&index) const
 {
     Qt::ItemFlags flags;
@@ -81,6 +89,9 @@ Qt::ItemFlags StringListModel::flags(const QModelIndex&index) const
     return flags;
 }
 
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 ModelView::ModelView(QVector<QStringList> & vdlist,
                      QAbstractItemView  * v,
                      QAbstractItemModel * m)
@@ -93,6 +104,9 @@ ModelView::ModelView(QVector<QStringList> & vdlist,
     view->setModel(model);
 }
 
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 ModelView::ModelView(QStringList & dlist,
                      QAbstractItemView  * v,
                      QAbstractItemModel * m)
@@ -104,11 +118,19 @@ ModelView::ModelView(QStringList & dlist,
     view->setModel(model);
 }
 
+//----------------------------------------------------------------------
+// Method: setHeader
+// Sets header in section 0
+//----------------------------------------------------------------------
 void ModelView::setHeader(QString h)
 {
     model->setHeaderData(0, Qt::Horizontal, h);
 }
 
+//----------------------------------------------------------------------
+// Method: setHeaders
+// Sets column headers for the model
+//----------------------------------------------------------------------
 void ModelView::setHeaders(QStringList & hlist)
 {
     for (int i = 0; i < hlist.count(); ++i) {
@@ -116,6 +138,10 @@ void ModelView::setHeaders(QStringList & hlist)
     }
 }
 
+//----------------------------------------------------------------------
+// Method: setData
+// Sets the data for a list view
+//----------------------------------------------------------------------
 void ModelView::setData(QStringList & dlist)
 {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
@@ -125,6 +151,11 @@ void ModelView::setData(QStringList & dlist)
         model->setData(model->index(row, 0, QModelIndex()), dlist.at(row));
     }
 }
+
+//----------------------------------------------------------------------
+// Method: setData
+// Sets the data for a table view
+//----------------------------------------------------------------------
 void ModelView::setData(QVector<QStringList> & vdlist)
 {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
@@ -138,6 +169,9 @@ void ModelView::setData(QVector<QStringList> & vdlist)
     }
 }
 
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 ConfigTool::ConfigTool(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigTool)
@@ -168,22 +202,20 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui->btngrpSection->setId(ui->tbtnExtTools      , PageExtTools);
     ui->btngrpSection->setId(ui->tbtnStorage       , PageStorage);
     ui->btngrpSection->setId(ui->tbtnFlags         , PageFlags);
-    
-    signalSender[ui->btnAddHost]         = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewHosts, ModelView::Table);
-    signalSender[ui->btnRemoveHost]      = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewHosts, ModelView::Table);
-    signalSender[ui->btnAddProduct]      = QPair<QAbstractItemView *, ModelView::Type>(ui->listProductTypes, ModelView::List);
-    signalSender[ui->btnRemoveProduct]   = QPair<QAbstractItemView *, ModelView::Type>(ui->listProductTypes, ModelView::List);
-    signalSender[ui->btnAddProcessor]    = QPair<QAbstractItemView *, ModelView::Type>(ui->listProcs, ModelView::List);
-    signalSender[ui->btnRemoveProcessor] = QPair<QAbstractItemView *, ModelView::Type>(ui->listProcs, ModelView::List);
-    signalSender[ui->btnAddRule]         = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewRules, ModelView::Table);
-    signalSender[ui->btnRemoveRule]      = QPair<QAbstractItemView *, ModelView::Type>(ui->tblviewRules, ModelView::Table);
 }
 
+//----------------------------------------------------------------------
+// Destructor
+//----------------------------------------------------------------------
 ConfigTool::~ConfigTool()
 {
     delete ui;
 }
 
+//----------------------------------------------------------------------
+// Method: readConfig
+// Reads config data from internals and places them into dialog
+//----------------------------------------------------------------------
 void ConfigTool::readConfig()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
@@ -322,9 +354,9 @@ void ConfigTool::readConfig()
     hdr << "Rule name" << "Inputs" << "Condition" << "Processor" << "Outputs";
     ModelView * mvRules = createTableModelView(ui->tblviewRules, rulesTable, hdr);
     (void)(mvRules);
-    
+
     // 5. USER DEFINED TOOLS
-    
+
     // Already set
 
     // 6. STORAGE
@@ -332,134 +364,15 @@ void ConfigTool::readConfig()
     ui->nedLocalArchiveFolder->setText(C(cfgInfo.storage.local_archive.path));
     ui->nedInbox->setText(C(cfgInfo.storage.inbox.path));
     ui->nedOutbox->setText(C(cfgInfo.storage.outbox.path));
-    
+
     // 7. FLAGS
     transferFlagsFromCfgToGUI();
 }
 
-ModelView * ConfigTool::createListModelView(QAbstractItemView * v,
-                                            QStringList & dlist,
-                                            QString hdr)
-{
-    ModelView * mv = new ModelView(dlist, v);
-    mv->setHeader(hdr);
-
-    return mv;
-}
-
-
-ModelView * ConfigTool::createTableModelView(QAbstractItemView * v,
-                                             QVector<QStringList> & vdlist,
-                                             QStringList & hdr)
-{
-    ModelView * mv = new ModelView(vdlist, v);
-    mv->setHeaders(hdr);
-
-    return mv;
-}
-
-void ConfigTool::save()
-{
-    (void)QMessageBox::warning(this, tr("Save"),
-                               tr("Sorry, but this functionality is not yet implemented."),
-                               QMessageBox::Ok);
-}
-
-void ConfigTool::saveAs()
-{
-    (void)QMessageBox::warning(this, tr("Save as..."),
-                               tr("Sorry, but this functionality is not yet implemented."),
-                               QMessageBox::Ok);
-}
-
-void ConfigTool::apply()
-{
-    transferFlagsFromGUIToCfg();
-    accept();
-}
-
-void ConfigTool::selectBasePath()
-{
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
-    QString pathName(QString::fromStdString(cfgInfo.storage.base));
-    pathName = QFileDialog::getExistingDirectory(this,
-                                                 tr("Select QPF base path"),
-                                                 pathName);
-    QFileInfo fs(pathName);
-    if (fs.exists()) {
-        ui->edBasePath->setText(pathName);
-    }
-
-}
-
-void ConfigTool::setWorkingPaths(QString newPath)
-{
-    ui->nedLocalArchiveFolder->setText(newPath + "/data/archive");
-    ui->nedInbox->setText(newPath + "/data/inbox");
-    ui->nedOutbox->setText(newPath + "/data/outbox");
-    ui->nedUserReprocArea->setText(newPath + "/data/user");
-}
-
-void ConfigTool::addHost()
-{
-    QTableView * vw = ui->tblviewHosts;
-    vw->model()->insertRow(vw->model()->rowCount()); 
-}
-
-void ConfigTool::removeHost()
-{  
-    removeFromTable(ui->tblviewHosts, "host");
-}
-
-void ConfigTool::addProduct()
-{   
-    QListView * vw = ui->listProductTypes;
-    vw->model()->insertRow(vw->model()->rowCount()); 
-}
-
-void ConfigTool::removeProduct()
-{   
-    removeFromTable(ui->listProductTypes, "product type");
-}
-
-void ConfigTool::addProcessor()
-{
-    QListView * vw = ui->listProcs;
-    vw->model()->insertRow(vw->model()->rowCount()); 
-}
-
-void ConfigTool::removeProcessor()
-{
-    removeFromTable(ui->listProcs, "processor");
-}
-
-void ConfigTool::addRule()
-{
-    QTableView * vw = ui->tblviewRules;
-    vw->model()->insertRow(vw->model()->rowCount()); 
-}
-
-void ConfigTool::removeRule()
-{   
-    removeFromTable(ui->tblviewRules, "rule");
-}
-
-void ConfigTool::removeFromTable(QAbstractItemView * vw, QString item)
-{   
-    QMessageBox msgBox;
-    msgBox.setText(QString("Yoy requested to remove a host from the list.").arg(item));
-    msgBox.setInformativeText(QString("Do you really want to delete the selected %1? "
-                                      " Its information will be lost.").arg(item));
-    QPushButton *removeButton = msgBox.addButton(QString("Remove %1").arg(item), QMessageBox::ActionRole);
-    QPushButton *discardtButton = msgBox.addButton(QMessageBox::Discard);
-    msgBox.setDefaultButton(discardtButton);
-    msgBox.exec();
-    if (msgBox.clickedButton() == removeButton) {
-        vw->model()->removeRow(vw->currentIndex().row()); 
-    }
-}
-
+//----------------------------------------------------------------------
+// Method: initExtTools
+// Init table of user defined / external tools
+//----------------------------------------------------------------------
 void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
 {
     ui->tblwdgUserDefTools->clear();
@@ -488,6 +401,177 @@ void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
             this, SLOT(changeToolWithItem(QTableWidgetItem*)));
 }
 
+//----------------------------------------------------------------------
+// Method: getExtTools
+// Allows external access to user defined tools
+//----------------------------------------------------------------------
+void ConfigTool::getExtTools(MapOfUserDefTools & userTools)
+{
+    userTools = userDefTools;
+}
+
+//----------------------------------------------------------------------
+// Slot: save
+// Saves the configuration data into the original file loaded
+//----------------------------------------------------------------------
+void ConfigTool::save()
+{
+    (void)QMessageBox::warning(this, tr("Save"),
+                               tr("Sorry, but this functionality is not yet implemented."),
+                               QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------
+// Slot: saveAs
+// Saves the configuration data into a new config file
+//----------------------------------------------------------------------
+void ConfigTool::saveAs()
+{
+    (void)QMessageBox::warning(this, tr("Save as..."),
+                               tr("Sorry, but this functionality is not yet implemented."),
+                               QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------
+// Slot: apply
+// Moves the new config. info into the internals for immediate use
+//----------------------------------------------------------------------
+void ConfigTool::apply()
+{
+    transferFlagsFromGUIToCfg();
+    accept();
+}
+
+//----------------------------------------------------------------------
+// Slot: selectBasePath
+// Select QPF base path
+//----------------------------------------------------------------------
+void ConfigTool::selectBasePath()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
+    QString pathName(QString::fromStdString(cfgInfo.storage.base));
+    pathName = QFileDialog::getExistingDirectory(this,
+                                                 tr("Select QPF base path"),
+                                                 pathName);
+    QFileInfo fs(pathName);
+    if (fs.exists()) {
+        ui->edBasePath->setText(pathName);
+    }
+
+}
+
+//----------------------------------------------------------------------
+// Slot: setWorkingPaths
+// Sets working paths for a given base path
+//----------------------------------------------------------------------
+void ConfigTool::setWorkingPaths(QString newPath)
+{
+    ui->nedLocalArchiveFolder->setText(newPath + "/data/archive");
+    ui->nedInbox->setText(newPath + "/data/inbox");
+    ui->nedOutbox->setText(newPath + "/data/outbox");
+    ui->nedUserReprocArea->setText(newPath + "/data/user");
+}
+
+//----------------------------------------------------------------------
+// Slot: addHost
+// Adds a new row to the hosts table to allow the addition of a new host
+//----------------------------------------------------------------------
+void ConfigTool::addHost()
+{
+    QTableView * vw = ui->tblviewHosts;
+    vw->model()->insertRow(vw->model()->rowCount());
+}
+
+//----------------------------------------------------------------------
+// Slot: removeHost
+// Removes the selected row with information of a configured host
+//----------------------------------------------------------------------
+void ConfigTool::removeHost()
+{
+    removeFromTable(ui->tblviewHosts, "host");
+}
+
+//----------------------------------------------------------------------
+// Slot: addProduct
+// Adds a new row to the product types list to allow the addition of a new one
+//----------------------------------------------------------------------
+void ConfigTool::addProduct()
+{
+    QListView * vw = ui->listProductTypes;
+    vw->model()->insertRow(vw->model()->rowCount());
+}
+
+//----------------------------------------------------------------------
+// Slot: removeProduct
+// Removes the selected row with information of a configured product type
+//----------------------------------------------------------------------
+void ConfigTool::removeProduct()
+{
+    removeFromTable(ui->listProductTypes, "product type");
+}
+
+//----------------------------------------------------------------------
+// Slot: addProcessor
+// Adds a new row to the processors list to allow the addition of a new one
+//----------------------------------------------------------------------
+void ConfigTool::addProcessor()
+{
+    QListView * vw = ui->listProcs;
+    vw->model()->insertRow(vw->model()->rowCount());
+}
+
+//----------------------------------------------------------------------
+// Slot: removeProcessor
+// Removes the selected row with information of a configured processor
+//----------------------------------------------------------------------
+void ConfigTool::removeProcessor()
+{
+    removeFromTable(ui->listProcs, "processor");
+}
+
+//----------------------------------------------------------------------
+// Slot: addRule
+// Adds a new row to the rules table to allow the addition of a new rule
+//----------------------------------------------------------------------
+void ConfigTool::addRule()
+{
+    QTableView * vw = ui->tblviewRules;
+    vw->model()->insertRow(vw->model()->rowCount());
+}
+
+//----------------------------------------------------------------------
+// Slot: removeRule
+// Removes the selected row with information of a configured rule
+//----------------------------------------------------------------------
+void ConfigTool::removeRule()
+{
+    removeFromTable(ui->tblviewRules, "rule");
+}
+
+//----------------------------------------------------------------------
+// Slot: removeFromTable
+// Removes the selected row from a table/list view, if confirmed by user
+//----------------------------------------------------------------------
+void ConfigTool::removeFromTable(QAbstractItemView * vw, QString item)
+{
+    QMessageBox msgBox;
+    msgBox.setText(QString("Yoy requested to remove a host from the list.").arg(item));
+    msgBox.setInformativeText(QString("Do you really want to delete the selected %1? "
+                                      " Its information will be lost.").arg(item));
+    QPushButton *removeButton = msgBox.addButton(QString("Remove %1").arg(item), QMessageBox::ActionRole);
+    QPushButton *discardtButton = msgBox.addButton(QMessageBox::Discard);
+    msgBox.setDefaultButton(discardtButton);
+    msgBox.exec();
+    if (msgBox.clickedButton() == removeButton) {
+        vw->model()->removeRow(vw->currentIndex().row());
+    }
+}
+
+//----------------------------------------------------------------------
+// Slot: addNewTool
+// Opens a dialog to add a new used defined tool
+//----------------------------------------------------------------------
 void ConfigTool::addNewTool()
 {
     ExtToolEdit dlg;
@@ -509,12 +593,20 @@ void ConfigTool::addNewTool()
     }
 }
 
+//----------------------------------------------------------------------
+// Slot: editTool
+// Edits the tool in the table with a given model index
+//----------------------------------------------------------------------
 void ConfigTool::editTool(QModelIndex idx)
 {
     int row = idx.row();
     editTool(row);
 }
 
+//----------------------------------------------------------------------
+// Slot: editTool
+// Edits the tool selected in the table
+//----------------------------------------------------------------------
 void ConfigTool::editTool()
 {
     QList<QTableWidgetItem*> items = ui->tblwdgUserDefTools->selectedItems();
@@ -522,6 +614,10 @@ void ConfigTool::editTool()
     editTool(row);
 }
 
+//----------------------------------------------------------------------
+// Slot: editTool
+// Edits the row-th tool in the table
+//----------------------------------------------------------------------
 void ConfigTool::editTool(int row)
 {
     QString name = ui->tblwdgUserDefTools->item(row, 0)->data(0).toString();
@@ -543,6 +639,10 @@ void ConfigTool::editTool(int row)
     }
 }
 
+//----------------------------------------------------------------------
+// Slot: changeToolWithItem
+// Puts tool info into table item
+//----------------------------------------------------------------------
 void ConfigTool::changeToolWithItem(QTableWidgetItem * item)
 {
     QString content = item->data(0).toString();
@@ -558,6 +658,10 @@ void ConfigTool::changeToolWithItem(QTableWidgetItem * item)
     }
 }
 
+//----------------------------------------------------------------------
+// Slot: removeTool
+// Removes the selected tool from table
+//----------------------------------------------------------------------
 void ConfigTool::removeTool()
 {
     QMessageBox msgBox;
@@ -579,22 +683,54 @@ void ConfigTool::removeTool()
     }
 }
 
+//----------------------------------------------------------------------
+// Slot: cancelDlg
+// Cancel dialog (all edited info is forgotten)
+//----------------------------------------------------------------------
 void ConfigTool::cancelDlg()
 {
     userDefTools = origDefTools;
 }
 
-void ConfigTool::getExtTools(MapOfUserDefTools & userTools)
+//----------------------------------------------------------------------
+// Method: createListModelView
+// Uses ModelView class to create a model for a list view
+//----------------------------------------------------------------------
+ModelView * ConfigTool::createListModelView(QAbstractItemView * v,
+                                            QStringList & dlist,
+                                            QString hdr)
 {
-    userTools = userDefTools;
+    ModelView * mv = new ModelView(dlist, v);
+    mv->setHeader(hdr);
+
+    return mv;
 }
 
+
+//----------------------------------------------------------------------
+// Method: createListModelView
+// Uses ModelView class to create a model for a table view
+//----------------------------------------------------------------------
+ModelView * ConfigTool::createTableModelView(QAbstractItemView * v,
+                                             QVector<QStringList> & vdlist,
+                                             QStringList & hdr)
+{
+    ModelView * mv = new ModelView(vdlist, v);
+    mv->setHeaders(hdr);
+
+    return mv;
+}
+
+//----------------------------------------------------------------------
+// Method: transferFlagsFromCfgToGUI
+// Transfer flags settings from internal cfg structure to dialog
+//----------------------------------------------------------------------
 void ConfigTool::transferFlagsFromCfgToGUI()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     std::string msgName;
-    
+
     std::map<std::string, bool> & fmapDsk = cfgInfo.flags.monit.msgsToDisk;
     std::map<std::string, bool> & fmapDB  = cfgInfo.flags.monit.msgsToDB;
 
@@ -613,6 +749,10 @@ void ConfigTool::transferFlagsFromCfgToGUI()
     ui->chkSendOutputsToArchive->setChecked(cfgInfo.flags.arch.sendOutputsToMainArchive);
 }
 
+//----------------------------------------------------------------------
+// Method: transferFlagsFromGUIToCfg
+// Transfer flags settings from dialog to internal cfg structure
+//----------------------------------------------------------------------
 void ConfigTool::transferFlagsFromGUIToCfg()
 {
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
@@ -639,8 +779,7 @@ void ConfigTool::transferFlagsFromGUIToCfg()
     cfgInfo.flags.arch.sendOutputsToMainArchive = ui->chkSendOutputsToArchive->isChecked();
 }
 
+// Auxiliary vector with information about config. flags
 QVector<ConfigTool::FlagSt> ConfigTool::monitMsgFlags;
-QMap<QPushButton *, QPair<QAbstractItemView *, 
-                          ModelView::Type> > ConfigTool::signalSender;
-    
+
 }

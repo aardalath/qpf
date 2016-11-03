@@ -180,8 +180,6 @@ private:
     MapOfUserDefTools origDefTools;
     QStringList       prodTypes;
 
-    static QMap<QPushButton *, QPair<QAbstractItemView *, ModelView::Type> > signalSender;
-
     static QVector<FlagSt> monitMsgFlags;
 };
 

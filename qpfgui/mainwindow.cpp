@@ -1169,6 +1169,9 @@ void MainWindow::initLocalArchiveView()
         connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
         acUserTools[key] = ac;
     }
+
+    // Add Expand All / Collapse All buttons
+    //addExpandCollapseButtonsTo(ui->treevwArchive);
 }
 
 //----------------------------------------------------------------------
@@ -1971,6 +1974,26 @@ void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)
     str.replace(",\"\":\"\"", "");
     str.replace("\":'", "\":\"");
     str.replace(QRegExp("'[ ]*,"), "\",");
+}
+
+void MainWindow::addExpandCollapseButtonsTo(QWidget * w)
+{
+    QSize sz = w->size();
+
+    QLabel * lblExpand = new QLabel(w);
+    lblExpand->setMinimumSize(QSize(16, 16));
+    lblExpand->setMaximumSize(QSize(16, 16));
+    lblExpand->setPixmap(QPixmap(QString::fromUtf8(":/img/expand.png")));
+    lblExpand->setGeometry(-16, 0, 16, 16);
+
+    QLabel * lblCollapse = new QLabel(w);
+    lblCollapse->setMinimumSize(QSize(16, 16));
+    lblCollapse->setMaximumSize(QSize(16, 16));
+    lblCollapse->setPixmap(QPixmap(QString::fromUtf8(":/img/collapse.png")));
+    lblCollapse->setGeometry(-16, 17, 16, 16);
+
+    connect(lblExpand,   SIGNAL(clicked()), w, SLOT(expandAll()));
+    connect(lblCollapse, SIGNAL(clicked()), w, SLOT(collapseAll()));
 }
 
 }

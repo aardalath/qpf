@@ -2241,7 +2241,7 @@ Processors</string>
  </tabstops>
  <resources>
   <include location="configtool.qrc"/>
-  <include location="../../../../.designer/backup/configtool.qrc"/>
+  <include location="configtool.qrc"/>
  </resources>
  <connections>
   <connection>

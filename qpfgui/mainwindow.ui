@@ -349,8 +349,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>28</height>
+                 <width>80</width>
+                 <height>16</height>
                 </rect>
                </property>
               </widget>
@@ -433,8 +433,85 @@
         <string>Internal/Local Archive</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QTreeView" name="treevwArchive"/>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame_2">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QToolButton" name="tbtnArchExpand">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="jsontree.qrc">
+               <normaloff>:/img/expand.png</normaloff>:/img/expand.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="tbtnArchCollapse">
+             <property name="minimumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="jsontree.qrc">
+               <normaloff>:/img/collapse.png</normaloff>:/img/collapse.png</iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonIconOnly</enum>
+             </property>
+             <property name="arrowType">
+              <enum>Qt::NoArrow</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>906</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -514,7 +591,7 @@
      <x>0</x>
      <y>0</y>
      <width>997</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
@@ -531,6 +608,42 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="icon.qrc"/>
+  <include location="jsontree.qrc"/>
+  <include location="configtool.qrc"/>
+  <include location="tx.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>tbtnArchExpand</sender>
+   <signal>clicked()</signal>
+   <receiver>treevwArchive</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>130</x>
+     <y>471</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbtnArchCollapse</sender>
+   <signal>clicked()</signal>
+   <receiver>treevwArchive</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>61</x>
+     <y>586</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
+     <y>525</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

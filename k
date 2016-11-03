@@ -1,1 +1,0 @@
-file,region,type,modified,line start,line end,std.code.magic:numbers,std.general:size,std.code.todo:strings,std.code.todo:comments,std.code.complexity:cyclomatic,std.code.complexity:maxindent,std.code.length:total,std.code.lines:code,std.code.lines:total,std.code.lines:preprocessor,std.code.lines:comments
