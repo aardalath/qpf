@@ -74,7 +74,7 @@ void FileNameSpec::setFileNameSpec(std::string regexp, std::string assign)
 void FileNameSpec::setRegEx(std::string regexp)
 {
     reStr = regexp;
-    
+
 #ifdef USE_CX11_REGEX
     re = std::regex(regexp);
 #else
@@ -262,7 +262,7 @@ std::regex                        FileNameSpec::re;
 PCRegEx *                         FileNameSpec::re = 0;
 #endif
 
-std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+[\.0-9]*Z)[_]*([0-9\.]*)";
+std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+[\\.0-9]*Z)[_]*([0-9\\.]*)";
 std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
 std::map< char, std::set<int> >   FileNameSpec::assignations;
 std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";
