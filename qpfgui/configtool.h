@@ -50,11 +50,17 @@ namespace Ui {
 class ConfigTool;
 }
 
+////////////////////////////////////////////////////////////////////////////
+// Namespace: QPF
+// -----------------------
+//
+// Library namespace
+////////////////////////////////////////////////////////////////////////////
 namespace QPF {
 
-class Model : public QAbstractItemModel {
-};
-
+//==========================================================================
+// Class: StandardItemModel
+//==========================================================================
 class StandardItemModel : public QStandardItemModel {
 public:
     StandardItemModel(int rows, int columns, QObject *parent = Q_NULLPTR) :
@@ -62,6 +68,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex&index) const;
 };
 
+//==========================================================================
+// Class: StringListModel
+//==========================================================================
 class StringListModel : public QStringListModel {
 public:
     StringListModel(QObject *parent = Q_NULLPTR) :
@@ -69,6 +78,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex&index) const;
 };
 
+//==========================================================================
+// Class: ModelView
+//==========================================================================
 class ModelView : public QWidget {
     Q_OBJECT
 public:
@@ -101,6 +113,9 @@ private:
     Type type;
 };
 
+//==========================================================================
+// Class: ConfigTool
+//==========================================================================
 class ConfigTool : public QDialog
 {
     Q_OBJECT
@@ -120,7 +135,7 @@ public:
         PageFlags,
     };
 
-    void readConfig();
+    void prepare(MapOfUserDefTools & userTools, QStringList pts);
 
     void initExtTools(MapOfUserDefTools & userTools, QStringList pts);
     void getExtTools(MapOfUserDefTools & userTools);
@@ -156,6 +171,9 @@ private slots:
     void changeToolWithItem(QTableWidgetItem * item);
 
 private:
+    void transferCfgToGUI();
+    void transferGUIToCfg();
+
     ModelView * createListModelView(QAbstractItemView * v,
                                     QStringList & dlist,
                                     QString hdr);
@@ -175,6 +193,8 @@ private:
 
 private:
     Ui::ConfigTool *ui;
+
+    std::string cfgDataBackup;
 
     MapOfUserDefTools userDefTools;
     MapOfUserDefTools origDefTools;
