@@ -805,8 +805,7 @@ void MainWindow::showConfigTool()
 
     getUserToolsFromSettings();
 
-    cfgTool.readConfig();
-    cfgTool.initExtTools(userDefTools, userDefProdTypes);
+    cfgTool.prepare(userDefTools, userDefProdTypes);
     if (cfgTool.exec()) {
         std::cerr << "Updating user tools!\n";
         cfgTool.getExtTools(userDefTools);
