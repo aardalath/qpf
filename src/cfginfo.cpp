@@ -37,6 +37,8 @@
  ******************************************************************************/
 
 #include "cfginfo.h"
+#include "config.h"
+#include "tools.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -65,9 +67,277 @@ void ConfigurationInfo::clear()
     machineNodes.clear();
 }
 
-ConfigurationInfo & ConfigurationInfo::data() {
+ConfigurationInfo & ConfigurationInfo::data()
+{
     static ConfigurationInfo cfgInfoInstance {};
     return cfgInfoInstance;
+}
+
+std::string ConfigurationInfo::toJSONString()
+{
+    std::stringstream s;
+    std::string i4("    ");
+    std::string nl("\n");
+
+#define C(x)  "\"" << x << "\""
+#define Cc(x) "\"" << x << "\","
+
+    // START
+    s << "{" << nl;
+
+    // General section
+    s << i4 << "\"general\": {" << nl
+    << i4 << i4 << "\"app_name\": " << Cc(appName) << nl
+    << i4 << i4 << "\"app_version\": " << Cc(appVersion) << nl
+    << i4 << i4 << "\"last_access\": " << Cc(lastAccess) << nl
+    << i4 << i4 << "\"run_path\": " << C(storage.run) << nl
+    << i4 << "}," << nl;
+
+    // Nodes
+    s << i4 << "\"nodes\": {" << nl
+    << i4 << i4 << "\"hmi_node\": " << Cc(qpfhmiCfg.name) << nl
+    << i4 << i4 << "\"master_machine\": " << Cc(masterMachine) << nl
+    << i4 << i4 << "\"node_list\": {" << nl;
+    int n = peersCfg.size();
+    for (int i = 0; i < n; ++i) {
+        Peer & p = peersCfg.at(i);
+        s << i4 << i4 << i4 << C(p.name) << ": {" << nl
+        << i4 << i4 << i4 << i4 << "\"client\": " << Cc(p.clientAddr) << nl
+        << i4 << i4 << i4 << i4 << "\"server\": " << Cc(p.serverAddr) << nl
+        << i4 << i4 << i4 << i4 << "\"type\": " << C(p.type) << nl
+        << i4 << i4 << i4 << ((i < (n - 1)) ? "}," : "}") << nl;
+    }
+    s << i4 << i4 << "}" << nl
+    << i4 << "}," << nl;
+
+    // Machines
+    s << i4 << "\"machines\": {" << nl;
+    n = machines.size();
+    for (int i = 0; i < n; ++i) {
+        std::string & mach = machines.at(i);
+        std::vector<std::string> & mnodes = machineNodes[mach];
+        s << i4 << i4 << C(mach) << ": [ " << C(mnodes.at(0));
+        int m = mnodes.size();
+        for (int j = 1; j < m; ++j) {
+            s << ", " << C(mnodes.at(j));
+        }
+        s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
+    }
+    s << i4 << "}," << nl;
+
+    // Connections
+    s << i4 << "\"connections\": {" << nl;
+    n = peersCfg.size();
+    for (int i = 0; i < n; ++i) {
+        Peer & p = peersCfg.at(i);
+        std::vector<std::string> & nconn = connections[p.name];
+        s << i4 << i4 << i4 << C(p.name) << ": [ " << C(nconn.at(0));
+        int m = nconn.size();
+        for (int j = 1; j < m; ++j) {
+            s << ", " << C(nconn.at(j));
+        }
+        s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
+    }
+    s << i4 << "}," << nl;
+
+    // Database
+    s << i4 << "\"db\": {" << nl
+    << i4 << i4 << "\"host\": " << Cc(Configuration::DBHost) << nl
+    << i4 << i4 << "\"port\": " << Cc(Configuration::DBPort) << nl
+    << i4 << i4 << "\"name\": " << Cc(Configuration::DBName) << nl
+    << i4 << i4 << "\"user\": " << Cc(Configuration::DBUser) << nl
+    << i4 << i4 << "\"pwd\": " << C(Configuration::DBPwd) << nl
+    << i4 << "}," << nl;
+
+    // Products
+    s << i4 << "\"products\": {" << nl
+    << i4 << i4 << "\"product_types\": [" << nl;
+    n = orcParams.productTypes.size();
+    s << C(orcParams.productTypes.at(0));
+    for (int i = 1; i < n; ++i) {
+        s << ", " << C(orcParams.productTypes.at(i));
+    }
+    s << " ]," << nl
+    << i4 << i4 << "\"parsing_regex\": " << Cc(parsing_regex) << nl
+    << i4 << i4 << "\"parsing_assign\": " << Cc(parsing_assign) << nl
+    << i4 << i4 << "\"product_id_tpl\": " << Cc(product_id_tpl) << nl
+    << i4 << i4 << "\"data_ext\": " << Cc(data_ext) << nl
+    << i4 << i4 << "\"meta_ext\": " << Cc(meta_ext) << nl
+    << i4 << i4 << "\"log_ext\": " << C(log_ext) << nl
+    << i4 << "}," << nl;
+
+    // Orchestration
+    s << i4 << "\"orchestration\": {" << nl
+    << i4 << i4 << "\"rules\": {" << nl;
+    n = orcParams.rules.size();
+    for (int i = 0; i < n; ++i) {
+        Rule * r = orcParams.rules.at(i);
+        s << i4 << i4 << i4 << C(r->name) << ": {" << nl
+        << i4 << i4 << i4 << i4 << "\"inputs\": ";
+        int m = r->inputs.size();
+        s << "\"" << r->inputs.at(0);
+        for (int j = 1; j < m; ++j) {
+            s << "," << r->inputs.at(j);
+        }
+        s << "\"," << nl
+        << i4 << i4 << i4 << i4 << "\"outputs\": ";
+        m = r->outputs.size();
+        s << "\"" << r->outputs.at(0);
+        for (int j = 1; j < m; ++j) {
+            s << "," << r->outputs.at(j);
+        }
+        s << "\"," << nl
+        << i4 << i4 << i4 << i4 << "\"processing\": " << Cc(r->processingElement) << nl
+        << i4 << i4 << i4 << i4 << "\"condition\": " << C(r->condition) << nl
+        << i4 << i4 << i4 << ((i < (n - 1)) ? "}," : "}") << nl;
+    }
+    s << i4 << i4 << "}" << nl
+    << i4 << "}," << nl;
+
+    // Processors
+    s << i4 << "\"processing\": {" << nl
+    << i4 << i4 << "\"processors\": {" << nl;
+    n = orcParams.processors.size();
+    int k = 0;
+    for (auto & kv : orcParams.processors) {
+        Processor * p = kv.second;
+        s << i4 << i4 << i4 << C(p->name) << ": {" << nl
+        << i4 << i4 << i4 << i4 << "\"exe_path\": " << Cc(p->exePath) << nl
+        << i4 << i4 << i4 << i4 << "\"input_path\": " << Cc(p->inPath) << nl
+        << i4 << i4 << i4 << i4 << "\"name\": " << Cc(p->name) << nl
+        << i4 << i4 << i4 << i4 << "\"output_path\": " << Cc(p->outPath) << nl
+        << i4 << i4 << i4 << ((k < (n - 1)) ? "}," : "}") << nl;
+        ++k;
+    }
+    s << i4 << i4 << "}" << nl
+    << i4 << "}," << nl;
+
+    // Storage
+    s
+    << i4 << "\"storage\": {" << nl
+    << i4 << i4 << "\"base\": {" << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.base) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"run\": {" << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.run) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"incoming\": {" << nl
+    << i4 << i4 << i4 << "\"protocol\": " << Cc(storage.inbox.protocol) << nl
+    << i4 << i4 << i4 << "\"address\": " << Cc(storage.inbox.address) << nl
+    << i4 << i4 << i4 << "\"port\": " << Cc(storage.inbox.port) << nl
+    << i4 << i4 << i4 << "\"user\": " << Cc(storage.inbox.user) << nl
+    << i4 << i4 << i4 << "\"password\": " << Cc(storage.inbox.passwd) << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.inbox.path) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"local_archive\": {" << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.local_archive.path) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"archive\": {" << nl
+    << i4 << i4 << i4 << "\"protocol\": " << Cc(storage.archive.protocol) << nl
+    << i4 << i4 << i4 << "\"address\": " << Cc(storage.archive.address) << nl
+    << i4 << i4 << i4 << "\"port\": " << Cc(storage.archive.port) << nl
+    << i4 << i4 << i4 << "\"user\": " << Cc(storage.archive.user) << nl
+    << i4 << i4 << i4 << "\"password\": " << Cc(storage.archive.passwd) << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.archive.path) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"gateway\": {" << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.gateway.path) << nl
+    << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"outgoing\": {" << nl
+    << i4 << i4 << i4 << "\"protocol\": " << Cc(storage.outbox.protocol) << nl
+    << i4 << i4 << i4 << "\"address\": " << Cc(storage.outbox.address) << nl
+    << i4 << i4 << i4 << "\"port\": " << Cc(storage.outbox.port) << nl
+    << i4 << i4 << i4 << "\"user\": " << Cc(storage.outbox.user) << nl
+    << i4 << i4 << i4 << "\"password\": " << Cc(storage.outbox.passwd) << nl
+    << i4 << i4 << i4 << "\"path\": " << C(storage.outbox.path) << nl
+    << i4 << i4 << "}" << nl
+    << i4 << "}," << nl;
+
+    // User Defined Tools
+    s << i4 << "\"userdeftools\": {" << nl
+    << i4 << i4 << "\"rules\": {" << nl;
+    n = userDefTools.size();
+    k = 0;
+    for (auto & kv : userDefTools) {
+        UserDefTool & u = kv.second;
+        s << i4 << i4 << i4 << "{" << nl
+        << i4 << i4 << i4 << i4 << "\"name\": " << Cc(u.name) << nl
+        << i4 << i4 << i4 << i4 << "\"description\": " << Cc(u.desc) << nl
+        << i4 << i4 << i4 << i4 << "\"arguments\": " << Cc(u.args) << nl
+        << i4 << i4 << i4 << i4 << "\"executable\": " << Cc(u.exe) << nl
+        << i4 << i4 << i4 << i4 << "\"product_types\": [ ";
+        int m = u.prod_types.size();
+        s << C(u.prod_types.at(0));
+        for (int j = 1; j < m; ++j) {
+            s << ", " << C(u.prod_types.at(j));
+        }
+        s << " ]" << nl
+        << i4 << i4 << i4 << ((k < (n - 1)) ? "}," : "}") << nl;
+        ++k;
+    }
+    s << i4 << i4 << "}" << nl
+    << i4 << "}," << nl;
+
+    // Flags
+    s << i4 << "\"flags\": {" << nl
+    << i4 << i4 << "\"monitoring\": {" << nl;
+
+    k = 0;
+    n = flags.monit.msgsToDisk.size();
+    s << i4 << i4 << i4 << "\"msgs_to_disk\": [ ";
+    for (auto & kv : flags.monit.msgsToDisk) {
+        ++k;
+        if (k < n) {
+            s << Cc(kv.first);
+        } else {
+            s << C(kv.first) << " ]," << nl;
+        }
+    }
+
+    k = 0;
+    n = flags.monit.msgsToDB.size();
+    s << i4 << i4 << i4 << "\"msgs_to_db\": [ ";
+    for (auto & kv : flags.monit.msgsToDB) {
+        ++k;
+        if (k < n) {
+            s << Cc(kv.first);
+        } else {
+            s << C(kv.first) << " ]," << nl;
+        }
+    }
+
+    s << i4 << i4 << i4 << "\"notify_msg_arrival\": "
+    << ((flags.monit.notifyMsgArrival) ? "true" : "false") << "," << nl;
+    s << i4 << i4 << i4 << "\"group_task_agent_logs\": "
+    << ((flags.monit.groupTaskAgentLogs) ? "true" : "false") << nl;
+
+    s << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"processing\": {" << nl;
+
+    s << i4 << i4 << i4 << "\"allow_reprocessing\": "
+    << ((flags.proc.allowReprocessing) ? "true" : "false") << "," << nl;
+    s << i4 << i4 << i4 << "\"intermediate_products\": "
+    << ((flags.proc.intermedProducts) ? "true" : "false") << nl;
+
+    s << i4 << i4 << "}," << nl
+    << i4 << i4 << "\"archiving\": {" << nl;
+
+    s << i4 << i4 << i4 << "\"send_outputs_to_main_archive\": "
+    << ((flags.arch.sendOutputsToMainArchive) ? "true" : "false") << nl;
+
+    s << i4 << i4 << "}" << nl
+    << i4 << "}" << nl;
+
+
+    s << "}" << nl;
+    // END
+
+    return s.str();
+}
+
+void ConfigurationInfo::loadFromJSONString(std::string s)
+{
+
 }
 
 void ConfigurationInfo::dump()

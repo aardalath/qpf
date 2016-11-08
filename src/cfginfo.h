@@ -81,6 +81,7 @@ public:
     std::string                         cfgFileName;
     std::string                         currentMachine;
     std::string                         currentUser;
+    bool                                isActualFile;
 
     std::string                         masterMachine;
     bool                                isMaster;
@@ -138,8 +139,13 @@ public:
     void clear();
     void dump();
 
+    std::string toJSONString();
+    void loadFromJSONString(std::string s);
+
 private:
     ConfigurationInfo();
+
+    std::vector<ConfigurationInfo *> pushedData;
 
 };
 
