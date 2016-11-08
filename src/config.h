@@ -210,12 +210,6 @@ private:
     void setConfigFile(std::string fName);
 
     //----------------------------------------------------------------------
-    // Method: applyNewConfig
-    // Get new configuration information from an external (JSON) file
-    //----------------------------------------------------------------------
-    void applyNewConfig(std::string fName);
-
-    //----------------------------------------------------------------------
     // Method: readConfiguration
     // Loads the configuration file content into memory
     //----------------------------------------------------------------------
@@ -265,6 +259,7 @@ private:
     Json::Value::iterator toolIt;
 
     bool hmiPresent;
+    bool isActualFile;
 
 public:
     static std::string DBHost;

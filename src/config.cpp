@@ -36,6 +36,7 @@
  *
  ******************************************************************************/
 
+#include <climits>
 #include <cstdlib>
 
 #include "config.h"
@@ -118,7 +119,9 @@ void Configuration::init(std::string fName)
         fName = ""; // clear filename, to read from DB
     }
     if (! fName.empty()) {
-        applyNewConfig(fName);
+        setConfigFile(fName);
+        readConfigurationFromFile();
+        saveConfigurationToDB();
     } else {
         readConfigurationFromDB();
     }
@@ -383,24 +386,16 @@ void Configuration::getUserDefTool(UserDefTool & t)
 }
 
 //----------------------------------------------------------------------
-// Method: applyNewConfig
-// Get new configuration information from an external (JSON) file
-//----------------------------------------------------------------------
-void Configuration::applyNewConfig(std::string fName)
-{
-    setConfigFile(fName);
-    readConfigurationFromFile();
-    saveConfigurationToDB();
-}
-
-//----------------------------------------------------------------------
 // Method: setConfigFile
 // Set configuration file name
 //----------------------------------------------------------------------
 void Configuration::setConfigFile(std::string fName)
 {
-    cfgFileName = fName;
-    cfgFilePath = std::string(dirname(strdup(fName.c_str())));
+    char actualpath [PATH_MAX+1];
+    char * ptr;
+    ptr = realpath(fName.c_str(), actualpath);
+    cfgFileName = std::string(ptr);
+    cfgFilePath = std::string(dirname(ptr));
 }
 
 //----------------------------------------------------------------------
@@ -418,6 +413,7 @@ void Configuration::readConfigurationFromFile()
     reader.parse(cfgJsonFile, cfg);
     cfgJsonFile.close();
 
+    isActualFile = true;
     processConfiguration();
 }
 
@@ -486,6 +482,7 @@ void Configuration::readConfigurationFromDB()
     // Close connection
     dbHdl->closeConnection();
 
+    isActualFile = false;
     processConfiguration();
 }
 
@@ -625,7 +622,8 @@ void Configuration::processConfiguration()
     // Now, fill in ConfigurationInfo structure
     reset();
     cfgInfo.clear();
-    cfgInfo.hmiPresent = false;
+    cfgInfo.hmiPresent   = false;
+    cfgInfo.isActualFile = isActualFile;
 
     // Configuration file name
     cfgInfo.currentMachine = getEnvVar("HOSTNAME");
