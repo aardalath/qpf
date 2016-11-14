@@ -281,14 +281,14 @@ void ConfigTool::getExtTools(MapOfUserDefTools & userTools)
 void ConfigTool::save()
 {
     if (!ConfigurationInfo::data().isActualFile) {
+        QString fileName(QString::fromStdString(ConfigurationInfo::data().cfgFileName));
         int ret = QMessageBox::question(this, tr("Save"),
                     tr("Do you want to overwrite the configuration file \"") +
-                    QString::fromStdString(ConfigurationInfo::data().cfgFileName) +
-                    QString("\"?"),
+                    fileName + QString("\"?"),
                     QMessageBox::Yes | QMessageBox::No,
                     QMessageBox::No);
         if (ret == QMessageBox::Yes) {
-            transferFlagsFromGUIToCfg();
+            saveAsFilename(fileName);
         }
     } else {
         saveAs();
@@ -308,7 +308,24 @@ void ConfigTool::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
             fs.absolutePath(), filter);
     if (! fileName.isEmpty()) {
+        saveAsFilename(fileName);
+    }
+}
 
+//----------------------------------------------------------------------
+// Slot: saveAsFilename
+// Saves the configuration data into a new config file
+//----------------------------------------------------------------------
+void ConfigTool::saveAsFilename(QString & fName)
+{
+    if (! fName.isEmpty()) {
+        transferGUIToCfg();
+        QString cfgJsonContent(ConfigurationInfo::data().toJSONString().c_str());
+        QFile file( fName );
+        if (file.open(QIODevice::ReadWrite)) {
+            QTextStream stream(&file);
+            stream << cfgJsonContent << endl;
+        }
     }
 }
 
@@ -318,8 +335,17 @@ void ConfigTool::saveAs()
 //----------------------------------------------------------------------
 void ConfigTool::apply()
 {
-    transferFlagsFromGUIToCfg();
+    transferGUIToCfg();
     accept();
+}
+
+//----------------------------------------------------------------------
+// Slot: closeDoNothing
+// Closes the dialog, without modifying the configuration
+//----------------------------------------------------------------------
+void ConfigTool::closeDoNothing()
+{
+    ConfigurationInfo::data().loadFromJSONString(cfgDataBackup);
 }
 
 //----------------------------------------------------------------------

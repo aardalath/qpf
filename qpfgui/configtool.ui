@@ -2245,22 +2245,6 @@ Processors</string>
  </resources>
  <connections>
   <connection>
-   <sender>btnDiscard</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigTool</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>612</x>
-     <y>577</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>725</x>
-     <y>427</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnSaveAs</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
@@ -2315,8 +2299,8 @@ Processors</string>
    <slot>addNewTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>899</x>
-     <y>71</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2331,8 +2315,8 @@ Processors</string>
    <slot>editTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>899</x>
-     <y>99</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>941</x>
@@ -2347,8 +2331,8 @@ Processors</string>
    <slot>removeTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>899</x>
-     <y>127</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>925</x>
@@ -2395,8 +2379,8 @@ Processors</string>
    <slot>setWorkingPaths(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>402</x>
-     <y>78</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>493</x>
@@ -2411,8 +2395,8 @@ Processors</string>
    <slot>selectBasePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>945</x>
-     <y>82</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>994</x>
@@ -2427,8 +2411,8 @@ Processors</string>
    <slot>addHost()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>930</x>
-     <y>79</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>664</x>
@@ -2443,8 +2427,8 @@ Processors</string>
    <slot>removeHost()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>903</x>
-     <y>112</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>776</x>
@@ -2459,8 +2443,8 @@ Processors</string>
    <slot>addRule()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>914</x>
-     <y>86</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -2475,8 +2459,8 @@ Processors</string>
    <slot>removeRule()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>893</x>
-     <y>108</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -2491,8 +2475,8 @@ Processors</string>
    <slot>addProduct()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>499</x>
-     <y>85</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>141</x>
@@ -2507,8 +2491,8 @@ Processors</string>
    <slot>removeProduct()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>530</x>
-     <y>108</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>238</x>
@@ -2523,8 +2507,8 @@ Processors</string>
    <slot>addProcessor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>908</x>
-     <y>84</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>985</x>
@@ -2539,12 +2523,28 @@ Processors</string>
    <slot>removeProcessor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>928</x>
-     <y>106</y>
+     <x>271</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>986</x>
      <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDiscard</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>closeDoNothing()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>582</x>
+     <y>567</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>292</x>
+     <y>589</y>
     </hint>
    </hints>
   </connection>
@@ -2588,6 +2588,7 @@ Processors</string>
   <slot>removeProduct()</slot>
   <slot>addProcessor()</slot>
   <slot>removeProcessor()</slot>
+  <slot>closeDoNothing()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="btngrpSection"/>

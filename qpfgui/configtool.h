@@ -144,6 +144,7 @@ public slots:
     void save();
     void saveAs();
     void apply();
+    void closeDoNothing();
     void selectBasePath();
     void setWorkingPaths(QString newPath);
 
@@ -169,6 +170,7 @@ private slots:
     void removeTool();
     void cancelDlg();
     void changeToolWithItem(QTableWidgetItem * item);
+    void saveAsFilename(QString & fName);
 
 private:
     void transferCfgToGUI();
