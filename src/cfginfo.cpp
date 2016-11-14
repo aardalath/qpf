@@ -113,30 +113,40 @@ std::string ConfigurationInfo::toJSONString()
     // Machines
     s << i4 << "\"machines\": {" << nl;
     n = machines.size();
-    for (int i = 0; i < n; ++i) {
-        std::string & mach = machines.at(i);
-        std::vector<std::string> & mnodes = machineNodes[mach];
-        s << i4 << i4 << C(mach) << ": [ " << C(mnodes.at(0));
-        int m = mnodes.size();
-        for (int j = 1; j < m; ++j) {
-            s << ", " << C(mnodes.at(j));
+    if (n > 0) {
+        for (int i = 0; i < n; ++i) {
+            std::string & mach = machines.at(i);
+            std::vector<std::string> & mnodes = machineNodes[mach];
+            s << i4 << i4 << C(mach) << ": [" << nl;
+            int m = mnodes.size();
+            if (m > 0) {
+                for (int j = 0; j < m - 1; ++j) {
+                    s << i4 << i4 << i4 << Cc(mnodes.at(j)) << nl;
+                }
+                s << i4 << i4 << i4 << C(mnodes.at(m - 1)) << nl;
+            }
+            s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
         }
-        s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
     }
     s << i4 << "}," << nl;
 
     // Connections
     s << i4 << "\"connections\": {" << nl;
     n = peersCfg.size();
-    for (int i = 0; i < n; ++i) {
-        Peer & p = peersCfg.at(i);
-        std::vector<std::string> & nconn = connections[p.name];
-        s << i4 << i4 << i4 << C(p.name) << ": [ " << C(nconn.at(0));
-        int m = nconn.size();
-        for (int j = 1; j < m; ++j) {
-            s << ", " << C(nconn.at(j));
+    if (n > 0) {
+        for (int i = 0; i < n; ++i) {
+            Peer & p = peersCfg.at(i);
+            std::vector<std::string> & nconn = connections[p.name];
+            s << i4 << i4 << C(p.name) << ": [" << nl;
+            int m = nconn.size();
+            if (m > 0) {
+                for (int j = 0; j < m - 1; ++j) {
+                    s << i4 << i4 << i4 << Cc(nconn.at(j)) << nl;
+                }
+                s << i4 << i4 << i4 << C(nconn.at(m - 1)) << nl;
+            }
+            s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
         }
-        s << i4 << i4 << ((i < (n - 1)) ? "]," : "]") << nl;
     }
     s << i4 << "}," << nl;
 
@@ -153,11 +163,13 @@ std::string ConfigurationInfo::toJSONString()
     s << i4 << "\"products\": {" << nl
     << i4 << i4 << "\"product_types\": [" << nl;
     n = orcParams.productTypes.size();
-    s << C(orcParams.productTypes.at(0));
-    for (int i = 1; i < n; ++i) {
-        s << ", " << C(orcParams.productTypes.at(i));
+    if (n > 0) {
+        for (int i = 0; i < n - 1; ++i) {
+            s << i4 << i4 << i4 << Cc(orcParams.productTypes.at(i)) << nl;
+        }
+        s << i4 << i4 << i4 << C(orcParams.productTypes.at(n - 1)) << nl;
     }
-    s << " ]," << nl
+    s << i4 << i4 << " ]," << nl
     << i4 << i4 << "\"parsing_regex\": " << Cc(parsing_regex) << nl
     << i4 << i4 << "\"parsing_assign\": " << Cc(parsing_assign) << nl
     << i4 << i4 << "\"product_id_tpl\": " << Cc(product_id_tpl) << nl
@@ -254,57 +266,57 @@ std::string ConfigurationInfo::toJSONString()
     << i4 << "}," << nl;
 
     // User Defined Tools
-    s << i4 << "\"userdeftools\": {" << nl
-    << i4 << i4 << "\"rules\": {" << nl;
+    s << i4 << "\"userdeftools\": [" << nl;
     n = userDefTools.size();
     k = 0;
     for (auto & kv : userDefTools) {
         UserDefTool & u = kv.second;
-        s << i4 << i4 << i4 << "{" << nl
-        << i4 << i4 << i4 << i4 << "\"name\": " << Cc(u.name) << nl
-        << i4 << i4 << i4 << i4 << "\"description\": " << Cc(u.desc) << nl
-        << i4 << i4 << i4 << i4 << "\"arguments\": " << Cc(u.args) << nl
-        << i4 << i4 << i4 << i4 << "\"executable\": " << Cc(u.exe) << nl
-        << i4 << i4 << i4 << i4 << "\"product_types\": [ ";
+        s << i4 << i4 << "{" << nl
+        << i4 << i4 << i4 << "\"name\": " << Cc(u.name) << nl
+        << i4 << i4 << i4 << "\"description\": " << Cc(u.desc) << nl
+        << i4 << i4 << i4 << "\"arguments\": " << Cc(u.args) << nl
+        << i4 << i4 << i4 << "\"executable\": " << Cc(u.exe) << nl
+        << i4 << i4 << i4 << "\"product_types\": [ ";
         int m = u.prod_types.size();
         s << C(u.prod_types.at(0));
         for (int j = 1; j < m; ++j) {
             s << ", " << C(u.prod_types.at(j));
         }
         s << " ]" << nl
-        << i4 << i4 << i4 << ((k < (n - 1)) ? "}," : "}") << nl;
+        << i4 << i4 << ((k < (n - 1)) ? "}," : "}") << nl;
         ++k;
     }
-    s << i4 << i4 << "}" << nl
-    << i4 << "}," << nl;
+    s << i4 << "]," << nl;
 
     // Flags
     s << i4 << "\"flags\": {" << nl
     << i4 << i4 << "\"monitoring\": {" << nl;
 
-    k = 0;
     n = flags.monit.msgsToDisk.size();
-    s << i4 << i4 << i4 << "\"msgs_to_disk\": [ ";
+    k = 0;
+    s << i4 << i4 << i4 << "\"msgs_to_disk\": [";
     for (auto & kv : flags.monit.msgsToDisk) {
-        ++k;
-        if (k < n) {
-            s << Cc(kv.first);
+        k++;
+        if (k == n) {
+            s << ' ' << C(kv.first);
         } else {
-            s << C(kv.first) << " ]," << nl;
+            s << ' ' << Cc(kv.first);
         }
     }
+    s << " ]," << nl;
 
-    k = 0;
     n = flags.monit.msgsToDB.size();
+    k = 0;
     s << i4 << i4 << i4 << "\"msgs_to_db\": [ ";
     for (auto & kv : flags.monit.msgsToDB) {
-        ++k;
-        if (k < n) {
-            s << Cc(kv.first);
+        k++;
+        if (k == n) {
+            s << ' ' << C(kv.first);
         } else {
-            s << C(kv.first) << " ]," << nl;
+            s << ' ' << Cc(kv.first);
         }
     }
+    s << " ]," << nl;
 
     s << i4 << i4 << i4 << "\"notify_msg_arrival\": "
     << ((flags.monit.notifyMsgArrival) ? "true" : "false") << "," << nl;
