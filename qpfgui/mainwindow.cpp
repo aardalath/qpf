@@ -290,6 +290,8 @@ void MainWindow::readConfig(QString dbUrl)
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
     cfg->setLastAccess(lastAccess.toStdString());
     putToSettings("lastAccess", QVariant(lastAccess));
+
+    getUserToolsFromSettings();
 }
 
 //----------------------------------------------------------------------
@@ -676,52 +678,7 @@ void MainWindow::putToSettings(QString name, QVariant value)
     QSettings settings(APP_SYS_NAME, APP_NAME);
     settings.setValue(name, value);
 }
-/*
-//----------------------------------------------------------------------
-// Method: getUserToolsFromSettings
-// Retrieves user defined tools from settings file
-//----------------------------------------------------------------------
-void MainWindow::getUserToolsFromSettings()
-{
-    QSettings settings(APP_SYS_NAME, APP_NAME);
-    int size = settings.beginReadArray("user_tools");
-    for (int i = 0; i < size; ++i) {
-        settings.setArrayIndex(i);
-        QUserDefTool udt;
-        udt.name = settings.value("name").toString();
-        udt.desc = settings.value("description").toString();
-        udt.exe  = settings.value("executable").toString();
-        udt.args = settings.value("arguments").toString();
-        udt.prod_types = settings.value("product_types").toStringList();
-        userDefTools[udt.name] = udt;
-    }
-    settings.endArray();
-    userDefProdTypes = settings.value("product_types").toStringList();
-}
 
-//----------------------------------------------------------------------
-// Method: putUserToolsToSettings
-// Retrieves user defined tools from settings file
-//----------------------------------------------------------------------
-void MainWindow::putUserToolsToSettings()
-{
-    QSettings settings(APP_SYS_NAME, APP_NAME);
-    settings.beginWriteArray("user_tools");
-    int i = 0;
-    foreach (QString key, userDefTools.keys()) {
-        const QUserDefTool & udt = userDefTools.value(key);
-        settings.setArrayIndex(i);
-        settings.setValue("name", udt.name);
-        settings.setValue("description", udt.desc);
-        settings.setValue("executable", udt.exe);
-        settings.setValue("arguments", udt.args);
-        settings.setValue("product_types", udt.prod_types);
-        i++;
-    }
-    settings.endArray();
-    settings.setValue("product_types", userDefProdTypes);
-}
-*/
 //----------------------------------------------------------------------
 // Method: getUserToolsFromSettings
 // Retrieves user defined tools from settings file
@@ -803,13 +760,10 @@ void MainWindow::showConfigTool()
 
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
-    getUserToolsFromSettings();
-
     cfgTool.prepare(userDefTools, userDefProdTypes);
     if (cfgTool.exec()) {
         std::cerr << "Updating user tools!\n";
         cfgTool.getExtTools(userDefTools);
-        putUserToolsToSettings();
     }
 }
 
@@ -834,7 +788,8 @@ void MainWindow::showExtToolsDef()
     dlg.initialize(userDefTools, userDefProdTypes);
     if (dlg.exec()) {
         dlg.getTools(userDefTools);
-        putUserToolsToSettings();
+        ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+        convertQUTools2UTools(userDefTools, cfgInfo.userDefTools);
     }
 }
 
@@ -1161,6 +1116,18 @@ void MainWindow::initLocalArchiveView()
     acDefault = new QAction("System Default", ui->treevwArchive);
     connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
 
+    setUToolTasks();
+
+    // Add Expand All / Collapse All buttons
+    //addExpandCollapseButtonsTo(ui->treevwArchive);
+}
+
+//----------------------------------------------------------------------
+// METHOD: setUToolTasks
+//----------------------------------------------------------------------
+void MainWindow::setUToolTasks()
+{
+    acUserTools.clear();
     foreach (QString key, userDefTools.keys()) {
         const QUserDefTool & udt = userDefTools.value(key);
         QAction * ac = new QAction(key, ui->treevwArchive);
@@ -1168,9 +1135,6 @@ void MainWindow::initLocalArchiveView()
         connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
         acUserTools[key] = ac;
     }
-
-    // Add Expand All / Collapse All buttons
-    //addExpandCollapseButtonsTo(ui->treevwArchive);
 }
 
 //----------------------------------------------------------------------
@@ -1993,6 +1957,31 @@ void MainWindow::addExpandCollapseButtonsTo(QWidget * w)
 
     connect(lblExpand,   SIGNAL(clicked()), w, SLOT(expandAll()));
     connect(lblCollapse, SIGNAL(clicked()), w, SLOT(collapseAll()));
+}
+
+//----------------------------------------------------------------------
+// Method: convertQUTools2UTools
+// Convert Qt map of user def tools to std map
+//----------------------------------------------------------------------
+void MainWindow::convertQUTools2UTools(MapOfUserDefTools qutmap,
+                                       std::map<std::string, UserDefTool> & utmap)
+{
+    utmap.clear();
+    //QMap<QString, QUserDefTool>::
+    QMap<QString, QUserDefTool>::const_iterator it  = qutmap.constBegin();
+    auto end = qutmap.constEnd();
+    while (it != end) {
+        const QUserDefTool & t = it.value();
+        UserDefTool ut;
+        ut.name = t.name.toStdString();
+        ut.args = t.args.toStdString();
+        ut.desc = t.desc.toStdString();
+        ut.exe  = t.exe.toStdString();
+        foreach (const QString & s, t.prod_types) {
+            ut.prod_types.push_back(s.toStdString());
+        }
+        utmap[ut.name] = ut;
+    }
 }
 
 }

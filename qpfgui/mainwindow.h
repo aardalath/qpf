@@ -138,6 +138,7 @@ private:
     virtual void defineValidTransitions();
 
     void initLocalArchiveView();
+    void setUToolTasks();
     void initTasksMonitView();
     void initAlertsTables();
     void initTxView();
@@ -148,6 +149,9 @@ private:
     void binaryGetFITSHeader(QString fileName, QString & tr);
 
     void addExpandCollapseButtonsTo(QWidget * w);
+    void convertQUTools2UTools(MapOfUserDefTools qutmap,
+                               std::map<std::string, UserDefTool> & utmap);
+
 
 private:
     Ui::MainWindow *ui;
@@ -201,20 +205,10 @@ private:
     //HMIProxy * hmiNode;
     //std::thread hmiPxyThread;
 
-    //SimInData * simInData;
-    //ArchiveModel * archHdl;
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
 
     QString inboxDirName;
-
-    //QMap<QString, QJsonObject> & tasksInfo;
-
-    //QMap<QString, Json::Value> taskResInfo;
-    //QMap<QString, QTreeWidgetItem *> taskResItems;
-    //QMap<QString, Json::Value> processedTasksInfo;
-
-    //QList<Alert> alerts;
 
     QAction * acWorkDir;
     QAction * acShowTaskInfo;
