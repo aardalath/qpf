@@ -26,6 +26,7 @@ set (qpfGuiLib_src
   exttooledit.cpp
   exttoolsdef.cpp
   frmagentstatus.cpp
+  hmipxy.cpp
   logframe.cpp
   logwatcher.cpp
   mainwindow.cpp
@@ -58,6 +59,7 @@ set (qpfGuiLib_hdr
   exttooledit.h
   exttoolsdef.h
   frmagentstatus.h
+  hmipxy.h
   hmitypes.h
   init.h
   logframe.h
