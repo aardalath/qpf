@@ -45,6 +45,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QMenu>
+
 #include "version.h"
 
 #include "tools.h"
@@ -67,6 +69,7 @@
 #include <QDesktopServices>
 
 #include <thread>
+#include <QtCore/qstring.h>
 
 #include "logwatcher.h"
 #include "progbardlg.h"
@@ -110,7 +113,10 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     ui(new Ui::MainWindow),
     isThereActiveCores(true)
 {
-    setSessionTag(sessionName.toStdString());
+    if (!sessionName.isEmpty()) {
+        ConfigurationInfo::data().session = sessionName.toStdString();
+        setSessionTag(ConfigurationInfo::data().session);
+    }
 
     // Read QPF Configuration
     readConfig(dbUrl);
@@ -138,13 +144,14 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     }
 
     //transitTo(INITIALISED);
-    qDebug() << "Trying to show state";
     showState();
-    qDebug() << "Trying to show state - DONE";
+
+    //init();
 
     statusBar()->showMessage(tr("QPF HMI Ready . . ."),
                              MessageDelay);
 
+    std::cerr << "SessionId: " << ConfigurationInfo::data().session << std::endl;
 
     // Launch automatic view update timer
     QTimer * updateSystemViewTimer = new QTimer(this);
@@ -154,6 +161,7 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    DBManager::close();
     delete ui;
 }
 
@@ -197,21 +205,6 @@ void MainWindow::manualSetupUI()
                                       QSizePolicy::Minimum,
                                       QSizePolicy::Expanding);
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);
-
-    // Show hosts and nodes
-    QString h, p;
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-    for (auto & s : cfgInfo.machines) {
-        if (! h.isEmpty()) { h += "\n"; }
-        h += QString::fromStdString(s);
-        if (! p.isEmpty()) { p += "\n"; }
-        p += ":  ";
-        for (auto & n : cfgInfo.machineNodes[s]) {
-            p += QString::fromStdString(n) + " ";
-        }
-    }
-    ui->lblHosts->setText(h);
-    ui->lblNodes->setText(p);
 
     //== Set log file watchers ========================================
 
@@ -277,16 +270,6 @@ void MainWindow::readConfig(QString dbUrl)
 
     Log::setLogBaseDir(Configuration::PATHSession);
 
-/*
-    for (auto & kv : taskAgentsInfo ) {
-        qDebug() << kv.first.c_str()
-                 << kv.second->name.c_str()
-                 << kv.second->client.c_str()
-                 << kv.second->server.c_str()
-                 << kv.second->total << kv.second->running << kv.second->waiting
-                 << kv.second->failed << kv.second->finished << kv.second->maxnum;
-    }
-*/
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
     cfg->setLastAccess(lastAccess.toStdString());
     putToSettings("lastAccess", QVariant(lastAccess));
@@ -866,11 +849,21 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    //ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // Initialize and create node part as a separate thread
     qDebug() << "Initializing QPFHMI...";
-    //hmiNode->initialize();
+
+    hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
+    hmiNode->addPeer(cfgInfo.peersCfgByName[cfgInfo.qpfhmiCfg.name]);
+
+    Peer * evtmngPeer = cfgInfo.peersCfgByName[cfgInfo.evtMngCfg.name];
+    hmiNode->addPeer(evtmngPeer);
+
+    hmiNode->initialize();
+
+    cfgInfo.peerNodes.push_back(hmiNode);
+
     qDebug() << "Trying to concurrentRun QPFHMI...";
     //hmiPxyThread = std::thread(&HMIProxy::concurrentRun, hmiNode);
     qDebug() << "QPFHMI should be concurrentRunning...";
@@ -986,32 +979,11 @@ void MainWindow::defineValidTransitions()
 //----------------------------------------------------------------------
 QString MainWindow::getState()
 {
-    static QString stateName(QString::fromStdString(OFF_StateName));
-    static bool requestState = true;
-    static bool firstTime = true;
-
-    // First, a clean up
-    if (firstTime) {
-        DBManager::removeICommands("PING");
-        DBManager::removeICommands("PONG");
-        firstTime = false;
-    }
-
-    if (requestState) {
-        requestState = false;
-        DBManager::addICommand("PING");
-        return stateName;
-    }
-
-    requestState = true;
-    isThereActiveCores = DBManager::getICommand("PONG", true);
-
-    if (!isThereActiveCores) {
-        // No active cores, set state in DB to OFF
-        DBManager::setState(QString::fromStdString(OFF_StateName));
-    }
-
-    stateName = DBManager::getState();
+    QString s = QString::fromStdString(ConfigurationInfo::data().session);
+    nodeStates.clear();
+    nodeStates = DBManager::getCurrentStates(s);
+    QString stateName = nodeStates["EvtMng"];
+    isThereActiveCores = (stateName.toStdString() == getStateName(OPERATIONAL));
     return stateName;
 }
 
@@ -1021,32 +993,73 @@ QString MainWindow::getState()
 //----------------------------------------------------------------------
 void MainWindow::showState()
 {
-    // Retrieve system state
-    QString stateName = getState();
-    int currentState = getStateIdx(stateName.toStdString());
+    static std::map<int,std::string> stateColors
+    {{OPERATIONAL,  "#008800"},
+     {RUNNING,      "#0000C0"},
+     {INITIALISED,  "#00C0C0"},
+     {OFF,          "#101010"},
+     {OFF,          "#FF1010"}};
 
-    QString stys;
-    switch (currentState) {
-    case ERROR:
-        stys = "QLabel { background-color : red; color : orange; }";
-        break;
-    case OFF:
-        stys = "QLabel { background-color : black; color : grey; }";
-        break;
-    case INITIALISED:
-        stys = "QLabel { background-color : blue; color : lightgrey; }";
-        break;
-    case RUNNING:
-        stys = "QLabel { background-color : lightgreen; color : blue; }";
-        break;
-    case OPERATIONAL:
-        stys = "QLabel { background-color : green; color : white; }";
-        break;
-    default:
-        break;
+    static std::map<int,std::string> stateStyle
+    {{OPERATIONAL,  "QLabel { background-color : green; color : white; }"},
+     {RUNNING,      "QLabel { background-color : lightgreen; color : blue; }"},
+     {INITIALISED,  "QLabel { background-color : blue; color : lightgrey; }"},
+     {OFF,          "QLabel { background-color : black; color : grey; }"},
+     {ERROR,        "QLabel { background-color : red; color : orange; }"}};
+
+    static QMap<QString,QString> prevNodeStates;
+
+    // Show hosts and nodes
+    std::string stateName = getState().toStdString();
+
+    // Compare QMaps
+    bool mapsAreEqual = nodeStates.size() == prevNodeStates.size();
+
+    auto it  = nodeStates.constBegin();
+    auto ite = nodeStates.constEnd();
+    auto itte = prevNodeStates.constEnd();
+    while ((it != ite) && mapsAreEqual) {
+        auto k = it.key();
+        QString s = ">>>" + k + " " + it.value() + ": ";
+        auto itt = prevNodeStates.find(k);
+        if (itt != itte) {
+            s += itt.value();
+            if (it.value() != itt.value()) {
+                mapsAreEqual = false;
+            }
+        } else {
+            mapsAreEqual = false;
+        }
+        std::cerr << s.toStdString() << std::endl;
+        ++it;
     }
-    ui->lblSysStatus->setText(stateName);
-    ui->lblSysStatus->setStyleSheet(stys);
+
+    if (!mapsAreEqual) {
+        ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+        QString h, p;
+        for (auto & s : cfgInfo.machines) {
+            if (! h.isEmpty()) { h += "<br>"; }
+            h += QString("<b>%1</b>").arg(QString::fromStdString(s));
+            if (! p.isEmpty()) { p += "<br>"; }
+            p += ":  ";
+            for (auto & n : cfgInfo.machineNodes[s]) {
+                std::string s = nodeStates[QString::fromStdString(n)].toStdString();
+                int stateId = getStateIdx(s);
+                QString color = QString::fromStdString(stateColors[stateId]);
+                p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(QString::fromStdString(n));
+            }
+        }
+        ui->lblHosts->setText(h);
+        ui->lblNodes->setText(p);
+
+        // Retrieve system state
+        int stateId = getStateIdx(stateName);
+        std::string stys = stateStyle[stateId];
+        ui->lblSysStatus->setText(QString::fromStdString(stateName));
+        ui->lblSysStatus->setStyleSheet(QString::fromStdString(stys));
+
+        prevNodeStates = nodeStates;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -1075,11 +1088,8 @@ void MainWindow::updateSystemView()
     procAlertModel->refresh();
     ui->tblvwAlerts->resizeColumnsToContents();
 
-    //== 3. Local Archive
-    productsModel->refresh();
-    for (int i = 0; i < productsModel->columnCount(); ++i) {
-        ui->treevwArchive->resizeColumnToContents(i);
-    }
+    //== 4. Local Archive
+    localarchViewUpdate();
 
     //== 5. Transmissions
     txModel->refresh();
@@ -1088,6 +1098,18 @@ void MainWindow::updateSystemView()
 
     // 6. Agents Monit. Panel
     updateAgentsMonitPanel();
+}
+
+//----------------------------------------------------------------------
+// SLOT: localarchViewUpdate
+// Updates the local archive view on demand
+//----------------------------------------------------------------------
+void MainWindow::localarchViewUpdate()
+{
+    productsModel->refresh();
+    for (int i = 0; i < productsModel->columnCount(); ++i) {
+        ui->treevwArchive->resizeColumnToContents(i);
+    }
 }
 
 //======================================================================
@@ -1349,6 +1371,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         model->setIcon(QJsonValue::String, QIcon(":/img/bullet_blue.png"));
         model->setIcon(QJsonValue::Array, QIcon(":/img/table.png"));
         model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
+        attachJsonPopUpMenu(view);
         editor = view;
     } else if (fs.suffix() == "fits") {
         QJsonModel * model = new QJsonModel;
@@ -1373,6 +1396,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         model->setIcon(QJsonValue::String, QIcon(":/img/bullet_blue.png"));
         model->setIcon(QJsonValue::Array, QIcon(":/img/table.png"));
         model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
+        attachJsonPopUpMenu(view);
         editor = view;
     } else if (fs.suffix() == "log") {
         QFile file(fs.absoluteFilePath());
@@ -1414,9 +1438,164 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     tabbtn->move(g.x() + 14, g.y() + 4);
 }
 
+//----------------------------------------------------------------------
+// SLOT: closeTab
+//----------------------------------------------------------------------
 void MainWindow::closeTab(int n)
 {
     ui->tabMainWgd->removeTab(n);
+}
+
+//----------------------------------------------------------------------
+// Method: attachJsonPopUpMenu
+//----------------------------------------------------------------------
+void MainWindow::attachJsonPopUpMenu(QWidget * w)
+{
+    w->setContextMenuPolicy(Qt::CustomContextMenu);
+    //w->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    connect(w, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showJsonContextMenu(const QPoint &)));
+}
+
+//----------------------------------------------------------------------
+// SLOT: showJsonContextMenu
+//----------------------------------------------------------------------
+void MainWindow::showJsonContextMenu(const QPoint & p)
+{
+    QAbstractItemView * w = qobject_cast<QAbstractItemView *>(sender());
+
+    QModelIndex m = w->indexAt(p);
+    //if (m.parent() == QModelIndex()) { return; }
+
+    if (w->indexAt(p).isValid()) {
+        QAction * acExp   = new QAction(tr("Expand"), w);
+        QAction * acExpS  = new QAction(tr("Expand subtree"), w);
+        QAction * acExpA  = new QAction(tr("Expand all"), w);
+
+        QAction * acColl  = new QAction(tr("Collapse"), w);
+        QAction * acCollS = new QAction(tr("Collapse subtree"), w);
+        QAction * acCollA = new QAction(tr("Collapse all"), w);
+
+        connect(acExp,   SIGNAL(triggered()), this, SLOT(jsontreeExpand()));
+        connect(acExpS,  SIGNAL(triggered()), this, SLOT(jsontreeExpandSubtree()));
+        connect(acExpA,  SIGNAL(triggered()), this, SLOT(jsontreeExpandAll()));
+
+        connect(acColl,  SIGNAL(triggered()), this, SLOT(jsontreeCollapse()));
+        connect(acCollS, SIGNAL(triggered()), this, SLOT(jsontreeCollapseSubtree()));
+        connect(acCollA, SIGNAL(triggered()), this, SLOT(jsontreeCollapseAll()));
+
+        QMenu menu(w);
+        menu.addAction(acExp);
+        menu.addAction(acExpS);
+        menu.addAction(acExpA);
+        menu.addSeparator();
+        menu.addAction(acColl);
+        menu.addAction(acCollS);
+        menu.addAction(acCollA);
+        pointOfAction = p;
+        menu.exec(w->mapToGlobal(p));
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeExpand
+//----------------------------------------------------------------------
+void MainWindow::jsontreeExpand()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    QModelIndex idx = w->indexAt(pointOfAction);
+    w->expand(idx);
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeExpandSubtree
+//----------------------------------------------------------------------
+void MainWindow::jsontreeExpandSubtree()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    QModelIndex idx = w->indexAt(pointOfAction);
+    QModelIndexList indices;
+    getAllChildren(idx, indices);
+    foreach (QModelIndex i, indices) {
+        w->collapse(i);
+    }
+    /*
+    QModelIndex i;
+    int k = idx.row();
+    while (idx.child(k, 0).isValid()) {
+        k++;
+        std::cerr << "Expanding at row k = " << k << std::endl;
+        w->expand(idx.child(k, 0));
+    }
+    */
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeExpandAll
+//----------------------------------------------------------------------
+void MainWindow::jsontreeExpandAll()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    w->expandAll();
+
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeCollapse
+//----------------------------------------------------------------------
+void MainWindow::jsontreeCollapse()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    QModelIndex idx = w->indexAt(pointOfAction);
+    w->collapse(idx);
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeCollapseSubtree
+//----------------------------------------------------------------------
+void MainWindow::jsontreeCollapseSubtree()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    QModelIndex idx = w->indexAt(pointOfAction);
+    QModelIndexList indices;
+    getAllChildren(idx, indices);
+    foreach (QModelIndex i, indices) {
+        w->collapse(i);
+    }
+    /*
+    QModelIndex i;
+    int k = idx.row();
+    while (idx.child(k, 0).isValid()) {
+        k++;
+        std::cerr << "Collapsing at row k = " << k << std::endl;
+        w->collapse(idx.child(k, 0));
+    }
+    */
+}
+
+//----------------------------------------------------------------------
+// SLOT: jsontreeCollapseAll
+//----------------------------------------------------------------------
+void MainWindow::jsontreeCollapseAll()
+{
+    QAction * ac = qobject_cast<QAction *>(sender());
+    QTreeView * w = qobject_cast<QTreeView *>(ac->parent());
+    w->collapseAll();
+}
+
+//----------------------------------------------------------------------
+// SLOT: getAllChildren
+//----------------------------------------------------------------------
+void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)
+{
+    indices.push_back(index);
+    for (int i = 0; i != index.model()->rowCount(index); ++i)
+        getAllChildren(index.child(i,0), indices);
 }
 
 //======================================================================

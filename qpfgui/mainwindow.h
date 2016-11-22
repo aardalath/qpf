@@ -18,6 +18,8 @@
 #include "textview.h"
 #include "statem.h"
 
+#include "hmipxy.h"
+
 #include "dbmng.h"
 
 #include "proctskstatmodel.h"
@@ -66,6 +68,7 @@ public slots:
     void updateMenus();
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
+    void localarchViewUpdate();
 
 private slots:
     void saveAs();
@@ -112,7 +115,16 @@ private slots:
     void showTxContextMenu(const QPoint & p);
     void displayTxInfo();
 
+    void showJsonContextMenu(const QPoint & p);
+
     void closeTab(int n);
+
+    void jsontreeExpand();
+    void jsontreeExpandSubtree();
+    void jsontreeExpandAll();
+    void jsontreeCollapse();
+    void jsontreeCollapseSubtree();
+    void jsontreeCollapseAll();
 
 private:
     void readConfig(QString dbUrl);
@@ -137,6 +149,8 @@ private:
 
     virtual void defineValidTransitions();
 
+    void attachJsonPopUpMenu(QWidget * w);
+
     void initLocalArchiveView();
     void setUToolTasks();
     void initTasksMonitView();
@@ -147,6 +161,8 @@ private:
 
     void showJSONdata(QString title, QString & dataString);
     void binaryGetFITSHeader(QString fileName, QString & tr);
+
+    void getAllChildren(QModelIndex index, QModelIndexList &indices);
 
     void addExpandCollapseButtonsTo(QWidget * w);
     void convertQUTools2UTools(MapOfUserDefTools qutmap,
@@ -202,8 +218,8 @@ private:
     QVector<QString> activeNodes;
     bool isThereActiveCores;
 
-    //HMIProxy * hmiNode;
-    //std::thread hmiPxyThread;
+    HMIProxy * hmiNode;
+    std::thread hmiPxyThread;
 
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
@@ -242,6 +258,9 @@ private:
     ProductsModel *       productsModel;
     TxTableModel *        txModel;
 
+    QMap<QString,QString> nodeStates;
+
+    QPoint pointOfAction;
     //DBManager *       dbMng;
 };
 
