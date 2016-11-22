@@ -447,7 +447,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,1,2,100">
+          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,1,0,2,100">
            <property name="spacing">
             <number>1</number>
            </property>
@@ -529,6 +529,13 @@
             </spacer>
            </item>
            <item>
+            <widget class="QCheckBox" name="chkboxRefresh">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QToolButton" name="tbtnArchRefresh">
              <property name="minimumSize">
               <size>
@@ -551,9 +558,6 @@
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonIconOnly</enum>
-             </property>
-             <property name="arrowType">
-              <enum>Qt::NoArrow</enum>
              </property>
             </widget>
            </item>
@@ -709,20 +713,38 @@
    <sender>tbtnArchRefresh</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>localarchViewUpdate()</slot>
+   <slot>updateLocalArchModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>76</x>
-     <y>600</y>
+     <x>94</x>
+     <y>590</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>624</y>
+     <x>103</x>
+     <y>620</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkboxRefresh</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>setAutomaticUpdateLocalArchModel(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>591</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>620</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>localarchViewUpdate()</slot>
+  <slot>updateLocalArchModel()</slot>
+  <slot>setAutomaticUpdateLocalArchModel(bool)</slot>
  </slots>
 </ui>

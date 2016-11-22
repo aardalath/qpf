@@ -111,6 +111,7 @@ const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
 MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    updateProductsModel(false),
     isThereActiveCores(true)
 {
     if (!sessionName.isEmpty()) {
@@ -1102,14 +1103,34 @@ void MainWindow::updateSystemView()
 
 //----------------------------------------------------------------------
 // SLOT: localarchViewUpdate
-// Updates the local archive view on demand
+// Updates the local archive view periodically
 //----------------------------------------------------------------------
 void MainWindow::localarchViewUpdate()
 {
-    productsModel->refresh();
+    if (updateProductsModel) {
+        productsModel->refresh();
+    }
     for (int i = 0; i < productsModel->columnCount(); ++i) {
         ui->treevwArchive->resizeColumnToContents(i);
     }
+}
+
+//----------------------------------------------------------------------
+// SLOT: updateLocalArchModel
+// Updates the local archive model on demand
+//----------------------------------------------------------------------
+void MainWindow::updateLocalArchModel()
+{
+    productsModel->refresh();
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticUpdateLocalArchModel
+// Toggles automatic update of local arch model on/off
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticUpdateLocalArchModel(bool b)
+{
+    updateProductsModel = b;
 }
 
 //======================================================================

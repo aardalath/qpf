@@ -69,6 +69,9 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
+    void updateLocalArchModel();
+    void setAutomaticUpdateLocalArchModel(bool b);
+
 
 private slots:
     void saveAs();
@@ -173,6 +176,8 @@ private:
     Ui::MainWindow *ui;
 
     QSignalMapper *windowMapper;
+
+    bool updateProductsModel;
 
     QMenu *fileMenu;
     QMenu *editMenu;
