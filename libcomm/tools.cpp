@@ -188,7 +188,9 @@ std::string sessionTag()
 //----------------------------------------------------------------------
 void setSessionTag(std::string userSessionTag)
 {
-    specificSessionTag = userSessionTag;
+    if (specificSessionTag.empty()) {
+        specificSessionTag = userSessionTag;
+    }
 }
 
 //----------------------------------------------------------------------
