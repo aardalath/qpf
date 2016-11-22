@@ -51,7 +51,7 @@ using namespace LibComm;
 #include <unistd.h>
 #include <time.h>
 
-#define WRITE_MESSAGE_FILES
+//#define WRITE_MESSAGE_FILES
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -134,7 +134,8 @@ void Component::fromRunningToOff()
 void Component::init()
 {
     isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
-    isRemote = (!ConfigurationInfo::data().isMaster);
+    isRemote     = (!ConfigurationInfo::data().isMaster);
+    session      = ConfigurationInfo::data().session;
 
     // Define log output
     Log::defineLogSystem(getCommNodeName(),
@@ -168,9 +169,9 @@ int Component::run()
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 
-    std::cerr << getCommNodeName() 
+    std::cerr << getCommNodeName()
               << (isRemote ? " : REMOTE" : " : LOCAL") << std::endl;
-    
+
     /* MAIN LOOP */
     while (getState() == OPERATIONAL) {
 
@@ -209,7 +210,9 @@ int Component::run()
                     processDATA_INFO();
                     break;
                 case MSG_MONIT_RQST_IDX:
-                    processMONIT_RQST();
+                    if (!processMONIT_RQST_State()) {
+                        processMONIT_RQST();
+                    }
                     break;
                 case MSG_MONIT_INFO_IDX:
                     processMONIT_INFO();
@@ -371,6 +374,31 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
 }
 
 //----------------------------------------------------------------------
+// Method: processMONIT_RQST_State
+// Check if a monit rqst refers to the state
+//----------------------------------------------------------------------
+bool Component::processMONIT_RQST_State()
+{
+    // Forward message to TskOrc
+    Message_MONIT_RQST * msg = dynamic_cast<Message_MONIT_RQST *>(msgData.msg);
+    ParameterList & plist = msg->variables;
+    std::map<std::string, std::string>::iterator it = plist.paramList.find("state");
+    if (it != plist.paramList.end()) {
+        (*it).second = getStateName(getState());
+        std::string recip(msg->header.source);
+        MessageData msgToRqstr(new Message_TASK_RES);
+        msgToRqstr.msg->setData(msg->getData());
+        setForwardTo(recip, msgToRqstr.msg->header);
+        PeerMessage * msgForRqstr = buildPeerMsg(msgToRqstr.msg->header.destination,
+                                                 msgToRqstr.msg->getDataString(),
+                                                 MSG_MONIT_INFO);
+        setTransmissionToPeer(recip, msgForRqstr);
+        return true;
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------
 // Method: buildMsgHeader
 // Build a message header
 //----------------------------------------------------------------------
@@ -508,7 +536,7 @@ void Component::registerMsg(std::string from,
         return;
     }
 
-    // Store message at DB 
+    // Store message at DB
     db->storeMsg(from, inPeerMsg, isBroadcast);
 
     // Close connection
@@ -593,6 +621,28 @@ void Component::setHeartBeatPeriod(int s, int us)
 {
     hbSecs = s;
     hbMicroSecs = us;
+}
+
+//----------------------------------------------------------------------
+// Method: afterTransition
+//----------------------------------------------------------------------
+void Component::afterTransition(int fromState, int toState)
+{
+    // Save task information in task_info table
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store new state
+        dbHdl->storeState(session, selfPeer()->name, getStateName(toState));
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 

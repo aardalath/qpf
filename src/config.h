@@ -250,6 +250,7 @@ private:
 private:
     std::string           cfgFileName;
     std::string           cfgFilePath;
+    std::string           sessionId;
     Json::Value           cfg;
 
     Json::Value::iterator ruleIt;

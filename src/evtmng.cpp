@@ -217,9 +217,9 @@ void EventManager::execAdditonalLoopTasks()
             InfoMsg("QPFHMI requests answer. . .");
             dbHdl->removeICommand(cmdId);
             // Add answer command
-            dbHdl->addICommand(cmdSource, selfPeer()->name, "PONG");          
-        } 
-	
+            dbHdl->addICommand(cmdSource, selfPeer()->name, "PONG");
+        }
+
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
         return;
@@ -257,31 +257,6 @@ void EventManager::processINDATA()
 
         // TODO: download external products into inbox
     }
-
-    /*
-     * This section of code should be obsolete, since the copy from a
-     * user folder to the Inbox (in case the data is injected from the HMI
-     * or another local application), or the download from a remote URL
-     * into the Inbox (in case the message is coming from elsewhere)
-     * shall be detected by the DirWatcher object, and the processing
-     * started at the execAdditonalLoopTasks() method.
-     *
-
-    // Send InData message to DataMng
-    std::array<std::string,1> fwdRecip = {"DataMng"};
-    for (std::string & recip : fwdRecip) {
-        // Forward to recipient
-        MessageData msgDataToRecip(new Message_INDATA);
-        msgDataToRecip.msg->setData(msgData.msg->getData());
-        setForwardTo(recip, msgDataToRecip.msg->header);
-        PeerMessage * msgForRecip = buildPeerMsg(msgDataToRecip.msg->header.destination,
-                                                 msgDataToRecip.msg->getDataString(),
-                                                 MSG_INDATA);
-        registerMsg(selfPeer()->name, *msgForRecip);
-        setTransmissionToPeer(recip, msgForRecip);
-    }
-
-     */
 }
 
 //----------------------------------------------------------------------
@@ -292,6 +267,7 @@ void EventManager::processTASK_RES()
     // TODO: Remove this connection, make TaskRes available to QPFHMI through DB
     // Send a TaskResMsg to the HMI
     Message_TASK_RES * msg = dynamic_cast<Message_TASK_RES *>(msgData.msg);
+/*
     MessageData msgToHMI(new Message_TASK_RES);
     msgToHMI.msg->setData(msg->getData());
     setForwardTo("QPFHMI", msgToHMI.msg->header);
@@ -300,11 +276,12 @@ void EventManager::processTASK_RES()
                                            MSG_TASK_RES);
     registerMsg(selfPeer()->name, *msgForHMI);
     setTransmissionToPeer("QPFHMI", msgForHMI);
-
+*/
     if (msg->task.taskData["State"]["Progress"].asString() == "100") {
         InfoMsg("RECEIVED NOTIFICATION OF TASK " + msg->task.taskName +
                 " FINISHED AT " + msg->task.taskEnd);
     }
+
 }
 
 //----------------------------------------------------------------------
@@ -312,28 +289,6 @@ void EventManager::processTASK_RES()
 //----------------------------------------------------------------------
 void EventManager::processMONIT_INFO()
 {
-}
-
-//----------------------------------------------------------------------
-// Method: afterTransition
-//----------------------------------------------------------------------
-void EventManager::afterTransition(int fromState, int toState)
-{
-    // Save task information in task_info table
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-
-    try {
-        // Check that connection with the DB is possible
-        dbHdl->openConnection();
-        // Store new state
-        dbHdl->storeState(getStateName(toState));
-    } catch (RuntimeException & e) {
-        ErrMsg(e.what());
-        return;
-    }
-
-    // Close connection
-    dbHdl->closeConnection();
 }
 
 }

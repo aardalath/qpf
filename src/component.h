@@ -206,6 +206,12 @@ protected:
                 Router2RouterPeer::PeerMessage & inPeerMsg);
 
     //----------------------------------------------------------------------
+    // Method: processMONIT_RQST_State
+    // Check if a monit rqst refers to the state
+    //----------------------------------------------------------------------
+    bool processMONIT_RQST_State();
+
+    //----------------------------------------------------------------------
     // Method: buildMsgHeader
     //----------------------------------------------------------------------
     bool buildMsgHeader(MessageId msgId,
@@ -284,8 +290,14 @@ protected:
     //----------------------------------------------------------------------
     void setHeartBeatPeriod(int s = 2, int us = 0);
 
+    //----------------------------------------------------------------------
+    // Method: afterTransition
+    //----------------------------------------------------------------------
+    virtual void afterTransition(int fromState, int toState);
+
 protected:
     std::set<int> canProcess;
+    std::string session;
     MessageData   msgData;
     int hbSecs;
     int hbMicroSecs;

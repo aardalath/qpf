@@ -90,6 +90,7 @@ public:
     std::string                         appName;
     std::string                         appVersion;
     std::string                         lastAccess;
+    std::string                         session;
 
     // Orchestration
     OrchestrationParameters             orcParams;
