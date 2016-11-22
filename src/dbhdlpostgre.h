@@ -137,15 +137,21 @@ public:
 
     //----------------------------------------------------------------------
     // Method: storeState
-    // Stores a new state to the database
+    // Stores a new state to the database, for a given node and session
     //----------------------------------------------------------------------
-    virtual bool storeState(std::string newState);
+    virtual bool storeState(std::string session, std::string node, std::string newState);
 
     //----------------------------------------------------------------------
     // Method: getCurrentState
-    // Stores a new state to the database
+    // Gets the list of nodes with its states for a given session
     //----------------------------------------------------------------------
-    virtual std::string getCurrentState();
+    virtual std::vector< std::vector<std::string> > getCurrentState(std::string session);
+
+    //----------------------------------------------------------------------
+    // Method: getLatestState
+    // Gets the last registered session name and state of the Event Manager
+    //----------------------------------------------------------------------
+    virtual std::pair<std::string, std::string> getLatestState();
 
     //----------------------------------------------------------------------
     // Method: getICommand

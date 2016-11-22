@@ -86,6 +86,8 @@ CREATE TYPE qpf_state AS ENUM ('ERROR', 'OFF', 'INITIALISED', 'RUNNING', 'OPERAT
 CREATE TABLE qpfstates (
     qpfstate_id   integer NOT NULL,
     timestmp      timestamp without time zone,
+    sessionname   text,
+    nodename      text,
     state         qpf_state
 );
 

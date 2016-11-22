@@ -375,15 +375,18 @@ bool DBHdlPostgreSQL::retrieveTask(TaskInfo & task)
 
 //----------------------------------------------------------------------
 // Method: storeState
-// Stores a new state to the database
+// Stores a new state to the database, for a given node and session
 //----------------------------------------------------------------------
-bool DBHdlPostgreSQL::storeState(std::string newState)
+bool DBHdlPostgreSQL::storeState(std::string session, std::string node, std::string newState)
 {
     bool result = true;
 
     std::string registrationTime(tagToTimestamp(preciseTimeTag()));
-    std::string cmd("INSERT INTO qpfstates (timestmp, state) VALUES (" +
-                    str::quoted(registrationTime) + ", " + str::quoted(newState) + ");");
+    std::string cmd("INSERT INTO qpfstates (timestmp, sessionname, nodename, state) VALUES (" +
+                    str::quoted(registrationTime) + ", " +
+                    str::quoted(session) + ", " +
+                    str::quoted(node) + ", " +
+                    str::quoted(newState) + ");");
 
     try { result = runCmd(cmd); } catch(...) { throw; }
 
@@ -394,24 +397,51 @@ bool DBHdlPostgreSQL::storeState(std::string newState)
 
 //----------------------------------------------------------------------
 // Method: getCurrentState
-// Stores a new state to the database
+// Gets the list of nodes with its states for a given session
 //----------------------------------------------------------------------
-std::string DBHdlPostgreSQL::getCurrentState()
+std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(std::string session)
 {
     bool result = true;
+    std::vector< std::vector<std::string> > table;
 
-    std::string cmd("SELECT state FROM qpfstates ORDER BY qpfstate_id DESC LIMIT 1;");
-    std::string stateName;
+    std::string cmd("SELECT nodename, state FROM qpfstates "
+                    "WHERE sessionname = " + str::quoted(session) +
+                    "ORDER BY qpfstate_id;");
     try {
         result = runCmd(cmd);
-        stateName = std::string(PQgetvalue(res, 0, 0));
+        if (result) { result = fillWithResult(table); }
     } catch(...) {
         throw;
     }
 
     PQclear(res);
-    UNUSED(result);
-    return stateName;
+    return table;
+}
+
+//----------------------------------------------------------------------
+// Method: getLatestState
+// Gets the last registered session name and state of the Event Manager
+//----------------------------------------------------------------------
+std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState()
+{
+    bool result = true;
+    std::pair<std::string, std::string> p;
+
+    std::string cmd("SELECT sessionname, state FROM qpfstates "
+                    "WHERE nodename = 'EvtMng' "
+                    "ORDER BY qpfstate_id DESC LIMIT 1;");
+    try {
+        result = runCmd(cmd);
+        if (result) {
+            p.first   = std::string(PQgetvalue(res, 0, 0));
+            p.second  = std::string(PQgetvalue(res, 0, 1));
+        }
+    } catch(...) {
+        throw;
+    }
+
+    PQclear(res);
+    return p;
 }
 
 //----------------------------------------------------------------------
@@ -427,9 +457,9 @@ void DBHdlPostgreSQL::addICommand(std::string target,
     std::string registrationTime(tagToTimestamp(preciseTimeTag()));
     std::string cmd("INSERT INTO icommands "
                     "(cmd_date, cmd_source, cmd_target, cmd_executed, cmd_content) "
-                    "VALUES (" + str::quoted(registrationTime) + 
-                    ", " + str::quoted(source) + 
-                    ", " + str::quoted(target) + 
+                    "VALUES (" + str::quoted(registrationTime) +
+                    ", " + str::quoted(source) +
+                    ", " + str::quoted(target) +
                     ", false, " + str::quoted(content) + ");");
     try {
         result = runCmd(cmd);
@@ -456,13 +486,14 @@ bool DBHdlPostgreSQL::getICommand(std::string target,
                     " FROM icommands cmd "
                     " WHERE cmd.cmd_target = " + str::quoted(target) +
                     " AND cmd.cmd_executed = false "
+                    " AND cmd_date + '15 sec'::interval > current_timestamp "
                     " ORDER BY cmd.id LIMIT 1;");
 
     try {
         result = runCmd(cmd);
         result &= (PQntuples(res) > 0);
         if (result) {
-            id      = atoi(PQgetvalue(res, 0, 0)); 
+            id      = atoi(PQgetvalue(res, 0, 0));
             source  = std::string(PQgetvalue(res, 0, 1));
             content = std::string(PQgetvalue(res, 0, 2));
         }
