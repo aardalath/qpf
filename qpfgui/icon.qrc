@@ -1,5 +1,6 @@
 <RCC>
-    <qresource prefix="/">
-        <file>img/QPF.png</file>
-    </qresource>
+  <qresource prefix="/">
+    <file>img/EuclidQPF.png</file>
+    <file>img/QPF.png</file>
+  </qresource>
 </RCC>
