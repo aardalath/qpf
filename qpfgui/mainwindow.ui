@@ -349,8 +349,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>80</width>
-                 <height>16</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
               </widget>
@@ -447,7 +447,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,1,2,100">
            <property name="spacing">
             <number>1</number>
            </property>
@@ -465,6 +465,18 @@
            </property>
            <item>
             <widget class="QToolButton" name="tbtnArchExpand">
+             <property name="minimumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -482,12 +494,60 @@
                <height>18</height>
               </size>
              </property>
+             <property name="maximumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
               <iconset resource="jsontree.qrc">
                <normaloff>:/img/collapse.png</normaloff>:/img/collapse.png</iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonIconOnly</enum>
+             </property>
+             <property name="arrowType">
+              <enum>Qt::NoArrow</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="tbtnArchRefresh">
+             <property name="minimumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>18</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="jsontree.qrc">
+               <normaloff>:/img/refresh.png</normaloff>:/img/refresh.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonIconOnly</enum>
@@ -636,8 +696,8 @@
    <slot>collapseAll()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>61</x>
-     <y>586</y>
+     <x>57</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>97</x>
@@ -645,5 +705,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tbtnArchRefresh</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>localarchViewUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>600</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>localarchViewUpdate()</slot>
+ </slots>
 </ui>
