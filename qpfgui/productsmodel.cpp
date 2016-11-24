@@ -64,9 +64,12 @@ ProductsModel::ProductsModel()
                 "                p.signature, '.',  "
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
-    defineHeaders({"Signature", "Product Id", "Type", "Version",
-                "Size", "Status", "Creator", "Obs.Mode",
-                "Start", "End", "Reg.Time", "URL"});
+    defineHeaders({//"Signature",
+                   "Product Id", "Type", "Version",
+                   "Size", "Status", "Creator", "Obs.Mode",
+                   "Start", "End", "Reg.Time", "URL"});
+
+    skipColumns(1);
 
     refresh();
 }
