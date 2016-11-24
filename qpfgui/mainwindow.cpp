@@ -69,11 +69,11 @@
 #include <QDesktopServices>
 
 #include <thread>
-#include <QtCore/qstring.h>
-#include <qt5/QtWidgets/qlistwidget.h>
-#include <qt5/QtCore/qpoint.h>
-#include <qt5/QtCore/qobject.h>
-#include <qt5/QtCore/qtextstream.h>
+#include <QString>
+#include <QListWidget>
+#include <QPoint>
+#include <QObject>
+#include <QTextSream>
 
 #include "logwatcher.h"
 #include "progbardlg.h"
