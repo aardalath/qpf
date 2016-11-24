@@ -39,9 +39,21 @@
 #define DBTREEMODEL_H
 
 #include <QStandardItemModel>
+#include <QStyledItemDelegate>
 #include <QSqlQuery>
 
 namespace QPF {
+
+class DBTreeBoldHeaderDelegate : public QStyledItemDelegate {
+
+    Q_OBJECT
+
+public:
+    DBTreeBoldHeaderDelegate(QObject *parent = Q_NULLPTR);
+    void paint(QPainter* painter,
+               const QStyleOptionViewItem& option,
+               const QModelIndex& index) const Q_DECL_OVERRIDE;
+};
 
 class DBTreeModel : public QStandardItemModel {
 
@@ -55,6 +67,8 @@ public:
 
     void defineHeaders(QStringList hdr);
     void defineQuery(QString q);
+    void skipColumns(int n = 0);
+    void setBoldHeader(bool b = false);
 
 protected:
     void setHeaders(QStringList & hdr);
@@ -65,6 +79,8 @@ protected:
     QString     queryString;
     QStringList headerLabels;
     int         rowsFromQuery;
+    int         skippedColumns;
+    bool        boldHeader;
 };
 
 }

@@ -43,10 +43,29 @@
 
 namespace QPF {
 
+DBTreeBoldHeaderDelegate::DBTreeBoldHeaderDelegate(QObject *parent)
+        : QStyledItemDelegate(parent)
+{
+}
+
+void DBTreeBoldHeaderDelegate::paint(QPainter* painter,
+                                     const QStyleOptionViewItem& option,
+                                     const QModelIndex& index) const
+{
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+
+    bool shouldBeBold = (! index.parent().isValid());
+    opt.font.setBold(shouldBeBold);
+    QStyledItemDelegate::paint(painter, opt, index);
+}
+
 DBTreeModel::DBTreeModel(QString q, QStringList hdr) :
     queryString(q),
     headerLabels(hdr),
-    rowsFromQuery(-1)
+    rowsFromQuery(-1),
+    skippedColumns(0),
+    boldHeader(false)
 {
     refresh();
 }
@@ -68,6 +87,11 @@ void DBTreeModel::defineHeaders(QStringList hdr)
 void DBTreeModel::defineQuery(QString q)
 {
     queryString = q;
+}
+
+void DBTreeModel::skipColumns(int n)
+{
+    skippedColumns = n;
 }
 
 void DBTreeModel::refresh()
@@ -97,19 +121,41 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     int children = 0;
     rowsFromQuery = 0;
     while (q.next()) {
+#if GROUP_ROW_EMPTY
         QString grp = q.value(0).toString();
         if (prevGrp != grp) {
-            parent = new QStandardItem(grp);
+            parent = new QStandardItem(q.value(skippedColumns).toString());
             row.clear();
             row << parent;
-            for (int i = 1; i < fldCount; ++i) { row << 0; }
+            for (int i = 1; i < fldCount - skippedColumns; ++i) { row << 0; }
             root->appendRow(row);
             children = 0;
             prevGrp = grp;
         }
         row.clear();
-        for (int i = 0; i < fldCount; ++i) { row << new QStandardItem(q.value(i).toString()); }
+        for (int i = skippedColumns; i < fldCount; ++i) {
+            row << new QStandardItem(q.value(i).toString());
+        }
         parent->appendRow(row);
+#else
+        QString grp = q.value(0).toString();
+        row.clear();
+        if (prevGrp != grp) {
+            parent = new QStandardItem(q.value(skippedColumns).toString());
+            row << parent;
+            for (int i = skippedColumns + 1; i < fldCount; ++i) {
+                row << new QStandardItem(q.value(i).toString());
+            }
+            root->appendRow(row);
+            children = 0;
+            prevGrp = grp;
+        } else {
+            for (int i = skippedColumns; i < fldCount; ++i) {
+                row << new QStandardItem(q.value(i).toString());
+            }
+            parent->appendRow(row);
+        }
+#endif
         ++rowsFromQuery;
         ++children;
     }
