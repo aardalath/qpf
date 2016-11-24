@@ -477,6 +477,9 @@
                <height>18</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string extracomment="Expand all branches"/>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -499,6 +502,9 @@
                <width>18</width>
                <height>18</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string extracomment="Collapse all branches"/>
              </property>
              <property name="text">
               <string/>
@@ -530,6 +536,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="chkboxRefresh">
+             <property name="toolTip">
+              <string extracomment="Toggle automatic update of this view"/>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -548,6 +557,9 @@
                <width>18</width>
                <height>18</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string extracomment="Update this view"/>
              </property>
              <property name="text">
               <string/>
@@ -579,7 +591,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tabpgAlerts">
        <attribute name="title">
         <string>Processing Alerts</string>
        </attribute>
@@ -668,6 +680,24 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="dockNavigator">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Navigator</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
+     <item>
+      <widget class="QListWidget" name="lstwdgNav"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
