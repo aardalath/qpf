@@ -65,13 +65,13 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
+    void setAppInfo(QString name, QString rev, QString bld);
     void updateMenus();
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
-
 
 private slots:
     void saveAs();
@@ -82,7 +82,13 @@ private slots:
     void quitApp();
     void quitAllQPF();
 
+    void showSelectedInNav(QListWidgetItem* item);
+    void selectRowInNav(int row);
+    void removeRowInNav(int row);
+
     void updateWindowMenu();
+
+    void reprocessProduct();
 
     void processPendingEvents();
 
@@ -120,6 +126,9 @@ private slots:
 
     void showJsonContextMenu(const QPoint & p);
 
+    void showTabsContextMenu(const QPoint & p);
+    void showTabsListMenu();
+    void selectTabFromList();
     void closeTab(int n);
 
     void jsontreeExpand();
@@ -128,6 +137,10 @@ private slots:
     void jsontreeCollapse();
     void jsontreeCollapseSubtree();
     void jsontreeCollapseAll();
+
+    void closeTabAction();
+    void closeAllTabAction();
+    void closeOtherTabAction();
 
 private:
     void readConfig(QString dbUrl);
@@ -167,10 +180,8 @@ private:
 
     void getAllChildren(QModelIndex index, QModelIndexList &indices);
 
-    void addExpandCollapseButtonsTo(QWidget * w);
     void convertQUTools2UTools(MapOfUserDefTools qutmap,
                                std::map<std::string, UserDefTool> & utmap);
-
 
 private:
     Ui::MainWindow *ui;
@@ -205,7 +216,9 @@ private:
     QAction *execTestRunAct;
 
     QAction *acDefault;
+    QAction *acReprocess;
 
+    QAction *navigAct;
     QAction *closeAct;
     QAction *closeAllAct;
     QAction *tileAct;
@@ -215,6 +228,12 @@ private:
     QAction *separatorAct;
     QAction *aboutAct;
     QAction *aboutQtAct;
+
+    bool isMenuForTabWidget;
+    QPoint menuPt;
+    QAction * tabCloseAct;
+    QAction * tabCloseAllAct;
+    QAction * tabCloseOtherAct;
 
     Configuration * cfg;
 

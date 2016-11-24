@@ -70,6 +70,10 @@
 
 #include <thread>
 #include <QtCore/qstring.h>
+#include <qt5/QtWidgets/qlistwidget.h>
+#include <qt5/QtCore/qpoint.h>
+#include <qt5/QtCore/qobject.h>
+#include <qt5/QtCore/qtextstream.h>
 
 #include "logwatcher.h"
 #include "progbardlg.h"
@@ -167,6 +171,15 @@ MainWindow::~MainWindow()
 }
 
 //----------------------------------------------------------------------
+// Method: setAppInfo
+// Set information to show in the main window title
+//----------------------------------------------------------------------
+void MainWindow::setAppInfo(QString name, QString rev, QString bld)
+{
+    setWindowTitle(QString("%1 : %2 : %3").arg(name).arg(rev).arg(bld));
+}
+
+//----------------------------------------------------------------------
 // Method: manualSetupUI
 // Additional (manual) GUI setup actions
 //----------------------------------------------------------------------
@@ -207,6 +220,50 @@ void MainWindow::manualSetupUI()
                                       QSizePolicy::Expanding);
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
+    //== Tab panels handling ==========================================
+
+    QTabBar * tb = ui->tabMainWgd->tabBar();
+    tb->setTabIcon(0, QIcon(":/img/logs.png"));
+    tb->setTabIcon(1, QIcon(":/img/messages.png"));
+    tb->setTabIcon(2, QIcon(":/img/monit.png"));
+    tb->setTabIcon(3, QIcon(":/img/storage2.png"));
+    tb->setTabIcon(4, QIcon(":/img/alerts.png"));
+
+    connect(ui->tabMainWgd, SIGNAL(currentChanged(int)),
+            this, SLOT(selectRowInNav(int)));
+    connect(ui->tabMainWgd, SIGNAL(tabCloseRequested(int)),
+            this, SLOT(closeTab(int)));
+
+    ui->tabMainWgd->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tabMainWgd, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showTabsContextMenu(const QPoint &)));
+
+    ui->lstwdgNav->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->lstwdgNav, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showTabsContextMenu(const QPoint &)));
+
+    QToolButton * tbtnTabsList = new QToolButton(ui->tabMainWgd);
+    tbtnTabsList->setArrowType(Qt::DownArrow);
+    connect(tbtnTabsList, SIGNAL(clicked()),
+            this, SLOT(showTabsListMenu()));
+    ui->tabMainWgd->setCornerWidget(tbtnTabsList, Qt::TopLeftCorner);
+
+    const QList<QString> fixedItemNames {"Log Information",
+                                         "Messages",
+                                         "Monitoring",
+                                         "Local Archive",
+                                         "Processing Alerts"};
+    foreach (QString s, fixedItemNames) {
+        QListWidgetItem * itemForNav = new QListWidgetItem(s);
+        QFont fn(itemForNav->font());
+        fn.setBold(true);
+        itemForNav->setFont(fn);
+        ui->lstwdgNav->addItem(itemForNav);
+    }
+
+    connect(ui->lstwdgNav, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+            this, SLOT(showSelectedInNav(QListWidgetItem*)));
+
     //== Set log file watchers ========================================
 
     setLogWatch();
@@ -235,6 +292,8 @@ void MainWindow::manualSetupUI()
     // 4. Local Archive Products Model
     productsModel = new ProductsModel;
     ui->treevwArchive->setModel(productsModel);
+    ui->treevwArchive->setItemDelegate(new DBTreeBoldHeaderDelegate(this));
+    ui->treevwArchive->setSortingEnabled(true);
 
     // 5. Transmissions Model
     txModel = new TxTableModel(nodeNames);
@@ -378,6 +437,8 @@ void MainWindow::updateMenus()
 void MainWindow::updateWindowMenu()
 {
     windowMenu->clear();
+    windowMenu->addAction(navigAct);
+    windowMenu->addSeparator();
     windowMenu->addAction(closeAct);
     windowMenu->addAction(closeAllAct);
     windowMenu->addSeparator();
@@ -407,8 +468,6 @@ void MainWindow::updateWindowMenu()
         windowMapper->setMapping(action, windows.at(i));
     }
 
-    connect(ui->tabMainWgd, SIGNAL(tabCloseRequested(int)),
-            this, SLOT(closeTab(int)));
 }
 
 //----------------------------------------------------------------------
@@ -498,6 +557,15 @@ void MainWindow::createActions()
     //connect(execTestRunAct, SIGNAL(triggered()), this, SLOT(execTestRun()));
 
     // Window menu
+    navigAct = new QAction(tr("Show &navigator panel"), this);
+    navigAct->setStatusTip(tr("Shows or hides the navigator panel"));
+    navigAct->setCheckable(true);
+    connect(navigAct, SIGNAL(toggled(bool)),
+            ui->dockNavigator, SLOT(setVisible(bool)));
+    connect(ui->dockNavigator, SIGNAL(visibilityChanged(bool)),
+            navigAct, SLOT(setChecked(bool)));
+    ui->dockNavigator->setVisible(false);
+
     closeAct = new QAction(tr("Cl&ose"), this);
     closeAct->setStatusTip(tr("Close the active window"));
     connect(closeAct, SIGNAL(triggered()),
@@ -540,6 +608,20 @@ void MainWindow::createActions()
     aboutQtAct = new QAction(tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
+    // Tab-related actions
+    tabCloseAct = new QAction(tr("&Close"), this);
+    tabCloseAct->setStatusTip(tr("Close this tab"));
+    connect(tabCloseAct, SIGNAL(triggered()), this, SLOT(closeTabAction()));
+
+    tabCloseAllAct = new QAction(tr("Close all"), this);
+    tabCloseAllAct->setStatusTip(tr("Close all tabs"));
+    connect(tabCloseAllAct, SIGNAL(triggered()), this, SLOT(closeAllTabAction()));
+
+    tabCloseOtherAct = new QAction(tr("Close &other"), this);
+    tabCloseOtherAct->setStatusTip(tr("Close all other tabs"));
+    connect(tabCloseOtherAct, SIGNAL(triggered()), this, SLOT(closeOtherTabAction()));
+
 }
 
 //----------------------------------------------------------------------
@@ -1102,6 +1184,78 @@ void MainWindow::updateSystemView()
 }
 
 //----------------------------------------------------------------------
+// SLOT: showSelectedInNav
+//----------------------------------------------------------------------
+void MainWindow::showSelectedInNav(QListWidgetItem* item)
+{
+    int itemRow = ui->lstwdgNav->currentRow();
+    ui->tabMainWgd->setCurrentIndex(itemRow);
+}
+
+//----------------------------------------------------------------------
+// SLOT: selectRowInNav
+//----------------------------------------------------------------------
+void MainWindow::selectRowInNav(int row)
+{
+    ui->lstwdgNav->setCurrentRow(row);
+}
+
+//----------------------------------------------------------------------
+// SLOT: removeRowInNav
+//----------------------------------------------------------------------
+void MainWindow::removeRowInNav(int row)
+{
+    ui->lstwdgNav->takeItem(row);
+}
+
+//======================================================================
+// Local Archive View configuration
+//======================================================================
+
+//----------------------------------------------------------------------
+// METHOD: initLocalArchiveView
+//----------------------------------------------------------------------
+void MainWindow::initLocalArchiveView()
+{
+    // Create pop-up menu with user defined tools
+    ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->treevwArchive->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
+
+    connect(ui->treevwArchive, SIGNAL(doubleClicked(QModelIndex)),
+            this, SLOT(openLocalArchiveElement(QModelIndex)));
+
+    acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
+
+    acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
+    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
+
+    acDefault = new QAction("System Default", ui->treevwArchive);
+    connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
+
+    acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
+    connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
+
+    setUToolTasks();
+}
+
+//----------------------------------------------------------------------
+// METHOD: setUToolTasks
+//----------------------------------------------------------------------
+void MainWindow::setUToolTasks()
+{
+    acUserTools.clear();
+    foreach (QString key, userDefTools.keys()) {
+        const QUserDefTool & udt = userDefTools.value(key);
+        QAction * ac = new QAction(key, ui->treevwArchive);
+        ac->setStatusTip(udt.desc);
+        connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
+        acUserTools[key] = ac;
+    }
+}
+
+//----------------------------------------------------------------------
 // SLOT: localarchViewUpdate
 // Updates the local archive view periodically
 //----------------------------------------------------------------------
@@ -1133,62 +1287,15 @@ void MainWindow::setAutomaticUpdateLocalArchModel(bool b)
     updateProductsModel = b;
 }
 
-//======================================================================
-// Local Archive View configuration
-//======================================================================
-
-//----------------------------------------------------------------------
-// METHOD: initLocalArchiveView
-//----------------------------------------------------------------------
-void MainWindow::initLocalArchiveView()
-{
-    // Create pop-up menu with user defined tools
-    ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->treevwArchive->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
-
-    connect(ui->treevwArchive, SIGNAL(doubleClicked(QModelIndex)),
-            this, SLOT(openLocalArchiveElement(QModelIndex)));
-
-    acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
-
-    acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
-    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
-
-    acDefault = new QAction("System Default", ui->treevwArchive);
-    connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
-
-    setUToolTasks();
-
-    // Add Expand All / Collapse All buttons
-    //addExpandCollapseButtonsTo(ui->treevwArchive);
-}
-
-//----------------------------------------------------------------------
-// METHOD: setUToolTasks
-//----------------------------------------------------------------------
-void MainWindow::setUToolTasks()
-{
-    acUserTools.clear();
-    foreach (QString key, userDefTools.keys()) {
-        const QUserDefTool & udt = userDefTools.value(key);
-        QAction * ac = new QAction(key, ui->treevwArchive);
-        ac->setStatusTip(udt.desc);
-        connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
-        acUserTools[key] = ac;
-    }
-}
-
 //----------------------------------------------------------------------
 // SLOT: openWithDefaults
 //----------------------------------------------------------------------
 void MainWindow::openWithDefault()
 {
+    static const int NumOfURLCol = 10;
+
     QModelIndex m = ui->treevwArchive->currentIndex();
-    qDebug() << m;
-    QString url = m.model()->index(m.row(), 11, m.parent()).data().toString();
-    qDebug() << url;
+    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
     QDesktopServices::openUrl(QUrl(url));
 }
 
@@ -1197,12 +1304,14 @@ void MainWindow::openWithDefault()
 //----------------------------------------------------------------------
 void MainWindow::openWith()
 {
+    static const int NumOfURLCol = 10;
+
     QAction * ac = qobject_cast<QAction*>(sender());
     QString key = ac->text();
     const QUserDefTool & udt = userDefTools.value(key);
 
     QModelIndex m = ui->treevwArchive->currentIndex();
-    QString url = m.model()->index(m.row(), 11, m.parent()).data().toString();
+    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
 
     // Build arguments by replacing placeholders
     //   -   %f        Product file name (without path)
@@ -1289,19 +1398,33 @@ void MainWindow::openWith()
 }
 
 //----------------------------------------------------------------------
+// SLOT: reprocessProduct
+//----------------------------------------------------------------------
+void MainWindow::reprocessProduct()
+{
+    QMessageBox::information(this, tr("Reprocess product"),
+            tr("The reprocessing of an Euclid data product is not yet "
+               "supported in the current release of the " APP_LONG_NAME ".\n\n"
+               "It is foreseen that this feature will be available from "
+               "next release on.\n\n"), QMessageBox::Close);
+}
+
+//----------------------------------------------------------------------
 // SLOT: showArchiveTableContextMenu
 //----------------------------------------------------------------------
 void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 {
-    QModelIndex m = ui->treevwArchive->indexAt(p);
-    if (m.parent() == QModelIndex()) { return; }
+    static const int NumOfProdTypeCol = 1;
 
-    QModelIndex m2 = m.model()->index(m.row(), 2, m.parent());
+    QModelIndex m = ui->treevwArchive->indexAt(p);
+    //if (m.parent() == QModelIndex()) { return; }
+
+    QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
     if (!m2.data().isValid()) { return; }
     QString productType = m2.data().toString();
-    QList<QAction *> actions;
 
-    if (ui->treevwArchive->indexAt(p).isValid()) {
+    QList<QAction *> actions;
+    if (m.isValid()) {
         foreach (QString key, userDefTools.keys()) {
             const QUserDefTool & udt = userDefTools.value(key);
             if (udt.prod_types.contains(productType) || true) {
@@ -1312,10 +1435,17 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
         acArchiveOpenExt->addAction(acDefault);
         acArchiveOpenExt->addSeparator();
         acArchiveOpenExt->addActions(actions);
+
         QMenu menu(this);
         menu.addAction(acArchiveShow);
         menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
+
+        if (! m.parent().isValid()) {
+            menu.addSeparator();
+            menu.addAction(acReprocess);
+        }
+
         menu.exec(ui->treevwArchive->mapToGlobal(p));
         //QMenu::exec(actions, ui->treevwArchive->mapToGlobal(p));
     }
@@ -1342,11 +1472,14 @@ void MainWindow::showJSONdata(QString title, QString & dataString)
 //----------------------------------------------------------------------
 void MainWindow::openLocalArchiveElement(QModelIndex idx)
 {
+    static const int NumOfNameCol = 0;
+    static const int NumOfURLCol = 10;
+
     qDebug() << idx;
     int row = idx.row();
     const QAbstractItemModel * model = idx.model();
-    QModelIndex nameIdx = model->index(row, 1, idx.parent());
-    QModelIndex urlIdx  = model->index(row, 11, idx.parent());
+    QModelIndex nameIdx = model->index(row, NumOfNameCol, idx.parent());
+    QModelIndex urlIdx  = model->index(row, NumOfURLCol, idx.parent());
 
     QString tabName = nameIdx.data().toString().trimmed();
     QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
@@ -1447,6 +1580,8 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
 
     // Ensure these tabs are closable (and only these)
     int tabIdx = ui->tabMainWgd->addTab(editor, tabName);
+    ui->lstwdgNav->addItem(tabName);
+
     ui->tabMainWgd->setTabsClosable(true);
     editor->setObjectName(tabName);
     for (int i = 0; i < 5; ++i) {
@@ -1456,7 +1591,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     QWidget * tabbtn = ui->tabMainWgd->tabBar()->tabButton(tabIdx, QTabBar::RightSide);
     QRect g = tabbtn->geometry();
     tabbtn->resize(6, 6);
-    tabbtn->move(g.x() + 14, g.y() + 4);
+    tabbtn->move(g.x() + 14, g.y() + 2);
 }
 
 //----------------------------------------------------------------------
@@ -1464,7 +1599,105 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
 //----------------------------------------------------------------------
 void MainWindow::closeTab(int n)
 {
-    ui->tabMainWgd->removeTab(n);
+    removeRowInNav(n);
+    delete ui->tabMainWgd->widget(n);
+}
+
+//----------------------------------------------------------------------
+// SLOT: showTabsContextMenu
+// Shows closing menu for all the main tabs in the window
+//----------------------------------------------------------------------
+void MainWindow::showTabsContextMenu(const QPoint & p)
+{
+    QWidget * w = qobject_cast<QWidget *>(sender());
+    isMenuForTabWidget = (w == (QWidget*)(ui->tabMainWgd));
+    menuPt = p;
+
+    QMenu menu(w);
+    menu.addAction(tabCloseAct);
+    menu.addAction(tabCloseAllAct);
+    menu.addAction(tabCloseOtherAct);
+    menu.exec(w->mapToGlobal(p));
+}
+
+//----------------------------------------------------------------------
+// SLOT: closeTabAction
+// Close the selected tab
+//----------------------------------------------------------------------
+void MainWindow::closeTabAction()
+{
+    static const int NumOfFixedTabs = 5;
+    int nTab;
+    if (isMenuForTabWidget) {
+        nTab = ui->tabMainWgd->tabBar()->tabAt(menuPt);
+    } else {
+        nTab = ui->lstwdgNav->currentRow();
+    }
+    if (nTab >= NumOfFixedTabs) {
+        closeTab(nTab);
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: closeAllTabAction
+// Close all tabs
+//----------------------------------------------------------------------
+void MainWindow::closeAllTabAction()
+{
+    static const int NumOfFixedTabs = 5;
+    for (int i = ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+        closeTab(i);
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: closeOtherTabAction
+// Close all but the selected tab
+//----------------------------------------------------------------------
+void MainWindow::closeOtherTabAction()
+{
+    static const int NumOfFixedTabs = 5;
+    int nTab;
+    if (isMenuForTabWidget) {
+        nTab = ui->tabMainWgd->tabBar()->tabAt(menuPt);
+    } else {
+        nTab = ui->lstwdgNav->currentRow();
+    }
+    for (int i = ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+        if (i != nTab) {
+            closeTab(i);
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// SLOT: showTabsListMenu
+// Shows list of tabs, in order to select one to move focus on to
+//----------------------------------------------------------------------
+void MainWindow::showTabsListMenu()
+{
+    QWidget * w = qobject_cast<QWidget*>(sender());
+    QPoint p(1, w->height() - 1);
+    QList<QAction*> acList;
+    for (int i = 0; i < ui->lstwdgNav->count(); ++i) {
+        QAction * ac = new QAction(ui->lstwdgNav->item(i)->text(), this);
+        ac->setData(QVariant(i));
+        acList << ac;
+        connect(ac, SIGNAL(triggered()), this, SLOT(selectTabFromList()));
+    }
+    QMenu menu(w);
+    menu.addActions(acList);
+    menu.exec(w->mapToGlobal(p));
+}
+
+//----------------------------------------------------------------------
+// SLOT: selectTabFromList
+// Selects hows list of tabs, in order to select one to move focus on to
+//----------------------------------------------------------------------
+void MainWindow::selectTabFromList()
+{
+    QAction * ac = qobject_cast<QAction*>(sender());
+    ui->tabMainWgd->setCurrentIndex(ac->data().toInt());
 }
 
 //----------------------------------------------------------------------
@@ -1540,7 +1773,7 @@ void MainWindow::jsontreeExpandSubtree()
     QModelIndexList indices;
     getAllChildren(idx, indices);
     foreach (QModelIndex i, indices) {
-        w->collapse(i);
+        w->expand(i);
     }
     /*
     QModelIndex i;
@@ -1588,15 +1821,6 @@ void MainWindow::jsontreeCollapseSubtree()
     foreach (QModelIndex i, indices) {
         w->collapse(i);
     }
-    /*
-    QModelIndex i;
-    int k = idx.row();
-    while (idx.child(k, 0).isValid()) {
-        k++;
-        std::cerr << "Collapsing at row k = " << k << std::endl;
-        w->collapse(idx.child(k, 0));
-    }
-    */
 }
 
 //----------------------------------------------------------------------
@@ -2137,26 +2361,6 @@ void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)
     str.replace(",\"\":\"\"", "");
     str.replace("\":'", "\":\"");
     str.replace(QRegExp("'[ ]*,"), "\",");
-}
-
-void MainWindow::addExpandCollapseButtonsTo(QWidget * w)
-{
-    QSize sz = w->size();
-
-    QLabel * lblExpand = new QLabel(w);
-    lblExpand->setMinimumSize(QSize(16, 16));
-    lblExpand->setMaximumSize(QSize(16, 16));
-    lblExpand->setPixmap(QPixmap(QString::fromUtf8(":/img/expand.png")));
-    lblExpand->setGeometry(-16, 0, 16, 16);
-
-    QLabel * lblCollapse = new QLabel(w);
-    lblCollapse->setMinimumSize(QSize(16, 16));
-    lblCollapse->setMaximumSize(QSize(16, 16));
-    lblCollapse->setPixmap(QPixmap(QString::fromUtf8(":/img/collapse.png")));
-    lblCollapse->setGeometry(-16, 17, 16, 16);
-
-    connect(lblExpand,   SIGNAL(clicked()), w, SLOT(expandAll()));
-    connect(lblCollapse, SIGNAL(clicked()), w, SLOT(collapseAll()));
 }
 
 //----------------------------------------------------------------------
