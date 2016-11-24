@@ -47,7 +47,11 @@
 #include <QDebug>
 #include <QSplashScreen>
 
-#define TIME_LAPSE 400000
+#define TIME_LAPSE 300000
+
+static QString appName(APP_NAME " - " APP_LONG_NAME);
+static QString appRev("Release " APP_RELEASE " - " APP_DATE);
+static QString appBld(BUILD_ID);
 
 //----------------------------------------------------------------------
 // Function: usage
@@ -99,14 +103,13 @@ void ctrlMsg(QSplashScreen & splash, int k = 0)
                       ""};
     static int i = 0;
 
-    static QString appMsg(APP_NAME " - " APP_DATE " - "
-                          APP_RELEASE " " BUILD_ID);
-
-    QString msgToShow = "<font color=\"yellow\"><b>" + appMsg + "</b></font><br>" +
-                        "<font color=\"white\">" + msgs[i++] + "</font>";
+    QString msgToShow = "<font color=\"yellow\"><b>" + appName +
+                        "<br>" + appRev + "<br>" + appBld + "</b></font><br>" +
+                        "<font color=\"white\">" + msgs[i] + "</font>";
     splash.showMessage(msgToShow, Qt::AlignLeft, Qt::white);
     qApp->processEvents(QEventLoop::AllEvents);
     QThread::usleep(TIME_LAPSE);
+    ++i;
 }
 
 //----------------------------------------------------------------------
@@ -144,17 +147,17 @@ int main(int argc, char *argv[])
     }
 
     ctrlMsg(splash);
-
     if (configStr.isEmpty()) {
         usage();
     }
 
     ctrlMsg(splash);
-
     QPF::MainWindow w(configStr, sessionStr);
+    w.setAppInfo(APP_NAME " - " APP_LONG_NAME,
+                 "V" APP_RELEASE " " APP_DATE,
+                 BUILD_ID);
 
     ctrlMsg(splash);
-
     w.show();
 
     ctrlMsg(splash);
