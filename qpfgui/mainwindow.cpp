@@ -73,7 +73,7 @@
 #include <QListWidget>
 #include <QPoint>
 #include <QObject>
-#include <QTextSream>
+#include <QTextStream>
 
 #include "logwatcher.h"
 #include "progbardlg.h"
