@@ -18,11 +18,14 @@ Second, amendment release to the [V1.0].  The main changes are:
 - Improved scripts for building the applications and for the installation of the COTS.
 
 ### Improvements
+
 QPF Core:
+
 - Improved Build script, which provides a BUILD_ID identifier for each build.
 - Now additional tasks can be coded for the execution in the run loop of each component.
 
 QPF GUI:
+
 - The list of open panels (tabs created showing the content of the different product files in the local archive) is now available.  With the right mouse button a context menu appears for closing all, the selected, or all but the selected element.  This list of panels is now shown in two places:
   + In a dedicated detachable docking window
   + In a combo box that appears when clicking in a button in the top left corner of the tabs bar.
@@ -30,7 +33,9 @@ QPF GUI:
 
 
 ### New Features
+
 QPF Core:
+
 - User Defined tools to open product files in the local archive.  They are part of the configuration and can be handled via the QPF GUI Config Tool.
 - New script to start docker service.
 - New PostgreSQL Database initialization script
@@ -38,18 +43,22 @@ QPF Core:
 - New COTS Installation script for LODEEN installations
 
 QPF GUI:
+
 - New integrated JSON data viewer.
 
 ### Fixed
+
 - Many bugs in the processing of the data and the handling of the input and output products are fixed.
 - Retrieval and displaying of the status of the different components by the QPF GUI is now fixed.
 
 ### Cosmetic Changes
+
 - A splash screen image is shown when
 - An application icon is now shown in the main window at the top right corner.
 - The fixed panels in the main window have now a small icon.
 
 ### Removed
+
 Removed entire integrated version of QPF Core and QPF GUI
 
 
