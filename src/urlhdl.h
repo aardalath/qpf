@@ -139,6 +139,11 @@ public:
     int rcopyfile(std::string & sFrom, std::string & sTo, bool toRemote);
 
     //----------------------------------------------------------------------
+    // Method: runlink
+    //----------------------------------------------------------------------
+    int runlink(std::string & f);
+
+    //----------------------------------------------------------------------
     // Method: setRemoteCopyParams
     //----------------------------------------------------------------------
     void setRemoteCopyParams(std::string maddr, std::string raddr);
