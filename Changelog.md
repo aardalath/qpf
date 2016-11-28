@@ -4,7 +4,7 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[Unreleased] / 2016-11-24
+[Unreleased] / 2016-11-28
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -50,6 +50,7 @@ QPF GUI:
 
 - Many bugs in the processing of the data and the handling of the input and output products are fixed.
 - Retrieval and displaying of the status of the different components by the QPF GUI is now fixed.
+- Solved issue with products left behind in gateway storage area.
 
 ### Cosmetic Changes
 
