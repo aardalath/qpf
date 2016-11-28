@@ -67,13 +67,22 @@ LOG_FILE=./build_${DATE}.log
 VERSION=$(cat "${QPF_PATH}/VERSION")
 LDLIBS=$(echo $LD_LIBRARY_PATH | tr ':' ' ')
 
-REV_ID=$(svn info ${QPF_PATH} | awk '/^Revision:/{print $2;}')
-if [ -z "$REV_ID" ]; then
-    REV_ID=$(git rev-parse HEAD)
-    if [ -z "$REV_ID" ]; then
-        REV_ID="DISCONNECTED-WORK-COPY-COMPILATION-00000"
+wsvn=$(which svn 2>/dev/null)
+if [ -n "$wsvn" ]; then
+    REV_ID=$(svn info ${QPF_PATH} 2>/dev/null | awk '/^Revision:/{print $2;}')
+fi
+
+if [ -z "$REV_ID" ]; then     
+    wgit=$(which git 2>/dev/null)
+    if [ -n "$wgit" ]; then
+        REV_ID=$(git rev-parse HEAD 2>/dev/null)
     fi
 fi
+
+if [ -z "$REV_ID" ]; then
+        REV_ID="DISCONNECTED-WORK-COPY-COMPILATION-00000"
+fi
+
 echo "Revision number: ${REV_ID}"
 BUILD_ID="${DATE}_${REV_ID}"
 echo "BUILD_ID: ${BUILD_ID}"
