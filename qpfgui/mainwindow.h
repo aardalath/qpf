@@ -74,6 +74,7 @@ public slots:
     void setAutomaticUpdateLocalArchModel(bool b);
 
 private slots:
+    void processPath();
     void saveAs();
     void cut();
     void copy();
@@ -157,6 +158,10 @@ private:
     void putUserToolsToSettings();
     TextView *activeTextView();
     void switchLayoutDirection();
+
+    void processProductsInPath(QString folder);
+    void getProductsInFolder(QString & path, QStringList & files, bool recursive = true);
+
     void init();
     void setLogWatch();
     void handleFinishedHMI();
@@ -199,6 +204,7 @@ private:
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
 
+    QAction *processPathAct;
     QAction *saveAsAct;
     QAction *restartAct;
     QAction *quitAct;

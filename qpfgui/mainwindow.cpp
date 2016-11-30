@@ -53,6 +53,7 @@
 #include "dbhdlpostgre.h"
 #include "except.h"
 #include "filenamespec.h"
+#include "urlhdl.h"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -362,6 +363,19 @@ void MainWindow::saveAs()
         statusBar()->showMessage(tr("File saved"), MessageDelay);
 }
 
+//----------------------------------------------------------------------
+// Method: processPath
+// Specify a folder and process the products contained therein
+//----------------------------------------------------------------------
+void MainWindow::processPath()
+{
+    QString folderName = QFileDialog::getExistingDirectory(this, 
+            tr("Process products in folder..."));
+    if (! folderName.isEmpty()) {
+        QtConcurrent::run(this, &MainWindow::processProductsInPath, folderName);
+    }
+}
+
 #ifndef QT_NO_CLIPBOARD
 void MainWindow::cut()
 {
@@ -499,6 +513,11 @@ void MainWindow::createActions()
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
+    processPathAct = new QAction(tr("Pr&ocess products in folder..."), this);
+    processPathAct->setShortcuts(QKeySequence::Open);
+    processPathAct->setStatusTip(tr("Specify a user selected folder and process all products inside"));
+    connect(processPathAct, SIGNAL(triggered()), this, SLOT(processPath()));
+
 //    restartAct = new QAction(tr("&Restart"), this);
 //    //restartAct->setShortcuts(QKeySequence::Quit);
 //    restartAct->setStatusTip(tr("Restart the application"));
@@ -632,10 +651,12 @@ void MainWindow::createMenus()
 {
     // File menu
     fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(saveAsAct);
+    fileMenu->addAction(processPathAct);
+    fileMenu->addSeparator();
+//    fileMenu->addAction(saveAsAct);
 //    fileMenu->addSeparator();
 //    fileMenu->addAction(restartAct);
-    fileMenu->addSeparator();
+//    fileMenu->addSeparator();
 //    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
     fileMenu->addAction(quitAct);
@@ -659,8 +680,8 @@ void MainWindow::createMenus()
     sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
     sessionInfoMenu->addAction(verbosityAct);
 
-    toolsMenu->addSeparator();
-    toolsMenu->addAction(execTestRunAct);
+    //toolsMenu->addSeparator();
+    //toolsMenu->addAction(execTestRunAct);
 
     // Window menu
     windowMenu = menuBar()->addMenu(tr("&Window"));
@@ -916,6 +937,56 @@ void MainWindow::quitAllQPF()
 
     qApp->closeAllWindows();
     qApp->quit();
+}
+
+//----------------------------------------------------------------------
+// Method: processProductsInPath
+// Specify a folder and process the products contained therein
+//----------------------------------------------------------------------
+void MainWindow::processProductsInPath(QString folder)
+{
+
+    // Get entire list (down the tree) of products in folder
+    QStringList files;
+    getProductsInFolder(folder, files);
+    
+    // Copy them (hard link, better) to the inbox
+    URLHandler uh;
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    std::string inbox = cfgInfo.storage.inbox.path + "/";
+            
+    foreach (const QString & fi, files) {
+        QFileInfo fs(fi);
+        std::string dirName  = fs.absolutePath().toStdString();
+        std::string fileName = fs.fileName().toStdString();
+        std::string origFile = dirName + "/" + fileName;
+        std::string newFile = inbox + fileName;
+        uh.relocate(origFile, newFile, LocalArchiveMethod::LINK);
+        //sleep(5);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: 
+// Obtain all the product files under the path
+//----------------------------------------------------------------------
+void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive) 
+{
+    QDir dir(path);
+    QFileInfoList allEntries = dir.entryInfoList(QDir::Files | QDir::Dirs | 
+            QDir::NoSymLinks | QDir::NoDotAndDotDot, 
+            QDir::Time | QDir::DirsLast);
+    foreach (const QFileInfo & fi, allEntries) {
+        QString absPath = fi.absoluteFilePath();
+        if (fi.isDir()) {
+            if (recursive) {
+                getProductsInFolder(absPath, files, recursive);
+            }
+        } else {
+            bool isProduct = true;
+            if (isProduct) { files << absPath; }
+        }
+    }
 }
 
 //----------------------------------------------------------------------
