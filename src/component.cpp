@@ -252,8 +252,7 @@ int Component::run()
 
     fromOperationalToRunning();
 
-    // Set state to Running
-    transitTo(RUNNING);
+    // Show Running state (only possible state from OPERATIONAL)
     InfoMsg("New state: " + getStateName(getState()));
 
     fromRunningToOff();
