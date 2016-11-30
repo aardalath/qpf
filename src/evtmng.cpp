@@ -48,6 +48,8 @@ using LibComm::Log;
 #include "config.h"
 #include "filenamespec.h"
 
+#include <csignal>
+#include <cstdlib>
 #include <sys/time.h>
 #include <unistd.h>
 #include <array>
@@ -150,9 +152,9 @@ void EventManager::execAdditonalLoopTasks()
 {
     // Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
-    if (dw->nextEvent(e)) {
+    while (dw->nextEvent(e)) {
         std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
-
+        
         // Process only files
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
@@ -177,7 +179,7 @@ void EventManager::execAdditonalLoopTasks()
 
             ProductCollection products;
             products.productList[m.productType] = m;
-
+    
             // Create message and send it to appropriate targets
             std::array<std::string,1> fwdRecip = {"DataMng"};
             for (std::string & recip : fwdRecip) {
@@ -194,7 +196,7 @@ void EventManager::execAdditonalLoopTasks()
             }
         }
     }
-
+    
     // 2. Check possible commands in DB
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     std::string cmdSource;
@@ -207,10 +209,7 @@ void EventManager::execAdditonalLoopTasks()
         dbHdl->getICommand(selfPeer()->name, cmdId, cmdSource, cmdContent);
 
         if (cmdContent == "QUIT") {
-            InfoMsg("Requesting STOP to all components. . .");
-            PeerMessage * msg = buildPeerMsg(selfPeer()->name, "Please, shut down!", MSG_STOP);
-            registerMsg(selfPeer()->name, *msg);
-            setTransmissionToPeer(selfPeer()->name, msg);
+            transitTo(RUNNING);
             // Mark command as executed
             dbHdl->markICommandAsDone(cmdId);
         } else if (cmdContent == "PING") {
@@ -219,7 +218,6 @@ void EventManager::execAdditonalLoopTasks()
             // Add answer command
             dbHdl->addICommand(cmdSource, selfPeer()->name, "PONG");
         }
-
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
         return;
