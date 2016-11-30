@@ -175,12 +175,15 @@ void DirWatcher::start()
                         dwe.size = -1;
                     }
 
-                    bool proceed = true;
-                    if (events.size() > 0) {
-                        proceed = events.back().path != dwe.path;
-                    }
+//                    bool proceed = true;
+//                    if (events.size() > 0) {
+//                        proceed = events.back().path != dwe.path;
+//                    }
 
-                    if (proceed) { events.push(dwe); }
+//                    if (proceed) { 
+                        fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
+                        events.push(dwe); 
+//                    }
                 }
             }
 
