@@ -55,6 +55,21 @@
 ////////////////////////////////////////////////////////////////////////////
 namespace QPF {
 
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
+Deployer * deployerCatcher;
+
+//----------------------------------------------------------------------
+// Ancillary signal handler
+//----------------------------------------------------------------------
+void signalCatcher(int s) 
+{
+    deployerCatcher->actionOnSigInt();
+}
+
 //----------------------------------------------------------------------
 // Constructor: Deployer
 //----------------------------------------------------------------------
@@ -72,12 +87,16 @@ Deployer::Deployer(int argc, char *argv[]) :
     hmiNeeded(false),
     deploymentCompleted(false)
 {
-    // Change value for delay between peer nodes launches (default: 50000us)
+    //== Change value for delay between peer nodes launches (default: 50000us)
     if (!processCmdLineOpts(argc, argv)) { exit(EXIT_FAILURE); }
 
-    //===== Read Configuration =====
+    //== Read Configuration 
     if (!newConfigFile.empty()) { configFile = newConfigFile.c_str(); }
     readConfig(configFile);
+    
+    //== Install signal handler
+    deployerCatcher = this;
+    installSignalHandlers();
 }
 
 //----------------------------------------------------------------------
@@ -333,5 +352,26 @@ bool Deployer::existsDir(std::string pathName)
     return (stat(pathName.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode));
 }
 
+//----------------------------------------------------------------------
+// Method: actionOnSigInt
+// Actions to be performed when capturing SigInt
+//----------------------------------------------------------------------
+void Deployer::actionOnSigInt()
+{
+    evtMng->transitTo(LibComm::CommNode::RUNNING);
+}
+
+//----------------------------------------------------------------------
+// Method: installSignalHandlers
+// Install signal handlers
+//----------------------------------------------------------------------
+void Deployer::installSignalHandlers()
+{
+   sigIntHandler.sa_handler = signalCatcher;
+   sigemptyset(&sigIntHandler.sa_mask);
+   sigIntHandler.sa_flags = 0;
+
+   sigaction(SIGINT, &sigIntHandler, NULL);
+}
 
 }

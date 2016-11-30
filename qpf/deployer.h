@@ -133,6 +133,12 @@ public:
     //----------------------------------------------------------------------
     Configuration * getConfigHandler();
 
+    //----------------------------------------------------------------------
+    // Method: actionOnSigInt
+    // Actions to be performed when capturing SigInt
+    //----------------------------------------------------------------------
+    void actionOnSigInt();
+
 private:
 
     //----------------------------------------------------------------------
@@ -202,6 +208,12 @@ private:
     // Removes old log and msg files
     //----------------------------------------------------------------------
     bool existsDir(std::string pathName);
+
+    //----------------------------------------------------------------------
+    // Method: installSignalHandlers
+    // Install signal handlers
+    //----------------------------------------------------------------------
+    void installSignalHandlers();
 
 private:
 
@@ -278,6 +290,13 @@ private:
     // Set to TRUE when the deployment (launch of nodes) is finished
     //----------------------------------------------------------------------
     bool deploymentCompleted;
+
+    //----------------------------------------------------------------------
+    // Variable: sigIntHandler
+    // Standard structure for signal handling
+    //----------------------------------------------------------------------
+    struct sigaction sigIntHandler;
+
 };
 
 }
