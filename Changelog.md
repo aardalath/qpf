@@ -4,7 +4,12 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[Unreleased] / 2016-11-28
+[Unreleased] / 2016-11-30
+--------------------------
+
+Current status is equal to tag [V1.1-RC1].
+
+[V1.1] / 2016-11-30
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -23,6 +28,7 @@ QPF Core:
 
 - Improved Build script, which provides a BUILD_ID identifier for each build.
 - Now additional tasks can be coded for the execution in the run loop of each component.
+- Now SIGINT is captured for a controlled shutting down.
 
 QPF GUI:
 
@@ -51,6 +57,7 @@ QPF GUI:
 - Many bugs in the processing of the data and the handling of the input and output products are fixed.
 - Retrieval and displaying of the status of the different components by the QPF GUI is now fixed.
 - Solved issue with products left behind in gateway storage area.
+- Components now do not transit to RUNNING when exiting from OPERATIONAL loop.
 
 ### Cosmetic Changes
 
@@ -72,6 +79,8 @@ First official release of the [QPF].
 ----
 
 [Unreleased]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/trunk
+[V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.1
+[V1.1-RC1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
 [QPF & QDT Installation]: https://issues.cosmos.esa.int/euclidwiki/display/QLA/QLA+Processing+Framework+and+Diagnostic+Tool+Installation
