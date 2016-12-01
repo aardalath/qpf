@@ -48,7 +48,7 @@
 #define APP_NAME         "QPFGUI"
 
 //! Application Release Number
-#define APP_RELEASE      "1.0.1"
+#define APP_RELEASE      "1.1rc1"
 
 //! Application Release Date
 #define APP_DATE         "OCT 2016"
