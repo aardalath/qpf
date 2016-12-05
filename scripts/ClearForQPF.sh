@@ -44,7 +44,8 @@ done
 
 ## Remove old run folders
 echo "Removing old sessions . . ."
-for p in $HOME/qpf/run/201* ; do
+sess=$(ls -d $HOME/qpf/run/201* 2>/dev/null)
+for p in $sess ; do
     sz=$(du -ks ${p} | cut -f 1)
     rm -rf ${p}/*
     size=$(($size + $sz))
