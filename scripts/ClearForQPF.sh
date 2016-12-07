@@ -47,7 +47,7 @@ echo "Removing old sessions . . ."
 sess=$(ls -d $HOME/qpf/run/201* 2>/dev/null)
 for p in $sess ; do
     sz=$(du -ks ${p} | cut -f 1)
-    rm -rf ${p}/*
+    rm -rf ${p}
     size=$(($size + $sz))
 done
 
