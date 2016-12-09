@@ -8,7 +8,9 @@
  *
  * Date:    2015/07/01
  *
- * Copyright (C) 2015 J C Gonzalez
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -48,10 +50,10 @@
 #define APP_NAME         "QPF"
 
 //! Application release number
-#define APP_RELEASE      "1.0.1"
+#define APP_RELEASE      "1.1rc1"
 
 //! Application release date
-#define APP_DATE         "OCT 2016"
+#define APP_DATE         "DEC 2016"
 
 //! Application developer company
 #define APP_COMPANY      "Euclid SOC Team"

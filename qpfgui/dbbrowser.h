@@ -1,3 +1,43 @@
+/******************************************************************************
+ * File:    dbbrowser.h
+ *          Declaration of class DBBrowser
+ *
+ * Domain:  QPF.qpfgui.dbbrowser
+ *
+ * Version: 1.1
+ *
+ * Date:    2016-11-03
+ *
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Declaration of class DBBrowser
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <ChangeLog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
 #ifndef DBBROWSER_H
 #define DBBROWSER_H
 

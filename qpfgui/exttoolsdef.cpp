@@ -1,3 +1,43 @@
+/******************************************************************************
+ * File:    exttoolsdef.cpp
+ *          Implementation of class ExtToolsDef
+ *
+ * Domain:  QPF.qpfgui.exttoolsdef
+ *
+ * Version: 1.1
+ *
+ * Date:    2016-11-03
+ *
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Implementation of class ExtToolsDef
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <ChangeLog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
 #include "exttoolsdef.h"
 #include "ui_exttoolsdef.h"
 

@@ -8,7 +8,9 @@
  *
  * Date:    2015/07/01
  *
- * Copyright (C) 2015 J C Gonzalez
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -58,6 +60,8 @@ namespace QPF {
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 Deployer * deployerCatcher;
@@ -192,13 +196,21 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 //----------------------------------------------------------------------
 void Deployer::readConfig(const char * configFile)
 {
+    // Check if the config file passed (if an actual file) does exits
+    if (strncmp(configFile, "db://", 5) != 0) {
+        struct stat fst;
+        if (stat(configFile, &fst) != 0) {
+            char msg[256];
+            sprintf(msg, "Trying to open config. file %s", configFile);
+            std::perror(msg);
+            exit(EXIT_FAILURE);            
+        }
+    }
+
     cfg   = new Configuration(configFile);
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     hmiNeeded = cfgInfo.hmiPresent;
-
-    // std::cerr << Configuration::PATHBase << std::endl;
-    // std::cerr << Configuration::PATHBin << std::endl;
 
     // Ensure paths for the execution are available and readu
     assert(existsDir(Configuration::PATHBase));

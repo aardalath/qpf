@@ -4,7 +4,17 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[Unreleased] / 2016-11-28
+[Unreleased] / 2016-12-09
+--------------------------
+
+- Now the Core reports an error if a config file is provided but does not exist.
+- Corrected bug in ClearForQPF.sh script
+- Updated version in version.h and VERSION files
+- Changed INSTALL.md to point to Confluence installation procedure.
+- Added main comment header to those source files without it.
+- Main comment headers updated
+
+[V1.1] / 2016-11-30
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -23,6 +33,7 @@ QPF Core:
 
 - Improved Build script, which provides a BUILD_ID identifier for each build.
 - Now additional tasks can be coded for the execution in the run loop of each component.
+- Now SIGINT is captured for a controlled shutting down.
 
 QPF GUI:
 
@@ -51,6 +62,7 @@ QPF GUI:
 - Many bugs in the processing of the data and the handling of the input and output products are fixed.
 - Retrieval and displaying of the status of the different components by the QPF GUI is now fixed.
 - Solved issue with products left behind in gateway storage area.
+- Components now do not transit to RUNNING when exiting from OPERATIONAL loop.
 
 ### Cosmetic Changes
 
@@ -72,6 +84,8 @@ First official release of the [QPF].
 ----
 
 [Unreleased]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/trunk
+[V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.1
+[V1.1-RC1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
 [QPF & QDT Installation]: https://issues.cosmos.esa.int/euclidwiki/display/QLA/QLA+Processing+Framework+and+Diagnostic+Tool+Installation
@@ -86,7 +100,9 @@ Project:     QPF
 Author:      J C Gonzalez
 Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
-Date:        2016-11-24
+Date:        2016-12-05
+
+Copyright (C) 2015, 2016 Euclid SOC Team @ ESAC
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 taking into account also [Semantic Versioning](http://semver.org/).
