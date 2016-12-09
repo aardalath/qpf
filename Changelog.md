@@ -4,10 +4,15 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[Unreleased] / 2016-11-30
+[Unreleased] / 2016-12-09
 --------------------------
 
-Current status is equal to tag [V1.1-RC1].
+- Now the Core reports an error if a config file is provided but does not exist.
+- Corrected bug in ClearForQPF.sh script
+- Updated version in version.h and VERSION files
+- Changed INSTALL.md to point to Confluence installation procedure.
+- Added main comment header to those source files without it.
+- Main comment headers updated
 
 [V1.1] / 2016-11-30
 --------------------------
@@ -95,7 +100,9 @@ Project:     QPF
 Author:      J C Gonzalez
 Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
-Date:        2016-11-24
+Date:        2016-12-05
+
+Copyright (C) 2015, 2016 Euclid SOC Team @ ESAC
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 taking into account also [Semantic Versioning](http://semver.org/).
