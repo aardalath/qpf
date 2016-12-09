@@ -8,7 +8,9 @@
  *
  * Date:    2016/06/01
  *
- * Copyright (C) 2016 J C Gonzalez
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information

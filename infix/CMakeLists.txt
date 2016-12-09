@@ -2,7 +2,7 @@
 # InFix - Simple Infix Expressions Evaluation Library
 #======================================================================
 # Library project file
-# Author: J C Gonzalez - 2015
+# Author: J C Gonzalez - 2015, 2016
 #======================================================================
 
 project (infix)

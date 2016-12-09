@@ -2,7 +2,7 @@
 # QPF - small toy QLA Processing Framework
 #======================================================================
 # Library project file
-# Author: J C Gonzalez - 2015
+# Author: J C Gonzalez - 2015, 2016
 #======================================================================
 
 include(../defaults.pri)

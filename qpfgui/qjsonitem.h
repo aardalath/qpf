@@ -1,3 +1,43 @@
+/******************************************************************************
+ * File:    qjsonitem.h
+ *          Declaration of class QJsonTreeItem
+ *
+ * Domain:  QPF.qpfgui.qjsonitem
+ *
+ * Version: 1.1
+ *
+ * Date:    2016-11-03
+ *
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Declaration of class QJsonTreeItem
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <ChangeLog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
 #ifndef JSONITEM_H
 #define JSONITEM_H
 #include <QtCore>
