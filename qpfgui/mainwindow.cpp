@@ -890,9 +890,11 @@ void MainWindow::showVerbLevel()
 {
     VerbLevelDlg dlg;
 
-    dlg.exec();
-
-    ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
+    if (dlg.exec()) {
+        int minLvl = dlg.getVerbosityLevelIdx();
+        Log::setMinLogLevel((Log::LogLevel)(minLvl));
+        ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
+    }
 }
 
 //----------------------------------------------------------------------
