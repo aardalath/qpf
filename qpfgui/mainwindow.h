@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.mainwindow
  *
- * Version: 1.1
+ * Version:  1.1
  *
  * Date:    2016-11-03
  *
@@ -154,8 +154,7 @@ private slots:
     void showTaskMonitContextMenu(const QPoint & p);
     void showWorkDir();
     void displayTaskInfo();
-    void pauseTask();
-    void resumeTask();
+    void restartTask();
     void stopTask();
     bool runDockerCmd(QModelIndex idx, QString cmd);
     void dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t);
@@ -246,6 +245,10 @@ private:
 
     QAction *processPathAct;
     QAction *saveAsAct;
+
+    QAction *stopTaskAct;
+    QAction *restartTaskAct;
+
     QAction *restartAct;
     QAction *quitAct;
     QAction *quitAllAct;
@@ -289,8 +292,7 @@ private:
     bool isThereActiveCores;
 
     HMIProxy * hmiNode;
-    std::thread hmiPxyThread;
-
+    
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
 
@@ -298,8 +300,7 @@ private:
 
     QAction * acWorkDir;
     QAction * acShowTaskInfo;
-    QAction * acPauseTask;
-    QAction * acResumeTask;
+    QAction * acRestartTask;
     QAction * acStopTask;
 
     QAction * acShowMsgInfo;
