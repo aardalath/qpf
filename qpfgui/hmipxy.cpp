@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.hmipxy
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -38,6 +38,7 @@
  *
  ******************************************************************************/
 
+#define PRESERVE_LOG_SYSTEM
 #include "hmipxy.h"
 
 #include "log.h"
@@ -62,7 +63,7 @@ namespace QPF {
 HMIProxy::HMIProxy(const char * name) :
     Component(name)
 {
-    setHeartBeatPeriod(5, 500000);
+    std::cerr << "Creating MIProxy with name '" << name << "'\n";
     canProcessMessage(MSG_MONIT_INFO_IDX);
 }
 
@@ -76,14 +77,39 @@ int HMIProxy::concurrentRun()
 }
 
 //----------------------------------------------------------------------
-// Method: init
-// Initialize the component
+// Method: log
+// Shows a log message with a given criticality
 //----------------------------------------------------------------------
-void HMIProxy::init()
+void HMIProxy::log(std::string s, Log::LogLevel lvl)
 {
-    isPeerLogMng = false;
-    isRemote     = false;
-    session      = ConfigurationInfo::data().session;
+    logMsg(s, lvl, true);
+}
+
+//----------------------------------------------------------------------
+// Method: sendCmd
+// Send a command message to a target (or a set of them)
+//----------------------------------------------------------------------
+void HMIProxy::sendCmd(std::string target, std::string what, std::string value)
+{
+    sendCMD(target, what, value);
+}
+
+//----------------------------------------------------------------------
+// Method: sendMinLogLevel
+//----------------------------------------------------------------------
+void HMIProxy::sendMinLogLevel(std::string lvlStr)
+{
+    sendMONIT_RQST("*", "set_min_log_level", lvlStr);
+}
+
+//----------------------------------------------------------------------
+// Method: fromInitialisedToRunning
+//----------------------------------------------------------------------
+void HMIProxy::fromInitialisedToRunning()
+{
+    // Establish communications with other peer
+    establishCommunications();
+    log("COMMUNICATION ESTABLISHED!!", Log::INFO);
 }
 
 //----------------------------------------------------------------------
@@ -91,16 +117,7 @@ void HMIProxy::init()
 //----------------------------------------------------------------------
 void HMIProxy::execAdditonalLoopTasks()
 {
-    MessageHeader hdr;
-    buildMsgHeader(MSG_MONIT_RQST_IDX, "QPFHMI", "", hdr);
-    Message_MONIT_RQST msg;
-    msg.header = hdr;
-    msg.variables.paramList["state"] = "";
-
-    std::cerr << "Requesting states at " << LibComm::sessionTag() << std::endl;
-    
-    PeerMessage * stateMsg = buildPeerMsg("", msg.getDataString(), MSG_MONIT_RQST);
-    broadcast(stateMsg);
+    sendMONIT_RQST("*", "state", "?");
 }
 
 //----------------------------------------------------------------------
@@ -113,7 +130,6 @@ void HMIProxy::processMONIT_INFO()
     std::map<std::string, std::string>::iterator it = msg->variables.paramList.find("state");
     if (it != msg->variables.paramList.end()) {
         nodeStates[msg->header.source] = (*it).second;
-        std::cerr << "State of " << msg->header.source << " is " << (*it).second << std::endl;
     }
 }
 

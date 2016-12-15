@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.HMIProxy
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -86,14 +86,30 @@ public:
 
     std::map<std::string, std::string> nodeStates;
 
+    //----------------------------------------------------------------------
+    // Method: sendMinLogLevel
+    //----------------------------------------------------------------------
+    void sendMinLogLevel(std::string lvlStr);
+
+    //----------------------------------------------------------------------
+    // Method: log
+    // Shows a log message with a given criticality
+    //----------------------------------------------------------------------
+    void log(std::string s, Log::LogLevel lvl = Log::INFO);
+
+    //----------------------------------------------------------------------
+    // Method: sendCmd
+    // Send a command message to a target (or a set of them)
+    //----------------------------------------------------------------------
+    void sendCmd(std::string target, std::string what, std::string value);
+
 protected:
     //----------------------------------------------------------------------
-    // Method: init
-    // Initialize the component
+    // Method: fromInitialisedToRunning
     //----------------------------------------------------------------------
-    void init();
-
-     //----------------------------------------------------------------------
+    virtual void fromInitialisedToRunning();
+    
+    //----------------------------------------------------------------------
     // Method: execAdditonalLoopTasks
     //----------------------------------------------------------------------
     virtual void execAdditonalLoopTasks();
