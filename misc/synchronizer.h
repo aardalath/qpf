@@ -4,7 +4,7 @@
  *
  * Module:  synchronizer
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2009/06/01
  *

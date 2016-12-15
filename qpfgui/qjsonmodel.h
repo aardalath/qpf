@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.qjsonmodel
  *
- * Version: 1.1
+ * Version:  1.1
  *
  * Date:    2016-11-03
  *

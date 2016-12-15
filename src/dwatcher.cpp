@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.DirWatcher
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2016/06/01
  *
