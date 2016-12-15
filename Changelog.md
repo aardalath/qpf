@@ -4,7 +4,7 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[V1.1] / 2016-12-15
+[V1.1rc2] / 2016-12-15
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -20,6 +20,7 @@ Second, amendment release to the [V1.0].  The main changes are:
 ### Improvements
 
 QPF Core:
+
 - Now the Core reports an error if a config file is provided but does not exist.
 - Updated version in version.h and VERSION files
 - Changed INSTALL.md to point to Confluence installation procedure.
@@ -34,7 +35,6 @@ QPF GUI:
   + In a dedicated detachable docking window
   + In a combo box that appears when clicking in a button in the top left corner of the tabs bar.
 - A more complete configuration tool is presented, although is not yet fully functional.
-
 
 ### New Features
 
