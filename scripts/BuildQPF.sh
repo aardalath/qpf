@@ -2,8 +2,8 @@
 ##############################################################################
 # File       : BuildQPF.sh - QPF Compilation and Installation script
 # Domain     : QPF.scripts
-# Version    : 1.0
-# Date       : 2016/04/01
+# Version    : 1.1
+# Date       : 2016/12/14
 # Copyright (C) 2015, 2016 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Compile and Install QPF binaries in target platform
@@ -60,6 +60,7 @@ RECREATEDB="no"
 WORK_AREA="${HOME}"
 PSQL_HOST="localhost"
 PSQL_PORT="5432"
+VERBOSE="no"
 
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
@@ -88,8 +89,12 @@ BUILD_ID="${DATE}_${REV_ID}"
 echo "BUILD_ID: ${BUILD_ID}"
 export BUILD_ID
 
-MAKE_OPTS="-k -j4 "
-CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf -D CMAKE_BUILD_TYPE=Debug --graphviz=dependencies.dot "
+MAKE_OPTS="-k -j4"
+COMP_FLAGS=""
+
+CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf"
+CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_BUILD_TYPE=Debug "
+CMAKE_OPTS="$CMAKE_OPTS --graphviz=dependencies.dot"
 
 ###### Handy functions
 
@@ -104,7 +109,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -p ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -p ] [ -v ]"
     opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
@@ -114,10 +119,12 @@ usage () {
     say "  -n         Show the actions without executing them"
     say "  -r         Clear previous build"
     say "  -b         Re-create PostsgreSQL system database"
+    say "  -D DEF     Define compile macros"
     say "  -p         Processing-only node: do not compile QPF HMI"
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
+    say "  -v         Make output verbose"
     say ""
     exit 1
 }
@@ -227,7 +234,7 @@ install_contrib () {
 ###### Start
 
 ## Parse command line
-while getopts :hcinrbpw:H:P: OPT; do
+while getopts :hcinrbD:pw:H:P:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -235,10 +242,12 @@ while getopts :hcinrbpw:H:P: OPT; do
         n|+n) FAKE="yes" ;;
         r|+r) REMOVE="yes" ;;
         b|+b) RECREATEDB="yes" ;;
+        D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
         w|+w) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
+        v|+v) VERBOSE="yes" ;;
         *)    usage ; exit 2
     esac
 done
@@ -266,6 +275,17 @@ step "Ensuring contributions to COTS are properly installed"
 
 install_contrib cppzmq-master/zmq.hpp opt/zmq/include
 install_contrib pcre2/PCRegEx.h       opt/pcre2/include
+
+if [ "${VERBOSE}" == "yes" ]; then
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_VERBOSE_MAKEFILE=ON"
+else
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_VERBOSE_MAKEFILE=OFF"
+fi
+
+if [ -n "${COMP_FLAGS}" ]; then
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_C_FLAGS=\"$COMP_FLAGS\"" 
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_CXX_FLAGS=\"$COMP_FLAGS\"" 
+fi
 
 ## Creating build folder
 step "Creating build folder"
