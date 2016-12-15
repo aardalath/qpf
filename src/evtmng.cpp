@@ -73,9 +73,8 @@ EventManager::EventManager(const char * name) :
     canProcessMessage(MSG_INDATA_IDX);
     canProcessMessage(MSG_TASK_RES_IDX); // TODO: Deprecate this for EvtMng in favour of DB
     canProcessMessage(MSG_MONIT_INFO_IDX);
-#ifdef XCMD
     canProcessMessage(MSG_CMD_IDX);
-#endif
+
     setHeartBeatPeriod(0, 200000);
 }
 
@@ -158,7 +157,7 @@ void EventManager::execAdditonalLoopTasks()
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
         std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
-        
+
         // Process only files
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
@@ -183,7 +182,7 @@ void EventManager::execAdditonalLoopTasks()
 
             ProductCollection products;
             products.productList[m.productType] = m;
-    
+
             // Create message and send it to appropriate targets
             std::array<std::string,1> fwdRecip = {"DataMng"};
             for (std::string & recip : fwdRecip) {
@@ -200,7 +199,7 @@ void EventManager::execAdditonalLoopTasks()
             }
         }
     }
-    
+
     // 2. Check possible commands in DB
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     std::string cmdSource;
@@ -282,10 +281,10 @@ void EventManager::processTASK_RES()
     } catch (...) {
         ErrMsg("Error when trying to update db info of task " +
                 msg->task.taskData["NameExtended"].asString());
-    }    
+    }
     // Check that connection with the DB is possible
     dbHdl->closeConnection();
-    
+
     if (msg->task.taskData["State"]["Progress"].asString() == "100") {
         InfoMsg("RECEIVED NOTIFICATION OF TASK " + msg->task.taskName +
                 " FINISHED AT " + msg->task.taskEnd);
@@ -299,10 +298,10 @@ void EventManager::processTASK_RES()
 void EventManager::processMONIT_INFO()
 {
     Message_MONIT_INFO * msg = dynamic_cast<Message_MONIT_INFO *>(msgData.msg);
-    
+
     NodeName & source = msg->header.source;
     PList & v = msg->variables.paramList;
-    
+
     for (auto & it : v) {
         if (it.first == "state") {
             DbgMsg("STATUS of " + source + " is " + it.second);
@@ -317,15 +316,15 @@ void EventManager::processCMD()
 {
     InfoMsg("Processing CMD message...");
 
-    Message_CMD * msg = dynamic_cast<Message_CMD *>(msgData.msg);   
-    
+    Message_CMD * msg = dynamic_cast<Message_CMD *>(msgData.msg);
+
     NodeName & source = msg->header.source;
     PList & v = msg->variables.paramList;
 
     for (auto & it : v) {
-        if (it.first == "quit") { 
+        if (it.first == "quit") {
             InfoMsg("Leaving OPERATIONAL state triggered by a CMD message...");
-            transitTo(RUNNING); 
+            transitTo(RUNNING);
         }
     }
 }
