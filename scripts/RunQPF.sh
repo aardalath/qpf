@@ -14,7 +14,7 @@
 ###### Script variables
 
 QPFDIR=/home/eucops/qpf
-VERSION=1.1rc2
+VERSION=1.1
 QPF=${QPFDIR}/bin/qpf
 QPFHMI=${QPFDIR}/bin/qpfgui
 QPF_SESSIONS_DIR=${QPFDIR}/run
