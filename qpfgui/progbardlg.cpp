@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.progbardlg
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -68,7 +68,7 @@ void ProgressBarDelegate::paint(QPainter *painter,
 {
     //QProgressBar progressbar;
 
-    if (index.column() != 7) {
+    if (index.column() != progressColumn) {
         QItemDelegate::paint(painter, option, index);
         return;
     }
@@ -76,7 +76,7 @@ void ProgressBarDelegate::paint(QPainter *painter,
     QStyleOptionProgressBarV2 progressBarOption;
 
     QRect rect = option.rect;
-    rect.setWidth(rect.width()*19/20);
+    rect.setWidth(rect.width());
 
     progressBarOption.state = QStyle::State_Enabled;
     progressBarOption.direction = QApplication::layoutDirection();
