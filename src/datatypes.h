@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.datatypes
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -167,8 +167,10 @@ struct StringList : public JsonStruct {
 
 struct ProductShortList : public StringList {};
 
+typedef std::map<std::string, std::string> PList;
+
 struct ParameterList : public JsonStruct {
-    std::map<std::string, std::string> paramList;
+    PList paramList;
 
     virtual void toFields();
     virtual void toData();
