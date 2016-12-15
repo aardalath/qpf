@@ -4,17 +4,7 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[Unreleased] / 2016-12-09
---------------------------
-
-- Now the Core reports an error if a config file is provided but does not exist.
-- Corrected bug in ClearForQPF.sh script
-- Updated version in version.h and VERSION files
-- Changed INSTALL.md to point to Confluence installation procedure.
-- Added main comment header to those source files without it.
-- Main comment headers updated
-
-[V1.1] / 2016-11-30
+[V1.1] / 2016-12-15
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -30,10 +20,13 @@ Second, amendment release to the [V1.0].  The main changes are:
 ### Improvements
 
 QPF Core:
-
-- Improved Build script, which provides a BUILD_ID identifier for each build.
+- Now the Core reports an error if a config file is provided but does not exist.
+- Updated version in version.h and VERSION files
+- Changed INSTALL.md to point to Confluence installation procedure.
+- Added main comment header to those source files without it.
 - Now additional tasks can be coded for the execution in the run loop of each component.
 - Now SIGINT is captured for a controlled shutting down.
+- Main comment headers updated
 
 QPF GUI:
 
@@ -44,6 +37,8 @@ QPF GUI:
 
 
 ### New Features
+
+- Improved Build script, which provides a BUILD_ID identifier for each build.
 
 QPF Core:
 
@@ -62,7 +57,9 @@ QPF GUI:
 - Many bugs in the processing of the data and the handling of the input and output products are fixed.
 - Retrieval and displaying of the status of the different components by the QPF GUI is now fixed.
 - Solved issue with products left behind in gateway storage area.
+- Solved bug in the handling of Task results messages.
 - Components now do not transit to RUNNING when exiting from OPERATIONAL loop.
+- Solved bugs in ClearForQPF.sh script.
 
 ### Cosmetic Changes
 
@@ -72,7 +69,8 @@ QPF GUI:
 
 ### Removed
 
-Removed entire integrated version of QPF Core and QPF GUI
+- Removed entire integrated version of QPF Core and QPF GUI
+- Now the Quit All commanded from the HMI is sent directly via CMD message to the EvtMng, not as a DB iCommand.
 
 
 [V1.0] / 2016-04-22
@@ -83,9 +81,7 @@ First official release of the [QPF].
 
 ----
 
-[Unreleased]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/trunk
-[V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.1
-[V1.1-RC1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
+[V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
 [QPF & QDT Installation]: https://issues.cosmos.esa.int/euclidwiki/display/QLA/QLA+Processing+Framework+and+Diagnostic+Tool+Installation
@@ -100,7 +96,7 @@ Project:     QPF
 Author:      J C Gonzalez
 Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
-Date:        2016-12-05
+Date:        2016-12-15
 
 Copyright (C) 2015, 2016 Euclid SOC Team @ ESAC
 
