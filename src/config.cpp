@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.config
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -795,6 +795,8 @@ void Configuration::processConfiguration()
     std::vector<std::string> & machineNodes =
             cfgInfo.machineNodes[cfgInfo.currentMachine];
 
+    SHW("Creating connections:\n");
+
     for (unsigned int i = 0; i < machineNodes.size(); ++i) {
 
         Peer * peer = cfgInfo.peersCfgByName[machineNodes.at(i)];
@@ -805,18 +807,20 @@ void Configuration::processConfiguration()
         if (component == 0) { continue; }
 
         component->addPeer(cfgInfo.peersCfgByName[peerName], true);
-        DBG("Creating connections for " << peerName
-            << "  [" << peer->clientAddr
-            << " ; " << peer->serverAddr << "]");
-
+        //DBG("Creating connections for " << peerName
+        //    << "  [" << peer->clientAddr
+        //    << " ; " << peer->serverAddr << "]");
+        SHW("* " << peerName << " [" << peer->clientAddr << "] <==>\n");
+        
         std::vector<std::string> & connectNodes = cfgInfo.connections[peerName];
 
         for (unsigned int j = 0; j < connectNodes.size(); ++j) {
             Peer * otherPeer = cfgInfo.peersCfgByName[connectNodes.at(j)];
             component->addPeer(otherPeer);
-            DBG("  Connecting to " << otherPeer->name
-                << "  [" << otherPeer->clientAddr
-                << " ; " << otherPeer->serverAddr << "]");
+            //DBG("  Connecting to " << otherPeer->name
+            //    << "  [" << otherPeer->clientAddr
+            //    << " ; " << otherPeer->serverAddr << "]");
+            SHW("\t\t* " << otherPeer->name << " [" << otherPeer->clientAddr << "]\n");
         }
 
         cfgInfo.peerNodes.push_back(component);
