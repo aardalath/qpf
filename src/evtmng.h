@@ -129,12 +129,12 @@ protected:
     // Method: processMONIT_INFO
     //----------------------------------------------------------------------
     virtual void processMONIT_INFO();
-#ifdef XCMD
+
     //----------------------------------------------------------------------
     // Method: processCMD
     //----------------------------------------------------------------------
     virtual void processCMD();
-#endif
+
 private:
     std::atomic<bool> waitingForGO;
     DirWatcher * dw;
