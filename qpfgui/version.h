@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.version
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -50,7 +50,7 @@
 #define APP_NAME         "QPFGUI"
 
 //! Application Release Number
-#define APP_RELEASE      "1.1rc1"
+#define APP_RELEASE      "1.1"
 
 //! Application Release Date
 #define APP_DATE         "DEC 2016"

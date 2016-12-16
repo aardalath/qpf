@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.procelem
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -726,6 +726,16 @@ void ProcessingElement::sendUpdatedInfo()
 //----------------------------------------------------------------------
 void ProcessingElement::cleanup()
 {
+    // Removing input products
+    std::map<ProductType,
+        ProductMetadata>::iterator it = task.inputs.productList.begin();
+    while (it != task.inputs.productList.end()) {
+        ProductMetadata & m = it->second;
+        std::string file(str::mid(m.url,7,1000));
+        urlh->runlink(file);
+        ++it;
+    }
+
     // Cleaning up . . .
     status = TASK_ARCHIVED;
     task.taskStatus = status;

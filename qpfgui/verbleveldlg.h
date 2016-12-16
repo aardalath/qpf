@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.verbleveldlg
  *
- * Version: 1.1
+ * Version:  1.1
  *
  * Date:    2016-11-03
  *
@@ -57,6 +57,7 @@ public:
     explicit VerbLevelDlg(QWidget *parent = 0);
     ~VerbLevelDlg();
     QString getVerbosityLevelName();
+    int getVerbosityLevelIdx();
 
 public slots:
     void setVerbosityLevel(int lvl);
@@ -65,6 +66,7 @@ private:
     Ui::VerbLevelDlg *ui;
     QStringList verbLevels;
     QString currentLevel;
+    int currentLevelIdx;
 };
 
 }

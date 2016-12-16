@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.verbleveldlg
  *
- * Version: 1.1
+ * Version:  1.1
  *
  * Date:    2016-11-03
  *
@@ -54,7 +54,7 @@ VerbLevelDlg::VerbLevelDlg(QWidget *parent) :
 
     verbLevels << "TRACE"
                << "DEBUG"
-               << "INFORMATIONAL"
+               << "INFO"
                << "WARNING"
                << "ERROR"
                << "FATAL";
@@ -69,13 +69,18 @@ VerbLevelDlg::VerbLevelDlg(QWidget *parent) :
 
 void VerbLevelDlg::setVerbosityLevel(int lvl)
 {
-    Log::setMinLogLevel((Log::LogLevel)(lvl));
     currentLevel = ui->listWidget->currentItem()->text();
+    currentLevelIdx = ui->listWidget->currentIndex().row();
 }
 
 QString VerbLevelDlg::getVerbosityLevelName()
 {
     return currentLevel;
+}
+
+int VerbLevelDlg::getVerbosityLevelIdx()
+{
+    return currentLevelIdx;
 }
 
 VerbLevelDlg::~VerbLevelDlg()
@@ -84,5 +89,3 @@ VerbLevelDlg::~VerbLevelDlg()
 }
 
 }
-#include "verbleveldlg.h"
-#include "ui_verbleveldlg.h"

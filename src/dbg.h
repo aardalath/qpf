@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.dbg
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -84,6 +84,8 @@
 #  define DBG(s) std::cerr << clock() << ":" \
     << __FILE__ << ':' << __FUNCTION__ << ':' << __LINE__			\
     << ": " << s << std::endl << std::flush
+
+#  define SHW(s) std::cerr << s << std::flush
 
 #  ifdef DEBUG_CHECKINOUT
 #    define CHKIN do { \

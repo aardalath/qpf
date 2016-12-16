@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfhmi.mainwindow
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -70,6 +70,7 @@
 #include <QMessageBox>
 #include <QDomDocument>
 #include <QDesktopServices>
+#include <QJsonObject>
 
 #include <thread>
 #include <QString>
@@ -90,7 +91,6 @@
 //#include "testrundlg.h"
 #include "qjsonmodel.h"
 #include "xmlsyntaxhighlight.h"
-
 #include "dlgalert.h"
 
 namespace QPF {
@@ -104,6 +104,14 @@ const int MainWindow::OFF          =  0;
 const int MainWindow::INITIALISED  =  1;
 const int MainWindow::RUNNING      =  2;
 const int MainWindow::OPERATIONAL  =  3;
+
+// Basic log macros
+#define TMsg(s)  hmiNode->log(s, Log::TRACE)
+#define DMsg(s)  hmiNode->log(s, Log::DEBUG)
+#define IMsg(s)  hmiNode->log(s, Log::INFO)
+#define WMsg(s)  hmiNode->log(s, Log::WARNING)
+#define EMsg(s)  hmiNode->log(s, Log::ERROR)
+#define FMsg(s)  hmiNode->log(s, Log::FATAL)
 
 // Valid Manager state names (strings)
 const std::string MainWindow::ERROR_StateName("ERROR");
@@ -134,6 +142,8 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     manualSetupUI();
     defineValidTransitions();
 
+    init();
+
     // Prepare DBManager
     if (QSqlDatabase::connectionNames().isEmpty()) {
         QString databaseName ( QPF::Configuration::DBName.c_str() );
@@ -146,20 +156,16 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
                                                databaseName,
                                                userName, password,
                                                hostName, port.toInt() };
-        qDebug() << "Adding DB connection";
+        DMsg("Adding DB connection");
         DBManager::addConnection("qpfdb", connection);
-        qDebug() << "Adding DB connection - DONE";
+        DMsg("Adding DB connection - DONE");
     }
 
-    //transitTo(INITIALISED);
     showState();
 
-    //init();
+    statusBar()->showMessage(tr("QPF HMI Ready . . ."), MessageDelay);
 
-    statusBar()->showMessage(tr("QPF HMI Ready . . ."),
-                             MessageDelay);
-
-    std::cerr << "SessionId: " << ConfigurationInfo::data().session << std::endl;
+    DMsg("SessionId: " + ConfigurationInfo::data().session);
 
     // Launch automatic view update timer
     QTimer * updateSystemViewTimer = new QTimer(this);
@@ -371,7 +377,7 @@ void MainWindow::saveAs()
 //----------------------------------------------------------------------
 void MainWindow::processPath()
 {
-    QString folderName = QFileDialog::getExistingDirectory(this, 
+    QString folderName = QFileDialog::getExistingDirectory(this,
             tr("Process products in folder..."));
     if (! folderName.isEmpty()) {
         QtConcurrent::run(this, &MainWindow::processProductsInPath, folderName);
@@ -851,7 +857,7 @@ void MainWindow::showConfigTool()
 
     cfgTool.prepare(userDefTools, userDefProdTypes);
     if (cfgTool.exec()) {
-        std::cerr << "Updating user tools!\n";
+        DMsg("Updating user tools!");
         cfgTool.getExtTools(userDefTools);
     }
 }
@@ -890,9 +896,13 @@ void MainWindow::showVerbLevel()
 {
     VerbLevelDlg dlg;
 
-    dlg.exec();
-
-    ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
+    if (dlg.exec()) {
+        int minLvl = dlg.getVerbosityLevelIdx();
+        Log::setMinLogLevel((Log::LogLevel)(minLvl));
+        ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
+        hmiNode->sendMinLogLevel(dlg.getVerbosityLevelName().toStdString());
+        statusBar()->showMessage(tr("Setting Verbosity level to ") + dlg.getVerbosityLevelName(), 2 * MessageDelay);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -932,11 +942,12 @@ void MainWindow::quitAllQPF()
 
     if (ret != QMessageBox::Yes) { return; }
 
+    IMsg("Sending quit command to EvtMng . . .");
+    hmiNode->sendCmd("EvtMng", "quit", "");
+    //DBManager::addICommand("QUIT");
+
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
-
-    DBManager::addICommand("QUIT");
-
     qApp->closeAllWindows();
     qApp->quit();
 }
@@ -951,12 +962,12 @@ void MainWindow::processProductsInPath(QString folder)
     // Get entire list (down the tree) of products in folder
     QStringList files;
     getProductsInFolder(folder, files);
-    
+
     // Copy them (hard link, better) to the inbox
     URLHandler uh;
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
     std::string inbox = cfgInfo.storage.inbox.path + "/";
-            
+
     foreach (const QString & fi, files) {
         QFileInfo fs(fi);
         std::string dirName  = fs.absolutePath().toStdString();
@@ -969,14 +980,14 @@ void MainWindow::processProductsInPath(QString folder)
 }
 
 //----------------------------------------------------------------------
-// Method: 
+// Method:
 // Obtain all the product files under the path
 //----------------------------------------------------------------------
-void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive) 
+void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)
 {
     QDir dir(path);
-    QFileInfoList allEntries = dir.entryInfoList(QDir::Files | QDir::Dirs | 
-            QDir::NoSymLinks | QDir::NoDotAndDotDot, 
+    QFileInfoList allEntries = dir.entryInfoList(QDir::Files | QDir::Dirs |
+            QDir::NoSymLinks | QDir::NoDotAndDotDot,
             QDir::Time | QDir::DirsLast);
     foreach (const QFileInfo & fi, allEntries) {
         QString absPath = fi.absoluteFilePath();
@@ -1008,21 +1019,23 @@ void MainWindow::init()
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // Initialize and create node part as a separate thread
-    qDebug() << "Initializing QPFHMI...";
+    Peer * qpfhmiPeer = cfgInfo.peersCfgByName[cfgInfo.qpfhmiCfg.name];
+    Peer * evtmngPeer = cfgInfo.peersCfgByName[cfgInfo.evtMngCfg.name];
 
     hmiNode = new HMIProxy(cfgInfo.qpfhmiCfg.name.c_str());
-    hmiNode->addPeer(cfgInfo.peersCfgByName[cfgInfo.qpfhmiCfg.name]);
-
-    Peer * evtmngPeer = cfgInfo.peersCfgByName[cfgInfo.evtMngCfg.name];
+    hmiNode->addPeer(qpfhmiPeer, true);
     hmiNode->addPeer(evtmngPeer);
-
     hmiNode->initialize();
+    hmiNode->log("QPFHMI node initialized", Log::DEBUG);
 
-    cfgInfo.peerNodes.push_back(hmiNode);
+    //cfgInfo.peerNodes.push_back(hmiNode);
 
-    qDebug() << "Trying to concurrentRun QPFHMI...";
-    //hmiPxyThread = std::thread(&HMIProxy::concurrentRun, hmiNode);
-    qDebug() << "QPFHMI should be concurrentRunning...";
+    hmiNode->log("Trying to concurrentRun QPFHMI...", Log::DEBUG);
+    //QFuture<int> futureHMIRun = QtConcurrent::run(this->hmiNode,
+    //                                              &HMIProxy::concurrentRun);
+    std::thread hmiPxyThread(&HMIProxy::concurrentRun, hmiNode);
+    hmiPxyThread.detach();
+    hmiNode->log("QPFHMI should be concurrentRunning...", Log::DEBUG);
 }
 
 //----------------------------------------------------------------------
@@ -1182,11 +1195,11 @@ void MainWindow::showState()
             s += itt.value();
             if (it.value() != itt.value()) {
                 mapsAreEqual = false;
+                hmiNode->log(s.toStdString());
             }
         } else {
             mapsAreEqual = false;
         }
-        std::cerr << s.toStdString() << std::endl;
         ++it;
     }
 
@@ -1231,6 +1244,7 @@ void MainWindow::updateSystemView()
     quitAllAct->setEnabled(isThereActiveCores);
 
     //== 1. Processing tasks
+    procTaskStatusModel->setFullUpdate(true);
     procTaskStatusModel->refresh();
     ui->tblvwTaskMonit->resizeColumnsToContents();
     const int TaskDataCol = 9;
@@ -1457,7 +1471,7 @@ void MainWindow::openWith()
             for (int i = 1; i <= nph; ++i) {
                 QString ph("%" + QString("%1").arg(i));
                 QLineEdit * e = edPh.at(i - 1);
-                qDebug() << "Trying to substitute '" << ph << "' with '" << e->text() << "'";
+                DMsg(("Trying to substitute '" + ph + "' with '" + e->text() + "'").toStdString());
                 args.replace(ph, e->text());
             }
         }
@@ -1548,8 +1562,8 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     static const int NumOfNameCol = 0;
     static const int NumOfURLCol = 10;
 
-    qDebug() << idx;
     int row = idx.row();
+    TMsg(QString("(%1,%2)").arg(row).arg(idx.column()).toStdString());
     const QAbstractItemModel * model = idx.model();
     QModelIndex nameIdx = model->index(row, NumOfNameCol, idx.parent());
     QModelIndex urlIdx  = model->index(row, NumOfURLCol, idx.parent());
@@ -1572,11 +1586,11 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
 
     QWidget * editor = 0;
     QFileInfo fs(url);
-    qDebug() << fs.absoluteFilePath() << fs.suffix();
+    TMsg((fs.absoluteFilePath() + fs.suffix()).toStdString());
     if (fs.suffix() == "xml") {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qDebug() << "Cannot open file";
+            DMsg("Cannot open file");
             return;
         }
         QTextStream in(&file);
@@ -1609,7 +1623,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         binaryGetFITSHeader(fs.absoluteFilePath(), str);
         QJsonDocument j = QJsonDocument::fromBinaryData(str.toLocal8Bit());
         if (j.isNull()) {
-            qDebug() << "Null document!";
+            DMsg("Null document!");
         }
         QFile js("js.json");
         if (js.open(QIODevice::ReadWrite)) {
@@ -1628,7 +1642,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     } else if (fs.suffix() == "log") {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qDebug() << "Cannot open file";
+            DMsg("Cannot open file");
             return;
         }
         QTextStream in(&file);
@@ -1640,7 +1654,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     } else {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qDebug() << "Cannot open file";
+            DMsg("Cannot open file");
             return;
         }
         QTextStream in(&file);
@@ -1853,7 +1867,7 @@ void MainWindow::jsontreeExpandSubtree()
     int k = idx.row();
     while (idx.child(k, 0).isValid()) {
         k++;
-        std::cerr << "Expanding at row k = " << k << std::endl;
+        DMsg("Expanding at row k = " + k);
         w->expand(idx.child(k, 0));
     }
     */
@@ -1931,15 +1945,13 @@ void MainWindow::initTasksMonitView()
 
     acWorkDir      = new QAction(tr("Open task working directory..."), ui->tblvwTaskMonit);
     acShowTaskInfo = new QAction(tr("Display task information"), ui->tblvwTaskMonit);
-    acPauseTask    = new QAction(tr("Pause"), ui->tblvwTaskMonit);
-    acResumeTask   = new QAction(tr("Resume"), ui->tblvwTaskMonit);
     acStopTask     = new QAction(tr("Stop"), ui->tblvwTaskMonit);
+    acRestartTask  = new QAction(tr("Restart"), ui->tblvwTaskMonit);
 
     connect(acWorkDir,      SIGNAL(triggered()), this, SLOT(showWorkDir()));
     connect(acShowTaskInfo, SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
-    connect(acPauseTask,    SIGNAL(triggered()), this, SLOT(pauseTask()));
-    connect(acResumeTask,   SIGNAL(triggered()), this, SLOT(resumeTask()));
     connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
+    connect(acRestartTask,  SIGNAL(triggered()), this, SLOT(restartTask()));
 
     connect(ui->tblvwTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTaskMonitContextMenu(const QPoint &)));
@@ -1969,8 +1981,7 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
     if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
         actions.append(acWorkDir);
         actions.append(acShowTaskInfo);
-        actions.append(acPauseTask);
-        actions.append(acResumeTask);
+        actions.append(acRestartTask);
         actions.append(acStopTask);
     }
     if (actions.count() > 0) {
@@ -2012,21 +2023,12 @@ void MainWindow::displayTaskInfo()
 }
 
 //----------------------------------------------------------------------
-// Method: pauseTask
-// Pauses selected task
+// Method: restartTask
+// Restarts selected (paused) task
 //----------------------------------------------------------------------
-void MainWindow::pauseTask()
+void MainWindow::restartTask()
 {
-    runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "pause");
-}
-
-//----------------------------------------------------------------------
-// Method: resumeTask
-// Resumes selected (paused) task
-//----------------------------------------------------------------------
-void MainWindow::resumeTask()
-{
-    runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "unpause");
+    runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "start");
 }
 
 //----------------------------------------------------------------------
@@ -2049,8 +2051,14 @@ bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)
       const Json::Value & v = processedTasksInfo.value(treeKey);
       QString dId = QString::fromStdString(v["NameExtended"].asString());
     */
-    Q_UNUSED(idx);
-    QString dId;
+
+    QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+    QString taskInfoString = procTaskStatusModel->data(dataIdx).toString().trimmed();
+    
+    QJsonDocument doc = QJsonDocument::fromJson(taskInfoString.toUtf8());
+    QJsonObject obj = doc.object();
+            
+    QString dId = obj["Id"].toString();
     QStringList args;
     args << cmd << dId;
 
@@ -2088,10 +2096,10 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
         //        } else {
         for (Json::ValueIterator i = v.begin(); i != v.end(); ++i) {
             QTreeWidgetItem * chld = new QTreeWidgetItem(t);
-            //qDebug() << "Show node key";
-            //qDebug() << i.key().asString().c_str();
+            //DMsg("Show node key");
+            //DMsg(i.key().asString().c_str());
             chld->setData(0, Qt::DisplayRole, QString::fromStdString(i.key().asString()));
-            //qDebug() << "now dump children...";
+            //DMsg("now dump children...");
             dumpToTree(*i, chld);
             t->addChild(chld);
             //            }

@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.Component
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -148,7 +148,7 @@ protected:
     //----------------------------------------------------------------------
     // Method: processMONIT_RQST
     //----------------------------------------------------------------------
-    virtual void processMONIT_RQST() {}
+    virtual void processMONIT_RQST();
 
     //----------------------------------------------------------------------
     // Method: processMONIT_INFO
@@ -166,7 +166,7 @@ protected:
     virtual void processTASK_RES() {}
 
     //----------------------------------------------------------------------
-    // Method: processTASK_RES
+    // Method: processCMD
     //----------------------------------------------------------------------
     virtual void processCMD() {}
 
@@ -189,6 +189,16 @@ protected:
 protected:
 
     //----------------------------------------------------------------------
+    // Method: sendMONIT_RQST
+    //----------------------------------------------------------------------
+    void sendMONIT_RQST(std::string target, std::string what, std::string value);
+
+    //----------------------------------------------------------------------
+    // Method: sendCMD
+    //----------------------------------------------------------------------
+    void sendCMD(std::string target, std::string what, std::string value);
+
+    //----------------------------------------------------------------------
     // Method: is
     //----------------------------------------------------------------------
     bool is(Router2RouterPeer::PeerMessage & inPeerMsg,
@@ -206,12 +216,6 @@ protected:
     //----------------------------------------------------------------------
     int process(Router2RouterPeer::Peer & inPeer,
                 Router2RouterPeer::PeerMessage & inPeerMsg);
-
-    //----------------------------------------------------------------------
-    // Method: processMONIT_RQST_State
-    // Check if a monit rqst refers to the state
-    //----------------------------------------------------------------------
-    bool processMONIT_RQST_State();
 
     //----------------------------------------------------------------------
     // Method: buildMsgHeader

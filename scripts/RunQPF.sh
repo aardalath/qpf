@@ -1,8 +1,8 @@
 ##############################################################################
 # File       : RunQPFHMI.sh - Run QPF HMI
 # Domain     : QPF.scripts
-# Version    : 1.0
-# Date       : 2016/07/12
+# Version    : 1.1
+# Date       : 2016/12/12
 # Copyright (C) 2015, 2016 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Run QPF HMI
@@ -14,7 +14,7 @@
 ###### Script variables
 
 QPFDIR=/home/eucops/qpf
-VERSION=1.0
+VERSION=1.1
 QPF=${QPFDIR}/bin/qpf
 QPFHMI=${QPFDIR}/bin/qpfgui
 QPF_SESSIONS_DIR=${QPFDIR}/run
@@ -118,7 +118,9 @@ greetings
 HOSTNAME=${THIS_HOST} ${DBG} ${QPFEXE} ${CFG_FILE} ${SESSION} -t 50000 2>&1  | tee ${LOG_FILE}
 
 if [ $? -ne 0 ]; then
-    die "Cannot run qpfhmi"
+    die "Exiting..."
+else 
+    say "Done."
 fi
 
 exit 0

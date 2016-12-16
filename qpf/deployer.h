@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.QPF.Deployer
  *
- * Version: 1.0.1
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *

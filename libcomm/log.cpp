@@ -4,7 +4,7 @@
  *
  * Domain:  LibComm.LibComm.Log
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -97,13 +97,12 @@ Log::~Log()
 //----------------------------------------------------------------------
 void Log::ensureSystemLogIsInitialized()
 {
-    std::cerr << "Checking if is initialized . . .\n";
     if (! isInitialised) {
         isInitialised = true;
-        std::cerr << "Not initialized, initializing . . .\n";
         std::string systemLogFile = logBaseDir + "/log/SYSTEM.syslog";
         defineLogSystem("SYSTEM", systemLogFile);
         atexit(Log::closeLogStreams);
+        log("SYSTEM", Log::INFO, "SYSTEM log service started");
     }
 }
 
@@ -115,6 +114,9 @@ void Log::log(std::string caller, Log::LogLevel level, std::string message)
 {
   static char LogLevelLetters[] = {'T', 'D', 'I', 'W', 'E', 'F'};
 
+  // Apply minimum log level filter
+  if (level < minimumLogLevel) return;
+  
   std::string severityTag = "";
   if (level == Log::ERROR) { severityTag = "ERROR: "; }
   if (level == Log::FATAL) { severityTag = "FATAL: "; }
@@ -233,7 +235,7 @@ void Log::setQuietExit(bool val)
 
 //----------------------------------------------------------------------
 // Static Method: defineLogSystem
-// Initialises a log system for a given entity
+// Initializes a log system for a given entity
 //----------------------------------------------------------------------
 void Log::defineLogSystem(std::string caller, std::string logFile, int numOfMsgs)
 {

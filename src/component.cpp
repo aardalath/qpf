@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.component
  *
- * Version: 1.0
+ * Version:  1.1
  *
  * Date:    2015/07/01
  *
@@ -87,6 +87,10 @@ Component::Component(const char * name) :
     CommNode(name)
 {
     setHeartBeatPeriod();
+    
+    // Every component must respond to MONIT_RQST messages (at least the 
+    // state might be requested)
+    canProcessMessage(MSG_MONIT_RQST_IDX);
 }
 
 //----------------------------------------------------------------------
@@ -171,8 +175,7 @@ int Component::run()
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 
-    std::cerr << getCommNodeName()
-              << (isRemote ? " : REMOTE" : " : LOCAL") << std::endl;
+    DbgMsg(getCommNodeName() + (isRemote ? " : REMOTE" : " : LOCAL"));
 
     /* MAIN LOOP */
     while (getState() == OPERATIONAL) {
@@ -189,7 +192,7 @@ int Component::run()
             int msgIdx = process(inPeer, inPeerMsg);
             if (msgIdx > 0) {
 
-                InfoMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
+                DbgMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
 
                 if (canProcess.find(msgIdx) == canProcess.end()) {
                     WarnMsg("Component " + selfPeer()->name +
@@ -212,9 +215,7 @@ int Component::run()
                     processDATA_INFO();
                     break;
                 case MSG_MONIT_RQST_IDX:
-                    if (!processMONIT_RQST_State()) {
-                        processMONIT_RQST();
-                    }
+                    processMONIT_RQST();
                     break;
                 case MSG_MONIT_INFO_IDX:
                     processMONIT_INFO();
@@ -224,6 +225,9 @@ int Component::run()
                     break;
                 case MSG_TASK_RES_IDX:
                     processTASK_RES();
+                    break;
+                case MSG_CMD_IDX:
+                    processCMD();
                     break;
                 case MSG_STOP_IDX:
                     processSTOP();
@@ -319,6 +323,7 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
     // If type not found, return false since message was not processed
     if (idx == (int)(MSG_UNKNOWN_IDX)) { return idx; }
 
+#define WRITE_MESSAGE_FILES    
 #ifdef WRITE_MESSAGE_FILES
     writeToFile(inPeerMsg);
 #endif
@@ -375,28 +380,81 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
 }
 
 //----------------------------------------------------------------------
-// Method: processMONIT_RQST_State
-// Check if a monit rqst refers to the state
+// Method: processMONIT_RQST
+// Processes monit request messages
 //----------------------------------------------------------------------
-bool Component::processMONIT_RQST_State()
+void Component::processMONIT_RQST()
 {
+    static std::map<std::string, Log::LogLevel> logLevel 
+        { {"TRACE",    Log::TRACE},    
+          {"DEBUG",    Log::DEBUG},
+          {"INFO",     Log::INFO},
+          {"WARNING",  Log::WARNING},
+          {"ERROR",    Log::ERROR},
+          {"FATAL",    Log::FATAL} };
+
     // Forward message to TskOrc
     Message_MONIT_RQST * msg = dynamic_cast<Message_MONIT_RQST *>(msgData.msg);
-    ParameterList & plist = msg->variables;
-    std::map<std::string, std::string>::iterator it = plist.paramList.find("state");
-    if (it != plist.paramList.end()) {
-        (*it).second = getStateName(getState());
-        std::string recip(msg->header.source);
-        MessageData msgToRqstr(new Message_TASK_RES);
-        msgToRqstr.msg->setData(msg->getData());
-        setForwardTo(recip, msgToRqstr.msg->header);
-        PeerMessage * msgForRqstr = buildPeerMsg(msgToRqstr.msg->header.destination,
-                                                 msgToRqstr.msg->getDataString(),
-                                                 MSG_MONIT_INFO);
-        setTransmissionToPeer(recip, msgForRqstr);
-        return true;
+    PList & plist = msg->variables.paramList;
+    for (auto & it : plist) {
+        DbgMsg("Incoming message with pair <" + it.first + ", " + it.second + ">");
+        if (it.first == "state") {
+            it.second = getStateName(getState());
+            std::string & recip = msg->header.source;
+            MessageData msgToRqstr(new Message_TASK_RES);
+            msgToRqstr.msg->setData(msg->getData());
+            buildMsgHeader(MSG_MONIT_INFO_IDX, selfPeer()->name, recip, msgToRqstr.msg->header);
+            PeerMessage * msgForRqstr = buildPeerMsg(msgToRqstr.msg->header.destination,
+                                                     msgToRqstr.msg->getDataString(),
+                                                     MSG_MONIT_INFO);
+            setTransmissionToPeer(recip, msgForRqstr);
+        } else if (it.first == "set_min_log_level") {
+            std::string & lvlStr = it.second;
+            Log::LogLevel & lvl = logLevel[lvlStr];
+            Log::setMinLogLevel(lvl);
+            InfoMsg("Setting log level to " + lvlStr);
+        }
     }
-    return false;
+}
+
+//----------------------------------------------------------------------
+// Method: sendMONIT_RQST
+// Send a monitoring request to a target (or a set of them)
+//----------------------------------------------------------------------
+void Component::sendMONIT_RQST(std::string target, std::string what, std::string value)
+{
+    Message_MONIT_RQST msg;
+    buildMsgHeader(MSG_MONIT_RQST_IDX, selfPeer()->name, target, msg.header);
+    PList & pl = msg.variables.paramList;
+    pl[what] = value;
+    PeerMessage * rqstMsg = buildPeerMsg(target, msg.getDataString(), MSG_MONIT_RQST);
+    if (target == "*") {
+        //registerMsg(selfPeer()->name, *rqstMsg, true);
+        broadcast(rqstMsg);
+    } else {
+        //registerMsg(selfPeer()->name, *rqstMsg);
+        setTransmissionToPeer(target, rqstMsg);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: sendCMD
+// Send a command message to a target (or a set of them)
+//----------------------------------------------------------------------
+void Component::sendCMD(std::string target, std::string what, std::string value)
+{
+    Message_CMD msg;
+    buildMsgHeader(MSG_CMD_IDX, selfPeer()->name, target, msg.header);
+    PList & pl = msg.variables.paramList;
+    pl[what] = value;
+    PeerMessage * rqstMsg = buildPeerMsg(target, msg.getDataString(), MSG_CMD);
+    if (target == "*") {
+        registerMsg(selfPeer()->name, *rqstMsg, true);
+        broadcast(rqstMsg);
+    } else {
+        registerMsg(selfPeer()->name, *rqstMsg);
+        setTransmissionToPeer(target, rqstMsg);
+    }
 }
 
 //----------------------------------------------------------------------
