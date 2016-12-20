@@ -4,7 +4,7 @@ Change Log
 All notable changes to the [QPF] software project will be documented in this file.
 
 
-[V1.1rc2] / 2016-12-15
+[V1.1rc2] / 2016-12-20
 --------------------------
 
 Second, amendment release to the [V1.0].  The main changes are:
@@ -16,6 +16,8 @@ Second, amendment release to the [V1.0].  The main changes are:
 - The [QPF] is now installed together with the [QDT], following the procedure at [QPF & QDT Installation].
 - A more complete configuration tool is presented, although is not yet fully functional.
 - Improved scripts for building the applications and for the installation of the COTS.
+- Included the files COPYING and COPYING.LESSER, containing the GPL and LGPL in text form.
+- Included the license notice in the README.md file.
 
 ### Improvements
 

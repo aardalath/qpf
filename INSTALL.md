@@ -1,5 +1,5 @@
-QPF - QLA Processing Framework - Installation
-=============================================
+QPF - The Euclid QLA Processing Framework - Installation
+=========================================================
 
 QPF is a C++ application that makes use of many of the C++-11 new features of the C++ language.  It was originally developed in an Ubuntu 15.10 box with a GCC compiler version 5.2.1 (Ubuntu 5.2.1-22ubuntu2 - 20151010).  So the compiler you use must be compatible with this one. The QPF Graphical User Interface is based on Qt 5.x.
 
