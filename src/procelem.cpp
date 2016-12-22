@@ -611,76 +611,16 @@ void ProcessingElement::retrieveOutputProducts()
     task.outputs.productList.clear();
 
     FileNameSpec fs;
-
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
         ProductMetadata m;
-        std::string & outFileName = outFiles.at(i);
-        FileNameSpec::FileNameComponents c = fs.parseFileName(outFileName);
-        if (c.mission == "EUC") {
-
-            // Set metadata for output product
-            m.startTime      = c.dateStart;
-            m.endTime        = c.dateEnd;
-            m.creator        = task.taskPath;
-            m.instrument     = c.instrument;
-            m.productType    = c.productType;
-            m.productSize    = 1234;
-            m.productStatus  = "OK";
-            m.productVersion = c.version;
-            m.productId      = c.productId;
-            m.signature      = c.signature;
-            m.regTime        = LibComm::timeTag();
-            m.url            = "file://" + outFileName;
-            m.urlSpace       = ProcessingSpace;
-
+        if (fs.parseFileName(outFiles.at(i), m, ProcessingSpace, task.taskPath)) {
             // Place output product at external (output) shared area
             DBG(" >> " << m);
             urlh->setProduct(m);
             m = urlh->fromProcessing2Gateway();
             DBG(" << " << m);
-
- /*
-            std::string relFileName = cfgInfo.storage.gateway.path + "/out/" +
-                                      c.baseName + "." + c.extension;
-            m.url = ("file://" + relFileName);
-            m.urlSpace = SharedSpace;
-
-            if (c.extension != "fits") {
-                urlh->relocate(outFileName, relFileName, 0, COPY);
-            } else {
-                std::string inFileName = relFileName;
-                str::replaceAll(inFileName, "/out/", "/in/");
-                str::replaceAll(inFileName, "_LE1_", "_RAW_");
-                DBG("FITS file, trying to point to orig.:"
-                    << inFileName << " => " << relFileName);
-                unlink(relFileName.c_str());
-                symlink(inFileName.c_str(), relFileName.c_str());
-            }
-
-            DBG("** Output file   " << outFileName);
-            DBG("**  relocated to " << relFileName);
-            DBG(m);
-*/
         } else {
-
             continue;
-
-            /*
-            // Set metadata for output product
-            m.startTime = task.taskStart;
-            m.endTime  = task.taskEnd;
-            m.creator = task.taskPath;
-            m.instrument = "UNKNOWN_INST";
-            m.productType = "UNKNOWN_TYPE";
-            m.productSize = 1234;
-            m.productStatus = "OK";
-            m.productVersion = "1";
-            m.productId = ("EUCL_" +
-                           m.productType + "_" +
-                           m.startTime  + "-" + m.endTime  + "_10");
-            m.regTime = LibComm::timeTag();
-            m.url = "http://euclid.esa.int/data/" + m.productId + ".zip";
-            */
         }
 
         task.outputs.productList[m.productType] = m;

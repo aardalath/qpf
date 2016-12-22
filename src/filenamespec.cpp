@@ -44,6 +44,11 @@
 #include <libgen.h>
 #include <cstring>
 #include <cassert>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include "tools.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -58,7 +63,7 @@ namespace QPF {
 //----------------------------------------------------------------------
 FileNameSpec::FileNameSpec()
 {
-    if (re == 0) { std::cerr << "PROBLEM!!" << std::endl; }
+    if (reStr.empty()) { std::cerr << "PROBLEM!!" << std::endl; }
 }
 
 FileNameSpec::FileNameSpec(std::string regexp, std::string assign)
@@ -125,6 +130,35 @@ void FileNameSpec::setAssignations(std::string assign)
 void FileNameSpec::setProductIdTpl(std::string tpl)
 {
     productIdTpl = tpl;
+}
+
+bool FileNameSpec::parseFileName(std::string fileName, 
+                                   ProductMetadata & m,
+                                   std::string space,
+                                   std::string creator)
+{
+    FileNameComponents c = parseFileName(fileName);
+
+    struct stat buf;
+    if (stat(fileName.c_str(), &buf) != 0) {
+        std::cerr << "PROBLEM!!" << std::endl; 
+    }
+       
+    m.startTime      = c.dateStart;
+    m.endTime        = c.dateEnd;
+    m.creator        = creator;
+    m.instrument     = c.instrument;
+    m.productId      = c.productId;
+    m.productType    = c.productType;
+    m.productVersion = c.version;
+    m.productStatus  = "OK";
+    m.productSize    = (int)(buf.st_size);
+    m.signature      = c.signature;
+    m.regTime        = LibComm::timeTag();
+    m.url            = "file://" + fileName;
+    m.urlSpace       = space;
+    
+    return (c.mission == "EUC");
 }
 
 FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileName)

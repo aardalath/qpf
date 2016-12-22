@@ -55,9 +55,11 @@
 #include <vector>
 #include <map>
 
-//#define USE_CX11_REGEX
+#define USE_CX11_REGEX
 #ifdef USE_CX11_REGEX
 #  include <regex>
+
+#include "cfginfo.h"
 #else
 #  include "PCRegEx.h"
 #endif
@@ -127,6 +129,10 @@ public:
     void setAssignations(std::string assign);
     void setProductIdTpl(std::string tpl);
 
+    bool parseFileName(std::string fileName, 
+                       ProductMetadata & m,
+                       std::string space = QPF::InboxSpace,
+                       std::string creator = "EUCLID");
     FileNameComponents parseFileName(std::string fileName);
 
     std::string buildProductId(FileNameComponents c);
