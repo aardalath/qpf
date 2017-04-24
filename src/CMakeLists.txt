@@ -79,12 +79,3 @@ install (TARGETS qpf
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
 
-add_executable(testfs test-filenamespec.cpp)
-add_dependencies (qpf libcomm)
-target_include_directories (testfs PUBLIC . ../src ../libcomm 
-  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
-  ${UUIDDIR}/include ${PCRE2DIR}/include)
-target_link_libraries (testfs
-  qpf libcomm 
-  ${PSQLLIB} zmq curl uuid pcre2-posix)
-

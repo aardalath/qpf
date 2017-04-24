@@ -98,4 +98,13 @@ target_link_libraries (qpfUnitTests
     ${PSQLLIB} zmq curl uuid pcre2-posix
     gtest gtest_main)
 
+add_executable(testfs src/test-filenamespec.cpp)
+add_dependencies (qpf libcomm)
+target_include_directories (testfs PUBLIC . ../src ../libcomm 
+  ${PSQLDIR}/include ${ZMQDIR}/include ${CURLDIR}/include
+  ${UUIDDIR}/include ${PCRE2DIR}/include)
+target_link_libraries (testfs
+  qpf libcomm 
+  ${PSQLLIB} zmq curl uuid pcre2-posix)
+
 add_test (NAME qpfUnitTests COMMAND qpfUnitTests)
