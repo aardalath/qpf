@@ -44,10 +44,12 @@
 using LibComm::Log;
 #include "tools.h"
 
+#include "filenamespec.h"
 #include "dbhdlpostgre.h"
 #include "except.h"
 #include "config.h"
 #include "dbg.h"
+#include "str.h"
 
 #include "urlhdl.h"
 
@@ -150,8 +152,24 @@ void DataManager::processTASK_PROC()
 //----------------------------------------------------------------------
 void DataManager::processTASK_RES()
 {
-    Message_TASK_Processing * msg = dynamic_cast<Message_TASK_Processing *>(msgData.msg);
+    Message_TASK_RES * msg = dynamic_cast<Message_TASK_RES *>(msgData.msg);
+
+    // Save task to DB
     saveTaskToDB(msg);
+
+    // Resend to EvtMng
+    // TODO: Deprecate this channel for EvtMng in favour of DB
+    std::vector<std::string> fwdRecip {"EvtMng"};
+    for (std::string & recip : fwdRecip) {
+        MessageData msgToRecip(new Message_TASK_RES);
+        msgToRecip.msg->setData(msg->getData());
+        setForwardTo(recip, msgToRecip.msg->header);
+        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
+                                                 msgToRecip.msg->getDataString(),
+                                                 MSG_TASK_RES);
+        registerMsg(selfPeer()->name, *msgForRecip);
+        setTransmissionToPeer(recip, msgForRecip);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -182,7 +200,6 @@ void DataManager::initializeDB()
 //----------------------------------------------------------------------
 void DataManager::saveToDB(Message_INDATA * msg)
 {
-    //InfoMsg("Saving inputs...");
     saveProductsToDB(msg->productsMetadata);
 }
 
@@ -218,6 +235,10 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
 
         URLHandler urlh;
 
+        // Check version of products in gateway against DB
+        sanitizeProductVersions(msg->task.outputs);
+
+        // Move products to local archive
         DBG("Preparing to send new INDATA with outputs to TskOrc...");
         for (auto & md : msg->task.outputs.productList) {
             urlh.setProduct(md.second);
@@ -239,10 +260,56 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         registerMsg(selfPeer()->name, *pmsgIn);
         setTransmissionToPeer(hdr.destination, pmsgIn);
 
-        InfoMsg("Archiving/Registering data at DSS/EAS");
-        //std::thread(&DataManager::archiveDSSnEAS, this, std::ref(msg->task.outputs)).detach();
-        archiveDSSnEAS(msg->task.outputs);
+        ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+        if (cfgInfo.flags.arch.sendOutputsToMainArchive) {
+            InfoMsg("Archiving/Registering data at DSS/EAS");
+            //std::thread(&DataManager::archiveDSSnEAS, this, std::ref(msg->task.outputs)).detach();
+            archiveDSSnEAS(msg->task.outputs);
+        }
     }
+}
+
+//----------------------------------------------------------------------
+// Method: sanitizeProductVersions
+// Make sure that there is no product with the same signature (and version)
+// in local archive, changing the version if needed
+//----------------------------------------------------------------------
+void DataManager::sanitizeProductVersions(ProductCollection & prodList)
+{
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    try {
+
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+
+        // Check signature for each product
+        std::string ver;
+        FileNameSpec fs;
+
+        for (auto & kv : prodList.productList) {
+            ProductMetadata & m = kv.second;
+            std::cerr << "Checking signature " << m.signature << std::endl;
+            if (dbHdl->checkSignature(m.signature, ver)) {
+                // Version exists: change minor version number
+                std::string origVer = m.productVersion;
+                std::string newVer  = fs.incrMinorVersion(origVer);
+                str::replaceAll(m.url, origVer, newVer);
+                str::replaceAll(m.baseName, origVer, newVer);
+                str::replaceAll(m.productId, origVer, newVer);
+                str::replaceAll(m.signature, origVer, newVer);
+                m.productVersion = newVer;
+            }
+        }
+
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        ErrMsg(prodList.getDataString());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------
@@ -255,11 +322,13 @@ void DataManager::saveProductsToDB(ProductCollection & productList)
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
     try {
+
         // Check that connection with the DB is possible
         dbHdl->openConnection();
 
         // Try to store the data into the DB
         dbHdl->storeProducts(productList);
+
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
         ErrMsg(productList.getDataString());

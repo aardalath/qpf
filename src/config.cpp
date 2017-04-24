@@ -97,8 +97,38 @@ Configuration::Configuration(const char * fName)
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
+Configuration::Configuration(Json::Value & c)
+{
+    cfg = c;
+
+    DBHost = cfg["db"]["host"].asString();
+    DBPort = cfg["db"]["port"].asString();
+    DBName = cfg["db"]["name"].asString();
+    DBUser = cfg["db"]["user"].asString();
+    DBPwd  = cfg["db"]["pwd"].asString();
+
+    PATHBase = cfg["storage"]["base"]["path"].asString();
+    PATHRun  = cfg["storage"]["run"]["path"].asString();
+
+    PATHBin     = PATHRun + "/bin";
+    PATHSession = PATHRun + "/" + sessionId;
+    PATHLog     = PATHSession + "/log";
+    PATHRlog    = PATHSession + "/rlog";
+    PATHTmp     = PATHSession + "/tmp";
+    PATHTsk     = PATHSession + "/tsk";
+    PATHMsg     = PATHSession + "/msg";
+
+    isActualFile = false;
+
+    processConfiguration();
+}
+
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 void Configuration::init(std::string fName)
 {
+    isLive = false;
     std::cerr << "Provided fName='" << fName << "'" << std::endl;
     if (fName.compare(0,5,"db://") == 0) {
         std::cerr << "A database URL!" << std::endl;
@@ -120,13 +150,14 @@ void Configuration::init(std::string fName)
                   << DBName << std::endl;
         fName = ""; // clear filename, to read from DB
     }
-    if (! fName.empty()) {        
+    if (! fName.empty()) {
         setConfigFile(fName);
         readConfigurationFromFile();
         saveConfigurationToDB();
     } else {
         readConfigurationFromDB();
     }
+    isLive = true;
 }
 
 //----------------------------------------------------------------------
@@ -251,13 +282,15 @@ int Configuration::getNumProcs()
 // Return processor parameters
 //----------------------------------------------------------------------
 void Configuration::getProc(std::string & name, std::string & exe,
-                            std::string & in, std::string & out)
+                            std::string & in, std::string & out,
+                            std::string & ver)
 {
     Json::Value const & v = (*procIt);
     name = v["name"].asString();
     exe  = v["exe_path"].asString();
     in   = v["input_path"].asString();
     out  = v["output_path"].asString();
+    ver  = v["version"].asString();
 
     procIt++;
     if (procIt == cfg["processing"]["processors"].end()) {
@@ -637,9 +670,14 @@ Component * Configuration::createNewComponent(ConfigurationInfo & cfgInfo,
 //----------------------------------------------------------------------
 void Configuration::processConfiguration()
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    dbHdl->setDbHost(Configuration::DBHost);
+    dbHdl->setDbPort(Configuration::DBPort);
+    dbHdl->setDbName(Configuration::DBName);
+    dbHdl->setDbUser(Configuration::DBUser);
+    dbHdl->setDbPasswd(Configuration::DBPwd);
 
-    Json::StyledWriter w;
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     // START OF: Configuration Reading
 
@@ -684,54 +722,20 @@ void Configuration::processConfiguration()
     }
 
     // Processors
+    // Check that connection with the DB is possible
+    try {
+        dbHdl->openConnection();
+    } catch (RuntimeException & e) {
+        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
+        return;
+    }
     for (int i = 0; i < getNumProcs(); ++i) {
         Processor * pe = new Processor;
-        getProc(pe->name, pe->exePath, pe->inPath, pe->outPath);
+        getProc(pe->name, pe->exePath, pe->inPath, pe->outPath, pe->version);
+        pe->counter = dbHdl->getVersionCounter(pe->name);
         cfgInfo.orcParams.processors[pe->name] = pe;
     }
-
-    // Nodes
-    for (int i = 0; i < getNumNodes(); ++i) {
-        Peer * peer = new Peer;
-        getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
-        cfgInfo.peersCfg.push_back(*peer);
-        cfgInfo.peerNames.push_back(peer->name);
-        cfgInfo.peersCfgByName[peer->name] = peer;
-        if (peer->type == "evtmng") {
-            cfgInfo.evtMngCfg.name = peer->name;
-            cfgInfo.evtMngCfg.type = peer->type;
-            cfgInfo.evtMngCfg.clientAddr = peer->clientAddr;
-            cfgInfo.evtMngCfg.serverAddr = peer->serverAddr;
-        }
-    }
-
-    // HMI node
-    cfgInfo.qpfhmiCfg.name = getHMINodeName();
-    getNodeByName(cfgInfo.qpfhmiCfg.name,
-                  cfgInfo.qpfhmiCfg.type,
-                  cfgInfo.qpfhmiCfg.clientAddr,
-                  cfgInfo.qpfhmiCfg.serverAddr);
-
-    // Master node
-    cfgInfo.masterMachine = cfg["nodes"]["master_machine"].asString();
-    cfgInfo.isMaster = (cfgInfo.masterMachine == cfgInfo.currentMachine);
-
-    // Machines and connections
-    reset();
-    std::string mname;
-    std::vector<std::string> mnodes;
-    for (int i = 0; i < getNumMachines(); ++i) {
-        mnodes.clear();
-        getMachine(mname, mnodes);
-        cfgInfo.machines.push_back(mname);
-        cfgInfo.machineNodes[mname] = mnodes;
-    }
-
-    for (unsigned int i = 0; i < cfgInfo.peerNames.size(); ++i) {
-        std::vector<std::string> nconn;
-        getConnectionsForNode(cfgInfo.peerNames.at(i), nconn);
-        cfgInfo.connections[cfgInfo.peerNames.at(i)] = nconn;
-    }
+    dbHdl->closeConnection();
 
     // Storage areas information
     const Json::Value & stge             = cfg["storage"];
@@ -785,9 +789,54 @@ void Configuration::processConfiguration()
     cfgInfo.flags.monit.groupTaskAgentLogs       = monitFlags["group_task_agent_logs"].asBool();
 
     cfgInfo.flags.proc.allowReprocessing         = procFlags["allow_reprocessing"].asBool();
-    cfgInfo.flags.proc.allowReprocessing         = procFlags["intermediate_products"].asBool();
+    cfgInfo.flags.proc.intermedProducts          = procFlags["intermediate_products"].asBool();
 
     cfgInfo.flags.arch.sendOutputsToMainArchive  = archFlags["send_outputs_to_main_archive"].asBool();
+
+    if (isLive) { return; }
+
+    // Nodes
+    for (int i = 0; i < getNumNodes(); ++i) {
+        Peer * peer = new Peer;
+        getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
+        cfgInfo.peersCfg.push_back(*peer);
+        cfgInfo.peerNames.push_back(peer->name);
+        cfgInfo.peersCfgByName[peer->name] = peer;
+        if (peer->type == "evtmng") {
+            cfgInfo.evtMngCfg.name = peer->name;
+            cfgInfo.evtMngCfg.type = peer->type;
+            cfgInfo.evtMngCfg.clientAddr = peer->clientAddr;
+            cfgInfo.evtMngCfg.serverAddr = peer->serverAddr;
+        }
+    }
+
+    // HMI node
+    cfgInfo.qpfhmiCfg.name = getHMINodeName();
+    getNodeByName(cfgInfo.qpfhmiCfg.name,
+                  cfgInfo.qpfhmiCfg.type,
+                  cfgInfo.qpfhmiCfg.clientAddr,
+                  cfgInfo.qpfhmiCfg.serverAddr);
+
+    // Master node
+    cfgInfo.masterMachine = cfg["nodes"]["master_machine"].asString();
+    cfgInfo.isMaster = (cfgInfo.masterMachine == cfgInfo.currentMachine);
+
+    // Machines and connections
+    reset();
+    std::string mname;
+    std::vector<std::string> mnodes;
+    for (int i = 0; i < getNumMachines(); ++i) {
+        mnodes.clear();
+        getMachine(mname, mnodes);
+        cfgInfo.machines.push_back(mname);
+        cfgInfo.machineNodes[mname] = mnodes;
+    }
+
+    for (unsigned int i = 0; i < cfgInfo.peerNames.size(); ++i) {
+        std::vector<std::string> nconn;
+        getConnectionsForNode(cfgInfo.peerNames.at(i), nconn);
+        cfgInfo.connections[cfgInfo.peerNames.at(i)] = nconn;
+    }
 
     // END OF: Configuration Reading
 
@@ -811,7 +860,7 @@ void Configuration::processConfiguration()
         //    << "  [" << peer->clientAddr
         //    << " ; " << peer->serverAddr << "]");
         SHW("* " << peerName << " [" << peer->clientAddr << "] <==>\n");
-        
+
         std::vector<std::string> & connectNodes = cfgInfo.connections[peerName];
 
         for (unsigned int j = 0; j < connectNodes.size(); ++j) {
@@ -905,5 +954,7 @@ std::string Configuration::PATHTsk;
 std::string Configuration::PATHMsg;
 
 mode_t Configuration::PATHMode = 0755;
+
+bool Configuration::isLive = false;
 
 }

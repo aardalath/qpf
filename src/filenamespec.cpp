@@ -39,8 +39,7 @@
  ******************************************************************************/
 
 #include "filenamespec.h"
-#include "dbg.h"
-#include "str.h"
+
 #include <libgen.h>
 #include <cstring>
 #include <cassert>
@@ -48,7 +47,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <iterator>
+#include <algorithm>
+
+#include "dbg.h"
+#include "str.h"
 #include "tools.h"
+
+#include "euclid.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -94,12 +100,14 @@ void FileNameSpec::setAssignations(std::string assign)
 {
     // Split assignations string
     // Assignation string is in the form:
-    // %x=n:m;%y=l;...
+    // %x=n+_+m;%y=l;...
     // where x, y, ... is one of:
     //   %M :  mission
+    //   %F :  procFunction
     //   %S :  signature
     //   %I :  instrument
     //   %T :  productType
+    //   %P :  params
     //   %v :  version
     //   %D :  dateRange
     //   %f :  dateStart (from)
@@ -114,13 +122,16 @@ void FileNameSpec::setAssignations(std::string assign)
     std::set<int> sexp;
     while (std::getline(ss, a, ';')) {
         if ((a.at(0) == '%') && (a.at(2) == '=')) {
+            assignationsTpl[a.at(1)] = a.substr(3);
+            str::replaceAll(assignationsTpl[a.at(1)], "+", "");
             sexp.clear();
-            std::stringstream sss(a.substr(3));
-            std::string numStr;
+            std::string numStr(a.substr(3));
+            std::stringstream sss(str::replaceAll(numStr, "%", ""));
+            numStr = "";
             while (std::getline(sss, numStr, '+')) {
                 std::stringstream ssss(numStr);
                 ssss >> n;
-                sexp.insert(n);
+                if (n > 0) sexp.insert(n);
             }
             assignations[a.at(1)] = sexp;
         }
@@ -132,40 +143,13 @@ void FileNameSpec::setProductIdTpl(std::string tpl)
     productIdTpl = tpl;
 }
 
-bool FileNameSpec::parseFileName(std::string fileName, 
-                                   ProductMetadata & m,
-                                   std::string space,
-                                   std::string creator)
-{
-    FileNameComponents c = parseFileName(fileName);
-
-    struct stat buf;
-    if (stat(fileName.c_str(), &buf) != 0) {
-        std::cerr << "PROBLEM!!" << std::endl; 
-    }
-       
-    m.startTime      = c.dateStart;
-    m.endTime        = c.dateEnd;
-    m.creator        = creator;
-    m.instrument     = c.instrument;
-    m.productId      = c.productId;
-    m.productType    = c.productType;
-    m.productVersion = c.version;
-    m.productStatus  = "OK";
-    m.productSize    = (int)(buf.st_size);
-    m.signature      = c.signature;
-    m.regTime        = LibComm::timeTag();
-    m.url            = "file://" + fileName;
-    m.urlSpace       = space;
-    
-    return (c.mission == "EUC");
-}
-
-FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileName)
+bool FileNameSpec::parseFileName(std::string fileName,
+                                 ProductMetadata & m,
+                                 std::string space,
+                                 std::string creator)
 {
     if (! initialized) { setFileNameSpec(reStr, assignationsStr); }
 
-    FileNameComponents c;
     // First, get path name out of the name
     char *dirc, *basec, *bname, *dname;
 
@@ -179,24 +163,32 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
 
     // Extract the matches of the regex
 #ifdef USE_CX11_REGEX
-    std::cmatch m;
+    std::cmatch mre;
     std::regex_match(baseName.c_str(), m, re);
 #else
-    std::vector<std::string> m;
-    if (re->match(baseName)) { re->get(m); }
+    std::vector<std::string> mre;
+    if (re->match(baseName)) { re->get(mre); }
 #endif
 
+    // Split name in dot '.' separated sections
     std::vector<std::string> baseExt;
     str::split(baseName, '.', baseExt);
 
+    // First one and all those starting with numbers belong to
+    // the file basename, the rest is the suffix
     baseName = baseExt.at(0);
     baseExt.erase(baseExt.begin());
+    while (isdigit(baseExt.at(0).at(0))) {
+        baseName += "." + baseExt.at(0);
+        baseExt.erase(baseExt.begin());
+    }
 
-    c.dirName   = dirName;
-    c.baseName  = baseName;
-    c.mission   = baseName.substr(0, 3);
-    c.suffix    = str::join(baseExt, ".");
-    c.extension = baseExt.at(baseExt.size() - 1);
+    m.dirName   = dirName;
+    m.baseName  = baseName;
+    m.suffix    = str::join(baseExt, ".");
+    m.extension = baseExt.at(baseExt.size() - 1);
+    m.fileType  = m.extension;
+    str::toUpper(m.fileType);
 
     // Extract fields according to assignations
 #ifdef USE_CX11_REGEX
@@ -204,7 +196,7 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
 #else
     // PCRE2 returns in m[0] the whole matched string
     // substrings start at m[1]
-    unsigned int count = m.size() - 1;
+    unsigned int count = mre.size() - 1;
 #endif
 
     for (unsigned int i = 0; i < count; ++i) {
@@ -212,8 +204,8 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
 #ifdef USE_CX11_REGEX
         int k = i;
 #else
-        // PCRE2 returns in m[0] the whole matched string
-        // substrings start at m[1]
+        // PCRE2 returns in mre[0] the whole matched string
+        // substrings start at mre[1]
         int k = i + 1;
 #endif
 
@@ -221,30 +213,41 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
             // indices in assignation string start with 1
             unsigned int idx = i + 1;
             std::string fld("ZZZ");
-            if (idx <= count + 1) { fld = m[k]; }
+            if (idx <= count + 1) { fld = mre[k]; }
             if (kv.second.find(idx) != kv.second.end()) {
+                std::string tpl(assignationsTpl[kv.first]);
                 switch (kv.first) {
+                case 'M':
+                    placeIn(m.mission,      tpl, idx, fld);
+                    break;
+                case 'F':
+                    placeIn(m.procFunc,     tpl, idx, fld);
+                    break;
+                case 'P':
+                    placeIn(m.params,       tpl, idx, fld);
+                    break;
                 case 'S':
-                    c.signature   += fld;
+                    placeIn(m.signature,    tpl, idx, fld);
                     break;
                 case 'I':
-                    c.instrument  += fld;
+                    placeIn(m.instrument,   tpl, idx, fld);
                     break;
                 case 'T':
-                    c.productType += fld;
+                    placeIn(m.productType,  tpl, idx, fld);
                     break;
                 case 'v':
-                    if (fld.length() < 5) { fld = "01.00"; }
-                    c.version     += fld;
+                    m.hadNoVersion = (fld.length() < 5);
+                    if (m.hadNoVersion) { fld = "01.00"; }
+                    placeIn(m.productVersion, tpl, idx, fld);
                     break;
                 case 'D':
-                    c.dateRange   += fld;
+                    placeIn(m.timeInterval, tpl, idx, fld);
                     break;
                 case 'f':
-                    c.dateStart   += fld;
+                    placeIn(m.startTime,    tpl, idx, fld);
                     break;
                 case 't':
-                    c.dateEnd     += fld;
+                    placeIn(m.endTime,      tpl, idx, fld);
                     break;
                 default:
                     break;
@@ -253,23 +256,88 @@ FileNameSpec::FileNameComponents FileNameSpec::parseFileName(std::string fileNam
         }
     }
 
-    c.productId = buildProductId(c);
+    m.productId = buildProductId(m);
 
-    return c;
+    struct stat buf;
+    if (stat(fileName.c_str(), &buf) != 0) {
+        std::cerr << "PROBLEM!!" << std::endl;
+    }
+
+    decodeSignature(m);
+
+    m.creator        = creator;
+    m.productStatus  = "OK";
+    m.productSize    = (int)(buf.st_size);
+    m.regTime        = LibComm::timeTag();
+    m.url            = "file://" + fileName;
+    m.urlSpace       = space;
+
+    return (m.mission == Euclid::MissionAcronym[Euclid::EUC_Mission]);
 }
 
-std::string FileNameSpec::buildProductId(FileNameSpec::FileNameComponents c)
+void FileNameSpec::placeIn(std::string & elem, std::string & tpl, int n,
+                           std::string & fld)
 {
-    return buildProductId(c.mission,
-                          c.dateStart, c.dateEnd,
-                          c.productType, c.signature,
-                          c.version);
+    if (elem.empty()) { elem = tpl; }
+    char intAsChar[3];
+    sprintf(intAsChar, "%d", n);
+    str::replaceAll(elem, "%" + std::string(intAsChar), fld);
 }
 
-std::string FileNameSpec::buildProductId(std::string mission,
-                                         std::string sDate, std::string eDate,
-                                         std::string prodType, std::string sign,
-                                         std::string ver)
+void FileNameSpec::decodeSignature(ProductMetadata & m)
+{
+    std::vector<std::string> signParts;
+    str::split(m.params, '-', signParts);
+    int nParts = signParts.size();
+    std::string obsId, expos;
+
+    if ((m.procFunc == "SOC") || (m.procFunc == "HK")) {
+        // Instrument-ObsMode-ObsId-Exposure
+        if (nParts < 4) { return; }
+        m.origin     = m.procFunc;
+        m.instrument = signParts[0];
+        m.productType = m.procFunc + "_" + m.instrument;
+        m.obsMode    = signParts[1];
+        obsId        = signParts[2];
+        expos        = signParts[3];
+    } else if ((m.procFunc == "SIM") || (m.procFunc == "LE1")) {
+        // Instrument-ObsMode-ObsId-Exposure
+        if (nParts < 4) { return; }
+        m.origin     = m.procFunc;
+        m.instrument = signParts[0];
+        m.productType = m.procFunc + "_" + m.instrument;
+        m.obsMode    = signParts[1];
+        obsId        = signParts[2];
+        expos        = signParts[3];
+    } else if (m.procFunc == "QLA") {
+        // OrigProcFunc-Instrument-ObsMode-ObsId-Exposure
+        if (nParts < 5) { return; }
+        m.origin     = signParts[0];
+        m.instrument = signParts[1];
+        m.productType = m.procFunc + "_" + m.origin + "_" + m.instrument;
+        m.obsMode    = signParts[2];
+        obsId        = signParts[3];
+        expos        = signParts[4];
+    } else {
+        // TBD
+    }
+
+    m.obsId      = strtoul(obsId.c_str(), NULL, 10);
+    m.expos      = strtoul(expos.c_str(), NULL, 10);
+
+    if ((m.fileType == "LOG") || (m.fileType == "ARCH")) {
+        m.productType += "-" + m.fileType;
+    }
+
+    m.signature = (m.mission + "_" +
+                   m.productType + "-" +
+                   obsId + "-" + expos + "-" + m.obsMode + "_" +
+                   m.productVersion);
+
+    m.signature = (obsId + "-" + expos + "-" + m.obsMode);
+}
+
+std::string FileNameSpec::buildProductId(ProductMetadata & m)
 {
     std::string id(productIdTpl);
 
@@ -277,19 +345,42 @@ std::string FileNameSpec::buildProductId(std::string mission,
     //   %S :  signature
     //   %I :  instrument
     //   %T :  productType
+    //   %F :  procFunction
+    //   %P :  params
     //   %v :  version
     //   %D :  dateRange
     //   %f :  dateStart (from)
     //   %t :  dateEnd   (to)
 
-    str::replaceAll(id, "%M", mission);
-    str::replaceAll(id, "%T", prodType);
-    str::replaceAll(id, "%S", sign);
-    str::replaceAll(id, "%f", sDate);
-    str::replaceAll(id, "%t", eDate);
-    str::replaceAll(id, "%v", ver);
+    str::replaceAll(id, "%M", m.mission);
+    str::replaceAll(id, "%T", m.productType);
+    str::replaceAll(id, "%F", m.procFunc);
+    str::replaceAll(id, "%P", m.params);
+    str::replaceAll(id, "%I", m.instrument);
+    str::replaceAll(id, "%S", m.signature);
+    str::replaceAll(id, "%f", m.startTime);
+    str::replaceAll(id, "%t", m.endTime);
+    str::replaceAll(id, "%v", m.productVersion);
 
     return id;
+}
+
+std::string FileNameSpec::buildVersion(int major, int minor)
+{
+    char v[6];
+    sprintf(v, "%02d.%02d", major, minor);
+    return std::string(v);
+}
+
+std::string FileNameSpec::incrMinorVersion(std::string & ver)
+{
+    int major, minor;
+    std::stringstream ss(ver);
+    char c;
+    ss >> major >> c >> minor;
+    char v[6];
+    sprintf(v, "%02d.%02d", major, minor + 1);
+    return std::string(v);
 }
 
 #ifdef USE_CX11_REGEX
@@ -301,6 +392,7 @@ PCRegEx *                         FileNameSpec::re = 0;
 std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+[\\.0-9]*Z)[_]*([0-9\\.]*)";
 std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
 std::map< char, std::set<int> >   FileNameSpec::assignations;
+std::map< char, std::string >     FileNameSpec::assignationsTpl;
 std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";
 
 bool                              FileNameSpec::initialized = false;

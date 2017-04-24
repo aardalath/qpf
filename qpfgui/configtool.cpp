@@ -347,7 +347,7 @@ void ConfigTool::apply()
 //----------------------------------------------------------------------
 void ConfigTool::closeDoNothing()
 {
-    ConfigurationInfo::data().loadFromJSONString(cfgDataBackup);
+    reject();
 }
 
 //----------------------------------------------------------------------

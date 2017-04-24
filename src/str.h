@@ -193,6 +193,12 @@ std::string mid(std::string & s, int from);
 std::string quoted(std::string s, char q = '\'');
 
 //----------------------------------------------------------------------
+// Function: toUpper
+// Returns the string in upper case
+//----------------------------------------------------------------------
+void toUpper(std::string & s);
+
+//----------------------------------------------------------------------
 // Function: getExtension
 // Returns the extension  part of filename
 //----------------------------------------------------------------------

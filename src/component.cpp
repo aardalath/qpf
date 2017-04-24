@@ -42,6 +42,7 @@
 
 #include "dbhdlpostgre.h"
 #include "except.h"
+#include "config.h"
 
 #include "log.h"
 using LibComm::Log;
@@ -80,6 +81,16 @@ std::map<std::string, TaskStatus> TaskStatusValue = { TLIST_TASK_STATUS };
 #undef T
 const int BadMsgProcessing = -1;
 
+static const int MsgTypeFrm = (const int)(Router2RouterPeer::FRAME_MSG_TYPE);
+
+#define T(a,b)  a ## _Str = std::string( #b )
+const std::string TLISTOF_MONIT_RQST_COMMANDS;
+#undef T
+
+#define T(a,b)  std::string( #b )
+const std::string MonitRqstCommands[] = { TLISTOF_MONIT_RQST_COMMANDS };
+#undef T
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -87,8 +98,8 @@ Component::Component(const char * name) :
     CommNode(name)
 {
     setHeartBeatPeriod();
-    
-    // Every component must respond to MONIT_RQST messages (at least the 
+
+    // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)
     canProcessMessage(MSG_MONIT_RQST_IDX);
 }
@@ -163,6 +174,8 @@ int Component::run()
     Peer inPeer;
     PeerMessage inPeerMsg;
 
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+
     fromInitialisedToRunning();
 
     /* Transition to Running */
@@ -192,7 +205,9 @@ int Component::run()
             int msgIdx = process(inPeer, inPeerMsg);
             if (msgIdx > 0) {
 
-                DbgMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
+                if (cfgInfo.flags.monit.notifyMsgArrival) {
+                    DbgMsg("Incoming messsage: " + MessageTypeId[msgIdx]);
+                }
 
                 if (canProcess.find(msgIdx) == canProcess.end()) {
                     WarnMsg("Component " + selfPeer()->name +
@@ -310,8 +325,6 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
 {
     UNUSED(inPeer);
 
-    static const int MsgTypeFrm = (const int)(Router2RouterPeer::FRAME_MSG_TYPE);
-
     // Look for message type
     int idx;
     for (idx = 0; idx < (int)(MSG_UNKNOWN_IDX); ++idx) {
@@ -323,13 +336,14 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
     // If type not found, return false since message was not processed
     if (idx == (int)(MSG_UNKNOWN_IDX)) { return idx; }
 
-#define WRITE_MESSAGE_FILES    
-#ifdef WRITE_MESSAGE_FILES
-    writeToFile(inPeerMsg);
-#endif
-
     // Otherwise, process it accordingly
+
     bool result = true;
+
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    std::string msgTypeName = MessageTypeId[(int)(idx)];
+    bool writeThisMsgToDisk = cfgInfo.flags.monit.msgsToDisk[msgTypeName];
+    if (writeThisMsgToDisk) { writeToFile(inPeerMsg); }
 
     switch (idx) {
     case MSG_START_IDX:
@@ -385,8 +399,8 @@ int Component::process(Router2RouterPeer::Peer & inPeer,
 //----------------------------------------------------------------------
 void Component::processMONIT_RQST()
 {
-    static std::map<std::string, Log::LogLevel> logLevel 
-        { {"TRACE",    Log::TRACE},    
+    static std::map<std::string, Log::LogLevel> logLevel
+        { {"TRACE",    Log::TRACE},
           {"DEBUG",    Log::DEBUG},
           {"INFO",     Log::INFO},
           {"WARNING",  Log::WARNING},
@@ -398,7 +412,7 @@ void Component::processMONIT_RQST()
     PList & plist = msg->variables.paramList;
     for (auto & it : plist) {
         DbgMsg("Incoming message with pair <" + it.first + ", " + it.second + ">");
-        if (it.first == "state") {
+        if (it.first == MONIT_RQST_STATE_Str) {
             it.second = getStateName(getState());
             std::string & recip = msg->header.source;
             MessageData msgToRqstr(new Message_TASK_RES);
@@ -408,11 +422,18 @@ void Component::processMONIT_RQST()
                                                      msgToRqstr.msg->getDataString(),
                                                      MSG_MONIT_INFO);
             setTransmissionToPeer(recip, msgForRqstr);
-        } else if (it.first == "set_min_log_level") {
+        } else if (it.first == MONIT_RQST_MIN_LOG_LVL_Str) {
             std::string & lvlStr = it.second;
+            InfoMsg("Setting log level to " + lvlStr);
             Log::LogLevel & lvl = logLevel[lvlStr];
             Log::setMinLogLevel(lvl);
-            InfoMsg("Setting log level to " + lvlStr);
+        } else if (it.first == MONIT_RQST_NEW_CFG_Str) {
+            InfoMsg("Applying new configuration . . .");
+            std::string & cfgStr = it.second;
+            Json::Reader r;
+            Json::Value cfg;
+            r.parse(cfgStr, cfg);
+            Configuration newConfig(cfg);
         }
     }
 }
@@ -584,6 +605,18 @@ void Component::registerMsg(std::string from,
                             Router2RouterPeer::PeerMessage & inPeerMsg,
                             bool isBroadcast)
 {
+    // Look for message type, and check if we are configured to store in DB
+    int idx;
+    for (idx = 0; idx < (int)(MSG_UNKNOWN_IDX); ++idx) {
+        if (inPeerMsg.at(MsgTypeFrm).compare(MessageTypeId[idx]) == 0) {
+            break;
+        }
+    }
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    std::string msgTypeName = MessageTypeId[(int)(idx)];
+    bool writeThisMsgToDB = cfgInfo.flags.monit.msgsToDB[msgTypeName];
+    if (!writeThisMsgToDB) { return; }
+
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     DBHandler * db = dbHdl.get();
 

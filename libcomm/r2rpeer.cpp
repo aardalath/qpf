@@ -451,13 +451,20 @@ void Router2RouterPeer::transmissionsHandler()
             Transmission tx = *outIt;
             PeerMessage * peerMsg = tx.second;
             if (peerMsg == 0) {
-                outTx.erase(outIt);
+                outTx.pop_front(); // outTx.erase(outIt);
                 outIt = outTx.begin();
                 timeSpan = setClock(1);
                 continue;
             }
 
-            PeerName recipient = peerMsg->peer();
+            PeerName recipient;
+            try {
+                recipient = peerMsg->peer();
+            } catch(...) {
+                std::cerr << peerMsg << std::endl;
+                for (int i = 0; i < peerMsg->size(); ++i)
+                    std::cerr << i << ": " << peerMsg->at(i) << std::endl;
+            }
 
             // In case we are still waiting for an ACK from this recipient,
             // do not send more messages

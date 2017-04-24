@@ -67,20 +67,22 @@ typedef LibComm::Router2RouterPeer::Peer           Peer;
 typedef LibComm::Router2RouterPeer::Frame          Frame;
 
 struct Rule {
-    std::string                         name;
-    std::vector<std::string>            inputs;
-    std::vector<std::string>            outputs;
-    std::string                         processingElement;
-    std::string                         condition;
+    std::string              name;
+    std::vector<std::string> inputs;
+    std::vector<std::string> outputs;
+    std::string              processingElement;
+    std::string              condition;
 };
 
 typedef std::map<Rule *, ProductList>  RuleInputs;
 
 struct Processor {
-    std::string                         name;
-    std::string                         exePath;
-    std::string                         inPath;
-    std::string                         outPath;
+    std::string name;
+    std::string exePath;
+    std::string inPath;
+    std::string outPath;
+    std::string version;
+    int         counter;
 };
 
 struct OrchestrationParameters {
@@ -117,14 +119,14 @@ struct StorageLocal {
 };
 
 struct StorageConfig {
-    std::string       base;
-    std::string       run;
-    std::string       tasks;
-    StorageExternal   inbox;
-    StorageLocal      local_archive;
-    StorageExternal   archive;
-    StorageLocal      gateway;
-    StorageExternal   outbox;
+    std::string     base;
+    std::string     run;
+    std::string     tasks;
+    StorageExternal inbox;
+    StorageLocal    local_archive;
+    StorageExternal archive;
+    StorageLocal    gateway;
+    StorageExternal outbox;
 };
 
 struct UserDefTool {

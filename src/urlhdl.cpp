@@ -117,7 +117,8 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == UserSpace);
+    assert((product.urlSpace == UserSpace) ||
+           (product.urlSpace == ReprocessingSpace));
 
     // Get product basename
     std::vector<std::string> tokens = str::split(product.url, '/');
@@ -133,7 +134,9 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 
     // Change url in processing task
     product.url = newUrl;
-    product.urlSpace = InboxSpace;
+    if (product.urlSpace != ReprocessingSpace) {
+        product.urlSpace = InboxSpace;
+    }
 
     return product;
 }
@@ -147,7 +150,8 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
 
     assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == InboxSpace);
+    assert((product.urlSpace == InboxSpace) ||
+           (product.urlSpace == ReprocessingSpace));
 
     // Set new location and url
     std::string file(str::mid(product.url,7,1000));
@@ -163,9 +167,25 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
                     cfgInfo.storage.inbox.path,
                     cfgInfo.storage.local_archive.path + section);
 
-    // Set (hard) link (should it be move?)
-    (void)relocate(file, newFile, MOVE);
+    if (product.hadNoVersion) {
+        std::string a("Z." + product.extension);
+        std::string b("Z_" + product.productVersion + "." + product.extension);
 
+        str::replaceAll(product.url, a, b);
+        str::replaceAll(newFile,     a, b);
+        str::replaceAll(newUrl,      a, b);
+
+        product.hadNoVersion = false;
+    }
+
+    if (product.urlSpace != ReprocessingSpace) {
+        // Set (hard) link (should it be move?)
+        (void)relocate(file, newFile, MOVE);
+    } else {
+        // From now on the addressed file will be the existing one in the
+        // local archive, so we remove the existing (hard) link in the inbox
+        (void)unlink(file.c_str());
+    }
     // Change url in processing task
     product.url = newUrl;
     product.urlSpace = LocalArchSpace;
@@ -329,7 +349,7 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
 // Method: relocate
 //----------------------------------------------------------------------
 int URLHandler::relocate(std::string & sFrom, std::string & sTo,
-                         LocalArchiveMethod method ,int msTimeOut)
+                         LocalArchiveMethod method, int msTimeOut)
 {
     if (msTimeOut > 0) {
         struct stat buffer;

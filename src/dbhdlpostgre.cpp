@@ -688,4 +688,53 @@ bool DBHdlPostgreSQL::updTable(std::string table, std::string cond,
     return runCmd(cmd);
 }
 
+//----------------------------------------------------------------------
+// Method: getVersionCounter
+// Returns the process version counter for a given processor
+//----------------------------------------------------------------------
+int DBHdlPostgreSQL::getVersionCounter(std::string & procName)
+{
+    bool result;
+    std::string cmd("SELECT counter FROM pvc "
+                    "WHERE name LIKE " +
+                    str::quoted(procName + "%") + " ORDER BY id "
+                    "DESC LIMIT 1;");
+
+    try { result = runCmd(cmd); } catch(...) { throw; }
+
+    int cnt = atoi(PQgetvalue(res, 0, 0));
+    PQclear(res);
+
+    return cnt;
+}
+
+//----------------------------------------------------------------------
+// Method: checkSignature
+// Check if a product with the same signature exists in the archive
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)
+{
+    bool result = true;
+
+    std::string cmd("SELECT product_version FROM products_info "
+                    "WHERE signature LIKE " +
+                    str::quoted(sgnt + "%") + " ORDER BY id "
+                    "DESC LIMIT 1;");
+
+
+    try {
+        result = runCmd(cmd);
+        result = PQntuples(res) > 0;
+        if (result) {
+            ver = std::string(PQgetvalue(res, 0, 0));
+        }
+    } catch(...) {
+        throw;
+    }
+
+    PQclear(res);
+    return result;
+}
+
+
 }

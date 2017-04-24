@@ -162,6 +162,12 @@ std::string ConfigurationInfo::toJSONString()
     << i4 << "}," << nl;
 
     // Products
+    std::string rx;
+    for (auto c : parsing_regex) {
+        rx.push_back(c);
+        if (c == '\\') { rx.push_back(c); }
+    }
+
     s << i4 << "\"products\": {" << nl
     << i4 << i4 << "\"product_types\": [" << nl;
     n = orcParams.productTypes.size();
@@ -172,7 +178,7 @@ std::string ConfigurationInfo::toJSONString()
         s << i4 << i4 << i4 << C(orcParams.productTypes.at(n - 1)) << nl;
     }
     s << i4 << i4 << " ]," << nl
-    << i4 << i4 << "\"parsing_regex\": " << Cc(parsing_regex) << nl
+    << i4 << i4 << "\"parsing_regex\": " << Cc(rx) << nl
     << i4 << i4 << "\"parsing_assign\": " << Cc(parsing_assign) << nl
     << i4 << i4 << "\"product_id_tpl\": " << Cc(product_id_tpl) << nl
     << i4 << i4 << "\"data_ext\": " << Cc(data_ext) << nl
@@ -219,7 +225,7 @@ std::string ConfigurationInfo::toJSONString()
         << i4 << i4 << i4 << i4 << "\"exe_path\": " << Cc(p->exePath) << nl
         << i4 << i4 << i4 << i4 << "\"input_path\": " << Cc(p->inPath) << nl
         << i4 << i4 << i4 << i4 << "\"name\": " << Cc(p->name) << nl
-        << i4 << i4 << i4 << i4 << "\"output_path\": " << Cc(p->outPath) << nl
+        << i4 << i4 << i4 << i4 << "\"output_path\": " << C(p->outPath) << nl
         << i4 << i4 << i4 << ((k < (n - 1)) ? "}," : "}") << nl;
         ++k;
     }
@@ -347,11 +353,6 @@ std::string ConfigurationInfo::toJSONString()
     // END
 
     return s.str();
-}
-
-void ConfigurationInfo::loadFromJSONString(std::string s)
-{
-
 }
 
 void ConfigurationInfo::dump()

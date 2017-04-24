@@ -233,7 +233,7 @@ bool TaskManager::sendTaskRes(Message_TASK_RES * msg)
 {
     // Send TASK_RES to all the recipients
     // TODO: Deprecate this channel for EvtMng in favour of DB
-    std::array<std::string,2> fwdRecip = {"DataMng", "EvtMng"};
+    std::vector<std::string> fwdRecip {"DataMng"}; //, "EvtMng"};
     for (std::string & recip : fwdRecip) {
         MessageData msgToRecip(new Message_TASK_RES);
         msgToRecip.msg->setData(msg->getData());

@@ -2083,7 +2083,7 @@ Processors</string>
               <item>
                <widget class="QCheckBox" name="chkGroupTskAgentLogs">
                 <property name="text">
-                 <string>Group Task Agents logs</string>
+                 <string>Group Task Agents logs (still not implemented)</string>
                 </property>
                </widget>
               </item>
@@ -2113,7 +2113,7 @@ Processors</string>
               <item>
                <widget class="QCheckBox" name="chkGenerateIntermedProd">
                 <property name="text">
-                 <string>Activate intermediate products</string>
+                 <string>Activate intermediate products (still not implemented)</string>
                 </property>
                </widget>
               </item>

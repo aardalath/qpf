@@ -859,6 +859,7 @@ void MainWindow::showConfigTool()
     if (cfgTool.exec()) {
         DMsg("Updating user tools!");
         cfgTool.getExtTools(userDefTools);
+        hmiNode->sendNewCfgInfo();
     }
 }
 
@@ -964,19 +965,27 @@ void MainWindow::processProductsInPath(QString folder)
     getProductsInFolder(folder, files);
 
     // Copy them (hard link, better) to the inbox
-    URLHandler uh;
     ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
     std::string inbox = cfgInfo.storage.inbox.path + "/";
 
+    URLHandler uh;
+    FileNameSpec fs;
+    ProductMetadata m;
     foreach (const QString & fi, files) {
-        QFileInfo fs(fi);
-        std::string dirName  = fs.absolutePath().toStdString();
-        std::string fileName = fs.fileName().toStdString();
-        std::string origFile = dirName + "/" + fileName;
-        std::string newFile = inbox + fileName;
-        uh.relocate(origFile, newFile, LocalArchiveMethod::LINK);
+        fs.parseFileName(fi.toStdString(), m);
+        uh.setProduct(m);
+        m = uh.fromFolder2Inbox();
         //sleep(5);
     }
+//    foreach (const QString & fi, files) {
+//        QFileInfo fs(fi);
+//        std::string dirName  = fs.absolutePath().toStdString();
+//        std::string fileName = fs.fileName().toStdString();
+//        std::string origFile = dirName + "/" + fileName;
+//        std::string newFile = inbox + fileName;
+//        uh.relocate(origFile, newFile, LocalArchiveMethod::LINK);
+//        //sleep(5);
+//    }
 }
 
 //----------------------------------------------------------------------
@@ -1415,17 +1424,18 @@ void MainWindow::openWith()
     QString fileName = archUrl.path();
     QString args = udt.args;
     FileNameSpec fns;
-    FileNameSpec::FileNameComponents c = fns.parseFileName(fileName.toStdString());
+    ProductMetadata md;
+    fns.parseFileName(fileName.toStdString(), md);
     QFileInfo fs(fileName);
 
     args.replace("%f", fs.fileName());
     args.replace("%F", fileName);
     args.replace("%p", fs.absolutePath());
-    args.replace("%i", QString::fromStdString(c.productId));
-    args.replace("%o", QString::fromStdString(c.signature));
-    args.replace("%s", QString::fromStdString(c.dateStart));
-    args.replace("%e", QString::fromStdString(c.dateEnd));
-    args.replace("%t", QString::fromStdString(c.productType));
+    args.replace("%i", QString::fromStdString(md.productId));
+    args.replace("%o", QString::fromStdString(md.signature));
+    args.replace("%s", QString::fromStdString(md.startTime));
+    args.replace("%e", QString::fromStdString(md.endTime));
+    args.replace("%t", QString::fromStdString(md.productType));
     args.replace("%x", fs.suffix());
 
     // Count how many %n placeholders are
@@ -1489,11 +1499,29 @@ void MainWindow::openWith()
 //----------------------------------------------------------------------
 void MainWindow::reprocessProduct()
 {
+    static const int NumOfURLCol = 10;
+    /*
     QMessageBox::information(this, tr("Reprocess product"),
             tr("The reprocessing of an Euclid data product is not yet "
                "supported in the current release of the " APP_LONG_NAME ".\n\n"
                "It is foreseen that this feature will be available from "
                "next release on.\n\n"), QMessageBox::Close);
+    */
+    QPoint p = acReprocess->property("clickedItem").toPoint();
+    QModelIndex m = ui->treevwArchive->indexAt(p);
+    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+    QUrl archUrl(url);
+    QString fileName = archUrl.path();
+    std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+
+    FileNameSpec fns;
+    ProductMetadata md;
+    fns.parseFileName(fileName.toStdString(), md);
+    md.urlSpace = ReprocessingSpace;
+
+    URLHandler urlh;
+    urlh.setProduct(md);
+    md = urlh.fromFolder2Inbox();
 }
 
 //----------------------------------------------------------------------
@@ -1529,8 +1557,11 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
         menu.addMenu(acArchiveOpenExt);
 
         if (! m.parent().isValid()) {
+            ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+            acReprocess->setEnabled(cfgInfo.flags.proc.allowReprocessing);
             menu.addSeparator();
             menu.addAction(acReprocess);
+            acReprocess->setProperty("clickedItem", p);
         }
 
         menu.exec(ui->treevwArchive->mapToGlobal(p));
@@ -2054,10 +2085,10 @@ bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)
 
     QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
     QString taskInfoString = procTaskStatusModel->data(dataIdx).toString().trimmed();
-    
+
     QJsonDocument doc = QJsonDocument::fromJson(taskInfoString.toUtf8());
     QJsonObject obj = doc.object();
-            
+
     QString dId = obj["Id"].toString();
     QStringList args;
     args << cmd << dId;

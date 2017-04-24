@@ -143,7 +143,6 @@ public:
     void dump();
 
     std::string toJSONString();
-    void loadFromJSONString(std::string s);
 
 private:
     ConfigurationInfo();
@@ -158,6 +157,7 @@ const std::string InboxSpace("INBOX");
 const std::string LocalArchSpace("LOCAL_ARCHIVE");
 const std::string GatewaySpace("GATEWAY");
 const std::string ProcessingSpace("PROCESSING");
+const std::string ReprocessingSpace("REPROCESSING");
 
 const std::set<std::string> URLSpaces
 { ExternalSpace, UserSpace, InboxSpace, LocalArchSpace, GatewaySpace, ProcessingSpace };

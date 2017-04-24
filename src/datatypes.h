@@ -90,16 +90,25 @@ namespace QPF {
 
 typedef std::string   ProductType;
 typedef std::string   DateTime;
+typedef std::string   DateRange;
 typedef std::string   URL;
 typedef std::string   URLSpace;
+typedef unsigned int  ObsId;
 typedef std::string   Instrument;
 typedef std::string   ObsMode;
+typedef unsigned int  Exposure;
 typedef std::string   Creator;
+typedef std::string   Mission;
+typedef std::string   Origin;
+typedef std::string   ProcFunction;
+typedef std::string   FileType;
+typedef std::string   ProductParams;
 typedef std::string   ProductId;
 typedef std::string   ProductVersion;
 typedef std::string   ProductStatus;
 typedef unsigned int  ProductSize;
 typedef std::string   Signature;
+typedef std::string   FileNamePart;
 
 //------------------------------------------------------------
 // Topic: Structures
@@ -125,23 +134,62 @@ struct JsonStruct {
 };
 
 struct ProductMetadata : public JsonStruct {
-    DateTime       startTime;
-    DateTime       endTime;
+    Mission        mission;        // %M
+    DateTime       startTime;      // %f
+    DateTime       endTime;        // %t
     DateTime       regTime;
-    Instrument     instrument;
+    DateRange      timeInterval;   // %D
+    ObsId          obsId;
+    Instrument     instrument;     // %I
     ObsMode        obsMode;
+    Exposure       expos;
     Creator        creator;
+    Origin         origin;
+    ProcFunction   procFunc;       // %F
+    FileType       fileType;
+    ProductParams  params;         // %P
     ProductId      productId;
-    ProductType    productType;
-    ProductVersion productVersion;
+    ProductType    productType;    // %T
+    ProductVersion productVersion; // %V
     ProductStatus  productStatus;
     ProductSize    productSize;
-    Signature      signature;
+    Signature      signature;      // %S
+    FileNamePart   dirName;
+    FileNamePart   baseName;
+    FileNamePart   suffix;
+    FileNamePart   extension;
     URL            url;
     URLSpace       urlSpace;
+    bool           hadNoVersion;
 
     virtual void toFields();
     virtual void toData();
+
+#ifdef DEBUG_BUILD
+    static void dump(std::ostream & os, ProductMetadata * o) {
+        os << "mission        : " << o->mission << std::endl;
+        os << "creator        : " << o->creator << std::endl;
+        os << "origin         : " << o->origin << std::endl;
+        os << "procFunc       : " << o->procFunc << std::endl;
+        os << "params         : " << o->params << std::endl;
+        os << "instrument     : " << o->instrument << std::endl;
+        os << "obsId          : " << o->obsId << std::endl;
+        os << "obsMode        : " << o->obsMode << std::endl;
+        os << "expos          : " << o->expos << std::endl;
+        os << "productType    : " << o->productType << std::endl;
+        os << "signature      : " << o->signature << std::endl;
+        os << "productId      : " << o->productId << std::endl;
+        os << "productVersion : " << o->productVersion << std::endl;
+        os << "productStatus  : " << o->productStatus << std::endl;
+        os << "startTime      : " << o->startTime << std::endl;
+        os << "endTime        : " << o->endTime << std::endl;
+        os << "regTime        : " << o->regTime << std::endl;
+        os << "productSize    : " << o->productSize << std::endl;
+        os << "fileType       : " << o->fileType << std::endl;
+        os << "url            : " << o->url << std::endl;
+        os << "urlSpace       : " << o->urlSpace << std::endl;
+    }
+#endif
 };
 
 struct ProductCollection : public JsonStruct {

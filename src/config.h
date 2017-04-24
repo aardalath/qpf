@@ -69,6 +69,7 @@ class Configuration {
 public:
     Configuration(std::string fName = std::string());
     Configuration(const char * fName = 0);
+    Configuration(Json::Value & c);
 
     void init(std::string fName);
 
@@ -129,7 +130,8 @@ public:
     // Return processor parameters
     //----------------------------------------------------------------------
     void getProc(std::string & name, std::string & exe,
-                 std::string & in, std::string & out);
+                 std::string & in, std::string & out,
+                 std::string & ver);
 
     //----------------------------------------------------------------------
     // Method: getNumNodes
@@ -283,6 +285,7 @@ public:
 
     static mode_t      PATHMode;
 
+    static bool isLive;
 };
 
 //----------------------------------------------------------------------

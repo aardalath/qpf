@@ -103,6 +103,15 @@ void HMIProxy::sendMinLogLevel(std::string lvlStr)
 }
 
 //----------------------------------------------------------------------
+// Method: sendNewCfgInfo
+//----------------------------------------------------------------------
+void HMIProxy::sendNewCfgInfo()
+{
+    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    sendMONIT_RQST("*", "set_new_cfg", cfgInfo.toJSONString());
+}
+
+//----------------------------------------------------------------------
 // Method: fromInitialisedToRunning
 //----------------------------------------------------------------------
 void HMIProxy::fromInitialisedToRunning()
@@ -126,7 +135,7 @@ void HMIProxy::execAdditonalLoopTasks()
 void HMIProxy::processMONIT_INFO()
 {
     Message_MONIT_RQST * msg = dynamic_cast<Message_MONIT_RQST *>(msgData.msg);
-    
+
     std::map<std::string, std::string>::iterator it = msg->variables.paramList.find("state");
     if (it != msg->variables.paramList.end()) {
         nodeStates[msg->header.source] = (*it).second;

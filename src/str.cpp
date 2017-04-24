@@ -45,6 +45,8 @@
 #include <iostream>
 #include <cstring>
 #include <libgen.h>
+#include <string>
+#include <locale>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -165,6 +167,17 @@ std::string mid(std::string & s, int from)
 std::string quoted(std::string s, char q)
 {
     return q + s + q;
+}
+
+//----------------------------------------------------------------------
+// Function: toUpper
+// Converts string to upper case
+//----------------------------------------------------------------------
+void toUpper(std::string & s)
+{
+    auto & f = std::use_facet<std::ctype<char>>(std::locale());
+    char * c = const_cast<char*>(s.data());
+    f.toupper(c, c + s.size());
 }
 
 //----------------------------------------------------------------------

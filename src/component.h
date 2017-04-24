@@ -77,6 +77,23 @@ namespace QPF {
 #define RaiseDiagAlert(a) raise(a, Alert::Diagnostics)
 #define RaiseAlert(a)     raise(a)
 
+#define TLISTOF_MONIT_RQST_COMMANDS \
+  T(MONIT_RQST_STATE,       state), \
+  T(MONIT_RQST_MIN_LOG_LVL, set_min_log_level), \
+  T(MONIT_RQST_NEW_CFG,     set_new_cfg)
+
+#undef T
+#define T(a,b) a
+enum MonitRqstCmd { TLISTOF_MONIT_RQST_COMMANDS };
+#undef T
+
+#define T(a,b)  a ## _Str
+extern const std::string TLISTOF_MONIT_RQST_COMMANDS;
+#undef T
+
+extern const std::string MonitRqstCommands[];
+
+
 //==========================================================================
 // Class: Component
 //==========================================================================

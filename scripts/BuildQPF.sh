@@ -60,6 +60,7 @@ RECREATEDB="no"
 WORK_AREA="${HOME}"
 PSQL_HOST="localhost"
 PSQL_PORT="5432"
+IP=""
 VERBOSE="no"
 
 #- Other
@@ -73,7 +74,7 @@ if [ -n "$wsvn" ]; then
     REV_ID=$(svn info ${QPF_PATH} 2>/dev/null | awk '/^Revision:/{print $2;}')
 fi
 
-if [ -z "$REV_ID" ]; then     
+if [ -z "$REV_ID" ]; then
     wgit=$(which git 2>/dev/null)
     if [ -n "$wgit" ]; then
         REV_ID=$(git rev-parse HEAD 2>/dev/null)
@@ -109,8 +110,8 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -p ] [ -v ]"
-    opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -v ]"
+    opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
     say "  -h         Show this usage message"
@@ -124,6 +125,7 @@ usage () {
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
+    say "  -I <ip>    IP address to use in the sample config. file"
     say "  -v         Make output verbose"
     say ""
     exit 1
@@ -234,7 +236,7 @@ install_contrib () {
 ###### Start
 
 ## Parse command line
-while getopts :hcinrbD:pw:H:P:v OPT; do
+while getopts :hcinrbD:pw:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -247,6 +249,7 @@ while getopts :hcinrbD:pw:H:P:v OPT; do
         w|+w) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
+        I|+I) IP="$OPTARG" ;;
         v|+v) VERBOSE="yes" ;;
         *)    usage ; exit 2
     esac
@@ -283,8 +286,8 @@ else
 fi
 
 if [ -n "${COMP_FLAGS}" ]; then
-    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_C_FLAGS=\"$COMP_FLAGS\"" 
-    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_CXX_FLAGS=\"$COMP_FLAGS\"" 
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_C_FLAGS=\"$COMP_FLAGS\""
+    CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_CXX_FLAGS=\"$COMP_FLAGS\""
 fi
 
 ## Creating build folder
@@ -295,10 +298,11 @@ if [ "${REMOVE}" == "yes" ]; then
 fi
 perform mkdir -p "'${BUILD_PATH}'"
 
+cd "${BUILD_PATH}"
+
 ## Generating dependencies and setting makefiles
-if [ "${COMPILE}" == "yes" ]; then
+if [ "${REMOVE}" == "yes" ]; then
     step "Generating dependencies and setting makefiles"
-    cd "${BUILD_PATH}"
     if [ "${HMI}" == "yes" ]; then
         perform cmake -D HMI=ON ${CMAKE_OPTS} ..
     else
@@ -343,6 +347,60 @@ if [ "${INSTALL}" == "yes" ]; then
         mkdir -p ${HOME}/.config/QPF
         cp "${QPF_INI}" ${HOME}/.config/QPF
     fi
+fi
+
+## Creating initial config file for current host
+if [ "${INSTALL}" == "yes" ]; then
+    step "Creating sample config file from template"
+
+    # Get Host name
+    hnamefull=$(uname -n)
+    hname=$(uname -n|cut -d. -f1)
+
+    if [ -n "$IP" ]; then
+        hip="$IP"
+    else
+        # Get IP addresses
+        ipsfile=/tmp/$$.ip
+        ip addr | \
+            grep 'state UP' -A2 | \
+            awk '{net=$2;getline;getline;print net,$2;getline;}' | \
+            cut -f1  -d'/' > $ipsfile
+
+        # Select IP address if several interfaces
+        nip=$(wc -l $ipsfile | cut -d" " -f1)
+        if [ $nip -gt 1 ]; then
+            PS3='Select the interface to use to configure QPF: '
+            k=1
+            while read if ip ; do
+                options[$k]="$if - IP address: $ip"
+                k=$((k + 1))
+            done < $ipsfile
+            echo "${options[@]}"
+            select opt in "${options[@]}"
+            do
+                hip=$(echo "$opt"|cut -d" " -f 5)
+                if [ -z "$ip" ]; then
+                    echo "Invalid option"
+                else
+                    echo "Selected option: $opt"
+                    break
+                fi
+            done
+        else
+            cat $ipsfile | read hif hip
+        fi
+        rm -f $ipsfile
+    fi
+
+    say "hname = ${hname}"
+    say "hip = ${hip}"
+    say "target = ${WORK_AREA}/qpf/cfg/qpf-test-${hname}.json"
+    # Finally, generate sample config file from template
+    sed -e "s/@THIS_HOST_ADDR@/$hnamefull/g" \
+        -e "s/@THIS_HOST_IP@/$hip/g" \
+        ${WORK_AREA}/qpf/cfg/tpl.cfg.json \
+        > ${WORK_AREA}/qpf/cfg/qpf-test-${hname}.json
 fi
 
 ## Creating QPFDB database

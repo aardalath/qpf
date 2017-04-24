@@ -152,6 +152,13 @@ protected:
     void saveTaskToDB(Message_TASK_Processing * msg, bool initialStore = false);
 
     //----------------------------------------------------------------------
+    // Method: sanitizeProductVersions
+    // Make sure that there is no product with the same signature (and version)
+    // in local archive, changing the version if needed
+    //----------------------------------------------------------------------
+    void sanitizeProductVersions(ProductCollection & productList);
+
+    //----------------------------------------------------------------------
     // Method: saveProductsToDB
     // Save the information of a new (incoming) product to the DB
     // (currently just an INI text file)
