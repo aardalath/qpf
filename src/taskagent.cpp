@@ -150,8 +150,8 @@ void TaskAgent::execAdditonalLoopTasks()
     for (unsigned int i = 0; i < finishedProcessingElements.size(); ++i) {
         ss << finishedProcessingElements.at(i) << ' ';
     }
-#endif
     DbgMsg(ss.str());
+#endif
 
     // Check status of child processing elements
     checkProcessingElements();

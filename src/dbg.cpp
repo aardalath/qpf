@@ -66,10 +66,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define SIZE 128
+
 void showBacktrace(void)
 {
     int j, nptrs;
-#define SIZE 100
     void *buffer[SIZE];
     char **strings;
 
@@ -85,8 +86,9 @@ void showBacktrace(void)
         exit(EXIT_FAILURE);
     }
 
-    for (j = 0; j < nptrs; j++)
+    for (j = 0; j < nptrs; j++) {
         fprintf(stderr, "%s\n", strings[j]);
+    }
 
     free(strings);
 }

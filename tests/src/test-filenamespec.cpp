@@ -56,7 +56,7 @@ int main(int argc, char * argv[])
         ProductMetadata m;
 
         bool b = fs.parseFileName(file, m);
-        ProductMetadata::dump(std::cerr, &m);
+        //ProductMetadata::dump(std::cerr, &m);
         std::cerr << "Product size: " << m.productSize
                   << ".........." << (b ? "OK" : "ERROR!")
                   << std::endl;

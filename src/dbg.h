@@ -109,16 +109,18 @@ static std::string spaces("                                                "
 #    define CHKOUT
 #endif
 
-void showBacktrace();
-
 #else
 
 #  define DUMPVAR(v)
 #  define DBG(s)
+#  define SHW(s)
+
 #  define CHKIN
 #  define CHKOUT
 
 #endif
+
+void showBacktrace(void);
 
 #include <string>
 
