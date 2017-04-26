@@ -73,43 +73,45 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
             std::string ccdSet = ccdIt.key().asString();
             //std::cerr << '\t' << ccdSet << '\n';
 
-            // Loop on all the Quadrants
-            Json::Value::iterator quadIt = c.begin();
-            Json::Value::iterator quadItEnd = c.end();
-            quadItEnd--;
-            while (quadIt != quadItEnd) {
+            if (ccdSet.compare(0, 3, "CCD") == 0) {
+                // Loop on all the quadrant
+                Json::Value::iterator quadIt = c.begin();
+                Json::Value::iterator quadItEnd = c.end();
+                quadItEnd--;
+                while (quadIt != quadItEnd) {
 
-                Json::Value const & q = (*quadIt);
-                std::string quadrant = quadIt.key().asString();
-                //std::cerr << "\t\t" << quadrant << '\n';
+                    Json::Value const & q = (*quadIt);
+                    std::string quadrant = quadIt.key().asString();
+                    //std::cerr << "\t\t" << quadrant << '\n';
 
-                // Loop on all the diagnostics for the quadrant
-                Json::Value::iterator diagIt = q["diagnostics"].begin();
-                while (diagIt != q["diagnostics"].end()) {
+                    // Loop on all the diagnostics for the quadrant
+                    Json::Value::iterator diagIt = q["diagnostics"].begin();
+                    while (diagIt != q["diagnostics"].end()) {
 
-                    std::string diagnostic = diagIt.key().asString();
-                    //std::cerr << "\t\t\t" << diagnostic << '\n';
+                        std::string diagnostic = diagIt.key().asString();
+                        //std::cerr << "\t\t\t" << diagnostic << '\n';
 
-                    std::string location = (product + "." + ccdSet + "." +
-                                            quadrant + "." + diagnostic);
+                        std::string location = (product + "." + ccdSet + "." +
+                                                quadrant + "." + diagnostic);
 
-                    checkDiagnostic(diagIt, location, issues);
+                        checkDiagnostic(diagIt, location, issues);
 
-                    ++diagIt; // next diagnostic
+                        ++diagIt; // next diagnostic
+                    }
+
+                    ++quadIt; // next quadrant
                 }
-
-                ++quadIt; // next Quadrant
             }
 
-            // Loop on all the diagnostics for the entire CCD
-            Json::Value::iterator diagIt = (*quadIt).begin();
-            while (diagIt != (*quadIt).end()) {
+            // Loop on all the diagnostics for the entire CCD or Detector
+            Json::Value::iterator diagIt = c["diagnostics"].begin();
+            while (diagIt != c["diagnostics"].end()) {
 
                 std::string diagnostic = diagIt.key().asString();
                 //std::cerr << "\t\t\t" << diagnostic << '\n';
 
                 std::string location = (product + "." + ccdSet + "." +
-                                        "FULL." + diagnostic);
+                                        diagnostic);
 
                 checkDiagnostic(diagIt, location, issues);
 
