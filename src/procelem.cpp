@@ -355,6 +355,8 @@ void ProcessingElement::forkProcess()
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
         // We are the child
+        // Command line is:
+        // <path>/runTask.sh <processorName> <cfgFileAbsPath>
         char *procTaskCmdLine[] = { (char*)(taskDriver.c_str()),
                                     (char*)(pe.c_str()),
                                     (char*)(cfgFile.c_str()), NULL };

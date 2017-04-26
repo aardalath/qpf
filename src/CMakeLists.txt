@@ -28,6 +28,9 @@ set (libqpfLib_hdr
   except.h
   filenamespec.h
   filetransfer.h
+  genfhdl.h
+  jsonfhdl.h
+  qdtrephdl.h
   logmng.h
   procelem.h
   propdef.h
@@ -53,6 +56,8 @@ set (libqpfLib_src
   except.cpp
   filenamespec.cpp
   filetransfer.cpp
+  jsonfhdl.cpp
+  qdtrephdl.cpp
   logmng.cpp
   procelem.cpp
   str.cpp
