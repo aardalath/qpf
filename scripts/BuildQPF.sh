@@ -380,7 +380,7 @@ if [ "${INSTALL}" == "yes" ]; then
             select opt in "${options[@]}"
             do
                 hip=$(echo "$opt"|cut -d" " -f 5)
-                if [ -z "$ip" ]; then
+                if [ -z "$hip" ]; then
                     echo "Invalid option"
                 else
                     echo "Selected option: $opt"
