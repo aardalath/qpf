@@ -320,13 +320,13 @@ fi
 
 ## Setting up Work Area in /tmp
 if [ "${INSTALL}" == "yes" ]; then
-    step "Setting up Work Area under '${WORK_AREA}'"
+    step "Setting up Work Area under '${WORK_AREA}/qpf'"
 
     if [ ! -d "${WORK_AREA}" ]; then
-         perform mkdir -p "'${WORK_AREA}'"
+         perform mkdir -p "'${WORK_AREA}/qpf'"
     fi
 
-    perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
+    perform tar xzCf "'${WORK_AREA}/qpf'" "'${QPF_WA_PKG}'"
 fi
 
 ## Installing QPF executable and libraries

@@ -52,7 +52,7 @@ class SysAlertModel : public DBTableModel {
 public:
     explicit SysAlertModel();
 
-    Alert getAlertAt(QModelIndex idx);
+    virtual Alert getAlertAt(QModelIndex idx);
 };
 
 }

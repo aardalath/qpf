@@ -25,6 +25,8 @@ set (qpfGuiLib_src
   dlgshowtaskinfo.cpp
   exttooledit.cpp
   exttoolsdef.cpp
+  frm_filter.cpp
+  frm_filterset.cpp
   frmagentstatus.cpp
   hmipxy.cpp
   logframe.cpp
@@ -58,6 +60,9 @@ set (qpfGuiLib_hdr
   dlgshowtaskinfo.h
   exttooledit.h
   exttoolsdef.h
+  filters.h
+  frm_filter.h
+  frm_filterset.h
   frmagentstatus.h
   hmipxy.h
   hmitypes.h
@@ -91,6 +96,8 @@ set (qpfGuiLib_ui
   dlgalert.ui
   exttooledit.ui
   exttoolsdef.ui
+  frm_filterset.ui
+  frm_filter.ui
   frmagentstatus.ui
   verbleveldlg.ui
   logframe.ui

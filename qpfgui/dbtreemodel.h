@@ -65,15 +65,16 @@ public:
     explicit DBTreeModel(QString q = QString(""),
                          QStringList hdr = QStringList());
 
-    void refresh();
+    virtual void refresh();
 
-    void defineHeaders(QStringList hdr);
-    void defineQuery(QString q);
-    void skipColumns(int n = 0);
-    void setBoldHeader(bool b = false);
+    virtual void defineHeaders(QStringList hdr);
+    virtual void defineQuery(QString q);
+    virtual void skipColumns(int n = 0);
+    virtual void setBoldHeader(bool b = false);
+    virtual void restart();
 
 protected:
-    void setHeaders(QStringList & hdr);
+    virtual void setHeaders(QStringList & hdr);
 
     //virtual QList<QStandardItem *> prepareRow(QStringList & l) = 0;
     virtual void execQuery(QString & qry, QSqlDatabase & db);
@@ -83,6 +84,9 @@ protected:
     int         rowsFromQuery;
     int         skippedColumns;
     bool        boldHeader;
+
+    QString     initialQuery;
+    QStringList initialHeaders;
 };
 
 }

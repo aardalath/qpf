@@ -61,7 +61,7 @@ void DlgAlert::setAlert(Alert & alert)
     ui->edID->setText(QString::fromStdString(Alert::TypeName[alert.getType()]));
     ui->edSeverity->setText(QString::fromStdString(Alert::SeverityName[alert.getSeverity()]));
     ui->edComponent->setText(QString::fromStdString(alert.getOrigin()));
-    ui->textedDescription->setPlainText(QString::fromStdString(alert.what()));
+    ui->textedDescription->setPlainText(QString::fromStdString(alert.allMessages("\n")));
 }
 
 }

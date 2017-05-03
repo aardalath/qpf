@@ -50,7 +50,7 @@ using LibComm::Log;
 #include "config.h"
 #include "dbg.h"
 #include "str.h"
-
+#include "qdtrephdl.h"
 #include "urlhdl.h"
 
 #include <sys/time.h>
@@ -248,6 +248,40 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         InfoMsg("Saving outputs...");
         saveProductsToDB(msg->task.outputs);
 
+        // Try to process the QDT report and get the issues found
+        for (auto & kv : msg->task.outputs.productList) {
+            ProductMetadata & m = kv.second;
+            DBG(kv.first);
+       DBG("mission        : " << m.mission);
+       DBG("creator        : " << m.creator);
+       DBG("origin         : " << m.origin);
+       DBG("procFunc       : " << m.procFunc);
+       DBG("params         : " << m.params);
+       DBG("instrument     : " << m.instrument);
+       DBG("obsId          : " << m.obsId);
+       DBG("obsMode        : " << m.obsMode);
+       DBG("expos          : " << m.expos);
+       DBG("productType    : " << m.productType);
+       DBG("signature      : " << m.signature);
+       DBG("productId      : " << m.productId);
+       DBG("productVersion : " << m.productVersion);
+       DBG("productStatus  : " << m.productStatus);
+       DBG("startTime      : " << m.startTime);
+       DBG("endTime        : " << m.endTime);
+       DBG("regTime        : " << m.regTime);
+       DBG("productSize    : " << m.productSize);
+       DBG("fileType       : " << m.fileType);
+       DBG("url            : " << m.url);
+       DBG("urlSpace       : " << m.urlSpace);
+            if ((m.procFunc == "QLA") && (m.fileType == "JSON")) {
+                QDTReportHandler qdtRep(m.url.substr(7));
+                qdtRep.read();
+                std::vector<Alert*> issues;
+                qdtRep.getIssues(issues);
+                for (auto & v : issues) { RaiseAlert(*v); }
+            }
+        }
+
         InfoMsg("Sending message to register outputs at Orchestrator catalogue");
 
         MessageHeader hdr;
@@ -289,7 +323,8 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
 
         for (auto & kv : prodList.productList) {
             ProductMetadata & m = kv.second;
-            std::cerr << "Checking signature " << m.signature << std::endl;
+            fs.parseFileName(m.url.substr(7), m, m.urlSpace, m.creator);
+            InfoMsg("Checking signature " + m.signature);
             if (dbHdl->checkSignature(m.signature, ver)) {
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion;
@@ -299,6 +334,8 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
                 str::replaceAll(m.productId, origVer, newVer);
                 str::replaceAll(m.signature, origVer, newVer);
                 m.productVersion = newVer;
+                WarnMsg("Found in database:" + m.signature + " [" + ver +
+                        "], changing " + origVer + " with " + newVer);
             }
         }
 

@@ -84,11 +84,24 @@ void DBTreeModel::setHeaders(QStringList & hdr)
 void DBTreeModel::defineHeaders(QStringList hdr)
 {
     headerLabels = hdr;
+    if (initialHeaders.size() < 1) { initialHeaders = hdr; }
 }
 
 void DBTreeModel::defineQuery(QString q)
 {
     queryString = q;
+    if (initialQuery.isEmpty()) { initialQuery = q; }
+}
+
+void DBTreeModel::setBoldHeader(bool b)
+{
+}
+
+void DBTreeModel::restart()
+{
+    defineQuery(initialQuery);
+    defineHeaders(initialHeaders);
+    refresh();
 }
 
 void DBTreeModel::skipColumns(int n)
@@ -160,6 +173,12 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
 #endif
         ++rowsFromQuery;
         ++children;
+    }
+
+    if (headerLabels.count() < 1) {
+        for (int i = 0; i < rec.count(); ++i) {
+            headerLabels << rec.fieldName(i);
+        }
     }
 
     if (headerLabels.count() > 0) {

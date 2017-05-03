@@ -126,7 +126,10 @@ void HMIProxy::fromInitialisedToRunning()
 //----------------------------------------------------------------------
 void HMIProxy::execAdditonalLoopTasks()
 {
-    sendMONIT_RQST("*", "state", "?");
+    static int iter = 0;
+    if ((++iter % 10) == 0) {
+        sendMONIT_RQST("*", "state", "?");
+    }
 }
 
 //----------------------------------------------------------------------

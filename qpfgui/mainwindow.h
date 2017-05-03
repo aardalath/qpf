@@ -67,6 +67,7 @@
 #include "procalertmodel.h"
 #include "productsmodel.h"
 #include "txtblmodel.h"
+#include "filters.h"
 
 namespace Ui {
     class MainWindow;
@@ -113,6 +114,12 @@ public slots:
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
 
+    void setProductsFilter(QString qry, QStringList hdr);
+    void restartProductsFilter();
+
+    void setAlertFilter(QString qry, QStringList hdr);
+    void restartAlertFilter();
+
 private slots:
     void processPath();
     void saveAs();
@@ -146,7 +153,7 @@ private slots:
     void openLocalArchiveElement(QModelIndex idx);
 
     void showAlertsContextMenu(const QPoint & p);
-    void showAlertInfo(QTableView * tblvw);
+    void showAlertInfo(QTableView * tblvw, DBTableModel * model);
     void showSysAlertInfo();
     void showProcAlertInfo();
 

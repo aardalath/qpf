@@ -74,6 +74,7 @@
 //   - DBG(s)      - Shows a debug message on StdErr
 //------------------------------------------------------------
 
+#define DEBUG_BUILD
 //#define DEBUG_CHECKINOUT
 
 #ifdef DEBUG_BUILD

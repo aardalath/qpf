@@ -164,7 +164,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     // Extract the matches of the regex
 #ifdef USE_CX11_REGEX
     std::cmatch mre;
-    std::regex_match(baseName.c_str(), m, re);
+    std::regex_match(baseName.c_str(), mre, re);
 #else
     std::vector<std::string> mre;
     if (re->match(baseName)) { re->get(mre); }
@@ -192,7 +192,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 
     // Extract fields according to assignations
 #ifdef USE_CX11_REGEX
-    unsigned int count = m.size();
+    unsigned int count = mre.size();
 #else
     // PCRE2 returns in m[0] the whole matched string
     // substrings start at m[1]
@@ -256,8 +256,6 @@ bool FileNameSpec::parseFileName(std::string fileName,
         }
     }
 
-    m.productId = buildProductId(m);
-
     struct stat buf;
     if (stat(fileName.c_str(), &buf) != 0) {
         std::cerr << "PROBLEM!!" << std::endl;
@@ -266,6 +264,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     decodeSignature(m);
 
     m.creator        = creator;
+    m.productId      = buildProductId(m);
     m.productStatus  = "OK";
     m.productSize    = (int)(buf.st_size);
     m.regTime        = LibComm::timeTag();
@@ -334,7 +333,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
                    obsId + "-" + expos + "-" + m.obsMode + "_" +
                    m.productVersion);
 
-    m.signature = (obsId + "-" + expos + "-" + m.obsMode);
+    //m.signature = (obsId + "-" + expos + "-" + m.obsMode);
 }
 
 std::string FileNameSpec::buildProductId(ProductMetadata & m)
@@ -389,8 +388,8 @@ std::regex                        FileNameSpec::re;
 PCRegEx *                         FileNameSpec::re = 0;
 #endif
 
-std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+[\\.0-9]*Z)[_]*([0-9\\.]*)";
-std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
+std::string                       FileNameSpec::reStr = "([A-Z]+)_([A-Z0-9]+)_([^_]+)_([0-9]+T[\\.0-9]+Z)[_]*([0-9]*\\.*[0-9]*)";
+std::string                       FileNameSpec::assignationsStr = "%M=%1;%F=%2;%P=%3;%S=%2+_+%3;%D=%4;%f=%4;%v=%5";
 std::map< char, std::set<int> >   FileNameSpec::assignations;
 std::map< char, std::string >     FileNameSpec::assignationsTpl;
 std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";

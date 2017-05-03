@@ -50,6 +50,8 @@ class ProcAlertModel : public DBTableModel {
 
 public:
     explicit ProcAlertModel();
+
+    virtual Alert getAlertAt(QModelIndex idx);
 };
 
 }

@@ -1333,6 +1333,40 @@ void MainWindow::initLocalArchiveView()
     acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
     connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
 
+        // Filter initialisation
+    QStringList a_sevs {"Warning", "Error", "Fatal"};
+    QStringList a_typs {"Resource", "OutOfRange", "Diagnostic"};
+
+    FieldSet products;
+    Field fld("product_id"          , STRING); products[fld.name] = fld;
+    fld = Field("product_type"      , STRING); products[fld.name] = fld;
+    fld = Field("product_version"   , STRING); products[fld.name] = fld;
+    fld = Field("signature"         , STRING); products[fld.name] = fld;
+    fld = Field("instrument_id"     , NUMBER); products[fld.name] = fld;
+    fld = Field("product_size"      , STRING); products[fld.name] = fld;
+    fld = Field("product_status_id" , NUMBER); products[fld.name] = fld;
+    fld = Field("creator_id"        , NUMBER); products[fld.name] = fld;
+    fld = Field("obsmode_id"        , NUMBER); products[fld.name] = fld;
+    fld = Field("start_time"        , DATETIME); products[fld.name] = fld;
+    fld = Field("end_time"          , DATETIME); products[fld.name] = fld;
+    fld = Field("registration_time" , DATETIME); products[fld.name] = fld;
+    fld = Field("url"               , STRING); products[fld.name] = fld;
+    
+    QStringList flds {"product_id", "product_type", "product_version", "signature",
+                      "instrument_id", "product_size", "product_status_id", "creator_id",
+                      "obsmode_id", "start_time", "end_time", "registration_time", "url"};
+    QStringList hdrs {"Product Id", "Type", "Version", "Signature", "Instrument",
+                      "Size", "Status", "Creator", "Obs.Mode", "Start", "End",
+                      "Reg.Time", "URL"};
+    ui->wdgFilters->setFields(products, flds, hdrs);
+    ui->wdgFilters->setTableName("products_info");
+
+    ui->wdgFilters->setVisible(false);
+    connect(ui->wdgFilters, SIGNAL(filterIsDefined(QString,QStringList)),
+            this, SLOT(setProductsFilter(QString,QStringList)));
+    connect(ui->wdgFilters, SIGNAL(filterReset()),
+            this, SLOT(restartProductsFilter()));
+
     setUToolTasks();
 }
 
@@ -2176,8 +2210,33 @@ void MainWindow::initAlertsTables()
     connect(ui->tblvwSysAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showAlertsContextMenu(const QPoint &)));
 
-    ui->tblvwAlerts->setSortingEnabled(false);
-    ui->tblvwSysAlerts->setSortingEnabled(false);
+    ui->tblvwAlerts->setSortingEnabled(true);
+    ui->tblvwSysAlerts->setSortingEnabled(true);
+
+    // Filter initialisation
+    QStringList a_sevs {"Warning", "Error", "Fatal"};
+    QStringList a_typs {"Resource", "OutOfRange", "Diagnostic"};
+
+    FieldSet alerts;
+    Field fld("alert_id",   NUMBER);   alerts[fld.name] = fld;
+    fld = Field("creation", DATETIME); alerts[fld.name] = fld;
+    fld = Field("sev",      CHOICE);
+    fld.setChoices(a_sevs);            alerts[fld.name] = fld;
+    fld = Field("typ",      CHOICE);
+    fld.setChoices(a_typs);            alerts[fld.name] = fld;
+    fld = Field("origin",   STRING);   alerts[fld.name] = fld;
+    fld = Field("msgs",     STRING);   alerts[fld.name] = fld;
+
+    QStringList flds {"alert_id", "creation", "sev", "typ", "origin", "msgs"};
+    QStringList hdrs {"ID", "Timestamp", "Severity", "Type", "Origin", "Information"};
+    ui->wdgAlertFilters->setFields(alerts, flds, hdrs);
+    ui->wdgAlertFilters->setTableName("alerts");
+
+    ui->wdgAlertFilters->setVisible(false);
+    connect(ui->wdgAlertFilters, SIGNAL(filterIsDefined(QString,QStringList)),
+            this, SLOT(setAlertFilter(QString,QStringList)));
+    connect(ui->wdgAlertFilters, SIGNAL(filterReset()),
+            this, SLOT(restartAlertFilter()));
 }
 
 //----------------------------------------------------------------------
@@ -2189,7 +2248,7 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
     if (tblvw->indexAt(p).isValid()) {
         actions.append(acShowAlert);
-        actions.append(acAckAlert);
+        //actions.append(acAckAlert);
         if (tblvw == ui->tblvwSysAlerts) {
             connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showSysAlertInfo()));
         } else {
@@ -2205,10 +2264,10 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 // Method: showAlertInfo
 // Show dialog with alert information
 //----------------------------------------------------------------------
-void MainWindow::showAlertInfo(QTableView * tblvw)
+void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)
 {
     QModelIndex idx = tblvw->currentIndex();
-    Alert alert = sysAlertModel->getAlertAt(idx);
+    Alert alert = model->getAlertAt(idx);
     DlgAlert dlg;
     dlg.setAlert(alert);
     dlg.exec();
@@ -2221,7 +2280,7 @@ void MainWindow::showAlertInfo(QTableView * tblvw)
 //----------------------------------------------------------------------
 void MainWindow::showSysAlertInfo()
 {
-    showAlertInfo(ui->tblvwSysAlerts);
+    showAlertInfo(ui->tblvwSysAlerts, sysAlertModel);
 }
 
 //----------------------------------------------------------------------
@@ -2230,7 +2289,7 @@ void MainWindow::showSysAlertInfo()
 //----------------------------------------------------------------------
 void MainWindow::showProcAlertInfo()
 {
-    showAlertInfo(ui->tblvwAlerts);
+    showAlertInfo(ui->tblvwAlerts, procAlertModel);
 }
 
 //======================================================================
@@ -2389,6 +2448,42 @@ void MainWindow::updateAgentsMonitPanel()
         }
         panel->updateInfo(*taInfo);
     }
+}
+
+//----------------------------------------------------------------------
+// SLOT: setPreoductsFilter
+//----------------------------------------------------------------------
+void MainWindow::setProductsFilter(QString qry, QStringList hdr)
+{
+    productsModel->defineQuery(qry);
+    productsModel->defineHeaders(hdr);
+    productsModel->refresh();
+}
+
+//----------------------------------------------------------------------
+// SLOT: restartProductsFilter
+//----------------------------------------------------------------------
+void MainWindow::restartProductsFilter()
+{
+    productsModel->restart();
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAlertFilter
+//----------------------------------------------------------------------
+void MainWindow::setAlertFilter(QString qry, QStringList hdr)
+{
+    procAlertModel->defineQuery(qry);
+    procAlertModel->defineHeaders(hdr);
+    procAlertModel->refresh();
+}
+
+//----------------------------------------------------------------------
+// SLOT: restartAlertFilter
+//----------------------------------------------------------------------
+void MainWindow::restartAlertFilter()
+{
+    procAlertModel->restart();
 }
 
 //======================================================================

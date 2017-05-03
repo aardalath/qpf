@@ -42,6 +42,7 @@
 
 #include <QSqlQueryModel>
 #include <QColor>
+#include "alert.h"
 
 namespace QPF {
 
@@ -64,17 +65,19 @@ public:
                           QStringList hdr = QStringList(),
                           TablePalette pal = TablePalette());
 
-    void refresh();
+    virtual void refresh();
 
-    void defineHeaders(QStringList hdr);
-    void defineQuery(QString q);
-    void defineTablePalette(TablePalette pal);
-    void setFullUpdate(bool b);
-
+    virtual void defineHeaders(QStringList hdr);
+    virtual void defineQuery(QString q);
+    virtual void defineTablePalette(TablePalette pal);
+    virtual void setFullUpdate(bool b);
+    virtual void restart();
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+    virtual Alert getAlertAt(QModelIndex idx) { return Alert(); }
+
 protected:
-    void setHeaders(QStringList & hdr);
+    virtual void setHeaders(QStringList & hdr);
 
     QString       queryString;
     QStringList   headerLabels;
@@ -82,6 +85,9 @@ protected:
     int           rowsFromQuery;
     bool          headerIsSet;
     bool          fullUpdate;
+
+    QString       initialQuery;
+    QStringList   initialHeaders;
 };
 
 }

@@ -112,6 +112,7 @@ void EventManager::fromRunningToOperational()
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(cfgInfo.storage.inbox.path);
 
+    /* Sample System Alerts
     Alert a1(Alert::System, Alert::Warning, Alert::Resource,
              Alert::here(__func__, __LINE__),
              "Sample alert");
@@ -123,6 +124,7 @@ void EventManager::fromRunningToOperational()
 
     RaiseAlert(a1);
     RaiseAlert(a2);
+    */
 }
 
 //----------------------------------------------------------------------

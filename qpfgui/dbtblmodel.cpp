@@ -67,16 +67,25 @@ void DBTableModel::setHeaders(QStringList & hdr)
 void DBTableModel::defineHeaders(QStringList hdr)
 {
     headerLabels = hdr;
+    if (initialHeaders.size() < 1) { initialHeaders = hdr; }
 }
 
 void DBTableModel::defineQuery(QString q)
 {
     queryString = q;
+    if (initialQuery.isEmpty()) { initialQuery = q; }
 }
 
 void DBTableModel::defineTablePalette(DBTableModel::TablePalette pal)
 {
     tblPalette = pal;
+}
+
+void DBTableModel::restart()
+{
+    defineQuery(initialQuery);
+    defineHeaders(initialHeaders);
+    refresh();
 }
 
 QVariant DBTableModel::data(const QModelIndex &index, int role) const
@@ -120,6 +129,11 @@ void DBTableModel::refresh()
         if (fullUpdate || (rowsFromQuery != qry.size())) {
             rowsFromQuery = qry.size();
             setQuery(qry);
+            if (headerLabels.count() < 1) {
+                for (int i = 0; i < record().count(); ++i) {
+                    headerLabels << record().fieldName(i);
+                }
+            }
             headerIsSet = false;
         }
     }
