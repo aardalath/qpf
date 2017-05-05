@@ -39,16 +39,23 @@
  ******************************************************************************/
 
 #include "dbtreemodel.h"
-
+#include <iostream>
 #include "dbmng.h"
 #include <QDebug>
 
 namespace QPF {
 
 DBTreeBoldHeaderDelegate::DBTreeBoldHeaderDelegate(QObject *parent)
-        : QStyledItemDelegate(parent)
+    : QStyledItemDelegate(parent),
+      isCustomFilter(false)
 {
 }
+
+void DBTreeBoldHeaderDelegate::setCustomFilter(bool b)
+{
+    isCustomFilter = b;
+}
+
 
 void DBTreeBoldHeaderDelegate::paint(QPainter* painter,
                                      const QStyleOptionViewItem& option,
@@ -57,8 +64,10 @@ void DBTreeBoldHeaderDelegate::paint(QPainter* painter,
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
-    bool shouldBeBold = (! index.parent().isValid());
-    opt.font.setBold(shouldBeBold);
+    if (!isCustomFilter) {
+        bool shouldBeBold = (! index.parent().isValid());
+        opt.font.setBold(shouldBeBold);
+    }
     QStyledItemDelegate::paint(painter, opt, index);
 }
 
@@ -66,8 +75,10 @@ DBTreeModel::DBTreeModel(QString q, QStringList hdr) :
     queryString(q),
     headerLabels(hdr),
     rowsFromQuery(-1),
-    skippedColumns(0),
-    boldHeader(false)
+    skippedColumns(-1),
+    boldHeader(false),
+    getGroupId([](QSqlQuery & q){return q.value(0).toString();}),
+    isCustomFilter(false)
 {
     refresh();
 }
@@ -97,16 +108,29 @@ void DBTreeModel::setBoldHeader(bool b)
 {
 }
 
+void DBTreeModel::setCustomFilter(bool b)
+{
+    isCustomFilter = b;
+}
+
 void DBTreeModel::restart()
 {
     defineQuery(initialQuery);
     defineHeaders(initialHeaders);
+    skipColumns(initialSkippedColumns);
     refresh();
 }
 
 void DBTreeModel::skipColumns(int n)
 {
-    skippedColumns = n;
+    if (skippedColumns < 0) {
+        initialSkippedColumns = n;
+    }
+    if (n < 1) {
+        skippedColumns = initialSkippedColumns;
+    } else {
+        skippedColumns = n;
+    }
 }
 
 void DBTreeModel::refresh()
@@ -133,8 +157,22 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     QList<QStandardItem *> row;
     QString prevGrp("");
 
-    int children = 0;
     rowsFromQuery = 0;
+
+    if (isCustomFilter) {
+        while (q.next()) {
+            row.clear();
+            for (int i = 0; i < fldCount; ++i) {
+                row << new QStandardItem(q.value(i).toString());
+            }
+            root->appendRow(row);
+            rowsFromQuery++;
+        }
+        setHeaders(headerLabels);
+        return;
+    }
+    
+    int children = 0;
     while (q.next()) {
 #if GROUP_ROW_EMPTY
         QString grp = q.value(0).toString();
@@ -174,14 +212,12 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         ++rowsFromQuery;
         ++children;
     }
-
+    
     if (headerLabels.count() < 1) {
         for (int i = 0; i < rec.count(); ++i) {
             headerLabels << rec.fieldName(i);
         }
-    }
-
-    if (headerLabels.count() > 0) {
+    } else {
         setHeaders(headerLabels);
     }
 }

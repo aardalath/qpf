@@ -133,7 +133,7 @@ void Frm_FilterSet::defineFilter(bool b)
     filterSet.headers.clear();
     foreach (QListWidgetItem * i, ui->lstFields->selectedItems()) {
         filterSet.selectedFields << hdr2fld[i->text()];
-        filterSet.headers << i->text();
+        filterSet.headers        << i->text();
     }
     filterSet.filters.clear();
     for (int i = 0; i < wdgFilters.count(); ++i) {
@@ -154,10 +154,13 @@ void Frm_FilterSet::defineFilter(bool b)
     QString sqlExpr = "SELECT ";
 
     if (filterSet.selectedFields.count() < 1) {
-        sqlExpr += "*";
-    } else {
-        sqlExpr += filterSet.selectedFields.join(",");
+        for (int i = 0; i < ui->lstFields->count(); ++i) {
+            filterSet.selectedFields << hdr2fld[ui->lstFields->item(i)->text()];
+            filterSet.headers        << ui->lstFields->item(i)->text();
+        }        
+        //sqlExpr += "*";
     }
+    sqlExpr += filterSet.selectedFields.join(",");
 
     sqlExpr += " FROM " + tableName;
 

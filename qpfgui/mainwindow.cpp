@@ -1333,10 +1333,7 @@ void MainWindow::initLocalArchiveView()
     acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
     connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
 
-        // Filter initialisation
-    QStringList a_sevs {"Warning", "Error", "Fatal"};
-    QStringList a_typs {"Resource", "OutOfRange", "Diagnostic"};
-
+    // Filter initialisation
     FieldSet products;
     Field fld("product_id"          , STRING); products[fld.name] = fld;
     fld = Field("product_type"      , STRING); products[fld.name] = fld;
@@ -1366,6 +1363,8 @@ void MainWindow::initLocalArchiveView()
             this, SLOT(setProductsFilter(QString,QStringList)));
     connect(ui->wdgFilters, SIGNAL(filterReset()),
             this, SLOT(restartProductsFilter()));
+
+    isProductsCustomFilterActive = false;
 
     setUToolTasks();
 }
@@ -1534,13 +1533,7 @@ void MainWindow::openWith()
 void MainWindow::reprocessProduct()
 {
     static const int NumOfURLCol = 10;
-    /*
-    QMessageBox::information(this, tr("Reprocess product"),
-            tr("The reprocessing of an Euclid data product is not yet "
-               "supported in the current release of the " APP_LONG_NAME ".\n\n"
-               "It is foreseen that this feature will be available from "
-               "next release on.\n\n"), QMessageBox::Close);
-    */
+
     QPoint p = acReprocess->property("clickedItem").toPoint();
     QModelIndex m = ui->treevwArchive->indexAt(p);
     QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
@@ -1565,13 +1558,15 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 {
     static const int NumOfProdTypeCol = 1;
 
+    if (isProductsCustomFilterActive) { return; }
+    
     QModelIndex m = ui->treevwArchive->indexAt(p);
     //if (m.parent() == QModelIndex()) { return; }
 
     QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
     if (!m2.data().isValid()) { return; }
     QString productType = m2.data().toString();
-
+        
     QList<QAction *> actions;
     if (m.isValid()) {
         foreach (QString key, userDefTools.keys()) {
@@ -2237,6 +2232,8 @@ void MainWindow::initAlertsTables()
             this, SLOT(setAlertFilter(QString,QStringList)));
     connect(ui->wdgAlertFilters, SIGNAL(filterReset()),
             this, SLOT(restartAlertFilter()));
+
+    isAlertsCustomFilterActive = false;
 }
 
 //----------------------------------------------------------------------
@@ -2244,6 +2241,8 @@ void MainWindow::initAlertsTables()
 //----------------------------------------------------------------------
 void MainWindow::showAlertsContextMenu(const QPoint & p)
 {
+    if (isAlertsCustomFilterActive) { return; }
+    
     QList<QAction *> actions;
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
     if (tblvw->indexAt(p).isValid()) {
@@ -2457,6 +2456,11 @@ void MainWindow::setProductsFilter(QString qry, QStringList hdr)
 {
     productsModel->defineQuery(qry);
     productsModel->defineHeaders(hdr);
+    productsModel->skipColumns(0);
+    productsModel->setCustomFilter(true);
+    QAbstractItemDelegate * del = ui->treevwArchive->itemDelegate();
+    qobject_cast<DBTreeBoldHeaderDelegate*>(del)->setCustomFilter(true);
+    isProductsCustomFilterActive = true;
     productsModel->refresh();
 }
 
@@ -2466,6 +2470,7 @@ void MainWindow::setProductsFilter(QString qry, QStringList hdr)
 void MainWindow::restartProductsFilter()
 {
     productsModel->restart();
+    isProductsCustomFilterActive = false;
 }
 
 //----------------------------------------------------------------------
@@ -2475,6 +2480,8 @@ void MainWindow::setAlertFilter(QString qry, QStringList hdr)
 {
     procAlertModel->defineQuery(qry);
     procAlertModel->defineHeaders(hdr);
+    procAlertModel->setFullUpdate(true);
+    isAlertsCustomFilterActive = true;
     procAlertModel->refresh();
 }
 
@@ -2484,6 +2491,7 @@ void MainWindow::setAlertFilter(QString qry, QStringList hdr)
 void MainWindow::restartAlertFilter()
 {
     procAlertModel->restart();
+    isAlertsCustomFilterActive = false;
 }
 
 //======================================================================

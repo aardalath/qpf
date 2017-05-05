@@ -340,6 +340,9 @@ private:
 
     QPoint pointOfAction;
     //DBManager *       dbMng;
+
+    bool isProductsCustomFilterActive;
+    bool isAlertsCustomFilterActive;
 };
 
 }

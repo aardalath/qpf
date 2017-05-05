@@ -43,6 +43,10 @@
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QSqlQuery>
+#include <QHash>
+#include <QVector>
+
+#include <functional>
 
 namespace QPF {
 
@@ -55,6 +59,9 @@ public:
     void paint(QPainter* painter,
                const QStyleOptionViewItem& option,
                const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void setCustomFilter(bool b);
+protected:
+    bool        isCustomFilter;
 };
 
 class DBTreeModel : public QStandardItemModel {
@@ -70,6 +77,7 @@ public:
     virtual void defineHeaders(QStringList hdr);
     virtual void defineQuery(QString q);
     virtual void skipColumns(int n = 0);
+    virtual void setCustomFilter(bool b);
     virtual void setBoldHeader(bool b = false);
     virtual void restart();
 
@@ -78,15 +86,18 @@ protected:
 
     //virtual QList<QStandardItem *> prepareRow(QStringList & l) = 0;
     virtual void execQuery(QString & qry, QSqlDatabase & db);
-
+    
     QString     queryString;
     QStringList headerLabels;
     int         rowsFromQuery;
     int         skippedColumns;
     bool        boldHeader;
-
     QString     initialQuery;
     QStringList initialHeaders;
+    int         initialSkippedColumns;
+
+    std::function<QString(QSqlQuery&)> getGroupId;
+    bool        isCustomFilter;
 };
 
 }

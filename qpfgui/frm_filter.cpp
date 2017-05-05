@@ -107,7 +107,7 @@ Filter Frm_Filter::getFilter()
     int op;
     QString value;
     QDateTime now = QDateTime::currentDateTime();
-    static const QString IntervalUnit[] = {"HOUR", "DAY", "WEEK", "MONTH", "YEAR"};
+    static const QString IntervalUnit[] = {"hour", "day", "week", "month", "year"};
 
     switch (filter.field.type) {
     case CHOICE:
@@ -162,35 +162,37 @@ Filter Frm_Filter::getFilter()
         filter.filtDateTime.value = ui->dtDateTime->dateTime();
         filter.filtDateTime.howMany = ui->spboxTimeUnits->value();
         filter.filtDateTime.units = DateTimeUnits(ui->cboxTimeUnits->currentIndex());
+        fieldName = "DATE(" + fieldName + ")";
         switch (filter.filtDateTime.test) {
         case DT_WITHIN_LAST:
-            filter.expr = fieldName + ">DATE_SUB('" + now.toString() +
-                    "', INTERVAL " + QString("%1").arg(filter.filtDateTime.howMany) +
-                    " " + IntervalUnit[filter.filtDateTime.units] + ")";
+            filter.expr = fieldName + ">(NOW() - " +
+                          QString("%1 * INTERVAL '1 %2'")
+                          .arg(filter.filtDateTime.howMany)
+                          .arg(IntervalUnit[filter.filtDateTime.units]) + ")";
             break;
         case DT_EXACTLY:
-            filter.expr = fieldName + "='" + filter.filtDateTime.value.toString() + "'";
+            filter.expr = fieldName + "=DATE('" + filter.filtDateTime.value.toString() + "')";
             break;
         case DT_BEFORE:
-            filter.expr = fieldName + "='" + filter.filtDateTime.value.toString() + "'";
+            filter.expr = fieldName + "=DATE('" + filter.filtDateTime.value.toString() + "')";
             break;
         case DT_AFTER:
-            filter.expr = fieldName + "='" + filter.filtDateTime.value.toString() + "'";
+            filter.expr = fieldName + "=DATE('" + filter.filtDateTime.value.toString() + "')";
             break;
         case DT_TODAY:
-            filter.expr = "DATE(" + fieldName + ")=DATE(NOW())";
+            filter.expr = fieldName + "=DATE(NOW())";
             break;
         case DT_YESTERDAY:
-            filter.expr = "DATE(" + fieldName + ")=DATE(DATE_SUB(NOW(), INTERVAL -1 DAY)";
+            filter.expr = fieldName + "=(DATE(NOW()) - INTERVAL '1 day')";
             break;
         case DT_THIS_WEEK:
-            filter.expr = "DATE(" + fieldName + ")>DATE(DATE_SUB(NOW(), INTERVAL -1 WEEK)";
+            filter.expr = fieldName + ">(DATE(NOW()) - INTERVAL '1 week')";
             break;
         case DT_THIS_MONTH:
-            filter.expr = "DATE(" + fieldName + ")>DATE(DATE_SUB(NOW(), INTERVAL -1 MONTH)";
+            filter.expr = fieldName + ">(DATE(NOW()) - INTERVAL '1 month')";
             break;
         case DT_THIS_YEAR:
-            filter.expr = "DATE(" + fieldName + ")>DATE(DATE_SUB(NOW(), INTERVAL -1 YEAR)";
+            filter.expr = fieldName + ">(DATE(NOW()) - INTERVAL '1 year')";
             break;
         }
         break;

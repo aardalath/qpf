@@ -44,6 +44,7 @@ namespace QPF {
 
 ProductsModel::ProductsModel()
 {
+    /*
     defineQuery("SELECT  "
                 "    concat(i.instrument, ':', p.signature) AS Signature,  "
                 "    p.product_id as ID,  "
@@ -63,6 +64,25 @@ ProductsModel::ProductsModel()
                 "INNER JOIN creators c ON p.creator_id = c.creator_id  "
                 "INNER JOIN observation_modes o ON p.obsmode_id = o.obsmode_id  "
                 "ORDER BY concat(i.instrument, '.',  "
+                "                p.signature, '.',  "
+                "                right(concat('00000000000000000000', p.ID), 20)),"
+                "                p.registration_time;");
+    */
+    defineQuery("SELECT  "
+                "    concat(p.instrument_id, ':', p.signature) AS Signature,  "
+                "    p.product_id as ID,  "
+                "    p.product_type as Type,  "
+                "    p.product_version as Version,  "
+                "    p.product_size as Size,  "
+                "    p.product_status_id as Status,  "
+                "    p.creator_id as Creator,  "
+                "    p.obsmode_id as ObsMode,  "
+                "    p.start_time as Start,  "
+                "    p.end_time as End,  "
+                "    p.registration_time as RegTime,  "
+                "    p.url as URL "
+                "FROM products_info p  "
+                "ORDER BY concat(p.instrument_id, '.',  "
                 "                p.signature, '.',  "
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
