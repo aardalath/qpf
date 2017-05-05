@@ -132,12 +132,12 @@ ALTER TABLE configuration OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: creators; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
-CREATE TABLE creators (
-    creator_id integer NOT NULL,
-    creator_desc character varying(128)
-);
-
-ALTER TABLE creators OWNER TO eucops;
+-- CREATE TABLE creators (
+--     creator_id integer NOT NULL,
+--     creator_desc character varying(128)
+-- );
+-- 
+-- ALTER TABLE creators OWNER TO eucops;
 
 -- ======================================================================
 -- TABLE: instruments
@@ -145,12 +145,12 @@ ALTER TABLE creators OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: instruments; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
-CREATE TABLE instruments (
-    instrument_id integer NOT NULL,
-    instrument character varying(128)
-);
-
-ALTER TABLE instruments OWNER TO eucops;
+-- CREATE TABLE instruments (
+--     instrument_id integer NOT NULL,
+--     instrument character varying(128)
+-- );
+-- 
+-- ALTER TABLE instruments OWNER TO eucops;
 
 -- ======================================================================
 -- TABLE: message_type
@@ -232,12 +232,12 @@ ALTER TABLE observation_modes OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: product_status; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
-CREATE TABLE product_status (
-    product_status_id integer NOT NULL,
-    status_desc character varying(128)
-);
-
-ALTER TABLE product_status OWNER TO eucops;
+-- CREATE TABLE product_status (
+--     product_status_id integer NOT NULL,
+--     status_desc character varying(128)
+-- );
+-- 
+-- ALTER TABLE product_status OWNER TO eucops;
 
 -- ======================================================================
 -- TABLE: products_info
@@ -245,21 +245,26 @@ ALTER TABLE product_status OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: products_info; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
+CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NIR', 'SIR', 'UNKNOWN_INST');
+CREATE TYPE prod_creator_enum     AS ENUM ('SOC_LE1', 'SOC_QLA_OPE', 'SOC_QLA_TEST');
+CREATE TYPE prod_status_enum      AS ENUM ('OK', 'NOTOK');
+CREATE TYPE prod_obsmode_enum     AS ENUM ('NOMINAL', 'TEST');
+
 CREATE TABLE products_info (
     id integer NOT NULL,
     product_id character varying(256) NOT NULL,
     product_type character varying(128),
     product_version character varying(128),
     product_size bigint,
-    product_status_id integer,
-    creator_id integer,
-    instrument_id integer,
+    product_status_id prod_status_enum,
+    creator_id prod_creator_enum,
+    instrument_id prod_instrument_enum,
+    obsmode_id prod_obsmode_enum,
     start_time timestamp without time zone,
     end_time timestamp without time zone,
     registration_time timestamp without time zone,
     url character varying(1024),
-    signature character varying,
-    obsmode_id integer NOT NULL
+    signature character varying
 );
 
 ALTER TABLE products_info OWNER TO eucops;
@@ -498,20 +503,20 @@ SELECT pg_catalog.setval('qpfstates_qpfstate_id_seq', 1, false);
 
 -- ----------------------------------------------------------------------
  -- Data for Name: creators; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY creators (creator_id, creator_desc) FROM stdin;
-1	SOC_LE1
-10	SOC_QLA.TEST
-11	SOC_QLA.OPE
-\.
-
+-- COPY creators (creator_id, creator_desc) FROM stdin;
+-- 1	SOC_LE1
+-- 10	SOC_QLA.TEST
+-- 11	SOC_QLA.OPE
+-- \.
+-- 
 -- ----------------------------------------------------------------------
  -- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY instruments (instrument_id, instrument) FROM stdin;
-1	VIS
-2	NIR
-3	SIR
--1	UNKNOWN_INST
-\.
+-- COPY instruments (instrument_id, instrument) FROM stdin;
+-- 1	VIS
+-- 2	NIR
+-- 3	SIR
+-- -1	UNKNOWN_INST
+-- \.
 
 -- ----------------------------------------------------------------------
  -- Data for Name: message_type; Type: TABLE DATA; Schema: public; Owner: eucops
@@ -534,17 +539,17 @@ COPY node_states (node_name, node_state) FROM stdin;
 
 -- ----------------------------------------------------------------------
  -- Data for Name: observation_modes; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY observation_modes (obsmode_id, obsmode_desc) FROM stdin;
-1	NOMINAL
-2	TEST
-\.
+-- COPY observation_modes (obsmode_id, obsmode_desc) FROM stdin;
+-- 1	NOMINAL
+-- 2	TEST
+-- \.
 
 -- ----------------------------------------------------------------------
  -- Data for Name: product_status; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY product_status (product_status_id, status_desc) FROM stdin;
-0	OK
-1	NOTOK
-\.
+-- COPY product_status (product_status_id, status_desc) FROM stdin;
+-- 0	OK
+-- 1	NOTOK
+-- \.
 
 -- ----------------------------------------------------------------------
  -- Data for Name: products_info; Type: TABLE DATA; Schema: public; Owner: eucops
@@ -613,15 +618,15 @@ ALTER TABLE ONLY configuration
 
 -- ----------------------------------------------------------------------
 -- Name: creators_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
-ALTER TABLE ONLY creators
-    ADD CONSTRAINT creators_pkey
-    PRIMARY KEY (creator_id);
+-- ALTER TABLE ONLY creators
+--     ADD CONSTRAINT creators_pkey
+--     PRIMARY KEY (creator_id);
 
 -- ----------------------------------------------------------------------
 -- Name: instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
-ALTER TABLE ONLY instruments
-    ADD CONSTRAINT instruments_pkey
-    PRIMARY KEY (instrument_id);
+-- ALTER TABLE ONLY instruments
+--     ADD CONSTRAINT instruments_pkey
+--     PRIMARY KEY (instrument_id);
 
 -- ----------------------------------------------------------------------
 -- Name: message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
@@ -643,15 +648,15 @@ ALTER TABLE ONLY node_states
 
 -- ----------------------------------------------------------------------
 -- Name: observation_modes_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
-ALTER TABLE ONLY observation_modes
-    ADD CONSTRAINT observation_modes_pkey
-    PRIMARY KEY (obsmode_id);
+-- ALTER TABLE ONLY observation_modes
+--     ADD CONSTRAINT observation_modes_pkey
+--     PRIMARY KEY (obsmode_id);
 
 -- ----------------------------------------------------------------------
 -- Name: product_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
-ALTER TABLE ONLY product_status
-    ADD CONSTRAINT product_status_pkey
-    PRIMARY KEY (product_status_id);
+-- ALTER TABLE ONLY product_status
+--     ADD CONSTRAINT product_status_pkey
+--     PRIMARY KEY (product_status_id);
 
 -- ----------------------------------------------------------------------
 -- Name: products_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
@@ -691,24 +696,24 @@ ALTER TABLE ONLY transmissions
 
 -- ----------------------------------------------------------------------
 -- Name: products_info_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
-ALTER TABLE ONLY products_info
-    ADD CONSTRAINT products_info_creator_id_fkey
-    FOREIGN KEY (creator_id)
-    REFERENCES creators(creator_id);
+-- ALTER TABLE ONLY products_info
+--     ADD CONSTRAINT products_info_creator_id_fkey
+--     FOREIGN KEY (creator_id)
+--     REFERENCES creators(creator_id);
 
 -- ----------------------------------------------------------------------
 -- Name: products_info_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
-ALTER TABLE ONLY products_info
-    ADD CONSTRAINT products_info_instrument_id_fkey
-    FOREIGN KEY (instrument_id)
-    REFERENCES instruments(instrument_id);
+-- ALTER TABLE ONLY products_info
+--     ADD CONSTRAINT products_info_instrument_id_fkey
+--     FOREIGN KEY (instrument_id)
+--     REFERENCES instruments(instrument_id);
 
 -- ----------------------------------------------------------------------
 -- Name: products_info_product_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
-ALTER TABLE ONLY products_info
-    ADD CONSTRAINT products_info_product_status_id_fkey
-    FOREIGN KEY (product_status_id)
-    REFERENCES product_status(product_status_id);
+-- ALTER TABLE ONLY products_info
+--     ADD CONSTRAINT products_info_product_status_id_fkey
+--     FOREIGN KEY (product_status_id)
+--     REFERENCES product_status(product_status_id);
 
 -- ----------------------------------------------------------------------
 -- Name: task_inputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
