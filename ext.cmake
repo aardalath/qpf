@@ -3,8 +3,8 @@
 # QPF - Prototype of QLA Processing Framework
 # General Project File
 #======================================================================
-# Author: J C Gonzalez - 2015, 2016
-# Copyright (C) 2015, 2016 Euclid SOC Team at ESAC
+# Author: J C Gonzalez - 2015,2016,2017 
+# Copyright (C) 2015,2016,2017  Euclid SOC Team at ESAC
 #======================================================================
 
 #===== Projec dir. =======

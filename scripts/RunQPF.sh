@@ -3,7 +3,7 @@
 # Domain     : QPF.scripts
 # Version    : 1.1
 # Date       : 2016/12/12
-# Copyright (C) 2015, 2016 J C Gonzalez
+# Copyright (C) 2015,2016,2017  J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Run QPF HMI
 # Created by : J C Gonzalez

@@ -2,7 +2,7 @@
 # QPF - small toy QLA Processing Framework
 #======================================================================
 # Library for JsonCpp, from amalgamated source
-# Author: J C Gonzalez - 2015, 2016
+# Author: J C Gonzalez - 2015,2016,2017 
 #======================================================================
 
 include(../defaults.pri)

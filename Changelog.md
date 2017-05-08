@@ -100,7 +100,7 @@ Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
 Date:        2016-12-15
 
-Copyright (C) 2015, 2016 Euclid SOC Team @ ESAC
+Copyright (C) 2015,2016,2017  Euclid SOC Team @ ESAC
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 taking into account also [Semantic Versioning](http://semver.org/).
