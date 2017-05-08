@@ -1247,6 +1247,10 @@ void MainWindow::showState()
 //----------------------------------------------------------------------
 void MainWindow::updateSystemView()
 {
+    static bool resTask = false;
+    static bool resSysAlert = false;
+    static bool resAlert = false;
+  
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
@@ -1255,17 +1259,26 @@ void MainWindow::updateSystemView()
     //== 1. Processing tasks
     procTaskStatusModel->setFullUpdate(true);
     procTaskStatusModel->refresh();
-    ui->tblvwTaskMonit->resizeColumnsToContents();
+    if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
+        ui->tblvwTaskMonit->resizeColumnsToContents();
+        resTask = true;
+    }
     const int TaskDataCol = 9;
     ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
 
     //== 2. System Alerts
     sysAlertModel->refresh();
-    ui->tblvwSysAlerts->resizeColumnsToContents();
+    if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
+        ui->tblvwSysAlerts->resizeColumnsToContents();
+        resSysAlert = true;
+    }
 
     //== 3. Diagnostics Alerts
     procAlertModel->refresh();
-    ui->tblvwAlerts->resizeColumnsToContents();
+    if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
+        ui->tblvwAlerts->resizeColumnsToContents();
+        resAlert = true;
+    }
 
     //== 4. Local Archive
     localarchViewUpdate();
@@ -1390,11 +1403,17 @@ void MainWindow::setUToolTasks()
 //----------------------------------------------------------------------
 void MainWindow::localarchViewUpdate()
 {
+    static bool resProd = false;
+  
     if (updateProductsModel) {
         productsModel->refresh();
     }
-    for (int i = 0; i < productsModel->columnCount(); ++i) {
-        ui->treevwArchive->resizeColumnToContents(i);
+
+    if ((!resProd) && (ui->treevwArchive->model()->rowCount() > 0)) {
+        for (int i = 0; i < productsModel->columnCount(); ++i) {
+            ui->treevwArchive->resizeColumnToContents(i);
+        }
+        resProd = true;
     }
 }
 
@@ -2469,6 +2488,9 @@ void MainWindow::setProductsFilter(QString qry, QStringList hdr)
 //----------------------------------------------------------------------
 void MainWindow::restartProductsFilter()
 {
+    productsModel->setCustomFilter(false);
+    QAbstractItemDelegate * del = ui->treevwArchive->itemDelegate();
+    qobject_cast<DBTreeBoldHeaderDelegate*>(del)->setCustomFilter(false);
     productsModel->restart();
     isProductsCustomFilterActive = false;
 }

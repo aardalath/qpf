@@ -77,6 +77,7 @@ DBTreeModel::DBTreeModel(QString q, QStringList hdr) :
     rowsFromQuery(-1),
     skippedColumns(-1),
     boldHeader(false),
+    initialSkippedColumns(-1),
     getGroupId([](QSqlQuery & q){return q.value(0).toString();}),
     isCustomFilter(false)
 {
@@ -123,14 +124,10 @@ void DBTreeModel::restart()
 
 void DBTreeModel::skipColumns(int n)
 {
-    if (skippedColumns < 0) {
+    if (initialSkippedColumns < 0) {
         initialSkippedColumns = n;
     }
-    if (n < 1) {
-        skippedColumns = initialSkippedColumns;
-    } else {
-        skippedColumns = n;
-    }
+    skippedColumns = n;
 }
 
 void DBTreeModel::refresh()
@@ -172,6 +169,8 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         return;
     }
     
+    std::cerr << "Skipping " << skippedColumns << " columns\n";
+    
     int children = 0;
     while (q.next()) {
 #if GROUP_ROW_EMPTY
@@ -203,6 +202,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
             children = 0;
             prevGrp = grp;
         } else {
+            std::cerr << "Skipping " << skippedColumns << " columns\n";
             for (int i = skippedColumns; i < fldCount; ++i) {
                 row << new QStandardItem(q.value(i).toString());
             }
