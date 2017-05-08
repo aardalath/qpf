@@ -1,7 +1,7 @@
 QPF - The Euclid QLA Processing Framework
 ==========================================
 
-This directory and all its sub-directories contain the Release V1.1 of the Euclid QLA Processing Framework.
+This directory and all its sub-directories contain the Release V1.2 of the Euclid QLA Processing Framework.
 
 The QPF is subject to the Lesser GNU Public License version 3, as published by the Free Software Foundation, and all the source files contained in this package should be considered to be published under this license.
 

@@ -2,7 +2,7 @@
 ##############################################################################
 # File       : BuildQPF.sh - QPF Compilation and Installation script
 # Domain     : QPF.scripts
-# Version    : 1.1
+# Version    : 1.2
 # Date       : 2016/12/14
 # Copyright (C) 2015,2016,2017  J C Gonzalez
 #_____________________________________________________________________________

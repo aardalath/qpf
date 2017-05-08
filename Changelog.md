@@ -3,11 +3,41 @@ Change Log
 
 All notable changes to the [QPF] software project will be documented in this file.
 
-
-[V1.1rc2] / 2016-12-20
+[V1.2rc1] / 2017-05-08 
 --------------------------
 
-Second, amendment release to the [V1.0].  The main changes are:
+First release candidate for the QPF V1.2.  The main changes with respecto to the previous version are:
+
+### Improvements
+
+- Added new wrapper for parseFilename to simplify calls
+- Modifications to add a filter panel to Alerts and Products listing
+- Modifications to allow pre-set and custom filters on Products Archive view and Processing Alerts view
+
+### New Features
+
+- Internal database now uses enum for some integer fields
+- Added euclid.h and new test file for FileNameSpec
+- Added file and QDT report handlers
+
+### Fixed
+
+- Fixed minor issues when not in DEBUG mode
+- Modified insert of record in products_info to use enum fields
+- Corrected QDTReportHandler to catch also NISP issues
+- Corrections to fix reset of custom filters on local archive table
+
+### Cosmetic changes
+
+- Modified release id and date
+
+### Removed
+
+
+[V1.1] / 2016-12-20
+--------------------------
+
+Release [V1.1] of the QPF.  The main changes are:
 
 - Now the reference target Linux distribution is LODEEN 1.2.
 - Now the integrated QPF application is split in two main components, the QPF Core and the QPF GUI
@@ -83,6 +113,7 @@ First official release of the [QPF].
 
 ----
 
+[V1.2rc1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.2-RC1
 [V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
@@ -98,7 +129,7 @@ Project:     QPF
 Author:      J C Gonzalez
 Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
-Date:        2016-12-15
+Date:        2017-05-09
 
 Copyright (C) 2015,2016,2017  Euclid SOC Team @ ESAC
 

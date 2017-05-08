@@ -1,7 +1,7 @@
 ##############################################################################
 # File       : RunQPFHMI.sh - Run QPF HMI
 # Domain     : QPF.scripts
-# Version    : 1.1
+# Version    : 1.2
 # Date       : 2016/12/12
 # Copyright (C) 2015,2016,2017  J C Gonzalez
 #_____________________________________________________________________________
@@ -14,7 +14,7 @@
 ###### Script variables
 
 QPFDIR=/home/eucops/qpf
-VERSION=1.1
+VERSION=1.2
 QPF=${QPFDIR}/bin/qpf
 QPFHMI=${QPFDIR}/bin/qpfgui
 QPF_SESSIONS_DIR=${QPFDIR}/run
