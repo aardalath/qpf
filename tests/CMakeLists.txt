@@ -15,9 +15,9 @@ enable_testing()
 set (GTESTDIR $ENV{GTESTDIR})
 include_directories(${GTESTDIR}/include)
 
-SET(CMAKE_CXX_FLAGS "-g -O0 -Wall -fprofile-arcs -ftest-coverage")
-SET(CMAKE_C_FLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
-SET(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -Wall -fprofile-arcs -ftest-coverage")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
 
 set (qpfUnitTests_hdr
     # sdc/test_array.h
