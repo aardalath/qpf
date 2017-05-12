@@ -56,6 +56,7 @@ INSTALL="no"
 FAKE="no"
 REMOVE="no"
 HMI="yes"
+COV="no"
 RECREATEDB="no"
 WORK_AREA="${HOME}"
 PSQL_HOST="localhost"
@@ -110,7 +111,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -v ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -o ] [ -v ]"
     opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
@@ -122,6 +123,7 @@ usage () {
     say "  -b         Re-create PostsgreSQL system database"
     say "  -D DEF     Define compile macros"
     say "  -p         Processing-only node: do not compile QPF HMI"
+    say "  -o         Activate support for tests coverage analysis"
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
@@ -236,7 +238,7 @@ install_contrib () {
 ###### Start
 
 ## Parse command line
-while getopts :hcinrbD:pw:H:P:I:v OPT; do
+while getopts :hcinrbD:pow:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -246,6 +248,7 @@ while getopts :hcinrbD:pw:H:P:I:v OPT; do
         b|+b) RECREATEDB="yes" ;;
         D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
+        o|+o) COV="yes" ;;
         w|+w) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
@@ -303,11 +306,18 @@ cd "${BUILD_PATH}"
 ## Generating dependencies and setting makefiles
 if [ "${REMOVE}" == "yes" ]; then
     step "Generating dependencies and setting makefiles"
-    if [ "${HMI}" == "yes" ]; then
-        perform cmake -D HMI=ON ${CMAKE_OPTS} ..
+    cmakeopts="${CMALKE_OPTS}"
+    if [ "${COV}" == "yes" ]; then
+        cmakeopts="-D COV=ON ${cmakeopts}"
     else
-        perform cmake -D HMI=OFF ${CMAKE_OPTS} ..
+        cmakeopts="-D COV=OFF ${cmakeopts}"
     fi
+    if [ "${HMI}" == "yes" ]; then
+        cmakeopts="-D HMI=ON ${cmakeopts}"
+    else
+        cmakeopts="-D HMI=OFF ${cmakeopts}"
+    fi
+    perform cmake ${cmakeopts} ..
 fi
 
 ## Compiling source code

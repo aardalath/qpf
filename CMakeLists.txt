@@ -41,6 +41,13 @@ if (HMI)
   add_subdirectory (qpfgui)
 endif()
 
+if (COV)
+  message ("Activated support for coverage analysis")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -Wall -fprofile-arcs -ftest-coverage")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+endif()
+
 add_subdirectory (tests)
 
 #== CPack configuration
