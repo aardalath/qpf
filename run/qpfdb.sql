@@ -462,6 +462,8 @@ COPY pvc  (id, date, counter, version, name, comment) FROM stdin;
 2	2016-02-09 14:01:42	1	V1.0                            	QLA_Processor                   	First version of QLA_processor script, just for testing purposes
 3	2017-01-09 14:01:42	2	V1.2                            	QLA_Processor                   	First ammend to version 1.0 of QLA_processor script, again just for testing purposes
 4	2017-01-09 14:01:42	1	V0.1                            	Archive_Ingestor                   	First version of the Archive Ingestor script, just for testing purposes
+5	2017-05-09 14:01:42	1	V0.1                            	LE1_VIS_Processor                   	First version of LE1_VIS_Processor script, just for testing purposes
+6	2017-05-09 14:01:42	1	V0.1                            	LE1_NISP_Processor                   	First version of LE1_NISP_Processor script, just for testing purposes
 \.
 
 -- ----------------------------------------------------------------------
