@@ -349,8 +349,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>653</width>
-                 <height>414</height>
+                 <width>80</width>
+                 <height>16</height>
                 </rect>
                </property>
               </widget>
@@ -452,7 +452,7 @@
               <property name="frameShadow">
                <enum>QFrame::Raised</enum>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,1,2,2,1,0,100">
+              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,0,1,2,2,1,0,100">
                <property name="spacing">
                 <number>1</number>
                </property>
@@ -523,6 +523,17 @@
                  </property>
                  <property name="arrowType">
                   <enum>Qt::NoArrow</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="tbtnResize">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="jsontree.qrc">
+                   <normaloff>:/img/resize.png</normaloff>:/img/resize.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -822,7 +833,7 @@
    <slot>updateLocalArchModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>378</x>
+     <x>403</x>
      <y>600</y>
     </hint>
     <hint type="destinationlabel">
@@ -838,8 +849,8 @@
    <slot>setAutomaticUpdateLocalArchModel(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>601</y>
+     <x>384</x>
+     <y>599</y>
     </hint>
     <hint type="destinationlabel">
      <x>79</x>
@@ -854,8 +865,8 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>588</y>
+     <x>435</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>677</x>
@@ -879,11 +890,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tbtnResize</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>resizeLocalArch()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>352</x>
+     <y>587</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>277</x>
+     <y>535</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>localarchViewUpdate()</slot>
   <slot>updateLocalArchModel()</slot>
   <slot>setAutomaticUpdateLocalArchModel(bool)</slot>
   <slot>setFilter()</slot>
+  <slot>resizeLocalArch()</slot>
  </slots>
 </ui>

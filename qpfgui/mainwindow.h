@@ -111,6 +111,7 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
+    void resizeLocalArch();
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
 

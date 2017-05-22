@@ -127,16 +127,16 @@ bool DBHdlPostgreSQL::closeConnection(const char * data)
 int  DBHdlPostgreSQL::storeProducts(ProductCollection & prodList)
 {
     bool result;
-
     int nInsProd = 0;
     std::stringstream ss;
 
     for (auto & kv : prodList.productList) {
         ProductMetadata & m = kv.second;
-
+        
         ss.str("");
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
+           << "obs_id, soc_id, "
            << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
            << "VALUES ("
            << str::quoted(m.productId) << ", "
@@ -145,6 +145,8 @@ int  DBHdlPostgreSQL::storeProducts(ProductCollection & prodList)
            << str::quoted(m.productVersion) << ", "
            << m.productSize << ", "
            << str::quoted("SOC_QLA_TEST") << ", "
+           << str::quoted(m.obsIdStr) << ", "
+           << str::quoted(m.obsIdStr) << ", "
            << str::quoted("VIS") << ", "
            << str::quoted("NOMINAL") << ", "
            << str::quoted(m.signature) << ", "

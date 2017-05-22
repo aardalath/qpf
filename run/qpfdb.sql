@@ -258,6 +258,8 @@ CREATE TABLE products_info (
     product_size bigint,
     product_status_id prod_status_enum,
     creator_id prod_creator_enum,
+    obs_id character varying(128),
+    soc_id character varying(128),
     instrument_id prod_instrument_enum,
     obsmode_id prod_obsmode_enum,
     start_time timestamp without time zone,

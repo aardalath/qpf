@@ -69,7 +69,7 @@ ProductsModel::ProductsModel()
                 "                p.registration_time;");
     */
     defineQuery("SELECT  "
-                "    concat(p.instrument_id, ':', p.signature) AS Signature,  "
+                "    concat(p.obs_id, ':', p.instrument_id) AS ObsIdInstr,  "
                 "    p.product_id as ID,  "
                 "    p.product_type as Type,  "
                 "    p.product_version as Version,  "
@@ -82,8 +82,7 @@ ProductsModel::ProductsModel()
                 "    p.registration_time as RegTime,  "
                 "    p.url as URL "
                 "FROM products_info p  "
-                "ORDER BY concat(p.instrument_id, '.',  "
-                "                p.signature, '.',  "
+                "ORDER BY concat(p.obs_id, '.', p.product_type, '.',  "
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
     defineHeaders({//"Signature",

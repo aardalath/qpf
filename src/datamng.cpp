@@ -251,30 +251,6 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         // Try to process the QDT report and get the issues found
         for (auto & kv : msg->task.outputs.productList) {
             ProductMetadata & m = kv.second;
-            /*
-            DBG(kv.first);
-            DBG("mission        : " << m.mission);
-            DBG("creator        : " << m.creator);
-            DBG("origin         : " << m.origin);
-            DBG("procFunc       : " << m.procFunc);
-            DBG("params         : " << m.params);
-            DBG("instrument     : " << m.instrument);
-            DBG("obsId          : " << m.obsId);
-            DBG("obsMode        : " << m.obsMode);
-            DBG("expos          : " << m.expos);
-            DBG("productType    : " << m.productType);
-            DBG("signature      : " << m.signature);
-            DBG("productId      : " << m.productId);
-            DBG("productVersion : " << m.productVersion);
-            DBG("productStatus  : " << m.productStatus);
-            DBG("startTime      : " << m.startTime);
-            DBG("endTime        : " << m.endTime);
-            DBG("regTime        : " << m.regTime);
-            DBG("productSize    : " << m.productSize);
-            DBG("fileType       : " << m.fileType);
-            DBG("url            : " << m.url);
-            DBG("urlSpace       : " << m.urlSpace);
-            */
             if ((m.procFunc == "QLA") && (m.fileType == "JSON")) {
                 QDTReportHandler qdtRep(m.url.substr(7));
                 qdtRep.read();
@@ -360,6 +336,33 @@ void DataManager::saveProductsToDB(ProductCollection & productList)
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
+    for (auto & kv : productList.productList) {
+        ProductMetadata & m = kv.second;
+        DBG(kv.first);
+        DBG("mission        : " << m.mission);
+        DBG("creator        : " << m.creator);
+        DBG("origin         : " << m.origin);
+        DBG("procFunc       : " << m.procFunc);
+        DBG("params         : " << m.params);
+        DBG("instrument     : " << m.instrument);
+        DBG("obsIdSt        : " << m.obsIdStr);
+        DBG("obsId          : " << m.obsId);
+        DBG("obsMode        : " << m.obsMode);
+        DBG("expos          : " << m.expos);
+        DBG("productType    : " << m.productType);
+        DBG("signature      : " << m.signature);
+        DBG("productId      : " << m.productId);
+        DBG("productVersion : " << m.productVersion);
+        DBG("productStatus  : " << m.productStatus);
+        DBG("startTime      : " << m.startTime);
+        DBG("endTime        : " << m.endTime);
+        DBG("regTime        : " << m.regTime);
+        DBG("productSize    : " << m.productSize);
+        DBG("fileType       : " << m.fileType);
+        DBG("url            : " << m.url);
+        DBG("urlSpace       : " << m.urlSpace);
+    }
+    
     try {
 
         // Check that connection with the DB is possible

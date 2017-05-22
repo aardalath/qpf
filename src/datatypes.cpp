@@ -140,6 +140,8 @@ std::ostream & operator<<(std::ostream &out, const JsonStruct & c) {
 void ProductMetadata::toFields() {
     startTime      = data["startTime"     ].asString();
     endTime        = data["endTime"       ].asString();
+    obsId          = data["obsId"         ].asUInt();
+    obsIdStr       = data["obsIdStr"      ].asString();
     instrument     = data["instrument"    ].asString();
     obsMode        = data["obsMode"       ].asString();
     creator        = data["creator"       ].asString();
@@ -156,6 +158,8 @@ void ProductMetadata::toFields() {
 void ProductMetadata::toData() {
     data["startTime"     ] = startTime;
     data["endTime"       ] = endTime;
+    data["obsId"         ] = obsId;
+    data["obsIdStr"      ] = obsIdStr;
     data["instrument"    ] = instrument;
     data["obsMode"       ] = obsMode;
     data["creator"       ] = creator;
@@ -299,6 +303,18 @@ TaskAgentInfo::TaskAgentInfo() :
     load15min(0),
     uptimesecs(0)
 {
+}
+
+void TaskAgentInfo::restart() {
+    total      = 0;                   
+    maxnum     = 3;                   
+    running    = 0;                   
+    waiting    = 0;                   
+    paused     = 0;                   
+    stopped    = 0;                   
+    failed     = 0;                   
+    finished   = 0;                   
+    uptimesecs = 0;
 }
 
 void TaskAgentInfo::toFields() {
