@@ -14,15 +14,18 @@
 IMAGE_NAME_BASE=le1-sim-debian:base
 IMAGE_NAME=le1-sim-debian:a
 
-.PHONY: image clean
+.PHONY: image baseimage complete mrproper clean
 
 .SILENT:
 
+all: image
+
+complete: mrproper image
+
 baseimage:
-	docker rmi -f $(IMAGE_NAME_BASE) \
-		|| echo "Cannot remove $(IAMGE_NAME_BASE). Continuing."
-	docker build -t $(IMAGE_NAME_BASE) -f Dockerfile-base .
-	cat /dev/null > baseimage
+	docker image inspect $(IMAGE_NAME_BASE) >/dev/null 2>&1 \
+		&& echo "Image $(IAMGE_NAME_BASE) already exists. Continuing." \
+		|| docker build -t $(IMAGE_NAME_BASE) -f Dockerfile-base .
 
 image: baseimage
 	docker rmi -f $(IMAGE_NAME)  \
@@ -31,7 +34,11 @@ image: baseimage
 
 clean:
 	-echo "Cleanning . . ."
-	-rm -f baseimage
 
-all: image
+mrproper:
+	docker rmi -f $(IMAGE_NAME_NAME)  \
+		|| echo "Cannot remove image $(IMAGE_NAME_BASE). Continuing."
+	docker rmi -f $(IMAGE_NAME)  \
+		|| echo "Cannot remove image $(IMAGE_NAME). Continuing."
+
 

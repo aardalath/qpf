@@ -349,8 +349,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>28</height>
+                 <width>653</width>
+                 <height>414</height>
                 </rect>
                </property>
               </widget>
@@ -483,7 +483,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string extracomment="Expand all branches"/>
+                  <string extracomment="Expand all branches">Expand all levels in the products tree</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -509,7 +509,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string extracomment="Collapse all branches"/>
+                  <string extracomment="Collapse all branches">Collapse all levels in the products tree</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -542,7 +542,7 @@
                <item>
                 <widget class="QCheckBox" name="chkboxRefresh">
                  <property name="toolTip">
-                  <string extracomment="Toggle automatic update of this view"/>
+                  <string extracomment="Toggle automatic update of this view">If activated, sets automatic update of the products tree</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -564,7 +564,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string extracomment="Update this view"/>
+                  <string extracomment="Update this view">Update the products tree list</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -593,6 +593,9 @@
                </item>
                <item>
                 <widget class="QToolButton" name="tbtnFilter">
+                 <property name="toolTip">
+                  <string>Display filter definition panel</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -673,6 +676,9 @@
                </property>
                <item>
                 <widget class="QToolButton" name="tbtnAlertFilter">
+                 <property name="toolTip">
+                  <string>Display filter definition panel</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -729,7 +735,7 @@
      <x>0</x>
      <y>0</y>
      <width>997</width>
-     <height>27</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
