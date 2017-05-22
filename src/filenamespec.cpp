@@ -328,10 +328,12 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         m.productType += "-" + m.fileType;
     }
 
-    m.signature = (m.mission + "_" +
-                   m.productType + "-" +
-                   obsId + "-" + expos + "-" + m.obsMode + "_" +
-                   m.productVersion);
+    //m.signature = (m.mission + "_" +
+    //               m.productType + "-" +
+    //               obsId + "-" + expos + "-" + m.obsMode + "_" +
+    //               m.productVersion);
+
+    m.signature = obsId + "-" + m.instrument + "-" + m.obsMode;
 
     //m.signature = (obsId + "-" + expos + "-" + m.obsMode);
 }
