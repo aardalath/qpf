@@ -976,6 +976,7 @@ void MainWindow::processProductsInPath(QString folder)
     ProductMetadata m;
     foreach (const QString & fi, files) {
         fs.parseFileName(fi.toStdString(), m);
+        m.urlSpace = UserSpace;
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
         sleep(60);
