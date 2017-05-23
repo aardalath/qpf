@@ -349,7 +349,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>80</width>
+                 <width>66</width>
                  <height>16</height>
                 </rect>
                </property>
@@ -452,7 +452,7 @@
               <property name="frameShadow">
                <enum>QFrame::Raised</enum>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,2,0,1,2,0,2,1,0,100">
+              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,2,2,0,1,2,0,0,1,0,100">
                <property name="spacing">
                 <number>1</number>
                </property>
@@ -468,6 +468,35 @@
                <property name="bottomMargin">
                 <number>0</number>
                </property>
+               <item>
+                <widget class="QToolButton" name="tbtnArchRefresh">
+                 <property name="minimumSize">
+                  <size>
+                   <width>22</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>22</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string extracomment="Update this view">Update the products tree list</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="jsontree.qrc">
+                   <normaloff>:/img/refresh.png</normaloff>:/img/refresh.png</iconset>
+                 </property>
+                 <property name="toolButtonStyle">
+                  <enum>Qt::ToolButtonIconOnly</enum>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <widget class="QToolButton" name="tbtnArchExpand">
                  <property name="minimumSize">
@@ -583,31 +612,12 @@
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="tbtnArchRefresh">
-                 <property name="minimumSize">
-                  <size>
-                   <width>22</width>
-                   <height>22</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>22</width>
-                   <height>22</height>
-                  </size>
-                 </property>
+                <widget class="QCheckBox" name="chkboxResize">
                  <property name="toolTip">
-                  <string extracomment="Update this view">Update the products tree list</string>
+                  <string extracomment="Toggle automatic update of this view">If activated, columns are resized to their contents upon updates</string>
                  </property>
                  <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="jsontree.qrc">
-                   <normaloff>:/img/refresh.png</normaloff>:/img/refresh.png</iconset>
-                 </property>
-                 <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonIconOnly</enum>
+                  <string>Auto resize</string>
                  </property>
                 </widget>
                </item>
@@ -835,8 +845,8 @@
    <slot>expandAll()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>313</x>
-     <y>600</y>
+     <x>346</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>708</x>
@@ -851,8 +861,8 @@
    <slot>collapseAll()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>600</y>
+     <x>369</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>675</x>
@@ -867,7 +877,7 @@
    <slot>updateLocalArchModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>605</x>
+     <x>323</x>
      <y>603</y>
     </hint>
     <hint type="destinationlabel">
@@ -883,8 +893,8 @@
    <slot>setAutomaticUpdateLocalArchModel(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>384</x>
-     <y>599</y>
+     <x>499</x>
+     <y>602</y>
     </hint>
     <hint type="destinationlabel">
      <x>79</x>
@@ -899,7 +909,7 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>633</x>
+     <x>726</x>
      <y>603</y>
     </hint>
     <hint type="destinationlabel">
@@ -916,11 +926,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>325</x>
-     <y>581</y>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
      <x>381</x>
-     <y>144</y>
+     <y>143</y>
     </hint>
    </hints>
   </connection>
@@ -931,8 +941,8 @@
    <slot>resizeLocalArch()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>587</y>
+     <x>392</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>277</x>
@@ -956,6 +966,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chkboxResize</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>setAutomaticResizeLocalArchModel(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>640</x>
+     <y>590</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>646</x>
+     <y>620</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>localarchViewUpdate()</slot>
@@ -964,5 +990,6 @@
   <slot>setFilter()</slot>
   <slot>resizeLocalArch()</slot>
   <slot>setAutomaticExpandLocalArchModel(bool)</slot>
+  <slot>setAutomaticResizeLocalArchModel(bool)</slot>
  </slots>
 </ui>
