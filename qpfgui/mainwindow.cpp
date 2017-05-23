@@ -978,7 +978,7 @@ void MainWindow::processProductsInPath(QString folder)
         fs.parseFileName(fi.toStdString(), m);
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
-        //sleep(5);
+        sleep(60);
     }
 //    foreach (const QString & fi, files) {
 //        QFileInfo fs(fi);
