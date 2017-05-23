@@ -127,6 +127,7 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     updateProductsModel(false),
+    expandProductsModel(false),
     isThereActiveCores(true)
 {
     if (!sessionName.isEmpty()) {
@@ -1406,6 +1407,9 @@ void MainWindow::localarchViewUpdate()
 {
     if (updateProductsModel) {
         productsModel->refresh();
+        if (expandProductsModel) {
+            ui->treevwArchive->expandAll();
+        }
     }
 
 }
@@ -1428,6 +1432,9 @@ void MainWindow::resizeLocalArch()
 void MainWindow::updateLocalArchModel()
 {
     productsModel->refresh();
+    if (expandProductsModel) {
+        ui->treevwArchive->expandAll();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -1437,6 +1444,15 @@ void MainWindow::updateLocalArchModel()
 void MainWindow::setAutomaticUpdateLocalArchModel(bool b)
 {
     updateProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticExpandLocalArchModel
+// Toggles automatic expand of local arch model on/off upon updates
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticExpandLocalArchModel(bool b)
+{
+    expandProductsModel = b;
 }
 
 //----------------------------------------------------------------------

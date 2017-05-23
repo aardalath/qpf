@@ -499,7 +499,7 @@ std::string ProcessingElement::prepareOutputFile(std::string vd, std::string& dn
      *** HACK: Simulate FITS output files
      ***       with hard links to input images
      **************************************************/
-
+    /*
     if (str::getExtension(dname) == "fits") {
         std::string refName;
         std::ifstream ifs(fullName);
@@ -517,7 +517,7 @@ std::string ProcessingElement::prepareOutputFile(std::string vd, std::string& dn
                         " to " + fullName).c_str());
             }
         }
-    }
+    }*/
     return fullName;
 }
 

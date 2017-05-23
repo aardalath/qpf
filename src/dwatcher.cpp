@@ -100,8 +100,8 @@ void DirWatcher::watch(std::string pth)
         exit(EXIT_FAILURE);
     }
 
-    int flags = fcntl(fd, F_GETFL, 0);
-    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    //int flags = fcntl(fd, F_GETFL, 0);
+    //fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     watchedDirs[wd] = pth;
 }
@@ -188,19 +188,15 @@ void DirWatcher::start()
 //                    }
 
 //                    if (proceed) { 
-                        fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
+                      //fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
                         events.push(dwe); 
 //                    }
-                        fprintf(stderr, "#");
                 }
-                        fprintf(stderr, ".");
             }
-                        fprintf(stderr, "-");
 
         }
-                        fprintf(stderr, "*");
     }
-    fprintf(stderr,"END\n");
+
     // Not watching anymore
     close(fd);
 }

@@ -158,7 +158,7 @@ void EventManager::execAdditonalLoopTasks()
     // Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
-        std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
+        //std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
 
         // Process only files
         // TODO: Process directories that appear at inbox
@@ -168,7 +168,7 @@ void EventManager::execAdditonalLoopTasks()
             FileNameSpec fs;
             ProductMetadata m;
             fs.parseFileName(file, m);
-
+            /*
             std::cerr << "mission        : " << m.mission << "\n";
             std::cerr << "creator        : " << m.creator << "\n";
             std::cerr << "origin         : " << m.origin << "\n";
@@ -191,7 +191,7 @@ void EventManager::execAdditonalLoopTasks()
             std::cerr << "fileType       : " << m.fileType << "\n";
             std::cerr << "url            : " << m.url << "\n";
             std::cerr << "urlSpace       : " << m.urlSpace << "\n";
-
+            */
             ProductCollection products;
             products.productList[m.productType] = m;
 

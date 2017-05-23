@@ -114,7 +114,7 @@ public slots:
     void resizeLocalArch();
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
-
+    void setAutomaticExpandLocalArchModel(bool b);
     void setProductsFilter(QString qry, QStringList hdr);
     void restartProductsFilter();
 
@@ -241,6 +241,7 @@ private:
     QSignalMapper *windowMapper;
 
     bool updateProductsModel;
+    bool expandProductsModel;
 
     QMenu *fileMenu;
     QMenu *editMenu;
