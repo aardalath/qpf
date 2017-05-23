@@ -144,7 +144,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     QSqlRecord rec = q.record();
     int fldCount = rec.count();
 
-    if (q.size() == rowsFromQuery) { return; }
+    //if ((q.size() == rowsFromQuery) && (!isCustomFilter)) { return; }
 
     clear();
 
@@ -155,6 +155,12 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     QString prevGrp("");
 
     rowsFromQuery = 0;
+
+    if (headerLabels.count() < 1) {
+        for (int i = 0; i < rec.count(); ++i) {
+            headerLabels << rec.fieldName(i);
+        }
+    }
 
     if (isCustomFilter) {
         while (q.next()) {
@@ -169,8 +175,6 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         return;
     }
     
-    std::cerr << "Skipping " << skippedColumns << " columns\n";
-
     int children = 0;
     while (q.next()) {
 #define GROUP_ROW_EMPTY
@@ -214,13 +218,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         ++children;
     }
     
-    if (headerLabels.count() < 1) {
-        for (int i = 0; i < rec.count(); ++i) {
-            headerLabels << rec.fieldName(i);
-        }
-    } else {
-        setHeaders(headerLabels);
-    }
+    setHeaders(headerLabels);
 }
 
 }

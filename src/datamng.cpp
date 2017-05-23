@@ -307,6 +307,7 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion;
                 std::string newVer  = fs.incrMinorVersion(origVer);
+                std::string oldFile(str::mid(m.url,7,1000));
                 str::replaceAll(m.url, origVer, newVer);
                 str::replaceAll(m.baseName, origVer, newVer);
                 str::replaceAll(m.productId, origVer, newVer);
@@ -314,6 +315,11 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
                 m.productVersion = newVer;
                 WarnMsg("Found in database:" + m.signature + " [" + ver +
                         "], changing " + origVer + " with " + newVer);
+                std::string newFile(str::mid(m.url,7,1000));
+                if (rename(oldFile.c_str(), newFile.c_str()) != 0) {
+                    WarnMsg("ERROR: Cannot rename file " + oldFile +
+                            " to " + newFile);
+                }
             }
         }
 
@@ -335,7 +341,7 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
 void DataManager::saveProductsToDB(ProductCollection & productList)
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-
+    /*
     for (auto & kv : productList.productList) {
         ProductMetadata & m = kv.second;
         DBG(kv.first);
@@ -362,7 +368,7 @@ void DataManager::saveProductsToDB(ProductCollection & productList)
         DBG("url            : " << m.url);
         DBG("urlSpace       : " << m.urlSpace);
     }
-    
+    */
     try {
 
         // Check that connection with the DB is possible

@@ -200,6 +200,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 #endif
 
     for (unsigned int i = 0; i < count; ++i) {
+
         // Extract the matches of the regex
 #ifdef USE_CX11_REGEX
         int k = i;
@@ -258,7 +259,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 
     struct stat buf;
     if (stat(fileName.c_str(), &buf) != 0) {
-        std::cerr << "PROBLEM!!" << std::endl;
+        std::cerr << "WARNING: Couldn't determine the file size\n";
     }
 
     decodeSignature(m);
