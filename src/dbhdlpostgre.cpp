@@ -147,14 +147,14 @@ int  DBHdlPostgreSQL::storeProducts(ProductCollection & prodList)
            << str::quoted("SOC_QLA_TEST") << ", "
            << str::quoted(m.obsIdStr) << ", "
            << str::quoted(m.obsIdStr) << ", "
-           << str::quoted("VIS") << ", "
-           << str::quoted("NOMINAL") << ", "
+           << str::quoted(m.instrument) << ", "
+           << str::quoted(m.obsMode) << ", "
            << str::quoted(m.signature) << ", "
            << str::quoted(str::tagToTimestamp(m.startTime)) << ", "
            << str::quoted(str::tagToTimestamp(m.endTime)) << ", "
            << str::quoted(str::tagToTimestamp(LibComm::timeTag())) << ", "
            << str::quoted(m.url) << ")";
-
+        std::cerr << ss.str() << "\n";
         try { result = runCmd(ss.str()); } catch(...) { throw; }
 
         PQclear(res);

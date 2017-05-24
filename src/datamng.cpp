@@ -243,6 +243,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         for (auto & md : msg->task.outputs.productList) {
             urlh.setProduct(md.second);
             md.second = urlh.fromGateway2LocalArch();
+            DBG("Product to store in DB:" << md.second.url);
         }
 
         InfoMsg("Saving outputs...");

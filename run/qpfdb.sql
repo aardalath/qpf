@@ -245,10 +245,10 @@ ALTER TABLE observation_modes OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: products_info; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
-CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NIR', 'SIR', 'UNKNOWN_INST');
+CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NISP', 'NIR', 'SIR', 'UNKNOWN_INST');
 CREATE TYPE prod_creator_enum     AS ENUM ('SOC_LE1', 'SOC_QLA_OPE', 'SOC_QLA_TEST');
 CREATE TYPE prod_status_enum      AS ENUM ('OK', 'NOTOK');
-CREATE TYPE prod_obsmode_enum     AS ENUM ('NOMINAL', 'TEST');
+CREATE TYPE prod_obsmode_enum     AS ENUM ('W', 'C', 'S', 'NOMINAL', 'TEST');
 
 CREATE TABLE products_info (
     id integer NOT NULL,
