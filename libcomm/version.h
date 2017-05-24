@@ -60,7 +60,7 @@
 #define APP_NAME         "LibComm"
 
 //! Application release number
-#define APP_RELEASE      "1.2rc1"
+#define APP_RELEASE      "1.2rc2"
 
 //! Application release date
 #define APP_DATE         "MAY 2017"

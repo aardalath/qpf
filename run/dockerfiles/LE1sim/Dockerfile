@@ -24,7 +24,7 @@ FROM le1-sim-debian:base
 MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
 
 LABEL esa.euclid.soc.qla.content="LE1 fake processor" \
-      esa.euclid.soc.qla.version="1.2-RC1" \
+      esa.euclid.soc.qla.version="1.2-RC2" \
       esa.euclid.soc.qla.release-date="2017-05-18"
       
 # install LE1-fake software (placed in current directory)
