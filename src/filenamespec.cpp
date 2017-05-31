@@ -200,6 +200,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 #endif
 
     for (unsigned int i = 0; i < count; ++i) {
+
         // Extract the matches of the regex
 #ifdef USE_CX11_REGEX
         int k = i;
@@ -258,11 +259,11 @@ bool FileNameSpec::parseFileName(std::string fileName,
 
     struct stat buf;
     if (stat(fileName.c_str(), &buf) != 0) {
-        std::cerr << "PROBLEM!!" << std::endl;
+        std::cerr << "WARNING: Couldn't determine the file size\n";
     }
 
     decodeSignature(m);
-
+    std::cerr << "For URL " << m.url << " productId built is " << m.productId << "\n";
     m.creator        = creator;
     m.productId      = buildProductId(m);
     m.productStatus  = "OK";
@@ -321,11 +322,13 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         // TBD
     }
 
+    m.obsIdStr   = obsId;
     m.obsId      = strtoul(obsId.c_str(), NULL, 10);
     m.expos      = strtoul(expos.c_str(), NULL, 10);
 
     if ((m.fileType == "LOG") || (m.fileType == "ARCH")) {
-        m.productType += "-" + m.fileType;
+        str::replaceAll(m.productId, m.productType, m.productType + "-" + m.fileType);
+        m.productType += "-" + m.fileType;      
     }
 
     m.signature = (m.mission + "_" +

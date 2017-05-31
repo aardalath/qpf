@@ -243,6 +243,7 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         for (auto & md : msg->task.outputs.productList) {
             urlh.setProduct(md.second);
             md.second = urlh.fromGateway2LocalArch();
+            DBG("Product to store in DB:" << md.second.url);
         }
 
         InfoMsg("Saving outputs...");
@@ -251,30 +252,6 @@ void DataManager::saveTaskToDB(Message_TASK_Processing * msg, bool initialStore)
         // Try to process the QDT report and get the issues found
         for (auto & kv : msg->task.outputs.productList) {
             ProductMetadata & m = kv.second;
-            /*
-            DBG(kv.first);
-            DBG("mission        : " << m.mission);
-            DBG("creator        : " << m.creator);
-            DBG("origin         : " << m.origin);
-            DBG("procFunc       : " << m.procFunc);
-            DBG("params         : " << m.params);
-            DBG("instrument     : " << m.instrument);
-            DBG("obsId          : " << m.obsId);
-            DBG("obsMode        : " << m.obsMode);
-            DBG("expos          : " << m.expos);
-            DBG("productType    : " << m.productType);
-            DBG("signature      : " << m.signature);
-            DBG("productId      : " << m.productId);
-            DBG("productVersion : " << m.productVersion);
-            DBG("productStatus  : " << m.productStatus);
-            DBG("startTime      : " << m.startTime);
-            DBG("endTime        : " << m.endTime);
-            DBG("regTime        : " << m.regTime);
-            DBG("productSize    : " << m.productSize);
-            DBG("fileType       : " << m.fileType);
-            DBG("url            : " << m.url);
-            DBG("urlSpace       : " << m.urlSpace);
-            */
             if ((m.procFunc == "QLA") && (m.fileType == "JSON")) {
                 QDTReportHandler qdtRep(m.url.substr(7));
                 qdtRep.read();
@@ -331,6 +308,7 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion;
                 std::string newVer  = fs.incrMinorVersion(origVer);
+                std::string oldFile(str::mid(m.url,7,1000));
                 str::replaceAll(m.url, origVer, newVer);
                 str::replaceAll(m.baseName, origVer, newVer);
                 str::replaceAll(m.productId, origVer, newVer);
@@ -338,6 +316,11 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
                 m.productVersion = newVer;
                 WarnMsg("Found in database:" + m.signature + " [" + ver +
                         "], changing " + origVer + " with " + newVer);
+                std::string newFile(str::mid(m.url,7,1000));
+                if (rename(oldFile.c_str(), newFile.c_str()) != 0) {
+                    WarnMsg("ERROR: Cannot rename file " + oldFile +
+                            " to " + newFile);
+                }
             }
         }
 
@@ -359,7 +342,34 @@ void DataManager::sanitizeProductVersions(ProductCollection & prodList)
 void DataManager::saveProductsToDB(ProductCollection & productList)
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-
+    /*
+    for (auto & kv : productList.productList) {
+        ProductMetadata & m = kv.second;
+        DBG(kv.first);
+        DBG("mission        : " << m.mission);
+        DBG("creator        : " << m.creator);
+        DBG("origin         : " << m.origin);
+        DBG("procFunc       : " << m.procFunc);
+        DBG("params         : " << m.params);
+        DBG("instrument     : " << m.instrument);
+        DBG("obsIdSt        : " << m.obsIdStr);
+        DBG("obsId          : " << m.obsId);
+        DBG("obsMode        : " << m.obsMode);
+        DBG("expos          : " << m.expos);
+        DBG("productType    : " << m.productType);
+        DBG("signature      : " << m.signature);
+        DBG("productId      : " << m.productId);
+        DBG("productVersion : " << m.productVersion);
+        DBG("productStatus  : " << m.productStatus);
+        DBG("startTime      : " << m.startTime);
+        DBG("endTime        : " << m.endTime);
+        DBG("regTime        : " << m.regTime);
+        DBG("productSize    : " << m.productSize);
+        DBG("fileType       : " << m.fileType);
+        DBG("url            : " << m.url);
+        DBG("urlSpace       : " << m.urlSpace);
+    }
+    */
     try {
 
         // Check that connection with the DB is possible

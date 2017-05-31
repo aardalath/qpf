@@ -332,7 +332,7 @@ fi
 if [ "${INSTALL}" == "yes" ]; then
     step "Setting up Work Area under '${WORK_AREA}/qpf'"
 
-    if [ ! -d "${WORK_AREA}" ]; then
+    if [ ! -d "${WORK_AREA}/qpf" ]; then
          perform mkdir -p "'${WORK_AREA}/qpf'"
     fi
 

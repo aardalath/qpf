@@ -508,7 +508,7 @@ bool Component::buildMsgINDATA(MessageHeader & hdr,
                                Message_INDATA & msg)
 {
     msg.header = hdr;
-    msg.productsMetadata = prdMetadata;
+    msg.productsMetadata.productList = prdMetadata.productList;;
     return true;
 }
 

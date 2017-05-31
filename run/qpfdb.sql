@@ -245,10 +245,10 @@ ALTER TABLE observation_modes OWNER TO eucops;
 
 -- ----------------------------------------------------------------------
 -- Name: products_info; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
-CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NIR', 'SIR', 'UNKNOWN_INST');
+CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NISP', 'NIR', 'SIR', 'UNKNOWN_INST');
 CREATE TYPE prod_creator_enum     AS ENUM ('SOC_LE1', 'SOC_QLA_OPE', 'SOC_QLA_TEST');
 CREATE TYPE prod_status_enum      AS ENUM ('OK', 'NOTOK');
-CREATE TYPE prod_obsmode_enum     AS ENUM ('NOMINAL', 'TEST');
+CREATE TYPE prod_obsmode_enum     AS ENUM ('W', 'C', 'S', 'NOMINAL', 'TEST');
 
 CREATE TABLE products_info (
     id integer NOT NULL,
@@ -258,6 +258,8 @@ CREATE TABLE products_info (
     product_size bigint,
     product_status_id prod_status_enum,
     creator_id prod_creator_enum,
+    obs_id character varying(128),
+    soc_id character varying(128),
     instrument_id prod_instrument_enum,
     obsmode_id prod_obsmode_enum,
     start_time timestamp without time zone,
@@ -462,6 +464,8 @@ COPY pvc  (id, date, counter, version, name, comment) FROM stdin;
 2	2016-02-09 14:01:42	1	V1.0                            	QLA_Processor                   	First version of QLA_processor script, just for testing purposes
 3	2017-01-09 14:01:42	2	V1.2                            	QLA_Processor                   	First ammend to version 1.0 of QLA_processor script, again just for testing purposes
 4	2017-01-09 14:01:42	1	V0.1                            	Archive_Ingestor                   	First version of the Archive Ingestor script, just for testing purposes
+5	2017-05-09 14:01:42	1	V0.1                            	LE1_VIS_Processor                   	First version of LE1_VIS_Processor script, just for testing purposes
+6	2017-05-09 14:01:42	1	V0.1                            	LE1_NISP_Processor                   	First version of LE1_NISP_Processor script, just for testing purposes
 \.
 
 -- ----------------------------------------------------------------------

@@ -49,6 +49,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -98,6 +99,10 @@ void DirWatcher::watch(std::string pth)
         perror("inotify_add_watch");
         exit(EXIT_FAILURE);
     }
+
+    //int flags = fcntl(fd, F_GETFL, 0);
+    //fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
     watchedDirs[wd] = pth;
 }
 
@@ -183,7 +188,7 @@ void DirWatcher::start()
 //                    }
 
 //                    if (proceed) { 
-                        fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
+                      //fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
                         events.push(dwe); 
 //                    }
                 }

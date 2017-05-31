@@ -1,6 +1,8 @@
 #include "frm_filterset.h"
 #include "ui_frm_filterset.h"
 
+#include <iostream>
+
 #include <QDebug>
 #include <QScrollArea>
 
@@ -187,7 +189,8 @@ void Frm_FilterSet::defineFilter(bool b)
 
 void Frm_FilterSet::defineManualFilter()
 {
-  emit filterIsDefined(ui->edSQL->toPlainText(), QStringList());
+    std::cerr << "Filter is " << ui->edSQL->toPlainText().toStdString() << "\n";
+    emit filterIsDefined(ui->edSQL->toPlainText(), QStringList());
 }
 
 void Frm_FilterSet::resetFilter(bool b)

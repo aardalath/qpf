@@ -140,6 +140,7 @@ struct ProductMetadata : public JsonStruct {
     DateTime       regTime;
     DateRange      timeInterval;   // %D
     ObsId          obsId;
+    std::string    obsIdStr;
     Instrument     instrument;     // %I
     ObsMode        obsMode;
     Exposure       expos;
@@ -284,6 +285,7 @@ struct TaskAgentInfo : public JsonStruct {
 
     virtual void toFields();
     virtual void toData();
+    virtual void restart();
 };
 
 //------------------------------------------------------------

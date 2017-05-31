@@ -127,6 +127,8 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     updateProductsModel(false),
+    expandProductsModel(false),
+    resizeProductsModel(false),
     isThereActiveCores(true)
 {
     if (!sessionName.isEmpty()) {
@@ -946,9 +948,10 @@ void MainWindow::quitAllQPF()
     IMsg("Sending quit command to EvtMng . . .");
     hmiNode->sendCmd("EvtMng", "quit", "");
     //DBManager::addICommand("QUIT");
-
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
+    sleep(1);
+    
     qApp->closeAllWindows();
     qApp->quit();
 }
@@ -973,9 +976,10 @@ void MainWindow::processProductsInPath(QString folder)
     ProductMetadata m;
     foreach (const QString & fi, files) {
         fs.parseFileName(fi.toStdString(), m);
+        m.urlSpace = UserSpace;
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
-        //sleep(5);
+        sleep(60);
     }
 //    foreach (const QString & fi, files) {
 //        QFileInfo fs(fi);
@@ -1403,17 +1407,19 @@ void MainWindow::setUToolTasks()
 //----------------------------------------------------------------------
 void MainWindow::localarchViewUpdate()
 {
-    static bool resProd = false;
-  
     if (updateProductsModel) {
-        productsModel->refresh();
+        updateLocalArchModel();
     }
+}
 
-    if ((!resProd) && (ui->treevwArchive->model()->rowCount() > 0)) {
-        for (int i = 0; i < productsModel->columnCount(); ++i) {
-            ui->treevwArchive->resizeColumnToContents(i);
-        }
-        resProd = true;
+//----------------------------------------------------------------------
+// SLOT: updateLocalArchModel
+// Updates the local archive model on demand
+//----------------------------------------------------------------------
+void MainWindow::resizeLocalArch()
+{
+    for (int i = 0; i < productsModel->columnCount(); ++i) {
+        ui->treevwArchive->resizeColumnToContents(i);
     }
 }
 
@@ -1424,6 +1430,12 @@ void MainWindow::localarchViewUpdate()
 void MainWindow::updateLocalArchModel()
 {
     productsModel->refresh();
+    if (expandProductsModel) {
+        ui->treevwArchive->expandAll();
+    }
+    if (resizeProductsModel) {
+        resizeLocalArch();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -1433,6 +1445,24 @@ void MainWindow::updateLocalArchModel()
 void MainWindow::setAutomaticUpdateLocalArchModel(bool b)
 {
     updateProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticExpandLocalArchModel
+// Toggles automatic expand of local arch model on/off upon updates
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticExpandLocalArchModel(bool b)
+{
+    expandProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticResizeLocalArchModel
+// Toggles automatic resize of local arch model on/off upon updates
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticResizeLocalArchModel(bool b)
+{
+    resizeProductsModel = b;
 }
 
 //----------------------------------------------------------------------
@@ -1604,7 +1634,9 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
         menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
 
-        if (! m.parent().isValid()) {
+        if ((m.parent().isValid()) && ((productType.left(4) == "LE1_") ||
+                                       (productType.left(4) == "SIM_") ||
+                                       (productType.left(4) == "SOC_"))) {
             ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
             acReprocess->setEnabled(cfgInfo.flags.proc.allowReprocessing);
             menu.addSeparator();
@@ -2392,31 +2424,19 @@ void MainWindow::updateAgentsMonitPanel()
 
     static int numOfRows = 0;
 
-    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
-
-    if (numOfRows == 0) {
-        for (auto & kv : taskAgentsInfo) {
-            TaskAgentInfo * taInfo = kv.second;
-            taInfo->total      = 0;
-            taInfo->maxnum     = 3;
-            taInfo->running    = 0;
-            taInfo->waiting    = 0;
-            taInfo->paused     = 0;
-            taInfo->stopped    = 0;
-            taInfo->failed     = 0;
-            taInfo->finished   = 0;
-            taInfo->load1min   = loadAvgs.at(0) * 100;
-            taInfo->load5min   = loadAvgs.at(1) * 100;
-            taInfo->load15min  = loadAvgs.at(2) * 100;
-            taInfo->uptimesecs = 0;
-        }
-    }
-
     // 2. Count tasks
     ProcTaskStatusModel * mdl = qobject_cast<ProcTaskStatusModel *>(ui->tblvwTaskMonit->model());
     int currentNumOfRows = mdl->rowCount();
-    if (currentNumOfRows > numOfRows) {
-        for (int i = numOfRows; i < currentNumOfRows; ++i) {
+    if (true) { //}(currentNumOfRows > numOfRows) {
+        QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
+        for (auto & kv : taskAgentsInfo) {
+            TaskAgentInfo * taInfo = kv.second;
+            taInfo->restart();
+            taInfo->load1min   = loadAvgs.at(0) * 100;
+            taInfo->load5min   = loadAvgs.at(1) * 100;
+            taInfo->load15min  = loadAvgs.at(2) * 100;
+        }
+        for (int i = 0; i < currentNumOfRows; ++i) {
             std::string agent = mdl->index(i, AgentsCol).data().toString().toStdString();
             if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
                 TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;

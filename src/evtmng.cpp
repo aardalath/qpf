@@ -158,7 +158,7 @@ void EventManager::execAdditonalLoopTasks()
     // Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
-        std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
+        //std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
 
         // Process only files
         // TODO: Process directories that appear at inbox
@@ -168,6 +168,30 @@ void EventManager::execAdditonalLoopTasks()
             FileNameSpec fs;
             ProductMetadata m;
             fs.parseFileName(file, m);
+            /*
+            std::cerr << "mission        : " << m.mission << "\n";
+            std::cerr << "creator        : " << m.creator << "\n";
+            std::cerr << "origin         : " << m.origin << "\n";
+            std::cerr << "procFunc       : " << m.procFunc << "\n";
+            std::cerr << "params         : " << m.params << "\n";
+            std::cerr << "instrument     : " << m.instrument << "\n";
+            std::cerr << "obsIdSt        : " << m.obsIdStr << "\n";
+            std::cerr << "obsId          : " << m.obsId << "\n";
+            std::cerr << "obsMode        : " << m.obsMode << "\n";
+            std::cerr << "expos          : " << m.expos << "\n";
+            std::cerr << "productType    : " << m.productType << "\n";
+            std::cerr << "signature      : " << m.signature << "\n";
+            std::cerr << "productId      : " << m.productId << "\n";
+            std::cerr << "productVersion : " << m.productVersion << "\n";
+            std::cerr << "productStatus  : " << m.productStatus << "\n";
+            std::cerr << "startTime      : " << m.startTime << "\n";
+            std::cerr << "endTime        : " << m.endTime << "\n";
+            std::cerr << "regTime        : " << m.regTime << "\n";
+            std::cerr << "productSize    : " << m.productSize << "\n";
+            std::cerr << "fileType       : " << m.fileType << "\n";
+            std::cerr << "url            : " << m.url << "\n";
+            std::cerr << "urlSpace       : " << m.urlSpace << "\n";
+            */
             ProductCollection products;
             products.productList[m.productType] = m;
 

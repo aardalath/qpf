@@ -57,7 +57,33 @@ int main(int argc, char * argv[])
 
         bool b = fs.parseFileName(file, m);
         //ProductMetadata::dump(std::cerr, &m);
-        std::cerr << "Product size: " << m.productSize
+
+        std::cerr << "\nFile           : " << file << '\n'
+                  << "----------------------------------------"
+                     "------------------------------\n"
+                  << "mission        : " << m.mission << '\n'
+                  << "creator        : " << m.creator << '\n'
+                  << "origin         : " << m.origin << '\n'
+                  << "procFunc       : " << m.procFunc << '\n'
+                  << "params         : " << m.params << '\n'
+                  << "instrument     : " << m.instrument << '\n'
+                  << "obsId          : " << m.obsId << '\n'
+                  << "obsMode        : " << m.obsMode << '\n'
+                  << "expos          : " << m.expos << '\n'
+                  << "productType    : " << m.productType << '\n'
+                  << "signature      : " << m.signature << '\n'
+                  << "productId      : " << m.productId << '\n'
+                  << "productVersion : " << m.productVersion << '\n'
+                  << "productStatus  : " << m.productStatus << '\n'
+                  << "startTime      : " << m.startTime << '\n'
+                  << "endTime        : " << m.endTime << '\n'
+                  << "regTime        : " << m.regTime << '\n'
+                  << "productSize    : " << m.productSize << '\n'
+                  << "fileType       : " << m.fileType << '\n'
+                  << "url            : " << m.url << '\n'
+                  << "urlSpace       : " << m.urlSpace << '\n';
+        
+        std::cerr << "\nProduct size: " << m.productSize
                   << ".........." << (b ? "OK" : "ERROR!")
                   << std::endl;
     }

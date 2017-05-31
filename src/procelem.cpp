@@ -499,7 +499,7 @@ std::string ProcessingElement::prepareOutputFile(std::string vd, std::string& dn
      *** HACK: Simulate FITS output files
      ***       with hard links to input images
      **************************************************/
-
+    /*
     if (str::getExtension(dname) == "fits") {
         std::string refName;
         std::ifstream ifs(fullName);
@@ -517,7 +517,7 @@ std::string ProcessingElement::prepareOutputFile(std::string vd, std::string& dn
                         " to " + fullName).c_str());
             }
         }
-    }
+    }*/
     return fullName;
 }
 
@@ -537,7 +537,7 @@ void ProcessingElement::retrieveOutputProducts()
     DIR * dp = NULL;
     struct dirent * dirp;
     for (auto & vd : {exchgOut, exchgLog}) {
-        DBG("Dir: " << vd);
+        //DBG("Dir: " << vd);
         if ((dp = opendir(vd.c_str())) == NULL) {
             std::cerr << "Cannot open output directory " << vd << std::endl;
         } else {
@@ -546,7 +546,7 @@ void ProcessingElement::retrieveOutputProducts()
                     std::string dname(dirp->d_name);
                     if (dname.substr(0, 3) != "EUC") { continue; }
                     std::string outputFile = prepareOutputFile(vd, dname);
-                    DBG("Saving outfile " << outputFile);
+                    //DBG("Saving outfile " << outputFile);
                     outFiles.push_back(outputFile);
                 }
             }
@@ -562,10 +562,10 @@ void ProcessingElement::retrieveOutputProducts()
         ProductMetadata m;
         if (fs.parseFileName(outFiles.at(i), m, ProcessingSpace, task.taskPath)) {
             // Place output product at external (output) shared area
-            DBG(" >> " << m);
+            //DBG(" >> " << m);
             urlh->setProduct(m);
             m = urlh->fromProcessing2Gateway();
-            DBG(" << " << m);
+            //DBG(" << " << m);
         } else {
             continue;
         }

@@ -111,9 +111,11 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
+    void resizeLocalArch();
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
-
+    void setAutomaticExpandLocalArchModel(bool b);
+    void setAutomaticResizeLocalArchModel(bool b);
     void setProductsFilter(QString qry, QStringList hdr);
     void restartProductsFilter();
 
@@ -240,6 +242,8 @@ private:
     QSignalMapper *windowMapper;
 
     bool updateProductsModel;
+    bool expandProductsModel;
+    bool resizeProductsModel;
 
     QMenu *fileMenu;
     QMenu *editMenu;
