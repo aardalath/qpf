@@ -306,7 +306,7 @@ cd "${BUILD_PATH}"
 ## Generating dependencies and setting makefiles
 if [ "${REMOVE}" == "yes" ]; then
     step "Generating dependencies and setting makefiles"
-    cmakeopts="${CMALKE_OPTS}"
+    cmakeopts="${CMAKE_OPTS}"
     if [ "${COV}" == "yes" ]; then
         cmakeopts="-D COV=ON ${cmakeopts}"
     else
