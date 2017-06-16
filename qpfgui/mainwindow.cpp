@@ -951,7 +951,7 @@ void MainWindow::quitAllQPF()
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
     sleep(1);
-    
+
     qApp->closeAllWindows();
     qApp->quit();
 }
@@ -979,7 +979,7 @@ void MainWindow::processProductsInPath(QString folder)
         m.urlSpace = UserSpace;
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
-        sleep(60);
+        usleep(100000);
     }
 //    foreach (const QString & fi, files) {
 //        QFileInfo fs(fi);
@@ -1254,7 +1254,7 @@ void MainWindow::updateSystemView()
     static bool resTask = false;
     static bool resSysAlert = false;
     static bool resAlert = false;
-  
+
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
@@ -1342,7 +1342,7 @@ void MainWindow::initLocalArchiveView()
     acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
 
     acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
-    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
+    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openLocation()));
 
     acDefault = new QAction("System Default", ui->treevwArchive);
     connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
@@ -1365,7 +1365,7 @@ void MainWindow::initLocalArchiveView()
     fld = Field("end_time"          , DATETIME); products[fld.name] = fld;
     fld = Field("registration_time" , DATETIME); products[fld.name] = fld;
     fld = Field("url"               , STRING); products[fld.name] = fld;
-    
+
     QStringList flds {"product_id", "product_type", "product_version", "signature",
                       "instrument_id", "product_size", "product_status_id", "creator_id",
                       "obsmode_id", "start_time", "end_time", "registration_time", "url"};
@@ -1474,7 +1474,21 @@ void MainWindow::openWithDefault()
 
     QModelIndex m = ui->treevwArchive->currentIndex();
     QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
-    QDesktopServices::openUrl(QUrl(url));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(url));
+}
+
+//----------------------------------------------------------------------
+// SLOT: openLocation
+//----------------------------------------------------------------------
+void MainWindow::openLocation()
+{
+    static const int NumOfURLCol = 10;
+
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+    QFileInfo fs(url.mid(7));
+    url = fs.absolutePath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(url));
 }
 
 //----------------------------------------------------------------------
@@ -1608,14 +1622,14 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
     static const int NumOfProdTypeCol = 1;
 
     if (isProductsCustomFilterActive) { return; }
-    
+
     QModelIndex m = ui->treevwArchive->indexAt(p);
     //if (m.parent() == QModelIndex()) { return; }
 
     QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
     if (!m2.data().isValid()) { return; }
     QString productType = m2.data().toString();
-        
+
     QList<QAction *> actions;
     if (m.isValid()) {
         foreach (QString key, userDefTools.keys()) {
@@ -2106,16 +2120,27 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 //----------------------------------------------------------------------
 void MainWindow::showWorkDir()
 {
-    QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
-    Q_UNUSED(idx);
-    /*
-      QString treeKey = item->data(0, Qt::UserRole).toString();
-      const Json::Value & v  = processedTasksInfo.value(treeKey);
-      QString bind = QString::fromStdString(v["HostConfig"]["Binds"][0].asString());
-      QString localDir = bind.left(bind.indexOf(":"));
-      QString cmdLine = "nautilus " + localDir + " &";
-      system(cmdLine.toStdString().c_str());
-    */
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex nameExtIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 3);
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+
+    QString localDir = QString::fromStdString(v["Mounts"][2]["Source"].asString());
+
+    std::cerr << "LocalDir: " << localDir.toStdString() << "\n";
+    QFileInfo fs(localDir);
+    if (fs.exists()) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(localDir));
+    } else {
+        int ret = QMessageBox::warning(this, tr("Folder does not exist"),
+                                       tr("The task folder does not exist in, or is not visible from this host.\n"
+                                          "This problem normally appears when the task has been executed in a processing host "
+                                          "that is not the host where the HMI is running"),
+                                       QMessageBox::Ok);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2124,10 +2149,10 @@ void MainWindow::showWorkDir()
 //----------------------------------------------------------------------
 void MainWindow::displayTaskInfo()
 {
-    QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
     QModelIndex nameExtIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 3);
-    QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
-    QString taskName = procTaskStatusModel->data(nameExtIdx).toString().trimmed();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+    QString taskName       = procTaskStatusModel->data(nameExtIdx).toString().trimmed();
     QString taskInfoString = procTaskStatusModel->data(dataIdx).toString().trimmed();
 
     showJSONdata("Task: " + taskName, taskInfoString);
@@ -2293,7 +2318,7 @@ void MainWindow::initAlertsTables()
 void MainWindow::showAlertsContextMenu(const QPoint & p)
 {
     if (isAlertsCustomFilterActive) { return; }
-    
+
     QList<QAction *> actions;
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
     if (tblvw->indexAt(p).isValid()) {
