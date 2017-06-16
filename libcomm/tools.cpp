@@ -51,6 +51,9 @@
 #include <iterator>
 #include <algorithm>
 
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <atomic>
 
 namespace LibComm {
@@ -511,6 +514,15 @@ void SysInfo::computeStats()
     this->swapStat.total = this->memData.totalSwap;
     this->swapStat.values.clear();
     this->swapStat.values.push_back(this->memData.usedSwap);
+}
+
+bool exists(const std::string & name) {
+    return exists(name.c_str());
+}
+
+bool exists(const char * name) {
+    struct stat buffer;
+    return (stat(name, &buffer) == 0);
 }
 
 }

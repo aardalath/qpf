@@ -244,6 +244,9 @@ void setDebugInfo(bool enable = true);
 //----------------------------------------------------------------------
 bool getDebugInfo();
 
+bool exists(const std::string & name);
+bool exists(const char * name);
+
 struct CPUData {
    unsigned long long int totalTime;
    unsigned long long int userTime;
