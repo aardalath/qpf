@@ -1,0 +1,4 @@
+/'skinparam handwritten true'/
+/'skinparam defaultFontName "Architects Daughter"'/
+skinparam defaultFontName "Droid Sans"
+hide footbox
