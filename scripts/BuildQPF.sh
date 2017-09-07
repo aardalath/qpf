@@ -4,7 +4,7 @@
 # Domain     : QPF.scripts
 # Version    : 1.1
 # Date       : 2016/12/14
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015, 2016 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Compile and Install QPF binaries in target platform
 # Created by : J C Gonzalez
@@ -33,12 +33,8 @@ BUILD_PATH="${QPF_PATH}"/build
 RUN_PATH="${QPF_PATH}"/run
 CONTRIB_PATH="${QPF_PATH}"/contrib
 
-QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
+QPF_WA_SRCDIR="${RUN_PATH}/qpf"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
-QPF_EXE="qpf/qpf"
-QPFHMI_EXE="qpfhmi/qpfhmi"
-QPFGUI_EXE="qpfgui/qpfgui"
-QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 status=0
 
@@ -57,7 +53,9 @@ FAKE="no"
 REMOVE="no"
 HMI="yes"
 RECREATEDB="no"
+
 WORK_AREA="${HOME}"
+QPF_WA_TGTDIR="${WORK_AREA}/qpf"
 PSQL_HOST="localhost"
 PSQL_PORT="5432"
 IP=""
@@ -65,8 +63,8 @@ VERBOSE="no"
 
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
-LOG_FILE=./build_${DATE}.log
-VERSION=$(cat "${QPF_PATH}/VERSION")
+LOG_FILE=${SCRIPT_PATH}/build_${DATE}.log
+VERSION=$(awk -F\" "/APP_RELEASE/{print $2;}" ${QPF_PATH}/version.h)
 LDLIBS=$(echo $LD_LIBRARY_PATH | tr ':' ' ')
 
 wsvn=$(which svn 2>/dev/null)
@@ -82,7 +80,7 @@ if [ -z "$REV_ID" ]; then
 fi
 
 if [ -z "$REV_ID" ]; then
-        REV_ID="DISCONNECTED-WORK-COPY-COMPILATION-00000"
+        REV_ID="NON-TRACKED-WORK-COPY-COMPILATION-00000"
 fi
 
 echo "Revision number: ${REV_ID}"
@@ -90,14 +88,16 @@ BUILD_ID="${DATE}_${REV_ID}"
 echo "BUILD_ID: ${BUILD_ID}"
 export BUILD_ID
 
-MAKE_OPTS="-k -j4"
+MAKE_OPTS="-k "
 COMP_FLAGS=""
 
 CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf"
 CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_BUILD_TYPE=Debug "
 CMAKE_OPTS="$CMAKE_OPTS --graphviz=dependencies.dot"
 
+############################################################
 ###### Handy functions
+############################################################
 
 greetings () {
     say "${_ONHDR}==============================================================================="
@@ -233,7 +233,9 @@ install_contrib () {
     fi
 }
 
+############################################################
 ###### Start
+############################################################
 
 ## Parse command line
 while getopts :hcinrbD:pw:H:P:I:v OPT; do
@@ -268,16 +270,17 @@ checkapp make
 checkapp psql
 
 searchlib Qt
-searchlib zmq
+#searchlib zmq
+searchlib nanomsg
 searchlib pcre2
-searchlib sodium
-searchlib curl
+#searchlib sodium
+#searchlib curl
 searchlib pq
 
 step "Ensuring contributions to COTS are properly installed"
 
-install_contrib cppzmq-master/zmq.hpp opt/zmq/include
-install_contrib pcre2/PCRegEx.h       opt/pcre2/include
+#install_contrib cppzmq-master/zmq.hpp opt/zmq/include
+#install_contrib pcre2/PCRegEx.h       opt/pcre2/include
 
 if [ "${VERBOSE}" == "yes" ]; then
     CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_VERBOSE_MAKEFILE=ON"
@@ -326,7 +329,12 @@ if [ "${INSTALL}" == "yes" ]; then
          perform mkdir -p "'${WORK_AREA}'"
     fi
 
-    perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_PKG}'"
+    if [ ! -d "${QPF_WA_TGTDIR}" ]; then
+         perform mkdir -p "'${QPF_WA_TGTDIR}'"
+    fi
+
+    #perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_SRCDIR}'"
+    perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/
 fi
 
 ## Installing QPF executable and libraries
