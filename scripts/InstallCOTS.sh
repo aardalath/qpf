@@ -206,7 +206,7 @@ if [ "${QT}" == "yes" ]; then
     sudo yum -y list qt5-*x86_64 | grep -v -- -examples|grep qt5- | awk '{print $1;}' | tee /tmp/qt5pkgs.list
 
     # Install packages
-    sudo yum -y install $(cat /tmp/qt5pkgs.list)
+    sudo yum -y install --skip-broken $(cat /tmp/qt5pkgs.list)
 fi
 
 #### Installing COTS: III - Install Nanomsg
