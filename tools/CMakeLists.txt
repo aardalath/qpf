@@ -8,7 +8,6 @@
 #======================================================================
 include (../common.cmake)
 
-#===== Projec dir. =======
 project (tools)
 
 set (libtools_hdr

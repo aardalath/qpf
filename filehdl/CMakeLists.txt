@@ -8,7 +8,6 @@
 #======================================================================
 include (../common.cmake)
 
-#===== Projec dir. =======
 project (filehdl)
 
 set (libfilehdl_hdr

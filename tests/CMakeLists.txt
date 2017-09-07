@@ -8,7 +8,6 @@
 #======================================================================
 include (../common.cmake)
 
-#===== tests =====
 project (tests)
 
 enable_testing()

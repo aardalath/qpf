@@ -8,7 +8,6 @@
 #======================================================================
 include (../common.cmake)
 
-#===== Projec dir. =======
 project (fmk)
 
 set (libfmk_hdr

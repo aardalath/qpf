@@ -8,7 +8,6 @@
 #======================================================================
 include (../common.cmake)
 
-#===== Projec dir. =======
 project (nncomm)
 
 set (libnncomm_hdr
