@@ -2,8 +2,8 @@
 ##############################################################################
 # File       : InstallCOTS.sh - COTS Installation and database initialisation
 # Domain     : QPF.scripts
-# Version    : 1.0
-# Date       : 2016/09/01
+# Version    : 2.0
+# Date       : 2017/09/08
 # Copyright (C) 2015, 2016 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : COTS Installation and database initialisation
@@ -40,7 +40,7 @@ STEP=0
 #- Options
 QT="no" 
 PGSQL="no"
-ZMQ="no" 
+NNMSG="no" 
 PCRE="no" 
 CURL="no" 
 UUID="no"
@@ -65,7 +65,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -A ] [ -a ] [ -q ] [ -p ] [ -z ] [ -r ] [ -c ] [ -u ] [ -d ]"
+    local opts="[ -h ] [ -A ] [ -a ] [ -q ] [ -p ] [ -n ] [ -r ] [ -c ] [ -u ] [ -d ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
     say "  -h         Show this usage message"
@@ -73,7 +73,7 @@ usage () {
     say "  -a         Install all COTS, EXCLUDING Qt framework"
     say "  -q         Install Qt framework"
     say "  -p         Install PostgreSQL, initialize database and restart server"
-    say "  -z         Install ZeroMQ"
+    say "  -n         Install Nanomsg"
     say "  -r         Install PCRE2"
     say "  -c         Install libcurl"
     say "  -u         Install UUID library"
@@ -102,13 +102,13 @@ die () {
 #### Parse command line and display grettings
 
 ## Parse command line
-while getopts :hAaqpzrcud OPT; do
+while getopts :hAaqpnrcud OPT; do
     case $OPT in
         h|+h) usage 
               ;;
         A|+A) QT="yes" 
               PGSQL="yes"
-              ZMQ="yes" 
+              NNMSG="yes" 
               PCRE="yes" 
               CURL="yes" 
               UUID="yes" 
@@ -116,7 +116,7 @@ while getopts :hAaqpzrcud OPT; do
               ;;
         a|+a) QT="no" 
               PGSQL="yes"
-              ZMQ="yes" 
+              NNMSG="yes" 
               PCRE="yes" 
               CURL="yes" 
               UUID="yes" 
@@ -126,7 +126,7 @@ while getopts :hAaqpzrcud OPT; do
               ;;
         p|+p) PGSQL="yes" 
               ;;
-        z|+z) ZMQ="yes" 
+        n|+n) NNMSG="yes" 
               ;;
         r|+r) PCRE="yes" 
               ;;
@@ -205,11 +205,24 @@ if [ "${QT}" == "yes" ]; then
     sudo yum -y install $(cat /tmp/qt5pkgs.list)
 fi
 
-#### Installing COTS: III - Install 0MQ
+#### Installing COTS: III - Install Nanomsg
 
-if [ "${ZMQ}" == "yes" ]; then 
-    step "Installing ZeroMQ library"
-    sudo yum -y install zeromq.x86_64 zeromq-devel.x86_64
+if [ "${NNMSG}" == "yes" ]; then 
+    step "Installing Nanomsg library"
+
+    NNMSG_URL="https://github.com/nanomsg/nanomsg/archive/1.0.0.tar.gz"
+    NNMSG_NAME="nanomsg-1.0.0"
+    NNMSG_PKG="${NNMSG_NAME}.tar.gz"
+
+    curdir=$(pwd)
+    cd ${SCRIPT_PATH}
+    mkdir -p pkgs && cd pkgs
+    wget ${NNMSG_URL} -o nanomsg.log -O ${NNMSG_PKG}
+    tar xzf ${NNMSG_PKG}
+    cd ${NNMSG_NAME}
+    mkdir build && cd build
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    make && sudo make install
 fi
 
 #### Installing COTS: IV - Install PCRE2
@@ -250,13 +263,29 @@ fi
 #### Finishing
 step "Final comments"
 
+cat <<EOF> ${HOME}/env_qpf.sh
+#!/bin/bash
+# Mini-script to update PATH and LD_LIBRARY_PATH environment variables 
+# for the compilation/execution of Euclid QPF
+# Creation date: ${DATE}
+export PATH=/usr/lib64/qt5/bin:/usr/local/bin:/usr/pgsql/bin:\$PATH
+export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH
+EOF
+say ""
 say "Compilation/Installation finished."
 say ""
 say "-------------------------------------------------------------------------------"
 say "Please, do not forget to include folder /usr/lib64 in the LD_LIBRARY_PATH "
 say "variable, and the /usr/lib64/qt5/bin folder in the PATH variable, with these"
 say "commands:" 
-say "  export PATH=/usr/lib64/qt5/bin:/usr/pgsql/bin:\$PATH"
-say "  export LD_LIBRARY_PATH=/usr/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH"
+say "  export PATH=/usr/lib64/qt5/bin:/usr/local/bin:/usr/pgsql/bin:\$PATH"
+say "  export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH"
+say ""
+say "For your convenience, these commands have been saved into the file:"
+say "  \$HOME/env_qpf.sh"
+say "so that you can just update your environment by typing:"
+say "  source \$HOME/env_qpf.sh"
+say "-------------------------------------------------------------------------------"
+say ""
 say "Done."
 
