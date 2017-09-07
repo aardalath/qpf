@@ -227,26 +227,26 @@ if [ "${NNMSG}" == "yes" ]; then
     mkdir build && cd build
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     make && sudo make install
-    cd $(curdir)
+    cd ${curdir}
 fi
 
 #### Installing COTS: IV - Install PCRE2
 
 if [ "${PCRE}" == "yes" ]; then 
     step "Installing PCRE2 library"
-    PCRE2_NAME="pcre2-10.30.tar.gz"
+    PCRE2_NAME="pcre2-10.30"
     PCRE2_PKG="${PCRE2_NAME}.tar.gz"
     PCRE2_URL="https://ftp.pcre.org/pub/pcre/${PCRE2_PKG}"
 
     curdir=$(pwd)
     cd ${SCRIPT_PATH}
     mkdir -p pkgs && cd pkgs
-    wget ${NNMSG_URL} -o nanomsg.log -O ${NNMSG_PKG}
-    tar xzf ${NNMSG_PKG}
-    cd ${NNMSG_NAME}
-    ./configure 
+    wget ${PCRE2_URL} -o nanomsg.log -O ${PCRE2_PKG}
+    tar xzf ${PCRE2_PKG}
+    cd ${PCRE2_NAME}
+    ./configure --prefix=/usr/local
     make && sudo make install
-    cd $(curdir)
+    cd ${curdir}
 fi
 
 #### Installing COTS: V - Install curl
@@ -286,7 +286,7 @@ cat <<EOF> ${HOME}/env_qpf.sh
 # for the compilation/execution of Euclid QPF
 # Creation date: ${DATE}
 export PATH=/usr/lib64/qt5/bin:/usr/local/bin:/usr/pgsql/bin:\$PATH
-export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH
 EOF
 say ""
 say "Compilation/Installation finished."
@@ -296,7 +296,7 @@ say "Please, do not forget to include folder /usr/lib64 in the LD_LIBRARY_PATH "
 say "variable, and the /usr/lib64/qt5/bin folder in the PATH variable, with these"
 say "commands:" 
 say "  export PATH=/usr/lib64/qt5/bin:/usr/local/bin:/usr/pgsql/bin:\$PATH"
-say "  export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH"
+say "  export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/pgsql/lib:\$LD_LIBRARY_PATH"
 say ""
 say "For your convenience, these commands have been saved into the file:"
 say "  \$HOME/env_qpf.sh"
