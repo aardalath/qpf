@@ -21,18 +21,29 @@ execute_process(
   OUTPUT_VARIABLE VERSION
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-#== Get BUILD_ID
+#== Get compilation date
 execute_process(
-  COMMAND svn info 
-  COMMAND grep Revision
-  COMMAND cut -d\  -f2
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  OUTPUT_VARIABLE BUILD_ID
+  COMMAND date +%Y%m%d%H%M%S
+  OUTPUT_VARIABLE DATE
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-#set (BUILD_ID $ENV{BUILD_ID})
+
+#== Get BUILD_ID
+set (BUILD_ID $ENV{BUILD_ID})
+if ("${BUILD_ID}" STREQUAL "")
+  execute_process(
+    COMMAND svn info 
+    COMMAND grep Revision
+    COMMAND cut -d\  -f2
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE COMMIT_NUMBER
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set (BUILD_ID ${DATE}_${COMMIT_NUMBER})
+  message (STATUS "Build id generated from svn info")
+endif()
+
 add_definitions(-DBUILD_ID="${BUILD_ID}")
 
-message ("Building ${CMAKE_PROJECT_NAME} version ${VERSION}, commit number ${BUILD_ID}")
+message ("Building ${CMAKE_PROJECT_NAME} version ${VERSION}, with build id. ${BUILD_ID}")
 
 #== Define subprojects
 
