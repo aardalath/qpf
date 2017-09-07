@@ -13,18 +13,28 @@ include (common.cmake)
 
 project (QPF)
 
-set (PROJECT_NAME QPF)
+#== Get project version
+execute_process(
+  COMMAND awk -F\" "/APP_RELEASE/{print $2;}"
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  INPUT_FILE ./version.h
+  OUTPUT_VARIABLE VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (QPF_MAJOR 1)
-set (QPF_MINOR 2)
-set (QPF_PATCH rc1)
-
-set (QPF_VERSION ${QPF_MAJOR}.${QPF_MINOR}.${QPF_PATCH})
-
-message (STATUS "Building QPF version ${QPF_VERSION}")
-
-set (BUILD_ID $ENV{BUILD_ID})
+#== Get BUILD_ID
+execute_process(
+  COMMAND svn info 
+  COMMAND grep Revision
+  COMMAND cut -d\  -f2
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  OUTPUT_VARIABLE BUILD_ID
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+#set (BUILD_ID $ENV{BUILD_ID})
 add_definitions(-DBUILD_ID="${BUILD_ID}")
+
+message ("Building ${CMAKE_PROJECT_NAME} version ${VERSION}, commit number ${BUILD_ID}")
+
+#== Define subprojects
 
 add_subdirectory (mongoose)
 
@@ -40,12 +50,19 @@ add_subdirectory (fmk)
 add_subdirectory (qpf)
 
 if (HMI)
-  message ("HMI component will be generated as well")
+  message ("HMI component will be built . . .")
   add_subdirectory (qpfhmi)
 endif()
 
-add_subdirectory (tests)
-add_subdirectory (sample)
+if (TESTS)
+  message ("Unitary tests will be compiled . . .")
+  add_subdirectory (tests)
+endif()
+
+if (SAMPLES)
+  message ("Samples will be generated . . .")
+  add_subdirectory (sample)
+endif()
 
 #== CPack configuration
 set (CPACK_PACKAGE_VERSION_MAJOR ${QPF_MAJOR})
