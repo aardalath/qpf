@@ -149,6 +149,10 @@ greetings
 
 ## Checking required applications and libraries are installed
 
+#### First, enable EPEL repository
+
+sudo yum install -y epel-release
+
 #### Installing COTS: I - Install PostgreSQL
 
 if [ "${PGSQL}" == "yes" ]; then 
@@ -210,9 +214,9 @@ fi
 if [ "${NNMSG}" == "yes" ]; then 
     step "Installing Nanomsg library"
 
-    NNMSG_URL="https://github.com/nanomsg/nanomsg/archive/1.0.0.tar.gz"
     NNMSG_NAME="nanomsg-1.0.0"
     NNMSG_PKG="${NNMSG_NAME}.tar.gz"
+    NNMSG_URL="https://github.com/nanomsg/nanomsg/archive/1.0.0.tar.gz"
 
     curdir=$(pwd)
     cd ${SCRIPT_PATH}
@@ -223,13 +227,26 @@ if [ "${NNMSG}" == "yes" ]; then
     mkdir build && cd build
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     make && sudo make install
+    cd $(curdir)
 fi
 
 #### Installing COTS: IV - Install PCRE2
 
 if [ "${PCRE}" == "yes" ]; then 
     step "Installing PCRE2 library"
-    sudo yum -y install pcre2*
+    PCRE2_NAME="pcre2-10.30.tar.gz"
+    PCRE2_PKG="${PCRE2_NAME}.tar.gz"
+    PCRE2_URL="https://ftp.pcre.org/pub/pcre/${PCRE2_PKG}"
+
+    curdir=$(pwd)
+    cd ${SCRIPT_PATH}
+    mkdir -p pkgs && cd pkgs
+    wget ${NNMSG_URL} -o nanomsg.log -O ${NNMSG_PKG}
+    tar xzf ${NNMSG_PKG}
+    cd ${NNMSG_NAME}
+    ./configure 
+    make && sudo make install
+    cd $(curdir)
 fi
 
 #### Installing COTS: V - Install curl
