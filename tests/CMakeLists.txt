@@ -3,7 +3,7 @@
 # QPF - Prototype of QLA Processing Framework
 # General Project File
 #======================================================================
-# Author: J C Gonzalez - 2015,2016,2017 
+# Author: J C Gonzalez - 2015-2017 
 # Copyright (C) 2015-2017  Euclid SOC Team at ESAC
 #======================================================================
 include (../common.cmake)

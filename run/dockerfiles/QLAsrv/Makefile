@@ -3,7 +3,7 @@
 # Domain     : QPF.run.dockerfiles.QLAsrv
 # Version    : 1.2
 # Date       : 2016/12/18
-# Copyright (C) 2015,2016,2017  J C Gonzalez
+# Copyright (C) 2015-2017  J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Generates docker images from Dockerfiles
 # Created by : J C Gonzalez
