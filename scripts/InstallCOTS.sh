@@ -191,10 +191,10 @@ if [ "${PGSQL}" == "yes" ]; then
     # use the scripts =scripts/pgsql_start_server.sh= and =scripts/pgsql_initdb.sh=
 
     say ". Initializing database"
-    source ${SCRIPT_PATH}/pgsql_initdb.sh
+    source ${SCRIPT_PATH}/maint/pgsql_initdb.sh
 
     say ". Starting server"
-    source ${SCRIPT_PATH}/pgsql_start_server.sh
+    source ${SCRIPT_PATH}/maint/pgsql_start_server.sh
 fi
 
 #### Installing COTS: II - Install Qt
