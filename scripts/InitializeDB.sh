@@ -36,9 +36,6 @@ PSQL_OPTS="$*"
 
 psql postgres ${PSQL_OPTS} -q -c "DROP DATABASE qpfdb;" 
 
-( \  
-  psql postgres ${PSQL_OPTS} -q -c "CREATE DATABASE qpfdb OWNER eucops;" && \
-  psql qpfdb    ${PSQL_OPTS} -q -f "${QPF_SQ_SCPT}" \
-) || \
-exit $?
+( psql postgres ${PSQL_OPTS} -q -c "CREATE DATABASE qpfdb OWNER eucops;" && \
+  psql qpfdb    ${PSQL_OPTS} -q -f "${QPF_SQ_SCPT}" ) || exit $?
 
