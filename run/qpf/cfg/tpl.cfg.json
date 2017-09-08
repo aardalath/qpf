@@ -1,4 +1,4 @@
-{
+g{
     "general": {
         "appName": "QPF",
         "appVersion": "2.0",
@@ -12,8 +12,7 @@
             "@THIS_HOST_IP@": 5
         },
         "swarms": {
-            }
-        }
+         }
     },
     "db": {
         "host": "127.0.0.1",
