@@ -3,8 +3,8 @@
 # File       : BuildQPF.sh - QPF Compilation and Installation script
 # Domain     : QPF.scripts
 # Version    : 1.1
-# Date       : 2016/12/14
-# Copyright (C) 2015, 2016 J C Gonzalez
+# Date       : 2017/09/08
+# Copyright (C) 2015-2017 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Compile and Install QPF binaries in target platform
 # Created by : J C Gonzalez
@@ -415,12 +415,8 @@ fi
 step "Setting up QPF database"
 
 if [ "${RECREATEDB}" == "yes" ]; then
-    QPF_DB_LOCATION="-h ${PSQL_HOST} -p ${PSQL_PORT}"
-
-    perform_dontexit psql postgres ${QPF_DB_LOCATION} -q -c "'DROP DATABASE qpfdb;'"
-
-    perform psql postgres ${QPF_DB_LOCATION} -q -c "'CREATE DATABASE qpfdb OWNER eucops;'"
-    perform psql qpfdb    ${QPF_DB_LOCATION} -q -f "'${QPF_SQ_SCPT}'" -o "'${LOG_FILE}.sqlout'"
+    perform bash ${SCRIPT_PATH}/InitializeDB.sh \
+            -h ${PSQL_HOST} -p ${PSQL_PORT} -o "'${LOG_FILE}.sqlout'"
 fi
 
 ## Finishing
