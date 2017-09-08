@@ -9,11 +9,18 @@
 #https://euclidsoc.esac.esa.int:8300/{status,jobs,files}
 #http://archives.esac.esa.int/esasky-beta
 
+#+begin_src plantuml :file procelem_plantuml.png
+@startuml
+testdot
+@enduml
+#+END_SRC
+#+RESULTS:
+
 * QPF - QLA Processing Framework
 
 ** Introduction
 
-*** Euclid Operations Main Entities
+*** TODO Euclid Operations Main Entities
 
 The main elements interfacing each other at the mission operation phase are the *Science Operations Centre* (SOC) and the *Mission Operations Centre* (MOC). In addition, there are two Instrument Operations Teams (IOTs), responsible for the definition of the instrument operational procedures as well as to ensure the operability of the different instruments along the mission.
 
@@ -782,6 +789,69 @@ Dply -> Dply: wait for START
 ***** Exceptions
 
 ***** Comments
+
+
+*** NEW QPF Use Cases
+
+**** System Maintenance
+The QPF system adninistrator realizes a series of tasks for maintenance of the QPF system, including monitoring of the disks space, DB cleaning/backup, addition/substitution of hosts into the system, etc.
+
+Includes:
+- System Internal Reporting
+- System Shutdown
+- System Start
+
+**** System Internal Reporting
+The QPF internally generates log and monitoring information.
+
+**** System Start
+The QPF is started, spawning its components, creating the appropriate connections among them, performing the neccessary internal checks, connecting to the internal DB, and processing the selected configuration.
+
+**** System Shutdown
+The QPF saves its internal state, closes connections, and deletes all temporary resources.
+
+**** System Configuration
+This includes the modification, from the HMI or using an external tool, of the Configuration file of the QPF.
+
+**** System Re-configuration
+This includes the modification of the QPF configuration, if needed, and the restart of the system to activate the newly selected configuration.
+
+Includes:
+- System Configuration
+- System Shutdown
+- System Start
+
+**** Product Processing
+This is an autonomous process that is performed by the QPF upon external products procurement, or retrieval of output products generated in a previous product processing.  The rules included in the QPF active configuration are evaluated for each of these products, and in case one of them is fired, the corresponding processor is launched according to its configured behaviour.  Once the processing is finished, the output products are ingested in the local archive and in the EAS @ SOC, and the rules are again checked against them.
+
+This use case is specialised by the Container-based and the Swarm-based Product Processing use cases.
+
+Includes:
+- Product Ingestion
+
+**** Product Re-processing
+The user of the system selects one or more products from the local archive, and requests their processing, according to the Product Processing use case.
+
+Includes:
+- Product Processing
+
+**** User Products Processing
+The user provides to the system a folder where a set of products are ready to be processed.  The QPF loads them and proceeds as per in Product Processing use case.
+
+Includes:
+- Product Processing
+
+**** Swarm-based Product Processing
+The input product is provided to the first swarm service element in the corresponding configured swarm for that type of products.  Once the swarm service has access to this product, this is processed.  Once the processing is finished, the swarm service send notification to the system about the generated output products, for their retrieval.
+
+**** Container-based Product Processing
+A new container is created and the corresponding configured processor for that type of product is launched, with the input product to be processed.  Once the processing is finished, the outputs are retrieved.
+
+**** Product Ingestion
+The generated output products that need to be persisted are stored in the EAS storage, and their metadata is registered into the EAS database, for further access and retrieval.
+
+**** Products External Analysis
+The user selects one or more products from the local archive, and requests the openning of an external tool for their analysis.
 
 
 ** QPF Internals

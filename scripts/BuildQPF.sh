@@ -2,9 +2,9 @@
 ##############################################################################
 # File       : BuildQPF.sh - QPF Compilation and Installation script
 # Domain     : QPF.scripts
-# Version    : 1.2
-# Date       : 2016/12/14
-# Copyright (C) 2015,2016,2017  J C Gonzalez
+# Version    : 2.0
+# Date       : 2017/09/08
+# Copyright (C) 2015-2017 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Compile and Install QPF binaries in target platform
 # Created by : J C Gonzalez
@@ -33,12 +33,8 @@ BUILD_PATH="${QPF_PATH}"/build
 RUN_PATH="${QPF_PATH}"/run
 CONTRIB_PATH="${QPF_PATH}"/contrib
 
-QPF_WA_PKG="${RUN_PATH}/QPF-workarea.tgz"
+QPF_WA_SRCDIR="${RUN_PATH}/qpf"
 QPF_SQ_SCPT="${RUN_PATH}/qpfdb.sql"
-QPF_EXE="qpf/qpf"
-QPFHMI_EXE="qpfhmi/qpfhmi"
-QPFGUI_EXE="qpfgui/qpfgui"
-QPF_LIBS="libcomm/liblibcomm infix/libinfix json/libjson sdc/libsdc src/libQPF"
 
 status=0
 
@@ -56,9 +52,10 @@ INSTALL="no"
 FAKE="no"
 REMOVE="no"
 HMI="yes"
-COV="no"
 RECREATEDB="no"
+
 WORK_AREA="${HOME}"
+QPF_WA_TGTDIR="${WORK_AREA}/qpf"
 PSQL_HOST="localhost"
 PSQL_PORT="5432"
 IP=""
@@ -66,8 +63,8 @@ VERBOSE="no"
 
 #- Other
 DATE=$(date +"%Y%m%d%H%M%S")
-LOG_FILE=./build_${DATE}.log
-VERSION=$(cat "${QPF_PATH}/VERSION")
+LOG_FILE=${SCRIPT_PATH}/build_${DATE}.log
+VERSION=$(awk -F\" "/APP_RELEASE/{print $2;}" ${QPF_PATH}/version.h)
 LDLIBS=$(echo $LD_LIBRARY_PATH | tr ':' ' ')
 
 wsvn=$(which svn 2>/dev/null)
@@ -83,7 +80,7 @@ if [ -z "$REV_ID" ]; then
 fi
 
 if [ -z "$REV_ID" ]; then
-        REV_ID="DISCONNECTED-WORK-COPY-COMPILATION-00000"
+        REV_ID="NON-TRACKED-WORK-COPY-COMPILATION-00000"
 fi
 
 echo "Revision number: ${REV_ID}"
@@ -91,14 +88,16 @@ BUILD_ID="${DATE}_${REV_ID}"
 echo "BUILD_ID: ${BUILD_ID}"
 export BUILD_ID
 
-MAKE_OPTS="-k -j4"
+MAKE_OPTS="-k "
 COMP_FLAGS=""
 
 CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf"
 CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_BUILD_TYPE=Debug "
 CMAKE_OPTS="$CMAKE_OPTS --graphviz=dependencies.dot"
 
+############################################################
 ###### Handy functions
+############################################################
 
 greetings () {
     say "${_ONHDR}==============================================================================="
@@ -111,7 +110,7 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -o ] [ -v ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -v ]"
     opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
@@ -123,7 +122,6 @@ usage () {
     say "  -b         Re-create PostsgreSQL system database"
     say "  -D DEF     Define compile macros"
     say "  -p         Processing-only node: do not compile QPF HMI"
-    say "  -o         Activate support for tests coverage analysis"
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
@@ -235,10 +233,12 @@ install_contrib () {
     fi
 }
 
+############################################################
 ###### Start
+############################################################
 
 ## Parse command line
-while getopts :hcinrbD:pow:H:P:I:v OPT; do
+while getopts :hcinrbD:pw:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -248,7 +248,6 @@ while getopts :hcinrbD:pow:H:P:I:v OPT; do
         b|+b) RECREATEDB="yes" ;;
         D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
-        o|+o) COV="yes" ;;
         w|+w) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
@@ -271,16 +270,17 @@ checkapp make
 checkapp psql
 
 searchlib Qt
-searchlib zmq
+#searchlib zmq
+searchlib nanomsg
 searchlib pcre2
-searchlib sodium
-searchlib curl
+#searchlib sodium
+#searchlib curl
 searchlib pq
 
 step "Ensuring contributions to COTS are properly installed"
 
-install_contrib cppzmq-master/zmq.hpp opt/zmq/include
-install_contrib pcre2/PCRegEx.h       opt/pcre2/include
+#install_contrib cppzmq-master/zmq.hpp opt/zmq/include
+#install_contrib pcre2/PCRegEx.h       opt/pcre2/include
 
 if [ "${VERBOSE}" == "yes" ]; then
     CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_VERBOSE_MAKEFILE=ON"
@@ -306,18 +306,11 @@ cd "${BUILD_PATH}"
 ## Generating dependencies and setting makefiles
 if [ "${REMOVE}" == "yes" ]; then
     step "Generating dependencies and setting makefiles"
-    cmakeopts="${CMAKE_OPTS}"
-    if [ "${COV}" == "yes" ]; then
-        cmakeopts="-D COV=ON ${cmakeopts}"
-    else
-        cmakeopts="-D COV=OFF ${cmakeopts}"
-    fi
     if [ "${HMI}" == "yes" ]; then
-        cmakeopts="-D HMI=ON ${cmakeopts}"
+        perform cmake -D HMI=ON ${CMAKE_OPTS} ..
     else
-        cmakeopts="-D HMI=OFF ${cmakeopts}"
+        perform cmake -D HMI=OFF ${CMAKE_OPTS} ..
     fi
-    perform cmake ${cmakeopts} ..
 fi
 
 ## Compiling source code
@@ -330,13 +323,18 @@ fi
 
 ## Setting up Work Area in /tmp
 if [ "${INSTALL}" == "yes" ]; then
-    step "Setting up Work Area under '${WORK_AREA}/qpf'"
+    step "Setting up Work Area under '${WORK_AREA}'"
 
-    if [ ! -d "${WORK_AREA}/qpf" ]; then
-         perform mkdir -p "'${WORK_AREA}/qpf'"
+    if [ ! -d "${WORK_AREA}" ]; then
+         perform mkdir -p "'${WORK_AREA}'"
     fi
 
-    perform tar xzCf "'${WORK_AREA}/qpf'" "'${QPF_WA_PKG}'"
+    if [ ! -d "${QPF_WA_TGTDIR}" ]; then
+         perform mkdir -p "'${QPF_WA_TGTDIR}'"
+    fi
+
+    #perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_SRCDIR}'"
+    perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/
 fi
 
 ## Installing QPF executable and libraries
@@ -390,7 +388,7 @@ if [ "${INSTALL}" == "yes" ]; then
             select opt in "${options[@]}"
             do
                 hip=$(echo "$opt"|cut -d" " -f 5)
-                if [ -z "$hip" ]; then
+                if [ -z "$ip" ]; then
                     echo "Invalid option"
                 else
                     echo "Selected option: $opt"
@@ -417,12 +415,8 @@ fi
 step "Setting up QPF database"
 
 if [ "${RECREATEDB}" == "yes" ]; then
-    QPF_DB_LOCATION="-h ${PSQL_HOST} -p ${PSQL_PORT}"
-
-    perform_dontexit psql postgres ${QPF_DB_LOCATION} -q -c "'DROP DATABASE qpfdb;'"
-
-    perform psql postgres ${QPF_DB_LOCATION} -q -c "'CREATE DATABASE qpfdb OWNER eucops;'"
-    perform psql qpfdb    ${QPF_DB_LOCATION} -q -f "'${QPF_SQ_SCPT}'" -o "'${LOG_FILE}.sqlout'"
+    perform bash ${SCRIPT_PATH}/InitializeDB.sh \
+            -h ${PSQL_HOST} -p ${PSQL_PORT} -o "'${LOG_FILE}.sqlout'"
 fi
 
 ## Finishing

@@ -10,7 +10,7 @@
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -40,14 +40,33 @@
 
 #include "deployer.h"
 
-#include "init.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
-#include <thread>
-#include <cerrno>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
-#define L(x) do { std::cerr << x << std::endl << std::flush; } while (0);
+#include "survey.h"
+#include "pubsub.h"
+#include "reqrep.h"
+#include "pipeline.h"
 
-#include <sys/stat.h>
+#include "message.h"
+#include "channels.h"
+#include "config.h"
+#include "str.h"
+#include "dbg.h"
+
+using Configuration::cfg;
+
+#define MINOR_SYNC_DELAY_MS    500
+
+#define DEFAULT_INITIAL_PORT   50000
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -55,21 +74,14 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
-
-#include <signal.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+//namespace QPF {
 
 Deployer * deployerCatcher;
 
 //----------------------------------------------------------------------
 // Ancillary signal handler
 //----------------------------------------------------------------------
-void signalCatcher(int s) 
+void signalCatcher(int s)
 {
     deployerCatcher->actionOnSigInt();
 }
@@ -77,34 +89,27 @@ void signalCatcher(int s)
 //----------------------------------------------------------------------
 // Constructor: Deployer
 //----------------------------------------------------------------------
-Deployer::Deployer(int argc, char *argv[]) :
-    spawnPeerProcesses(false),
-    waitingForSignalToGo(true),
-    verboseOutput(false),
-    usec(50000),
-    usecStart(1000000),
-    startDetached(false),
-    newConfigFile(std::string()),
-    configFile(0),
-    cfg(0),
-    evtMng(0),
-    hmiNeeded(false),
-    deploymentCompleted(false)
+Deployer::Deployer(int argc, char *argv[])
 {
-    //== Change value for delay between peer nodes launches (default: 50000us)
-    if (!processCmdLineOpts(argc, argv)) { exit(EXIT_FAILURE); }
+    // Get host info
+    getHostnameAndIp(currentHostName, currentHostAddr);
+    setInitialPort(DEFAULT_INITIAL_PORT);
 
-    //== Read Configuration 
-    if (!newConfigFile.empty()) { configFile = newConfigFile.c_str(); }
-    readConfig(configFile);
-    
+    //== Change value for delay between peer nodes launches (default: 50000us)
+    if ((!processCmdLineOpts(argc, argv)) || (cfgFileName.empty())) {
+        usage(EXIT_FAILURE);
+    }
+
+    //== ReadConfiguration
+    readConfiguration();
+
     //== Install signal handler
     deployerCatcher = this;
     installSignalHandlers();
 }
 
 //----------------------------------------------------------------------
-// Constructor: Deployer
+// Destructor: Deployer
 //----------------------------------------------------------------------
 Deployer::~Deployer()
 {
@@ -112,28 +117,52 @@ Deployer::~Deployer()
 
 //----------------------------------------------------------------------
 // Method: run
-// Minimal working example
-// The elements are launched and wait for the start from the
-// Event Manager.
-// Then the systems starts the normal operational cycle.
-// Current version of Event Manager takes external events from
-// the HMI (simulated external events)
+// Launches the system components and starts the system
 //----------------------------------------------------------------------
 int Deployer::run()
 {
-    //===== Prepare system for launch =====
-    prepareSystem();
+    // Greetings...
+    sayHello();
 
-    //===== Launch them =====
-    launchPeerNodes();
+    // System components creation and setup
+    createElementsNetwork();
 
-    //===== Start System =====
-    start();
+    // START!
+    delay(MINOR_SYNC_DELAY_MS);
+    synchro.notify();
 
-    //===== System cleanup at shutdown =====
-    cleanUp();
+    // FOREVER
+    delay(MINOR_SYNC_DELAY_MS);
+    synchro.wait();
 
+    // Bye, bye
+    INFO("Exiting...");
     return EXIT_SUCCESS;
+}
+
+//----------------------------------------------------------------------
+// Method: usage
+// Shows usage information
+//----------------------------------------------------------------------
+bool Deployer::usage(int code)
+{
+    Dbg::verbosityLevel = Dbg::INFO_LEVEL;
+
+    INFO("Usage: " << exeName << "  -c configFile "
+         "[ -p initialPort ] [-H hostName ] [ -I ipAddress ] [ -v ] [ -h ]\n"
+         "where:\n"
+         "\t-c cfgFile          System is reconfigured with configuration in\n"
+         "\t                    file cfgFile (configuration is then saved to DB).\n"
+         "\t-p initialPort      Set initial port for system set up (default:"
+         << DEFAULT_INITIAL_PORT << ").\n\n"
+         "\t-H hostName         Set the host name (by default the program takes\n"
+         "\t                    this information from the system).\n"
+         "\t-I IPaddress        Set the host IP address (by default the program takes\n"
+         "\t                    this information from the system).\n"
+         "\t-v                  Increases verbosity (default:silent operation).\n\n"
+         "\t-h                  Shows this help message.\n");
+
+    exit(code);
 }
 
 //----------------------------------------------------------------------
@@ -145,45 +174,30 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     bool retVal = true;
     int exitCode = EXIT_FAILURE;
 
+    exeName = std::string(argv[0]);
+
     int opt;
-    int delay;
-    while ((opt = getopt(argc, argv, "hpvt:c:m:s:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvp:c:H:I:")) != -1) {
         switch (opt) {
-        case 'p':
-            spawnPeerProcesses = true;
-            break;
         case 'v':
-            verboseOutput = true;
-            break;
-        case 't':
-            usec = (useconds_t)(atoi(optarg));
+            Dbg::verbosityLevel++;
             break;
         case 'c':
-            newConfigFile = std::string(optarg);
+            setConfigFile(std::string(optarg));
             break;
-        case 's':
-            delay = atoi(optarg);
-            if (delay < 0) {
-                delay = 0;
-                startDetached = true;
-            }
-            usecStart = (useconds_t)(delay);
+        case 'p':
+            setInitialPort(atoi(optarg));
+            break;
+        case 'H':
+            setCurrentHostName(std::string(optarg));
+            break;
+        case 'I':
+            setCurrentHostAddr(std::string(optarg));
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
         default: /* '?' */
-            L("Usage: " << argv[0] << " [-p] [-c configFile] [-t usecs] [-s delay] [-h]");
-            L("where:");
-            L("\t-p         Components are deployed as separate processes,");
-            L("\t           instead of threads.");
-            L("\t-c cfgFile System is reconfigured with configuration in");
-            L("\t           file cfgFile (configuration is then saved to DB).");
-            L("\t-t usecs   Number of microseconds of time lapse between ");
-            L("\t           components deployment (default: 50000us).");
-            L("\t-t usecs   Number of microseconds before the start signal is sent.");
-            L("\t           If < 0, the system waits for external event.");
-            L("\t-h         shows this help message.");
-            exit(exitCode);
+            usage(exitCode);
         }
     }
 
@@ -191,166 +205,193 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
 }
 
 //----------------------------------------------------------------------
-// Method: readConfig
-// Reads configuration file
+// Method: setConfigFile
+// Sets the name of the configuration file to be used
 //----------------------------------------------------------------------
-void Deployer::readConfig(const char * configFile)
+void Deployer::setConfigFile(std::string fName)
 {
-    // Check if the config file passed (if an actual file) does exits
-    if (strncmp(configFile, "db://", 5) != 0) {
-        struct stat fst;
-        if (stat(configFile, &fst) != 0) {
-            char msg[256];
-            sprintf(msg, "Trying to open config. file %s", configFile);
-            std::perror(msg);
-            exit(EXIT_FAILURE);            
-        }
+    cfgFileName = fName;
+}
+
+//----------------------------------------------------------------------
+// Method: setInitialPort
+// Sets the initial port for communications set up
+//----------------------------------------------------------------------
+void Deployer::setInitialPort(int port)
+{
+    initialPort = port;
+}
+
+//----------------------------------------------------------------------
+// Method: setCurrentHostName
+// Set the host name the current host
+//----------------------------------------------------------------------
+void Deployer::setCurrentHostName(std::string host)
+{
+    currentHostName = host;
+}
+
+//----------------------------------------------------------------------
+// Method: setCurrentHostAddr
+// Set the address (IP) of the current host
+//----------------------------------------------------------------------
+void Deployer::setCurrentHostAddr(std::string addr)
+{
+    currentHostAddr = addr;
+}
+
+//----------------------------------------------------------------------
+// Method: readConfiguration
+// Retrieves the configuration for the execution of the system (from
+// a disk file or from the internal database)
+//----------------------------------------------------------------------
+void Deployer::readConfiguration()
+{
+    // Initialize configuration
+    cfg.setCurrentHostAddress(currentHostAddr);
+    cfg.init(cfgFileName);
+    cfg.startingPort = initialPort;
+    cfg.generateProcFmkInfoStructure();
+
+    DBG("Master host: " << cfg.network.masterNode());
+    DBG("Current host: " << currentHostAddr << "/"
+        << cfg.currentHostAddr);
+    DBG("Running in a "
+        << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
+        << " Host.");
+
+    TRC(cfg.general.appName());
+    TRC(cfg.network.masterNode());
+    for (auto & kv : cfg.network.processingNodes()) {
+        TRC(kv.first << ": " << kv.second);
     }
-
-    cfg   = new Configuration(configFile);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
-    hmiNeeded = cfgInfo.hmiPresent;
+    //cfg.dump();
+    TRC("Config::PATHBase....: " << Config::PATHBase);
+    TRC("Config::PATHSession.: " << Config::PATHSession);
 
     // Ensure paths for the execution are available and readu
-    assert(existsDir(Configuration::PATHBase));
-    assert(existsDir(Configuration::PATHBin));
+    assert(existsDir(Config::PATHBase));
+    assert(existsDir(Config::PATHBin));
     std::vector<std::string> runPaths {
-                Configuration::PATHSession,
-                Configuration::PATHLog,
-                Configuration::PATHRlog,
-                Configuration::PATHTmp,
-                Configuration::PATHTsk,
-                Configuration::PATHMsg };
+            Config::PATHSession,
+            Config::PATHLog,
+            Config::PATHRlog,
+            Config::PATHTmp,
+            Config::PATHTsk,
+            Config::PATHMsg };
     for (auto & p : runPaths) {
-        if (mkdir(p.c_str(), Configuration::PATHMode) != 0) {
+        TRC(p);
+        if (mkdir(p.c_str(), Config::PATHMode) != 0) {
             std::perror(("mkdir " + p).c_str());
             exit(EXIT_FAILURE);
         }
     }
-    LibComm::Log::setLogBaseDir(Configuration::PATHSession);
+    Log::setLogBaseDir(Config::PATHLog);
 }
 
 //----------------------------------------------------------------------
-// Method: prepareSystem
-// Prepares environment and do initial checks
+// Method: delay
+// Waits for a small time lapse for system sync
 //----------------------------------------------------------------------
-void Deployer::prepareSystem()
+int Deployer::delay(int ms)
 {
-    L("Checking system . . .");
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
 
-    //-- Initial (quick and dirty) cleanup
-    removeOldFiles();
-    LibComm::Log::setConsoleOutput(verboseOutput);
-
-    //-- Check Docker is running
-    int status = system("docker info > /tmp/docker.nfo");
-    if (WEXITSTATUS(status) != 0) {
-        std::cerr << "ERROR: Docker service must be started!  Exiting." << std::endl;
-        exit(EXIT_FAILURE);
+//----------------------------------------------------------------------
+// Method: sayHello
+// Shows a minimal title and build id for the application
+//----------------------------------------------------------------------
+void Deployer::sayHello()
+{
+    std::string buildId(BUILD_ID);
+    if (buildId.empty()) {
+        char buf[20];
+        sprintf(buf, "%ld", (long)(time(0)));
+        buildId = std::string(buf);
     }
+
+    std::chrono::time_point<std::chrono::system_clock>
+        now = std::chrono::system_clock::now();
+    std::time_t end_time = std::chrono::system_clock::to_time_t(now);
+
+    const std::string hline("----------------------------------------"
+                            "--------------------------------------");
+    INFO(hline << '\n'
+         << " " << APP_NAME << " - " << APP_LONG_NAME << '\n'
+         << " " << APP_DATE << " - "
+         << APP_RELEASE << " Build " << buildId << '\n'
+         << " " << std::ctime(&end_time) << '\n'
+         << " Started at " << currentHostName
+         << " [" << currentHostAddr << "]\n"
+         << hline << std::endl);
 }
 
 //----------------------------------------------------------------------
-// Method: launchPeerNodes
-// Launches the different nodes execution, either by creating a new
-// thread or by spawning a new process
+// Method: getHostnameAndIp
+// Gets from the system the host name and ip address of the host
 //----------------------------------------------------------------------
-void Deployer::launchPeerNodes()
+void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    const int MaxHostNameLen = 100;
+    const int MaxAddrStringLen = 512;
+    char hostname[MaxHostNameLen];
+    char addrString[MaxAddrStringLen];
+    struct hostent * hostPtr = 0;
+    int errorNum;
 
-    L("Running as " << cfgInfo.currentUser << " @ " << cfgInfo.currentMachine);
+    // Get hostname from the system
+    gethostname(hostname, MaxHostNameLen);
 
-    // Launch all (as processes or as threads)
-    // Event Manager launched always as a thread
-    L("Launching nodes . . .");
-    for (unsigned int k = 0; k < cfgInfo.peerNodes.size(); ++k) {
-        Component * node = cfgInfo.peerNodes.at(k);
-        node->initialize();
-        L("   ====> Initialising " << node->selfPeer()->name);
-        usleep(usec);
-        if (node->selfPeer()->type == "evtmng") {
-            node->create();
-            evtMng = dynamic_cast<EventManager*>(node);
-            L("   ====> Creating " << node->selfPeer()->name);
-        } else {
-            if (spawnPeerProcesses) {
-                childrenPids.push_back(node->spawn(node));
-                L("   ====> Spawning " << node->selfPeer()->name);
-            } else {
-                node->create();
-                L("   ====> Creating " << node->selfPeer()->name);
+    // If necessary, get the domain to form the canonical name.
+    if (NULL == strchr(hostname, (int)'.')) {
+        int x;
+        hostPtr = gethostbyname(hostname);
+
+        if (!strchr(hostPtr->h_name, '.')) {
+            if (hostPtr->h_aliases) {
+                for (x = 0; hostPtr->h_aliases[x]; ++x) {
+                    if (strchr(hostPtr->h_aliases[x], '.') &&
+                        (!strncasecmp(hostPtr->h_aliases[x],
+                                      hostPtr->h_name,
+                                      strlen(hostPtr->h_name)))) {
+                        strcpy(hostname, hostPtr->h_aliases[x]);
+                    }
+                }
             }
+        } else {
+            strcpy(hostname, hostPtr->h_name);
         }
-        usleep(usec);
     }
 
-    deploymentCompleted = true;
-}
+    hName = std::string(hostname);
 
-//----------------------------------------------------------------------
-// Method: start
-// Starts the entire system execution
-//----------------------------------------------------------------------
-void Deployer::start()
-{
-    // Send the GO! signal
-    if (evtMng != 0) {
-        usleep(usecStart);
-        if (startDetached) {
-            L("Waiting for START signal . . .");
-            while (waitingForGoAhead()) { usleep(10000); }
-        }
-        L("GO!")
-        evtMng->go();
+    //hostPtr = getipnodebyname(hostname, AF_INET,
+    //                        (AI_ADDRCONFIG | AI_V4MAPPED), &errorNum);
+
+    struct addrinfo *ai;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET; /* IPv4 address family */
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = (AI_ADDRCONFIG | AI_V4MAPPED); //AI_DEFAULT;
+
+    if (getaddrinfo(hostname, NULL, &hints, &ai)) {
+        printf("getaddrinfo() failed\n");
+    } else {
+        //if (inet_ntop(ai->ai_family, ai->ai_addr, addrString, 512))
+        if (0 == getnameinfo(ai->ai_addr, sizeof(struct sockaddr),
+                             addrString, 512, NULL, 0, NI_NUMERICHOST))
+            ipAddr = std::string(addrString);
     }
-
-    L("Starting...");
-
-    while(true) {}
+    freeaddrinfo(ai);
 }
 
 //----------------------------------------------------------------------
-// Method: cleanUp
-// Removes any remaining children
+// Method: actionOnSigInt
+// Actions to be performed when capturing SigInt
 //----------------------------------------------------------------------
-void Deployer::cleanUp()
-{
-    // Kill remaining children
-    for (unsigned int i = 0; i < childrenPids.size(); ++i) {
-        kill(childrenPids.at(i), SIGTERM);
-    }
-    L("Exiting . . .");
-}
-
-//----------------------------------------------------------------------
-// Method: fexists
-// Checks that a file exists
-//----------------------------------------------------------------------
-bool Deployer::fexists(const char * name)
-{
-    struct stat buffer;
-    return (stat(name, &buffer) == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: waitingForGoAhead
-// Returns true if the "Go ahead" message (existence of a given file)
-// is received
-//----------------------------------------------------------------------
-bool Deployer::waitingForGoAhead()
-{
-    bool keepWaiting = !fexists(EvtMngGoFile);
-    if (!keepWaiting) { unlink(EvtMngGoFile); }
-    return keepWaiting;
-}
-
-//----------------------------------------------------------------------
-// Method: removeOldFiles
-// Removes old log and msg files
-//----------------------------------------------------------------------
-void Deployer::removeOldFiles()
+void Deployer::actionOnSigInt()
 {
 }
 
@@ -365,25 +406,266 @@ bool Deployer::existsDir(std::string pathName)
 }
 
 //----------------------------------------------------------------------
-// Method: actionOnSigInt
-// Actions to be performed when capturing SigInt
-//----------------------------------------------------------------------
-void Deployer::actionOnSigInt()
-{
-    evtMng->transitTo(LibComm::CommNode::RUNNING);
-}
-
-//----------------------------------------------------------------------
 // Method: installSignalHandlers
 // Install signal handlers
 //----------------------------------------------------------------------
 void Deployer::installSignalHandlers()
 {
-   sigIntHandler.sa_handler = signalCatcher;
-   sigemptyset(&sigIntHandler.sa_mask);
-   sigIntHandler.sa_flags = 0;
+    sigIntHandler.sa_handler = signalCatcher;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
 
-   sigaction(SIGINT, &sigIntHandler, NULL);
+    sigaction(SIGINT, &sigIntHandler, NULL);
 }
 
+//----------------------------------------------------------------------
+// createElementsNetwork
+//----------------------------------------------------------------------
+void Deployer::createElementsNetwork()
+{
+    //======================================================================
+    // 1. Gather host information
+    //======================================================================
+
+    MasterNodeElements & m = masterNodeElems;
+    std::vector<CommNode*>  & ag = agentsNodes;
+    std::string & thisHost = currentHostAddr;
+
+    masterAddress = cfg.network.masterNode();
+    isMasterHost = (thisHost == masterAddress);
+
+    TRC("MasterAddress is " << masterAddress);
+
+    //======================================================================
+    // 2. Create the elements and connections for the host we are running on
+    //======================================================================
+
+    // Agent names, hosts and ports (port range starts with initialPort)
+    const char * sAgName = 0;
+    std::vector<std::string> & agName    = cfg.agentNames;
+    //std::vector<std::string> & agHost    = cfg.agHost;
+    std::vector<int> &         agPortTsk = cfg.agPortTsk;
+
+    for (auto & a : agName) { TRC(" ===>> " << a); }
+    for (auto & ap : agPortTsk) { TRC(" ===>> " << ap); }
+
+    // Connection addresses and channel
+    std::string bindAddr;
+    std::string connAddr;
+
+    ChannelDescriptor chnl;
+
+    // Delta ports (deltas from initialPort)
+    const int PortEvtMng     = 1;
+    const int PortHMICmd     = 2;
+    const int PortTskRepDist = 3;
+
+    int j = 0;
+    
+    //=== If we are running on a processing host ==========================
+    if (! isMasterHost) {
+
+        //-----------------------------------------------------------------
+        // a. Fill agents vector with as agents for this host
+        //-----------------------------------------------------------------
+
+        int h = 1;
+        for (auto & kv : cfg.network.processingNodes()) {
+            int numOfTskAgents = kv.second;
+            if (thisHost == kv.first) {
+              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
+                    sAgName = agName.at(i).c_str();
+                    TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
+                    // By default, task agents are assumed to live in remote hosts
+                    tskag->setRemote(true);
+                    tskag->setSysDir(Config::PATHRun);
+                    tskag->setWorkDir(Config::PATHTsk);
+                    ag.push_back(tskag);
+                }
+            } else {
+              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
+                    ag.push_back(0);
+                }
+            }
+            ++h;
+        }
+
+        //-----------------------------------------------------------------
+        // b. Create Swarm Manager if serviceNodes is not empty and the
+        //    current host is the first in the list (Swam Manager)
+        //-----------------------------------------------------------------
+
+        for (auto & it : cfg.network.swarms()) {
+            sAgName = agName.at(j).c_str();
+            CfgGrpSwarm & swrm = it.second;
+            if ((thisHost == swrm.serviceNodes().at(0)) && (swrm.serviceNodes().size() > 0)) {
+                TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
+                serviceInfo->service    = swrm.name();
+                serviceInfo->serviceImg = swrm.image();
+                serviceInfo->scale      = swrm.scale();
+                serviceInfo->exe        = swrm.exec();
+                for (auto & a: swrm.args()) {
+                        serviceInfo->args.push_back(a);
+                }
+                ag.push_back(new TskAge(sAgName, thisHost, &synchro,
+                                        SERVICE, swrm.serviceNodes(),
+                                        serviceInfo));
+            } else {
+                ag.push_back(0);
+            }
+            ++h;
+            ++j;
+        }
+
+        //-----------------------------------------------------------------
+        // c. Create agent connections
+        //-----------------------------------------------------------------
+
+        // CHANNEL CMD - PUBSUB
+        // - Publisher: EvtMng
+        // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
+        chnl     = ChnlCmd;
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
+        connAddr = bindAddr;
+        for (auto & a : ag) {
+            if (a != 0) {
+                a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+            }
+        }
+
+        // CHANNEL EVTMNG Related - SURVEY
+        // - Surveyor: EvtMng
+        // - Respondent: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
+        chnl     = ChnlEvtMng;
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
+        connAddr = bindAddr;
+        for (auto & a : ag) {
+            if (a != 0) {
+                a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+            }
+        }
+
+        // CHANNEL TASK-PROCESSING - REQREP
+        // - Out/In: TskAge*/TskMng
+        // Note that this channel is used to send from TskAgents to TskManager:
+        // 1. Processing requests
+        // 2. Processing status reports
+        // 3. Processing completion messages
+        int j = 0;
+        for (auto & p : cfg.agPortTsk) {
+            if (ag.at(j) != 0) {
+                chnl = ChnlTskProc + "_" + agName.at(j);
+                TRC("### Connections for channel " << chnl);
+                connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+                ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            }
+            ++j;
+        }
+
+        return;
+    }
+
+    //=== Else, we are running on the master host =========================
+
+    //-----------------------------------------------------------------
+    // a. Create master node elements
+    //-----------------------------------------------------------------
+    m.evtMng = new EvtMng  ("EvtMng", masterAddress, &synchro);
+    m.datMng = new DataMng ("DatMng", masterAddress, &synchro);
+    m.logMng = new LogMng  ("LogMng", masterAddress, &synchro);
+    m.tskOrc = new TskOrc  ("TskOrc", masterAddress, &synchro);
+    m.tskMng = new TskMng  ("TskMng", masterAddress, &synchro);
+
+
+    //-----------------------------------------------------------------
+    // b. Create component connections
+    //-----------------------------------------------------------------
+
+    // CHANNEL CMD - PUBSUB
+    // - Publisher: EvtMng
+    // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
+    chnl     = ChnlCmd;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
+    connAddr = bindAddr;
+    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
+    // CHANNEL EVTMNG Related - SURVEY
+    // - Surveyor: EvtMng
+    // - Respondent: DataMng LogMng TskOrc TskMng TskAge*
+    chnl     = ChnlEvtMng;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
+    m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
+    connAddr = bindAddr;
+    std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
+    cs.insert(cs.end(), ag.begin(), ag.end());
+    for (auto & c : cs) {
+        if (c != 0) {
+            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        }
+    }
+
+    // CHANNEL HMICMD - REQREP
+    // - Out/In: QPFHMI/EvtMng
+    chnl     = ChnlHMICmd;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortHMICmd);
+    m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+
+    // CHANNEL INDATA -  PUBSUB
+    // - Publisher: EvtMng
+    // - Subscriber: DataMng TskOrc
+    chnl     = ChnlInData;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
+    // CHANNEL TASK-SCHEDULING - PUBSUB
+    // - Publisher: TskOrc
+    // - Subscriber: DataMng TskMng
+    chnl     = ChnlTskSched;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
+    // CHANNEL TASK-PROCESSING - REQREP
+    // - Out/In: TskAge*/TskMng
+    int k = 0;
+    for (auto & p : agPortTsk) {
+        chnl = ChnlTskProc + "_" + agName.at(k);
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+        m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+        ++k;
+    }
+
+    // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+    // - Publisher: TskMng
+    // - Subscriber: DataMng EvtMng QPFHMI
+    chnl     = ChnlTskRepDist;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist);
+    //bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
 }
+
+//}

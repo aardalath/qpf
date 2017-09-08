@@ -2,8 +2,9 @@
 # JSON - JSON Parsing Library
 #======================================================================
 # Library project file
-# Author: J C Gonzalez - 2015,2016,2017 
+# Author: J C Gonzalez - 2015, 2016
 #======================================================================
+include (../common.cmake)
 
 project (json)
 
@@ -15,9 +16,7 @@ set (jsonLib_hdr
   json/json-forwards.h)
 
 add_library (json SHARED ${jsonLib_src})
-
 install (TARGETS json
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
-

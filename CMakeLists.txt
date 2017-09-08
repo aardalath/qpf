@@ -3,52 +3,77 @@
 # QPF - Prototype of QLA Processing Framework
 # General Project File
 #======================================================================
-# Author: J C Gonzalez - 2015,2016,2017 
-# Copyright (C) 2015,2016,2017  Euclid SOC Team at ESAC
+# Author: J C Gonzalez - 2015-2017
+# Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
+cmake_minimum_required(VERSION 2.8)
+cmake_policy (SET CMP0015 OLD)
 
-#===== CMAKE Init. Section =====
-cmake_minimum_required (VERSION 2.8.11)
-#cmake_policy (SET CMP0046 NEW)
+include (common.cmake)
 
-#===== QPF =====
 project (QPF)
 
-set (PROJECT_NAME QPF)
+#== Get project version
+execute_process(
+  COMMAND awk -F\" "/APP_RELEASE/{print $2;}"
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  INPUT_FILE ./version.h
+  OUTPUT_VARIABLE VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (QPF_MAJOR 1)
-set (QPF_MINOR 0)
-set (QPF_PATCH 1)
+#== Get compilation date
+execute_process(
+  COMMAND date +%Y%m%d%H%M%S
+  OUTPUT_VARIABLE DATE
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (QPF_VERSION ${QPF_MAJOR}.${QPF_MINOR}.${QPF_PATCH})
-
-message (STATUS "Building QPF version ${QPF_VERSION}")
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
+#== Get BUILD_ID
 set (BUILD_ID $ENV{BUILD_ID})
+if ("${BUILD_ID}" STREQUAL "")
+  execute_process(
+    COMMAND svn info 
+    COMMAND grep Revision
+    COMMAND cut -d\  -f2
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE COMMIT_NUMBER
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set (BUILD_ID ${DATE}_${COMMIT_NUMBER})
+  message (STATUS "Build id generated from svn info")
+endif()
+
 add_definitions(-DBUILD_ID="${BUILD_ID}")
 
+message ("Building ${CMAKE_PROJECT_NAME} version ${VERSION}, with build id. ${BUILD_ID}")
+
+#== Define subprojects
+
+add_subdirectory (mongoose)
+
 add_subdirectory (json)
-add_subdirectory (sdc)
+add_subdirectory (nncomm)
+add_subdirectory (filehdl)
 add_subdirectory (infix)
-add_subdirectory (libcomm)
-add_subdirectory (src)
+add_subdirectory (log)
+add_subdirectory (str)
+add_subdirectory (tools)
+add_subdirectory (uuid)
+add_subdirectory (fmk)
 add_subdirectory (qpf)
 
 if (HMI)
-  message ("HMI component will be generated as well")
-  add_subdirectory (qpfgui)
+  message ("HMI component will be built . . .")
+  add_subdirectory (qpfhmi)
 endif()
 
-if (COV)
-  message ("Activated support for coverage analysis")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -Wall -fprofile-arcs -ftest-coverage")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
-  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+if (TESTS)
+  message ("Unitary tests will be compiled . . .")
+  add_subdirectory (tests)
 endif()
 
-add_subdirectory (tests)
+if (SAMPLES)
+  message ("Samples will be generated . . .")
+  add_subdirectory (sample)
+endif()
 
 #== CPack configuration
 set (CPACK_PACKAGE_VERSION_MAJOR ${QPF_MAJOR})

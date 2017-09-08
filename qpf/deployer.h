@@ -10,7 +10,7 @@
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -51,35 +51,31 @@
 //   - vector
 //   - fstream
 //------------------------------------------------------------
-
-#include <iostream>
-#include <atomic>
+#include <vector>
+#include <map>
+#include <csignal>
 
 //------------------------------------------------------------
 // Topic: External packages
 //   none
 //------------------------------------------------------------
 
-#include <signal.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
 //------------------------------------------------------------
 // Topic: Project headers
 //   none
 //------------------------------------------------------------
-
 #include "evtmng.h"
 #include "datamng.h"
 #include "logmng.h"
-#include "taskmng.h"
-#include "taskagent.h"
-#include "taskorc.h"
-#include "config.h"
-#include "tools.h"
+#include "tskorc.h"
+#include "tskmng.h"
+#include "tskage.h"
+
+#include "version.h"
+
+#ifndef BUILD_ID
+#define BUILD_ID ""
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -87,7 +83,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //==========================================================================
 // Class: Deployer
@@ -95,45 +91,21 @@ namespace QPF {
 class Deployer {
 
 public:
-
     //----------------------------------------------------------------------
     // Constructor: Deployer
     //----------------------------------------------------------------------
     Deployer(int argc, char *argv[]);
 
     //----------------------------------------------------------------------
-    // Destructor: ~Deployer
+    // Destructor: Deployer
     //----------------------------------------------------------------------
     ~Deployer();
 
     //----------------------------------------------------------------------
     // Method: run
-    // Minimal working example
-    // The elements are launched and wait for the start from the
-    // Event Manager.
-    // Then the systems starts the normal operational cycle.
-    // Current version of Event Manager takes external events from
-    // the HMI (simulated external events)
+    // Launches the system components and starts the system
     //----------------------------------------------------------------------
     int run();
-
-    //----------------------------------------------------------------------
-    // Method: mustLaunchHMI
-    // Returns true if the application must launch the HMI
-    //----------------------------------------------------------------------
-    bool mustLaunchHMI();
-
-    //----------------------------------------------------------------------
-    // Method: getConfigFileName
-    // Returns the name of the configuration file name used
-    //----------------------------------------------------------------------
-    char * getConfigFileName();
-
-    //----------------------------------------------------------------------
-    // Method: getConfigHandler
-    // Returns the configuration handler
-    //----------------------------------------------------------------------
-    Configuration * getConfigHandler();
 
     //----------------------------------------------------------------------
     // Method: actionOnSigInt
@@ -142,6 +114,11 @@ public:
     void actionOnSigInt();
 
 private:
+    //----------------------------------------------------------------------
+    // Method: usage
+    // Shows usage information
+    //----------------------------------------------------------------------
+    bool usage(int code);
 
     //----------------------------------------------------------------------
     // Method: processCmdLineOpts
@@ -150,60 +127,53 @@ private:
     bool processCmdLineOpts(int argc, char * argv[]);
 
     //----------------------------------------------------------------------
-    // Method: prepareSystem
-    // Prepares environment and do initial checks
+    // Method: setConfigFile
+    // Sets the name of the configuration file to be used
     //----------------------------------------------------------------------
-    void prepareSystem();
+    void setConfigFile(std::string fName);
 
     //----------------------------------------------------------------------
-    // Function: launchQPFHMI
-    // Launches (fork) HMI as a separate process
+    // Method: setInitialPort
+    // Sets the initial port for communications set up
     //----------------------------------------------------------------------
-    pid_t launchQPFHMI();
+    void setInitialPort(int port);
 
     //----------------------------------------------------------------------
-    // Function: readConfig
-    // Reads configuration file
+    // Method: setCurrentHostName
+    // Set the host name the current host
     //----------------------------------------------------------------------
-    void readConfig(const char * configFile = 0);
+    void setCurrentHostName(std::string host);
 
     //----------------------------------------------------------------------
-    // Function: launchPeerNodes
-    // Launches the different nodes execution, either by creating a new
-    // thread or by spawning a new process
+    // Method: setCurrentHostAddr
+    // Set the address (IP) of the current host
     //----------------------------------------------------------------------
-    void launchPeerNodes();
+    void setCurrentHostAddr(std::string addr);
 
     //----------------------------------------------------------------------
-    // Function: start
-    // Starts the entire system execution
+    // Method: readConfiguration
+    // Retrieves the configuration for the execution of the system (from
+    // a disk file or from the internal database);
     //----------------------------------------------------------------------
-    void start();
+    void readConfiguration();
 
     //----------------------------------------------------------------------
-    // Function: cleanUp
-    // Removes any remaining children
+    // Method: delay
+    // Waits for a small time lapse for system sync
     //----------------------------------------------------------------------
-    void cleanUp();
+    int delay(int ms);
 
     //----------------------------------------------------------------------
-    // Function: fexists
-    // Checks that a file exists
+    // Method: sayHello
+    // Shows a minimal title and build id for the application
     //----------------------------------------------------------------------
-    bool fexists(const char * name);
+    void sayHello();
 
     //----------------------------------------------------------------------
-    // Function: waitingForGoAhead
-    // Returns true if the "Go ahead" message (existence of a given file)
-    // is received
+    // Method: getHostnameAndIp
+    // Gets from the system the host name and ip address of the host
     //----------------------------------------------------------------------
-    bool waitingForGoAhead();
-
-    //----------------------------------------------------------------------
-    // Function: removeOldFiles
-    // Removes old log and msg files
-    //----------------------------------------------------------------------
-    void removeOldFiles();
+    void getHostnameAndIp(std::string & hName, std::string & ipAddr);
 
     //----------------------------------------------------------------------
     // Method: existsDir
@@ -217,90 +187,51 @@ private:
     //----------------------------------------------------------------------
     void installSignalHandlers();
 
+    //----------------------------------------------------------------------
+    // createElementsNetwork
+    //----------------------------------------------------------------------
+    void createElementsNetwork();
+
+    //----------------------------------------------------------------------
+    // generateProcFmkInfoStructure
+    //----------------------------------------------------------------------
+    void generateProcFmkInfoStructure();
+
 private:
-
-    //----------------------------------------------------------------------
-    // Flags: Execution options
-    //   spawnPeerProcesses - Used to create the components as processes
-    //                        instead of threads
-    //   waitingForSignalToGo - Control flag to start execution
-    //   verboseOutput - Controls if log messages are dumped to console
-    //----------------------------------------------------------------------
-    bool        spawnPeerProcesses;
-    bool        waitingForSignalToGo;
-    bool        verboseOutput;
-
-    //----------------------------------------------------------------------
-    // Variable: usec
-    // Time lapse in microseconds from the launch of one component until the
-    // launch of the next component
-    //----------------------------------------------------------------------
-    useconds_t  usec;
-
-    //----------------------------------------------------------------------
-    // Variable: usecStart
-    // Time lapse in microseconds before generating the GO signal
-    //----------------------------------------------------------------------
-    useconds_t  usecStart;
-
-    //----------------------------------------------------------------------
-    // Variable: startImmediately
-    // Flag to start only when an external source produces the GO event
-    //----------------------------------------------------------------------
-    bool startDetached;
-
-    //----------------------------------------------------------------------
-    // Variable: newConfigFile
-    // Holds the file name of the configuration file where the new configuration
-    // is stored (in case of reconfiguration, =-c newConfigFile= is used)
-    //----------------------------------------------------------------------
-    std::string newConfigFile;
-
-    //----------------------------------------------------------------------
-    // Variable: configFile
-    // Constant pointer to the name of the config.file, or zero if config.
-    // must be acquired from the central DB
-    //----------------------------------------------------------------------
-    const char * configFile;
-
-    //----------------------------------------------------------------------
-    // Variable: cfg
-    // Configuration object (pointer)
-    //----------------------------------------------------------------------
-    Configuration * cfg;
-
-    //----------------------------------------------------------------------
-    // Variable: childrenPids
-    // Vector with PIDs of deployer children commnodes
-    //----------------------------------------------------------------------
-    std::vector<pid_t> childrenPids;
-
-    //----------------------------------------------------------------------
-    // Variable: evtMng
-    // Pointer to the CommNode for the Event Manager (main component)
-    //----------------------------------------------------------------------
-    EventManager * evtMng;
-
-    //----------------------------------------------------------------------
-    // Variable: hmiNeeded
-    // Set to TRUE when the machine is the one hosting the HMI
-    //----------------------------------------------------------------------
-    bool hmiNeeded;
-
-    //----------------------------------------------------------------------
-    // Variable: deploymentCompleted
-    // Set to TRUE when the deployment (launch of nodes) is finished
-    //----------------------------------------------------------------------
-    bool deploymentCompleted;
-
     //----------------------------------------------------------------------
     // Variable: sigIntHandler
     // Standard structure for signal handling
     //----------------------------------------------------------------------
     struct sigaction sigIntHandler;
 
+private:
+    struct MasterNodeElements {
+        EvtMng  * evtMng;
+        DataMng * datMng;
+        LogMng  * logMng;
+        TskOrc  * tskOrc;
+        TskMng  * tskMng;
+    };
+
+    typedef MasterNodeElements * MasterNodeElementsPtr;
+
+    MasterNodeElements     masterNodeElems;
+    std::vector<CommNode*> agentsNodes;
+
+    Synchronizer           synchro;
+
+    std::string            cfgFileName;
+    std::string            currentHostAddr;
+    std::string            currentHostName;
+    int                    initialPort;
+
+    std::string            exeName;
+
+    std::string            masterAddress;
+    bool                   isMasterHost;
+
 };
 
-}
+//}
 
 #endif  /* DEPLOYER_H */

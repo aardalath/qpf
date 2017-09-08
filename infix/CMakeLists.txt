@@ -2,8 +2,9 @@
 # InFix - Simple Infix Expressions Evaluation Library
 #======================================================================
 # Library project file
-# Author: J C Gonzalez - 2015,2016,2017 
+# Author: J C Gonzalez - 2015-2017
 #======================================================================
+include (../common.cmake)
 
 project (infix)
 
@@ -17,4 +18,3 @@ install (TARGETS infix
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
-
