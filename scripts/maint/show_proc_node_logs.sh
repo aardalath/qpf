@@ -1,11 +1,9 @@
 #!/bin/bash
 
-QPFSYSDIR=/qpf
+QPFSYSDIR=${HOME}/qpf
 QPFRUNDIR=${QPFSYSDIR}/run
 
-year=2015
-
-lastRunPath=$(ls -drt ${QPFRUNDIR}/${year}* | tail -1)
+lastRunPath=$(ls -drt ${QPFRUNDIR}/2* | tail -1)
 
 if [ "$1" == "-r" ]; then
     logDir=${lastRunPath}/rlog
