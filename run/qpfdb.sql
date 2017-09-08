@@ -2,17 +2,22 @@
 -- File:     qpfdb.sql
 --           QPFDB PostgreSQL Database creation script
 --
--- Version:  1.2
+-- Version:  2.0
 --
--- Date:     2016/12/21
+-- Date:     2017/07/28
 --
 -- Author:   J C Gonzalez
 --
 -- Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+-- ----------------------------------------------------------------------
+-- Notes:
+-- . Dumped from database version 9.6.0
+-- . Dumped by pg_dump version 9.6.0
 -- ======================================================================
 
 SET statement_timeout = 0;
--- SET lock_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -40,7 +45,7 @@ SET default_with_oids = false;
 -- Name: alerts; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
 CREATE TYPE alert_group     AS ENUM ('System', 'Diagnostics');
 CREATE TYPE alert_severity  AS ENUM ('Warning', 'Error', 'Fatal');
-CREATE TYPE alert_type      AS ENUM ('Resource', 'OutOfRange', 'Diagnostic');
+CREATE TYPE alert_type      AS ENUM ('Resource', 'OutOfRange', 'Diagnostic', 'Comms');
 CREATE TYPE alert_vartype   AS ENUM ('INT', 'FLOAT', 'DOUBLE');
 CREATE TYPE alert_varvalue  AS (i integer, f float, d double precision);
 CREATE TYPE alert_variable  AS (
@@ -50,6 +55,13 @@ CREATE TYPE alert_variable  AS (
     ul     alert_varvalue,
     vtype  alert_vartype
 );
+
+ALTER TYPE alert_group    OWNER to eucops;
+ALTER TYPE alert_severity OWNER to eucops;
+ALTER TYPE alert_type     OWNER to eucops;
+ALTER TYPE alert_vartype  OWNER to eucops;
+ALTER TYPE alert_varvalue OWNER to eucops;
+ALTER TYPE alert_variable OWNER to eucops;
 
 CREATE TABLE alerts (
     alert_id   integer NOT NULL,
@@ -249,6 +261,11 @@ CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NISP', 'NIR', 'SIR', 'UNKNOWN
 CREATE TYPE prod_creator_enum     AS ENUM ('SOC_LE1', 'SOC_QLA_OPE', 'SOC_QLA_TEST');
 CREATE TYPE prod_status_enum      AS ENUM ('OK', 'NOTOK');
 CREATE TYPE prod_obsmode_enum     AS ENUM ('W', 'C', 'S', 'NOMINAL', 'TEST');
+
+ALTER TYPE prod_instrument_enum OWNER to eucops;
+ALTER TYPE prod_creator_enum    OWNER to eucops;
+ALTER TYPE prod_status_enum     OWNER to eucops;
+ALTER TYPE prod_obsmode_enum    OWNER to eucops;
 
 CREATE TABLE products_info (
     id integer NOT NULL,
@@ -459,6 +476,11 @@ ALTER TABLE pvc_id_seq OWNER TO eucops;
 ALTER SEQUENCE pvc_id_seq OWNED BY pvc.id;
 
 -- ======================================================================
+-- DATA
+-- ======================================================================
+
+-- ----------------------------------------------------------------------
+-- Data for Name: pvc; Type: TABLE DATA; Schema: public; Owner: eucops
 COPY pvc  (id, date, counter, version, name, comment) FROM stdin;
 1	2016-02-09 14:01:42	1	V0.1                            	LE1_Processor                   	First version of LE1_processor script, just for testing purposes
 2	2016-02-09 14:01:42	1	V1.0                            	QLA_Processor                   	First version of QLA_processor script, just for testing purposes
@@ -469,113 +491,7 @@ COPY pvc  (id, date, counter, version, name, comment) FROM stdin;
 \.
 
 -- ----------------------------------------------------------------------
--- Name: alert_id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY alerts ALTER COLUMN alert_id SET DEFAULT nextval('alerts_alert_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: qpfstate_id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY qpfstates ALTER COLUMN qpfstate_id SET DEFAULT nextval('qpfstates_qpfstate_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY products_info ALTER COLUMN id SET DEFAULT nextval('products_info_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY tasks_info ALTER COLUMN id SET DEFAULT nextval('tasks_info_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY transmissions ALTER COLUMN id SET DEFAULT nextval('transmissions_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
-ALTER TABLE ONLY icommands ALTER COLUMN id SET DEFAULT nextval('icommands_id_seq'::regclass);
-
--- ----------------------------------------------------------------------
--- Name: alerts_alert_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('alerts_alert_id_seq', 1, false);
-
--- ----------------------------------------------------------------------
--- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('qpfstates_qpfstate_id_seq', 1, false);
-
-
--- ----------------------------------------------------------------------
- -- Data for Name: creators; Type: TABLE DATA; Schema: public; Owner: eucops
--- COPY creators (creator_id, creator_desc) FROM stdin;
--- 1	SOC_LE1
--- 10	SOC_QLA.TEST
--- 11	SOC_QLA.OPE
--- \.
--- 
--- ----------------------------------------------------------------------
- -- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: eucops
--- COPY instruments (instrument_id, instrument) FROM stdin;
--- 1	VIS
--- 2	NIR
--- 3	SIR
--- -1	UNKNOWN_INST
--- \.
-
--- ----------------------------------------------------------------------
- -- Data for Name: message_type; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY message_type (message_type, type_desc) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
- -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY messages (id, message_id, message_type, origin, destination, message_version, creation_time, transmission_time, reception_time) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
--- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('messages_id_seq', 1, false);
-
--- ----------------------------------------------------------------------
- -- Data for Name: node_states; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY node_states (node_name, node_state) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
- -- Data for Name: observation_modes; Type: TABLE DATA; Schema: public; Owner: eucops
--- COPY observation_modes (obsmode_id, obsmode_desc) FROM stdin;
--- 1	NOMINAL
--- 2	TEST
--- \.
-
--- ----------------------------------------------------------------------
- -- Data for Name: product_status; Type: TABLE DATA; Schema: public; Owner: eucops
--- COPY product_status (product_status_id, status_desc) FROM stdin;
--- 0	OK
--- 1	NOTOK
--- \.
-
--- ----------------------------------------------------------------------
- -- Data for Name: products_info; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY products_info (id, product_id, product_type, product_version, product_size, product_status_id, creator_id, instrument_id, start_time, end_time, registration_time, url, signature, obsmode_id) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
--- Name: products_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('products_info_id_seq', 69106, true);
-
--- ----------------------------------------------------------------------
- -- Data for Name: task_inputs; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY task_inputs (task_id, product_id) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
- -- Data for Name: task_outputs; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY task_outputs (task_id, product_id) FROM stdin;
-\.
-
--- ----------------------------------------------------------------------
- -- Data for Name: task_status; Type: TABLE DATA; Schema: public; Owner: eucops
+-- Data for Name: task_status; Type: TABLE DATA; Schema: public; Owner: eucops
 COPY task_status (task_status_id, status_desc) FROM stdin;
 -1	FAILED
 0	FINISHED
@@ -585,163 +501,220 @@ COPY task_status (task_status_id, status_desc) FROM stdin;
 \.
 
 -- ----------------------------------------------------------------------
- -- Data for Name: tasks_info; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY tasks_info (id, task_id, task_status_id, task_exitcode, task_path, task_size, registration_time, start_time, end_time, task_data) FROM stdin;
-\.
+-- Data for Name: creators; Type: TABLE DATA; Schema: public; Owner: eucops
+-- COPY creators (creator_id, creator_desc) FROM stdin;
+-- 1	SOC_LE1
+-- 10	SOC_QLA.TEST
+-- 11	SOC_QLA.OPE
+-- \.
+
+-- ----------------------------------------------------------------------
+-- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: eucops
+-- COPY instruments (instrument_id, instrument) FROM stdin;
+-- 1	VIS
+-- 2	NIR
+-- 3	SIR
+-- -1	UNKNOWN_INST
+-- \.
+
+-- ----------------------------------------------------------------------
+-- Data for Name: observation_modes; Type: TABLE DATA; Schema: public; Owner: eucops
+-- COPY observation_modes (obsmode_id, obsmode_desc) FROM stdin;
+-- 1	NOMINAL
+-- 2	TEST
+-- \.
+
+-- ----------------------------------------------------------------------
+-- Data for Name: product_status; Type: TABLE DATA; Schema: public; Owner: eucops
+-- COPY product_status (product_status_id, status_desc) FROM stdin;
+-- 0	OK
+-- 1	NOTOK
+-- \.
+
+
+-- ======================================================================
+-- AUTO COUNTERS
+-- ======================================================================
+
+-- ----------------------------------------------------------------------
+-- Name: alert_id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY alerts 
+    ALTER COLUMN alert_id 
+    SET DEFAULT nextval('alerts_alert_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: qpfstate_id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY qpfstates 
+    ALTER COLUMN qpfstate_id 
+    SET DEFAULT nextval('qpfstates_qpfstate_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY messages 
+    ALTER COLUMN id 
+    SET DEFAULT nextval('messages_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY products_info 
+    ALTER COLUMN id 
+    SET DEFAULT nextval('products_info_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY tasks_info 
+    ALTER COLUMN id 
+    SET DEFAULT nextval('tasks_info_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY transmissions 
+    ALTER COLUMN id 
+    SET DEFAULT nextval('transmissions_id_seq'::regclass);
+
+-- ----------------------------------------------------------------------
+-- Name: id; Type: DEFAULT; Schema: public; Owner: eucops
+ALTER TABLE ONLY icommands 
+    ALTER COLUMN id 
+    SET DEFAULT nextval('icommands_id_seq'::regclass);
+
+-- ======================================================================
+-- INITIAL VALUES
+-- ======================================================================
+
+-- ----------------------------------------------------------------------
+-- Name: alerts_alert_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('alerts_alert_id_seq',       1, true);
+
+-- ----------------------------------------------------------------------
+-- Name: icommands_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('icommands_id_seq',          1, false);
+
+-- ----------------------------------------------------------------------
+-- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('messages_id_seq',           1, false);
+
+-- ----------------------------------------------------------------------
+-- Name: products_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('products_info_id_seq',      1, true);
+
+-- ----------------------------------------------------------------------
+-- Name: pvc_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('pvc_id_seq',                1, false);
+
+-- ----------------------------------------------------------------------
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
+SELECT pg_catalog.setval('qpfstates_qpfstate_id_seq', 1, true);
 
 -- ----------------------------------------------------------------------
 -- Name: tasks_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('tasks_info_id_seq', 22606, true);
-
--- ----------------------------------------------------------------------
- -- Data for Name: transmissions; Type: TABLE DATA; Schema: public; Owner: eucops
-COPY transmissions (id, msg_date, msg_from, msg_to, msg_type, msg_bcast, msg_content) FROM stdin;
-\.
+SELECT pg_catalog.setval('tasks_info_id_seq',         1, true);
 
 -- ----------------------------------------------------------------------
 -- Name: transmissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: eucops
-SELECT pg_catalog.setval('transmissions_id_seq', 928641, true);
+SELECT pg_catalog.setval('transmissions_id_seq',      1, true);
+
+-- ======================================================================
+-- KEYS
+-- ======================================================================
 
 -- ----------------------------------------------------------------------
--- Name: alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: alerts alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY alerts
-    ADD CONSTRAINT alerts_pkey
+    ADD CONSTRAINT alerts_pkey 
     PRIMARY KEY (alert_id);
 
 -- ----------------------------------------------------------------------
--- Name: qpfstates_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
-ALTER TABLE ONLY qpfstates
-ADD CONSTRAINT qpfstates_pkey
-    PRIMARY KEY (qpfstate_id);
-
--- ----------------------------------------------------------------------
--- Name: configuration_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: configuration configuration_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY configuration
-    ADD CONSTRAINT configuration_pkey
+    ADD CONSTRAINT configuration_pkey 
     PRIMARY KEY (created);
 
 -- ----------------------------------------------------------------------
--- Name: creators_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
--- ALTER TABLE ONLY creators
---     ADD CONSTRAINT creators_pkey
---     PRIMARY KEY (creator_id);
-
--- ----------------------------------------------------------------------
--- Name: instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
--- ALTER TABLE ONLY instruments
---     ADD CONSTRAINT instruments_pkey
---     PRIMARY KEY (instrument_id);
-
--- ----------------------------------------------------------------------
--- Name: message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: message_type message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY message_type
-    ADD CONSTRAINT message_type_pkey
+    ADD CONSTRAINT message_type_pkey 
     PRIMARY KEY (message_type);
 
 -- ----------------------------------------------------------------------
--- Name: messages_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: messages messages_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY messages
-    ADD CONSTRAINT messages_pkey
+    ADD CONSTRAINT messages_pkey 
     PRIMARY KEY (id, message_id, message_type, origin, destination);
 
 -- ----------------------------------------------------------------------
--- Name: node_states_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: node_states node_states_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY node_states
-    ADD CONSTRAINT node_states_pkey
+    ADD CONSTRAINT node_states_pkey 
     PRIMARY KEY (node_name);
 
 -- ----------------------------------------------------------------------
--- Name: observation_modes_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
--- ALTER TABLE ONLY observation_modes
---     ADD CONSTRAINT observation_modes_pkey
---     PRIMARY KEY (obsmode_id);
-
--- ----------------------------------------------------------------------
--- Name: product_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
--- ALTER TABLE ONLY product_status
---     ADD CONSTRAINT product_status_pkey
---     PRIMARY KEY (product_status_id);
-
--- ----------------------------------------------------------------------
--- Name: products_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: products_info products_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY products_info
-    ADD CONSTRAINT products_info_pkey
+    ADD CONSTRAINT products_info_pkey 
     PRIMARY KEY (product_id);
 
 -- ----------------------------------------------------------------------
--- Name: task_inputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: qpfstates qpfstates_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
+ALTER TABLE ONLY qpfstates
+    ADD CONSTRAINT qpfstates_pkey 
+    PRIMARY KEY (qpfstate_id);
+
+-- ----------------------------------------------------------------------
+-- Name: task_inputs task_inputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY task_inputs
-    ADD CONSTRAINT task_inputs_pkey
+    ADD CONSTRAINT task_inputs_pkey 
     PRIMARY KEY (task_id, product_id);
 
 -- ----------------------------------------------------------------------
--- Name: task_outputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: task_outputs task_outputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY task_outputs
-    ADD CONSTRAINT task_outputs_pkey
+    ADD CONSTRAINT task_outputs_pkey 
     PRIMARY KEY (task_id, product_id);
 
 -- ----------------------------------------------------------------------
--- Name: task_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: task_status task_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY task_status
-    ADD CONSTRAINT task_status_pkey
+    ADD CONSTRAINT task_status_pkey 
     PRIMARY KEY (task_status_id);
 
 -- ----------------------------------------------------------------------
--- Name: tasks_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: tasks_info tasks_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY tasks_info
-    ADD CONSTRAINT tasks_info_pkey
+    ADD CONSTRAINT tasks_info_pkey 
     PRIMARY KEY (task_id);
 
 -- ----------------------------------------------------------------------
--- Name: transmissions_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops; Tablespace:
+-- Name: transmissions transmissions_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY transmissions
-    ADD CONSTRAINT transmissions_pkey
+    ADD CONSTRAINT transmissions_pkey 
     PRIMARY KEY (id);
 
 -- ----------------------------------------------------------------------
--- Name: products_info_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
--- ALTER TABLE ONLY products_info
---     ADD CONSTRAINT products_info_creator_id_fkey
---     FOREIGN KEY (creator_id)
---     REFERENCES creators(creator_id);
-
--- ----------------------------------------------------------------------
--- Name: products_info_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
--- ALTER TABLE ONLY products_info
---     ADD CONSTRAINT products_info_instrument_id_fkey
---     FOREIGN KEY (instrument_id)
---     REFERENCES instruments(instrument_id);
-
--- ----------------------------------------------------------------------
--- Name: products_info_product_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
--- ALTER TABLE ONLY products_info
---     ADD CONSTRAINT products_info_product_status_id_fkey
---     FOREIGN KEY (product_status_id)
---     REFERENCES product_status(product_status_id);
-
--- ----------------------------------------------------------------------
--- Name: task_inputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
+-- Name: task_inputs task_inputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY task_inputs
-    ADD CONSTRAINT task_inputs_task_id_fkey
-    FOREIGN KEY (task_id)
+    ADD CONSTRAINT task_inputs_task_id_fkey 
+    FOREIGN KEY (task_id) 
     REFERENCES tasks_info(task_id);
 
 -- ----------------------------------------------------------------------
--- Name: task_outputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
+-- Name: task_outputs task_outputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY task_outputs
-    ADD CONSTRAINT task_outputs_task_id_fkey
-    FOREIGN KEY (task_id)
+    ADD CONSTRAINT task_outputs_task_id_fkey 
+    FOREIGN KEY (task_id) 
     REFERENCES tasks_info(task_id);
 
 -- ----------------------------------------------------------------------
--- Name: tasks_info_task_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
+-- Name: tasks_info tasks_info_task_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY tasks_info
-    ADD CONSTRAINT tasks_info_task_status_id_fkey
-    FOREIGN KEY (task_status_id)
+    ADD CONSTRAINT tasks_info_task_status_id_fkey 
+    FOREIGN KEY (task_status_id) 
     REFERENCES task_status(task_status_id);
 
--- ----------------------------------------------------------------------
--- Name: public; Type: ACL; Schema: -; Owner: eucops
+-- ======================================================================
+-- FINAL PERMISSIONS
+-- ======================================================================
+
 GRANT ALL ON SCHEMA public TO PUBLIC;
 GRANT ALL ON SCHEMA public TO eucops;
 
