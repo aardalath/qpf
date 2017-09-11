@@ -89,6 +89,7 @@ echo "BUILD_ID: ${BUILD_ID}"
 export BUILD_ID
 
 MAKE_OPTS="-k "
+BUILD_FLAGS=""
 COMP_FLAGS=""
 
 CMAKE_OPTS="-D CMAKE_INSTALL_PREFIX:PATH=${WORK_AREA}/qpf"
@@ -110,8 +111,8 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -p ] [ -v ]"
-    opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -D def ] [ -p ]"
+    opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ] [ -v ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
     say "  -h         Show this usage message"
@@ -120,6 +121,7 @@ usage () {
     say "  -n         Show the actions without executing them"
     say "  -r         Clear previous build"
     say "  -b         Re-create PostsgreSQL system database"
+    say "  -B DEF     Define build macros"
     say "  -D DEF     Define compile macros"
     say "  -p         Processing-only node: do not compile QPF HMI"
     say "  -w <path>  Folder to locate QPF working area (default:HOME)"
@@ -238,7 +240,7 @@ install_contrib () {
 ############################################################
 
 ## Parse command line
-while getopts :hcinrbD:pw:H:P:I:v OPT; do
+while getopts :hcinrbB:D:pw:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -246,6 +248,7 @@ while getopts :hcinrbD:pw:H:P:I:v OPT; do
         n|+n) FAKE="yes" ;;
         r|+r) REMOVE="yes" ;;
         b|+b) RECREATEDB="yes" ;;
+        B|+B) BUILD_FLAGS="${BUILD_FLAGS} -D $OPTARG" ;;
         D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
         w|+w) WORK_AREA="$OPTARG" ;;
@@ -281,6 +284,8 @@ step "Ensuring contributions to COTS are properly installed"
 
 #install_contrib cppzmq-master/zmq.hpp opt/zmq/include
 #install_contrib pcre2/PCRegEx.h       opt/pcre2/include
+
+CMAKE_OPTS="$CMAKE_OPTS $BUILD_FLAGS"
 
 if [ "${VERBOSE}" == "yes" ]; then
     CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_VERBOSE_MAKEFILE=ON"
