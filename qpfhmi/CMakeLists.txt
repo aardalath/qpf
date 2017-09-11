@@ -143,8 +143,6 @@ add_library (qpfGuiLib SHARED
 target_link_libraries (qpfGuiLib Qt5::Widgets Qt5::Sql Qt5::Network Qt5::Xml) # Qt5::WebKit Qt5::WebKitWidgets)
 #qt5_use_modules(qpfGuiLib Widgets Sql Network Xml WebKit)
 target_include_directories (qpfGuiLib PUBLIC .
-  ${PSQLINCDIR}
-  ${NNMSG_ROOT_DIR}/include
   ${JSON_ROOT_DIR}
   ${INFIX_ROOT_DIR}
   ${NNCOMM_ROOT_DIR}
@@ -153,14 +151,14 @@ target_include_directories (qpfGuiLib PUBLIC .
   ${LOG_ROOT_DIR}
   ${UUID_ROOT_DIR}
   ${FMK_ROOT_DIR}
-  ${PCRE2LIBDIR}
-  ${PSQLLIBDIR})
+  ${NNMSGINCDIR}
+  ${PCRE2INCDIR}
+  ${UUIDINCDIR}
+  ${PSQLINCDIR})
 
 add_executable(qpfgui ${qpfGuiBin_src})
 add_dependencies (qpfgui qpfGuiLib)
 target_include_directories (qpfgui PUBLIC .
-    ${PSQLINCDIR}
-  ${NNMSG_ROOT_DIR}/include
   ${JSON_ROOT_DIR}
   ${INFIX_ROOT_DIR}
   ${NNCOMM_ROOT_DIR}
@@ -169,8 +167,10 @@ target_include_directories (qpfgui PUBLIC .
   ${LOG_ROOT_DIR}
   ${UUID_ROOT_DIR}
   ${FMK_ROOT_DIR}
-  ${PCRE2LIBDIR}
-  ${PSQLLIBDIR})
+  ${NNMSGINCDIR}
+  ${PCRE2INCDIR}
+  ${UUIDINCDIR}
+  ${PSQLINCDIR})
 target_link_libraries (qpfgui qpfGuiLib 
   json infix str log tools uuid fmk nncomm
   nanomsg ${PCRE2LIB} ${PSQLLIB} pthread)

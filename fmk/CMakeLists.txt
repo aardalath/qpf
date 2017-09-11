@@ -64,8 +64,6 @@ set (libfmk_src
 
 add_library(fmk SHARED ${libfmk_src})
 target_include_directories (fmk PUBLIC .
-  ${PSQLINCDIR}
-  ${NNMSG_ROOT_DIR}/include
   ${JSON_ROOT_DIR}
   ${INFIX_ROOT_DIR}
   ${NNCOMM_ROOT_DIR}
@@ -75,8 +73,10 @@ target_include_directories (fmk PUBLIC .
   ${UUID_ROOT_DIR}
   ${FILEHDL_ROOT_DIR}
   ${FMK_ROOT_DIR}
-  ${PCRE2LIBDIR}
-  ${PSQLLIBDIR}
+  ${NNMSGINCDIR}
+  ${PCRE2INCDIR}
+  ${PSQLINCDIR}
+  ${UUIDINCDIR}
   ${MONGOOSEDIR})
 target_link_libraries (fmk
   json filehdl infix str log tools uuidxx nncomm

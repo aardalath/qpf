@@ -35,6 +35,8 @@ if ("${COTSDIR}" STREQUAL "")
   endif()
   
 else()
+
+  message ("Using a custom COTSDIR = ${COTSDIR}")
   
   set (NNMSG_ROOT_DIR ${COTSDIR}/nanomsg)
   set (NNMSGINCDIR ${NNMSG_ROOT_DIR}/include)
@@ -46,9 +48,9 @@ else()
   
   set (PCRE2_ROOT_DIR ${COTSDIR}/pcre2)
   set (PCRE2INCDIR ${PCRE2_ROOT_DIR}/include)
-  set (PCRE2LIBDIR ${PCRE2_ROOT_DIR}/lib64)
+  set (PCRE2LIBDIR ${PCRE2_ROOT_DIR}/lib)
   
-  set (PSQL_ROOT_DIR ${COTSDIR}/uuid)
+  set (PSQL_ROOT_DIR ${COTSDIR}/pgsql)
   set (PSQLINCDIR ${PSQL_ROOT_DIR}/include)
   set (PSQLLIBDIR ${PSQL_ROOT_DIR}/lib)
 
