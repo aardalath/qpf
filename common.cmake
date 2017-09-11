@@ -13,25 +13,49 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #===== COTS =====
 
-set (NNMSG_ROOT_DIR /usr/local)
-#set (NNMSG_ROOT_DIR /Users/jcgonzalez/ws/nanomsg/cots/nanomsg-1.0.0/src)
+if ("${COTSDIR}" STREQUAL "")
 
-set (UUIDINCDIR /usr/include)
-set (UUIDLIBDIR /usr/lib64)
-set (UUIDLIB uuidxx)
+  set (NNMSG_ROOT_DIR /usr/local)
+  set (NNMSGINCDIR ${NNMSG_ROOT_DIR}/include)
+  set (NNMSGLIBDIR ${NNMSG_ROOT_DIR}/lib)
 
-set (PCRE2INCDIR /usr/include)
-set (PCRE2LIBDIR /usr/lib64)
-set (PCRE2LIB pcre2-posix)
-
-if (EXISTS /usr/pgsql-9.6)
-  set (PSQLDIR /usr/pgsql-9.6)
-  set (PSQLLIBDIR ${PSQLDIR}/lib)
-  set (PSQLINCDIR ${PSQLDIR}/include)
+  set (UUIDINCDIR /usr/include)
+  set (UUIDLIBDIR /usr/lib64)
+  
+  set (PCRE2INCDIR /usr/include)
+  set (PCRE2LIBDIR /usr/lib64)
+  
+  if (EXISTS /usr/pgsql-9.6)
+    set (PSQLDIR /usr/pgsql-9.6)
+    set (PSQLLIBDIR ${PSQLDIR}/lib)
+    set (PSQLINCDIR ${PSQLDIR}/include)
+  else()
+    set (PSQLLIBDIR /usr/lib/x86_64-linux-gnu)
+    set (PSQLINCDIR /usr/include/postgresql)
+  endif()
+  
 else()
-  set (PSQLLIBDIR /usr/lib/x86_64-linux-gnu)
-  set (PSQLINCDIR /usr/include/postgresql)
+  
+  set (NNMSG_ROOT_DIR ${COTSDIR}/nanomsg)
+  set (NNMSGINCDIR ${NNMSG_ROOT_DIR}/include)
+  set (NNMSGLIBDIR ${NNMSG_ROOT_DIR}/lib64)
+
+  set (UUID_ROOT_DIR ${COTSDIR}/uuid)
+  set (UUIDINCDIR ${UUID_ROOT_DIR}/include)
+  set (UUIDLIBDIR ${UUID_ROOT_DIR}/lib)
+  
+  set (PCRE2_ROOT_DIR ${COTSDIR}/pcre2)
+  set (PCRE2INCDIR ${PCRE2_ROOT_DIR}/include)
+  set (PCRE2LIBDIR ${PCRE2_ROOT_DIR}/lib64)
+  
+  set (PSQL_ROOT_DIR ${COTSDIR}/uuid)
+  set (PSQLINCDIR ${PSQL_ROOT_DIR}/include)
+  set (PSQLLIBDIR ${PSQL_ROOT_DIR}/lib)
+
 endif()
+
+set (PCRE2LIB pcre2-posix)
+set (UUIDLIB uuidxx)
 set (PSQLLIB pq)
 
 #===== Project libraries =====
@@ -54,7 +78,10 @@ set (MONGOOSEDIR      ${PWD}/mongoose)
 #==== Common directives
 
 link_directories (
-  ${NNMSG_ROOT_DIR}/lib
+  ${NNMSGLIBDIR}
+  ${UUIDLIBDIR}
+  ${PCRE2LIBDIR}
+  ${PSQLLIBDIR}
   ${NNCOMM_ROOT_DIR}
   ${FILEHDL_ROOT_DIR}
   ${FMK_ROOT_DIR}
@@ -64,6 +91,4 @@ link_directories (
   ${INFIX_ROOT_DIR}
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
-  ${PCRE2LIBDIR}
-  ${PSQLLIBDIR}
 )
