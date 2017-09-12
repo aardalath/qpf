@@ -268,11 +268,13 @@ greetings
 ## Checking required applications and libraries are installed
 step "Checking required applications and libraries are installed"
 
-checkapp qmake
+#checkapp qmake
 checkapp make
 checkapp psql
 
-searchlib Qt
+if [ "${HMI}" == "yes" ]; then
+    searchlib Qt
+fi
 #searchlib zmq
 searchlib nanomsg
 searchlib pcre2
