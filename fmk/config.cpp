@@ -105,7 +105,6 @@ void Config::init(std::string fName)
     TRC("Provided fName='" << fName << "'");
     if (fName.compare(0,5,"db://") == 0) {
         TRC("A database URL!");
-
         // fName in fact is a db url in the form:
         //   db://user:pwd@host:port/dbname
         // So, take the fields
@@ -115,22 +114,17 @@ void Config::init(std::string fName)
         DBHost = url.substr(0, url.find(":")); url.erase(0, url.find(":") + 1); // take host
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
-
         TRC(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
-        fName = ""; // clear filename, to read from DB
-    }
-
-    if (! fName.empty()) {
+        TRC("Configuration is retrieved from db: " << fName);
+        readConfigFromDB();
+        isActualFile = false;
+    } else {
         TRC("Configuration is retrieved from file: " << fName);
         setConfigFile(fName);
         readConfigFromFile();
         if (weAreOnMaster) { saveConfigToDB(); }
         isActualFile = true;
-    } else {
-        TRC("Configuration is retrieved from db: " << fName);
-        readConfigFromDB();
-        isActualFile = false;
     }
 
     isLive = true;
@@ -224,7 +218,6 @@ void Config::readConfigFromFile()
     buffer << cfgFile.rdbuf();
     TRC("CONFIG FROM FILE:\n" + buffer.str());
     fromStr(buffer.str());
-    fillData();
 }
 
 //----------------------------------------------------------------------
@@ -404,6 +397,8 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
+    fillData();
+    
     PATHBase    = general.workArea();
 
     PATHData    = PATHBase + "/data";
