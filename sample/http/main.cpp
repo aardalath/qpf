@@ -52,12 +52,12 @@ int main(int argc, char * argv[])
 
     cfg.init(std::string(argv[1]));
     Log::setLogBaseDir(Config::PATHSession);
-
+    
     // Launch the HTTP Server for Docker Swarm Services, and to
     // serve information through HTML pages. We activate the service to
     // provide data files only if we do really need it (swarm services)
     HttpServer * httpSrv = new HttpServer("httpSrv", "localhost:8080", true);
-
+    
     for (;;) {}
 
     return 0;

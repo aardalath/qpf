@@ -105,7 +105,7 @@ void TskMng::fromRunningToOperational()
     // serve information through HTML pages. We activate the service to
     // provide data files only if we do really need it (swarm services)
     httpSrv = new HttpServer("httpSrv",
-                             "cfg.network.httpServerAddress()",
+                             "localhost:8080", //"cfg.network.httpServerAddress()",
                              cfg.network.swarms().size() > 0);
 
     // Deactivate sending ProcessingFrameworkInfo updates
