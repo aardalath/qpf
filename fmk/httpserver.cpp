@@ -60,7 +60,7 @@ using Configuration::cfg;
 // Constructor
 //----------------------------------------------------------------------
 HttpServer::HttpServer(const char * name, const char * addr, bool serveFiles)
-    : Component(name, addr, 0), enableSwarmRequests(serveFiles), server(0)
+    : Component(name, "", 0), enableSwarmRequests(serveFiles), server(0)
 {
 }
 
@@ -68,7 +68,7 @@ HttpServer::HttpServer(const char * name, const char * addr, bool serveFiles)
 // Constructor
 //----------------------------------------------------------------------
 HttpServer::HttpServer(std::string name, std::string addr, bool serveFiles)
-    : Component(name, addr, 0), enableSwarmRequests(serveFiles)
+    : Component(name, "", 0), enableSwarmRequests(serveFiles)
 {
 }
 
@@ -92,7 +92,7 @@ void HttpServer::info(Request &request, StreamResponse &response)
 "<html>"
 "  <head>"
 "    <title>Your Home Page</title>"
-"    <script>"
+"    <style>"
 "      body {"
 "        margin:20px 10px 0px 10px;"
 "        padding:0px;"
@@ -256,7 +256,7 @@ void HttpServer::info(Request &request, StreamResponse &response)
 "        border-right: 1px dotted #ccc;"
 "        border-bottom: 1px dotted #ccc;"
 "      }"
-"    </script>"
+"    </style>"
 "  </head>"
 "  <body>"
 "    <div id=\"right1\">"
@@ -422,6 +422,8 @@ void HttpServer::setup()
     // File upload demo
     addRoute("GET",  "/upload",    HttpServer, uploadForm);
     addRoute("POST", "/upload",    HttpServer, uploadFormExecute);
+
+    run();
 }
 
 //----------------------------------------------------------------------
@@ -440,16 +442,15 @@ void HttpServer::fromRunningToOperational()
     server->start();
 
     InfoMsg("Server started, routes:");
-    std::map<string, RequestHandlerBase *>::iterator it;
+    std::map<std::string, RequestHandlerBase *>::iterator it;
     for (it=routes.begin(); it!=routes.end(); it++) {
-        InfoMsg("- " << (*it).first);
+        InfoMsg("- " + (*it).first);
     }
     
     this->dumpRoutes();
     
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
-    
 }
 
 //----------------------------------------------------------------------

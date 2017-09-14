@@ -114,9 +114,11 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     transitTo(INITIALISED);
     InfoMsg("New state: " + getStateName(getState()));
 
-    TRC("Creating thread for " << compName << " in " << compAddress);
-    thrId = std::thread(&Component::run, this);
-    thrId.detach();
+    if (! compAddress.empty()) {
+      TRC("Creating thread for " << compName << " in " << compAddress);
+      thrId = std::thread(&Component::run, this);
+      thrId.detach();
+    }
 }
 
 //----------------------------------------------------------------------
