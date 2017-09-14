@@ -63,6 +63,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <sys/syslimits.h>
+#include <ftw.h>
+
 //namespace LibComm {
 
 template<class T>
@@ -226,6 +229,44 @@ std::vector<double> getLoadAvgs()
     }
 }
 
+//----------------------------------------------------------------------
+// Function: rmItem
+// Removes file or folder, calling unlink or rmdir
+//----------------------------------------------------------------------
+int rmItem(const char *path, const struct stat *s, int flag, struct FTW *f)
+{
+    int status;
+    int (*rm_func)( const char * );
+
+    switch (flag) {
+    case FTW_DP: rm_func = rmdir;
+    default:     rm_func = unlink; break;
+    }
+    if (status = rm_func(path), status != 0) {
+        perror(path);
+    } else {
+        puts(path);
+    }
+    return status;
+}
+
+//----------------------------------------------------------------------
+// Function: rm
+// Removes a file or a folder
+//----------------------------------------------------------------------
+bool rm(const char * name)
+{
+    if (nftw(name, rmItem, OPEN_MAX, FTW_DEPTH)) {
+        perror(name);
+        return false;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------
+// Function: getUptime
+// Returns the uptime in number of seconds
+//----------------------------------------------------------------------
 int getUptime()
 {
    double uptime = 0;
@@ -238,6 +279,10 @@ int getUptime()
    return (int) floor(uptime);
 }
 
+//----------------------------------------------------------------------
+// Function: scanMemoryInfo
+// Returns memory statistics
+//----------------------------------------------------------------------
 bool scanMemoryInfo(MemData & memData)
 {
     unsigned long long int swapFree = 0;

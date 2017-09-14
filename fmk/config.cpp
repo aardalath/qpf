@@ -405,6 +405,8 @@ void Config::processConfig()
 
     PATHRun     = PATHBase + "/run";
 
+    PATHWww     = PATHBase + "/www";
+    
     PATHBin     = PATHRun + "/bin";
     PATHSession = PATHRun + "/" + sessionId;
 

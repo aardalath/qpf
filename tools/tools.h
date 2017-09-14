@@ -154,6 +154,18 @@ void setDebugInfo(bool enable = true);
 //----------------------------------------------------------------------
 bool getDebugInfo();
 
+//----------------------------------------------------------------------
+// Function: rmItem
+// Removes file or folder, calling unlink or rmdir
+//----------------------------------------------------------------------
+int rmItem(const char *path, const struct stat *s, int flag, struct FTW *f);
+
+//----------------------------------------------------------------------
+// Function: rm
+// Removes a file or a folder
+//----------------------------------------------------------------------
+bool rm(const char * name);
+
 struct CPUData {
    unsigned long long int totalTime;
    unsigned long long int userTime;

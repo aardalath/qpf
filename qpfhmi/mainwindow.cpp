@@ -354,6 +354,7 @@ void MainWindow::readConfig(QString dbUrl)
 
     std::vector<std::string> runPaths {
         Config::PATHSession,
+            Config::PATHWww,
             Config::PATHLog,
             Config::PATHRlog,
             Config::PATHTmp,

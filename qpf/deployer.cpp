@@ -272,8 +272,10 @@ void Deployer::readConfiguration()
     // Ensure paths for the execution are available and readu
     assert(existsDir(Config::PATHBase));
     assert(existsDir(Config::PATHBin));
+    assert(rm(PATHWww));
     std::vector<std::string> runPaths {
-            Config::PATHSession,
+        Config::PATHSession,
+            Config::PATHWww,
             Config::PATHLog,
             Config::PATHRlog,
             Config::PATHTmp,

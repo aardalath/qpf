@@ -413,6 +413,7 @@ public:
     static std::string    PATHTmp;
     static std::string    PATHTsk;
     static std::string    PATHMsg;
+    static std::string    PATHWww;
 
     static mode_t         PATHMode;
 
