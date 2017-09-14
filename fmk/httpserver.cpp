@@ -60,7 +60,7 @@ using Configuration::cfg;
 // Constructor
 //----------------------------------------------------------------------
 HttpServer::HttpServer(const char * name, const char * addr, bool serveFiles)
-    : Component(name, "", 0), enableSwarmRequests(serveFiles), server(0)
+    : Component(name, "", 0), enableSwarmRequests(serveFiles), server(0), serverIsStarted(false)
 {
 }
 
@@ -68,7 +68,7 @@ HttpServer::HttpServer(const char * name, const char * addr, bool serveFiles)
 // Constructor
 //----------------------------------------------------------------------
 HttpServer::HttpServer(std::string name, std::string addr, bool serveFiles)
-    : Component(name, "", 0), enableSwarmRequests(serveFiles)
+    : Component(name, "", 0), enableSwarmRequests(serveFiles), server(0), serverIsStarted(false)
 {
 }
 
@@ -422,14 +422,12 @@ void HttpServer::setup()
     // File upload demo
     addRoute("GET",  "/upload",    HttpServer, uploadForm);
     addRoute("POST", "/upload",    HttpServer, uploadFormExecute);
-
-    run();
 }
 
 //----------------------------------------------------------------------
-// Method: fromRunningToOperational
+// Method: start
 //----------------------------------------------------------------------
-void HttpServer::fromRunningToOperational()
+void HttpServer::start()
 {
     int t;
     t = time(NULL);
@@ -448,6 +446,16 @@ void HttpServer::fromRunningToOperational()
     }
     
     this->dumpRoutes();
+
+    serverIsStarted = true;
+}
+
+//----------------------------------------------------------------------
+// Method: fromRunningToOperational
+//----------------------------------------------------------------------
+void HttpServer::fromRunningToOperational()
+{
+    while (!serverIsStarted) { timeStep(); }
     
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));

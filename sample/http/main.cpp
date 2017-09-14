@@ -56,7 +56,8 @@ int main(int argc, char * argv[])
     // Launch the HTTP Server for Docker Swarm Services, and to
     // serve information through HTML pages. We activate the service to
     // provide data files only if we do really need it (swarm services)
-    HttpServer * httpSrv = new HttpServer("httpSrv", "localhost:8080", true);
+    HttpServer httpSrv("httpSrv", "localhost:8080", true);
+    httpSrv.start();
     
     for (;;) {}
 
