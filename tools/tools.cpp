@@ -63,7 +63,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <sys/syslimits.h>
 #include <ftw.h>
 
 //namespace LibComm {
@@ -256,7 +255,7 @@ int rmItem(const char *path, const struct stat *s, int flag, struct FTW *f)
 //----------------------------------------------------------------------
 bool rm(const char * name)
 {
-    if (nftw(name, rmItem, OPEN_MAX, FTW_DEPTH)) {
+    if (nftw(name, rmItem, FOPEN_MAX, FTW_DEPTH)) {
         perror(name);
         return false;
     }
