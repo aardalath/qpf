@@ -107,6 +107,7 @@ void TskMng::fromRunningToOperational()
     httpSrv = new HttpServer("httpSrv",
                              "localhost:8080", //"cfg.network.httpServerAddress()",
                              cfg.network.swarms().size() > 0);
+    httpSrv->start();
 
     // Deactivate sending ProcessingFrameworkInfo updates
     sendingPeriodicFmkInfo = false;
