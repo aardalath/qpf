@@ -270,46 +270,46 @@ private:
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
 
-    QAction *processPathAct;
-    QAction *saveAsAct;
+    QAction *acProcessPath;
+    QAction *acSaveAs;
 
-    QAction *stopTaskAct;
-    QAction *restartTaskAct;
+    QAction *acStopTask;
+    QAction *acRestartTask;
 
-    QAction *restartAct;
-    QAction *quitAct;
-    QAction *quitAllAct;
+    QAction *acRestart;
+    QAction *acQuit;
+    QAction *acQuitAll;
 #ifndef QT_NO_CLIPBOARD
-    QAction *cutAct;
-    QAction *copyAct;
-    QAction *pasteAct;
+    QAction *acCut;
+    QAction *acCopy;
+    QAction *acPaste;
 #endif
 
-    QAction *configToolAct;
-    QAction *browseDBAct;
-    QAction *extToolsAct;
-    QAction *verbosityAct;
-    QAction *execTestRunAct;
+    QAction *acConfigTool;
+    QAction *acBrowseDB;
+    QAction *acExtTools;
+    QAction *acVerbosity;
+    QAction *acExecTestRun;
 
     QAction *acDefault;
     QAction *acReprocess;
 
-    QAction *navigAct;
-    QAction *closeAct;
-    QAction *closeAllAct;
-    QAction *tileAct;
-    QAction *cascadeAct;
-    QAction *nextAct;
-    QAction *previousAct;
-    QAction *separatorAct;
-    QAction *aboutAct;
-    QAction *aboutQtAct;
+    QAction *acNavig;
+    QAction *acClose;
+    QAction *acCloseAll;
+    QAction *acTile;
+    QAction *acCascade;
+    QAction *acNext;
+    QAction *acPrevious;
+    QAction *acSeparator;
+    QAction *acAbout;
+    QAction *acAboutQt;
 
     bool isMenuForTabWidget;
     QPoint menuPt;
-    QAction * tabCloseAct;
-    QAction * tabCloseAllAct;
-    QAction * tabCloseOtherAct;
+    QAction * acTabClose;
+    QAction * acTabCloseAll;
+    QAction * acTabCloseOther;
 
     QVector<LogWatcher*> nodeLogs;
     QStringList nodeNames;

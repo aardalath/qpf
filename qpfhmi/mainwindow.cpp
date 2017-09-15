@@ -504,23 +504,23 @@ void MainWindow::updateMenus()
 {
     bool hasTextView = (activeTextView() != 0);
 
-    saveAsAct->setEnabled(hasTextView);
+    acSaveAs->setEnabled(hasTextView);
 #ifndef QT_NO_CLIPBOARD
-    pasteAct->setEnabled(hasTextView);
+    acPaste->setEnabled(hasTextView);
 #endif
-    closeAct->setEnabled(hasTextView);
-    closeAllAct->setEnabled(hasTextView);
-    tileAct->setEnabled(hasTextView);
-    cascadeAct->setEnabled(hasTextView);
-    nextAct->setEnabled(hasTextView);
-    previousAct->setEnabled(hasTextView);
-    separatorAct->setVisible(hasTextView);
+    acClose->setEnabled(hasTextView);
+    acCloseAll->setEnabled(hasTextView);
+    acTile->setEnabled(hasTextView);
+    acCascade->setEnabled(hasTextView);
+    acNext->setEnabled(hasTextView);
+    acPrevious->setEnabled(hasTextView);
+    acSeparator->setVisible(hasTextView);
 
 #ifndef QT_NO_CLIPBOARD
     bool hasSelection = (activeTextView() &&
                          activeTextView()->getTextEditor()->textCursor().hasSelection());
-    cutAct->setEnabled(hasSelection);
-    copyAct->setEnabled(hasSelection);
+    acCut->setEnabled(hasSelection);
+    acCopy->setEnabled(hasSelection);
 #endif
 }
 
@@ -531,20 +531,20 @@ void MainWindow::updateMenus()
 void MainWindow::updateWindowMenu()
 {
     windowMenu->clear();
-    windowMenu->addAction(navigAct);
+    windowMenu->addAction(acNavig);
     windowMenu->addSeparator();
-    windowMenu->addAction(closeAct);
-    windowMenu->addAction(closeAllAct);
+    windowMenu->addAction(acClose);
+    windowMenu->addAction(acCloseAll);
     windowMenu->addSeparator();
-    windowMenu->addAction(tileAct);
-    windowMenu->addAction(cascadeAct);
+    windowMenu->addAction(acTile);
+    windowMenu->addAction(acCascade);
     windowMenu->addSeparator();
-    windowMenu->addAction(nextAct);
-    windowMenu->addAction(previousAct);
-    windowMenu->addAction(separatorAct);
+    windowMenu->addAction(acNext);
+    windowMenu->addAction(acPrevious);
+    windowMenu->addAction(acSeparator);
 
     QList<QMdiSubWindow *> windows = ui->mdiArea->subWindowList();
-    separatorAct->setVisible(!windows.isEmpty());
+    acSeparator->setVisible(!windows.isEmpty());
 
     for (int i = 0; i < windows.size(); ++i) {
         TextView *child = qobject_cast<TextView *>(windows.at(i)->widget());
@@ -574,8 +574,8 @@ TextView *MainWindow::createTextView()
     ui->mdiArea->addSubWindow(child);
 
 #ifndef QT_NO_CLIPBOARD
-    connect(child, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-    connect(child, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+    connect(child, SIGNAL(copyAvailable(bool)), acCut, SLOT(setEnabled(bool)));
+    connect(child, SIGNAL(copyAvailable(bool)), acCopy, SLOT(setEnabled(bool)));
 #endif
 
     return child;
@@ -588,138 +588,138 @@ TextView *MainWindow::createTextView()
 void MainWindow::createActions()
 {
     // File menu
-    saveAsAct = new QAction(tr("Save &As..."), this);
-    saveAsAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsAct->setStatusTip(tr("Save the document under a new name"));
-    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+    acSaveAs = new QAction(tr("Save &As..."), this);
+    acSaveAs->setShortcuts(QKeySequence::SaveAs);
+    acSaveAs->setStatusTip(tr("Save the document under a new name"));
+    connect(acSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    processPathAct = new QAction(tr("Pr&ocess products in folder..."), this);
-    processPathAct->setShortcuts(QKeySequence::Open);
-    processPathAct->setStatusTip(tr("Specify a user selected folder and process all products inside"));
-    connect(processPathAct, SIGNAL(triggered()), this, SLOT(processPath()));
+    acProcessPath = new QAction(tr("Pr&ocess products in folder..."), this);
+    acProcessPath->setShortcuts(QKeySequence::Open);
+    acProcessPath->setStatusTip(tr("Specify a user selected folder and process all products inside"));
+    connect(acProcessPath, SIGNAL(triggered()), this, SLOT(processPath()));
 
-//    restartAct = new QAction(tr("&Restart"), this);
-//    //restartAct->setShortcuts(QKeySequence::Quit);
-//    restartAct->setStatusTip(tr("Restart the application"));
-//    connect(restartAct, SIGNAL(triggered()), this, SLOT(restart()));
+//    acRestart = new QAction(tr("&Restart"), this);
+//    //acRestart->setShortcuts(QKeySequence::Quit);
+//    acRestart->setStatusTip(tr("Restart the application"));
+//    connect(acRestart, SIGNAL(triggered()), this, SLOT(restart()));
 
-    quitAct = new QAction(tr("Close HMI"), this);
-    quitAct->setShortcuts(QKeySequence::Close);
-    quitAct->setStatusTip(tr("Quit the QPF HMI application"));
-    connect(quitAct, SIGNAL(triggered()), this, SLOT(quitApp()));
+    acQuit = new QAction(tr("Close HMI"), this);
+    acQuit->setShortcuts(QKeySequence::Close);
+    acQuit->setStatusTip(tr("Quit the QPF HMI application"));
+    connect(acQuit, SIGNAL(triggered()), this, SLOT(quitApp()));
 
-    quitAllAct = new QAction(tr("Quit all"), this);
-    quitAllAct->setShortcuts(QKeySequence::Quit);
-    quitAllAct->setStatusTip(tr("Quit the QLA Processing Framework"));
-    connect(quitAllAct, SIGNAL(triggered()), this, SLOT(quitAllQPF()));
+    acQuitAll = new QAction(tr("Quit all"), this);
+    acQuitAll->setShortcuts(QKeySequence::Quit);
+    acQuitAll->setStatusTip(tr("Quit the QLA Processing Framework"));
+    connect(acQuitAll, SIGNAL(triggered()), this, SLOT(quitAllQPF()));
 
     // Edit menu
 #ifndef QT_NO_CLIPBOARD
-    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
-    cutAct->setShortcuts(QKeySequence::Cut);
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+    acCut = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+    acCut->setShortcuts(QKeySequence::Cut);
+    acCut->setStatusTip(tr("Cut the current selection's contents to the "
                             "clipboard"));
-    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
+    connect(acCut, SIGNAL(triggered()), this, SLOT(cut()));
 
-    copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
-    copyAct->setShortcuts(QKeySequence::Copy);
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+    acCopy = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
+    acCopy->setShortcuts(QKeySequence::Copy);
+    acCopy->setStatusTip(tr("Copy the current selection's contents to the "
                              "clipboard"));
-    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+    connect(acCopy, SIGNAL(triggered()), this, SLOT(copy()));
 
-    pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
-    pasteAct->setShortcuts(QKeySequence::Paste);
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+    acPaste = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
+    acPaste->setShortcuts(QKeySequence::Paste);
+    acPaste->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
-    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
+    connect(acPaste, SIGNAL(triggered()), this, SLOT(paste()));
 #endif
 
     // Tools menu
-    configToolAct = new QAction(tr("&Configuration Tool ..."), this);
-    configToolAct->setStatusTip(tr("Open Configuration Tool with current configuration"));
-    connect(configToolAct, SIGNAL(triggered()), this, SLOT(showConfigTool()));
+    acConfigTool = new QAction(tr("&Configuration Tool ..."), this);
+    acConfigTool->setStatusTip(tr("Open Configuration Tool with current configuration"));
+    connect(acConfigTool, SIGNAL(triggered()), this, SLOT(showConfigTool()));
 
-    browseDBAct = new QAction(tr("&Browse System DB ..."), this);
-    browseDBAct->setStatusTip(tr("Open System Database Browser"));
-    connect(browseDBAct, SIGNAL(triggered()), this, SLOT(showDBBrowser()));
+    acBrowseDB = new QAction(tr("&Browse System DB ..."), this);
+    acBrowseDB->setStatusTip(tr("Open System Database Browser"));
+    connect(acBrowseDB, SIGNAL(triggered()), this, SLOT(showDBBrowser()));
 
-    extToolsAct = new QAction(tr("&Define External Tools ..."), this);
-    extToolsAct->setStatusTip(tr("Define external tools to open data products"));
-    connect(extToolsAct, SIGNAL(triggered()), this, SLOT(showExtToolsDef()));
+    acExtTools = new QAction(tr("&Define External Tools ..."), this);
+    acExtTools->setStatusTip(tr("Define external tools to open data products"));
+    connect(acExtTools, SIGNAL(triggered()), this, SLOT(showExtToolsDef()));
 
-    verbosityAct = new QAction(tr("&Define Verbosity Level ..."), this);
-    verbosityAct->setStatusTip(tr("Define verbosity level to be used in this session"));
-    connect(verbosityAct, SIGNAL(triggered()), this, SLOT(showVerbLevel()));
+    acVerbosity = new QAction(tr("&Define Verbosity Level ..."), this);
+    acVerbosity->setStatusTip(tr("Define verbosity level to be used in this session"));
+    connect(acVerbosity, SIGNAL(triggered()), this, SLOT(showVerbLevel()));
 
-    execTestRunAct = new QAction(tr("&Execute test run ..."), this);
-    execTestRunAct->setStatusTip(tr("Execute a test run processing on dummy data"));
-    //connect(execTestRunAct, SIGNAL(triggered()), this, SLOT(execTestRun()));
+    acExecTestRun = new QAction(tr("&Execute test run ..."), this);
+    acExecTestRun->setStatusTip(tr("Execute a test run processing on dummy data"));
+    //connect(acExecTestRun, SIGNAL(triggered()), this, SLOT(execTestRun()));
 
     // Window menu
-    navigAct = new QAction(tr("Show &navigator panel"), this);
-    navigAct->setStatusTip(tr("Shows or hides the navigator panel"));
-    navigAct->setCheckable(true);
-    connect(navigAct, SIGNAL(toggled(bool)),
+    acNavig = new QAction(tr("Show &navigator panel"), this);
+    acNavig->setStatusTip(tr("Shows or hides the navigator panel"));
+    acNavig->setCheckable(true);
+    connect(acNavig, SIGNAL(toggled(bool)),
             ui->dockNavigator, SLOT(setVisible(bool)));
     connect(ui->dockNavigator, SIGNAL(visibilityChanged(bool)),
-            navigAct, SLOT(setChecked(bool)));
+            acNavig, SLOT(setChecked(bool)));
     ui->dockNavigator->setVisible(false);
 
-    closeAct = new QAction(tr("Cl&ose"), this);
-    closeAct->setStatusTip(tr("Close the active window"));
-    connect(closeAct, SIGNAL(triggered()),
+    acClose = new QAction(tr("Cl&ose"), this);
+    acClose->setStatusTip(tr("Close the active window"));
+    connect(acClose, SIGNAL(triggered()),
             ui->mdiArea, SLOT(closeActiveSubWindow()));
 
-    closeAllAct = new QAction(tr("Close &All"), this);
-    closeAllAct->setStatusTip(tr("Close all the windows"));
-    connect(closeAllAct, SIGNAL(triggered()),
+    acCloseAll = new QAction(tr("Close &All"), this);
+    acCloseAll->setStatusTip(tr("Close all the windows"));
+    connect(acCloseAll, SIGNAL(triggered()),
             ui->mdiArea, SLOT(closeAllSubWindows()));
 
-    tileAct = new QAction(tr("&Tile"), this);
-    tileAct->setStatusTip(tr("Tile the windows"));
-    connect(tileAct, SIGNAL(triggered()), ui->mdiArea, SLOT(tileSubWindows()));
+    acTile = new QAction(tr("&Tile"), this);
+    acTile->setStatusTip(tr("Tile the windows"));
+    connect(acTile, SIGNAL(triggered()), ui->mdiArea, SLOT(tileSubWindows()));
 
-    cascadeAct = new QAction(tr("&Cascade"), this);
-    cascadeAct->setStatusTip(tr("Cascade the windows"));
-    connect(cascadeAct, SIGNAL(triggered()), ui->mdiArea, SLOT(cascadeSubWindows()));
+    acCascade = new QAction(tr("&Cascade"), this);
+    acCascade->setStatusTip(tr("Cascade the windows"));
+    connect(acCascade, SIGNAL(triggered()), ui->mdiArea, SLOT(cascadeSubWindows()));
 
-    nextAct = new QAction(tr("Ne&xt"), this);
-    nextAct->setShortcuts(QKeySequence::NextChild);
-    nextAct->setStatusTip(tr("Move the focus to the next window"));
-    connect(nextAct, SIGNAL(triggered()),
+    acNext = new QAction(tr("Ne&xt"), this);
+    acNext->setShortcuts(QKeySequence::NextChild);
+    acNext->setStatusTip(tr("Move the focus to the next window"));
+    connect(acNext, SIGNAL(triggered()),
             ui->mdiArea, SLOT(activateNextSubWindow()));
 
-    previousAct = new QAction(tr("Pre&vious"), this);
-    previousAct->setShortcuts(QKeySequence::PreviousChild);
-    previousAct->setStatusTip(tr("Move the focus to the previous "
+    acPrevious = new QAction(tr("Pre&vious"), this);
+    acPrevious->setShortcuts(QKeySequence::PreviousChild);
+    acPrevious->setStatusTip(tr("Move the focus to the previous "
                                  "window"));
-    connect(previousAct, SIGNAL(triggered()),
+    connect(acPrevious, SIGNAL(triggered()),
             ui->mdiArea, SLOT(activatePreviousSubWindow()));
 
-    separatorAct = new QAction(this);
-    separatorAct->setSeparator(true);
+    acSeparator = new QAction(this);
+    acSeparator->setSeparator(true);
 
     // Help menu
-    aboutAct = new QAction(tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+    acAbout = new QAction(tr("&About"), this);
+    acAbout->setStatusTip(tr("Show the application's About box"));
+    connect(acAbout, SIGNAL(triggered()), this, SLOT(about()));
 
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    acAboutQt = new QAction(tr("About &Qt"), this);
+    acAboutQt->setStatusTip(tr("Show the Qt library's About box"));
+    connect(acAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     // Tab-related actions
-    tabCloseAct = new QAction(tr("&Close"), this);
-    tabCloseAct->setStatusTip(tr("Close this tab"));
-    connect(tabCloseAct, SIGNAL(triggered()), this, SLOT(closeTabAction()));
+    acTabClose = new QAction(tr("&Close"), this);
+    acTabClose->setStatusTip(tr("Close this tab"));
+    connect(acTabClose, SIGNAL(triggered()), this, SLOT(closeTabAction()));
 
-    tabCloseAllAct = new QAction(tr("Close all"), this);
-    tabCloseAllAct->setStatusTip(tr("Close all tabs"));
-    connect(tabCloseAllAct, SIGNAL(triggered()), this, SLOT(closeAllTabAction()));
+    acTabCloseAll = new QAction(tr("Close all"), this);
+    acTabCloseAll->setStatusTip(tr("Close all tabs"));
+    connect(acTabCloseAll, SIGNAL(triggered()), this, SLOT(closeAllTabAction()));
 
-    tabCloseOtherAct = new QAction(tr("Close &other"), this);
-    tabCloseOtherAct->setStatusTip(tr("Close all other tabs"));
-    connect(tabCloseOtherAct, SIGNAL(triggered()), this, SLOT(closeOtherTabAction()));
+    acTabCloseOther = new QAction(tr("Close &other"), this);
+    acTabCloseOther->setStatusTip(tr("Close all other tabs"));
+    connect(acTabCloseOther, SIGNAL(triggered()), this, SLOT(closeOtherTabAction()));
 
 }
 
@@ -731,37 +731,37 @@ void MainWindow::createMenus()
 {
     // File menu
     fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(processPathAct);
+    fileMenu->addAction(acProcessPath);
     fileMenu->addSeparator();
-//    fileMenu->addAction(saveAsAct);
+//    fileMenu->addAction(acSaveAs);
 //    fileMenu->addSeparator();
-//    fileMenu->addAction(restartAct);
+//    fileMenu->addAction(acRestart);
 //    fileMenu->addSeparator();
 //    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
 //    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
-    fileMenu->addAction(quitAct);
-    fileMenu->addAction(quitAllAct);
+    fileMenu->addAction(acQuit);
+    fileMenu->addAction(acQuitAll);
 
     // Edit menu
     editMenu = menuBar()->addMenu(tr("&Edit"));
 #ifndef QT_NO_CLIPBOARD
-    editMenu->addAction(cutAct);
-    editMenu->addAction(copyAct);
-    editMenu->addAction(pasteAct);
+    editMenu->addAction(acCut);
+    editMenu->addAction(acCopy);
+    editMenu->addAction(acPaste);
 #endif
 
     // Tools menu
     toolsMenu = menuBar()->addMenu(tr("&Tools"));
-    toolsMenu->addAction(configToolAct);
-    toolsMenu->addAction(browseDBAct);
-    toolsMenu->addAction(extToolsAct);
+    toolsMenu->addAction(acConfigTool);
+    toolsMenu->addAction(acBrowseDB);
+    toolsMenu->addAction(acExtTools);
     toolsMenu->addSeparator();
 
     sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
-    sessionInfoMenu->addAction(verbosityAct);
+    sessionInfoMenu->addAction(acVerbosity);
 
     //toolsMenu->addSeparator();
-    //toolsMenu->addAction(execTestRunAct);
+    //toolsMenu->addAction(acExecTestRun);
 
     // Window menu
     windowMenu = menuBar()->addMenu(tr("&Window"));
@@ -772,8 +772,8 @@ void MainWindow::createMenus()
 
     // Help menu
     helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
+    helpMenu->addAction(acAbout);
+    helpMenu->addAction(acAboutQt);
 }
 
 //----------------------------------------------------------------------
@@ -783,13 +783,13 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 //    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(quitAct);
+//    fileToolBar->addAction(acQuit);
 
 //#ifndef QT_NO_CLIPBOARD
 //    editToolBar = addToolBar(tr("Edit"));
-//    editToolBar->addAction(cutAct);
-//    editToolBar->addAction(copyAct);2000
-//    editToolBar->addAction(pasteAct);
+//    editToolBar->addAction(acCut);
+//    editToolBar->addAction(acCopy);2000
+//    editToolBar->addAction(acPaste);
 //#endif
 }
 
@@ -1393,7 +1393,7 @@ void MainWindow::updateSystemView()
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
-    quitAllAct->setEnabled(isThereActiveCores);
+    acQuitAll->setEnabled(isThereActiveCores);
 
     //-- 0b. If received sessionId from master, add files to watch
     if (!newPathToWatch.isEmpty()) {
@@ -1972,9 +1972,9 @@ void MainWindow::showTabsContextMenu(const QPoint & p)
     menuPt = p;
 
     QMenu menu(w);
-    menu.addAction(tabCloseAct);
-    menu.addAction(tabCloseAllAct);
-    menu.addAction(tabCloseOtherAct);
+    menu.addAction(acTabClose);
+    menu.addAction(acTabCloseAll);
+    menu.addAction(acTabCloseOther);
     menu.exec(w->mapToGlobal(p));
 }
 
