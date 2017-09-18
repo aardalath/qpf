@@ -189,6 +189,27 @@ void HMIProxy::quit()
     requestQuit = true;
 }
 
+//----------------------------------------------------------------------
+// Method: sendCmd
+// Send a processing handling command to an agent
+//----------------------------------------------------------------------
+void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId subCmd)
+{
+    Message<MsgBodyCMD> msg;
+    MsgBodyCMD body;
+    msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                 compName, "*",
+                 "", "", "");
+
+    // Create message and send
+    body["cmd"]         = CmdProcHdl;
+    body["subcmd"]      = SubcmdName[(int)(subCmd)];
+    body["target_type"] = (int)(subj);
+    body["target"]      = subjName;
+
+    msg.buildBody(body);
+    send(ChnlHMICmd, msg.str());    
+}
 
 //----------------------------------------------------------------------
 // Method: sendCmd

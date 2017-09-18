@@ -97,6 +97,12 @@ public:
 
     //----------------------------------------------------------------------
     // Method: sendCmd
+    // Send a processing handling command to an agent
+    //----------------------------------------------------------------------
+    void sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId subCmd);
+    
+    //----------------------------------------------------------------------
+    // Method: sendCmd
     // Send a command message to a target (or a set of them)
     //----------------------------------------------------------------------
     void sendCmd(std::string target, std::string what, std::string value);

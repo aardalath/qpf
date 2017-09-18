@@ -186,7 +186,8 @@ typedef std::string CmdDescriptor;
         T(SESSION),                                  \
         T(QUIT),                                     \
         T(PING),                                     \
-        T(STATES)
+        T(STATES),                                   \
+        T(PROCHDL)
 
 #define T(x) CMD_ ## x
 enum CmdId { TLISTOF_CMD_IDS };
@@ -201,5 +202,30 @@ const CmdDescriptor CmdSession  (CmdName[CMD_SESSION]);
 const CmdDescriptor CmdQuit     (CmdName[CMD_QUIT]);
 const CmdDescriptor CmdPing     (CmdName[CMD_PING]);
 const CmdDescriptor CmdStates   (CmdName[CMD_STATES]);
+const CmdDescriptor CmdProcHdl  (CmdName[CMD_PROCHDL]);
+
+//-- Processing Handling constants ------------
+
+#undef T
+#define TLISTOF_PROCHDL_SUBJECT_IDS                  \
+    T(TASK), T(AGENT), T(HOST)
+
+#define T(x) PROC_ ## x
+enum SubjectId { TLISTOF_PROCHDL_SUBJECT_IDS };
+#undef T
+
+typedef std::string SubcmdDescriptor;
+
+#define TLISTOF_PROCHDL_SUBCMD_IDS                  \
+    T(PAUSE), T(RESUME), T(CANCEL),                 \
+        T(SUSPEND), T(STOP), T(REACTIVATE)
+
+#define T(x) PROC_HDL_ ## x
+enum SubcmdId { TLISTOF_PROCHDL_SUBCMD_IDS };
+#undef T
+
+#define T(x) std::string( #x )
+const SubcmdDescriptor SubcmdName[] = { TLISTOF_PROCHDL_SUBCMD_IDS };
+#undef T
 
 #endif
