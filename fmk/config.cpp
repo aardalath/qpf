@@ -155,7 +155,7 @@ void Config::synchronizeSessionId(std::string newId)
     PATHTmp     = PATHSession + "/tmp";
     PATHTsk     = PATHSession + "/tsk";
     PATHMsg     = PATHSession + "/msg";
-}2
+}
 
 //----------------------------------------------------------------------
 // Method: fillData
