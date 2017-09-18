@@ -131,6 +131,11 @@ protected:
     //----------------------------------------------------------------------
     virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
 
+    //----------------------------------------------------------------------
+    // Method: processSubcmdMsg
+    //----------------------------------------------------------------------
+    virtual void processSubcmdMsg(MessageString & m);
+
 private:
     //----------------------------------------------------------------------
     // Method: runEachIterationForContainers
@@ -202,6 +207,8 @@ private:
     URLHandler               urlh;
 
     HostInfo                 hostInfo;
+
+    bool                     isTaskRequestActive;
 };
 
 //}

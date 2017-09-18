@@ -130,6 +130,8 @@ void TskAge::fromRunningToOperational()
     numTask = 0;
     runningTask = 0;
 
+    isTaskRequestActive = true;
+
     // Get initial values for Host Info structure
     hostInfo.hostIp = compAddress;
     hostInfo.cpuInfo.overallCpuLoad.timeInterval = 0;
@@ -168,22 +170,24 @@ void TskAge::runEachIterationForContainers()
     case IDLE:
         ++idleCycles;
         // Request task for processing in case the agent is idle
-        if (idleCycles > idleCyclesBeforeRequest) {
-            // Create message and send
-            Message<MsgBodyTSK> msg;
-            msg.buildHdr(ChnlTskProc, MsgTskRqst, CHNLS_IF_VERSION,
-                         compName, "TskMng",
-                         "", "", "");
-
-            std::string chnl(ChnlTskProc + "_" + compName);
-            send(chnl, msg.str());
-            DBG("Sending request via channel " + chnl);
-            InfoMsg("Sending request via channel " + chnl);
-
-            pStatus = WAITING;
-            InfoMsg("Switching to status " + ProcStatusName[pStatus]);
-            waitingCycles = 0;
-        }
+	if (isTaskRequestActive) {
+	    if (idleCycles > idleCyclesBeforeRequest) {
+		// Create message and send
+		Message<MsgBodyTSK> msg;
+		msg.buildHdr(ChnlTskProc, MsgTskRqst, CHNLS_IF_VERSION,
+			     compName, "TskMng",
+			     "", "", "");
+		
+		std::string chnl(ChnlTskProc + "_" + compName);
+		send(chnl, msg.str());
+		DBG("Sending request via channel " + chnl);
+		InfoMsg("Sending request via channel " + chnl);
+		
+		pStatus = WAITING;
+		InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+		waitingCycles = 0;
+	    }
+	}
         break;
     case WAITING:
         ++waitingCycles;
@@ -321,6 +325,16 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         }
 
     }
+}
+
+//----------------------------------------------------------------------
+// Method: processSubcmdMsg
+//----------------------------------------------------------------------
+void TskAge::processSubcmdMsg(MessageString & m)
+{
+    TRC("Sub-command message received: " + m);
+
+    Message<MsgBodyTSK> msg(m);    
 }
 
 //----------------------------------------------------------------------

@@ -137,6 +137,8 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             InfoMsg("Trying to monitor folder for master session id " + sessId);
             doInParent(parent, "linkSessionLogs", sessId);
         }
+    } else if (cmd == CmdProcHdl) {
+        // Do nothing, answer is dummy (for the time being)
     }
 }
 
@@ -208,7 +210,8 @@ void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId sub
     body["target"]      = subjName;
 
     msg.buildBody(body);
-    send(ChnlHMICmd, msg.str());    
+    send(ChnlHMICmd, msg.str()); 
+    TRC("Sending message: " + msg.str());
 }
 
 //----------------------------------------------------------------------

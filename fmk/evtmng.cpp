@@ -194,6 +194,7 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     TRC("MSG: " + m);
 
     if (cmd == CmdStates) { // Component states request
+
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
@@ -205,15 +206,37 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             states[kv.first] = kv.second;
         }
         body["states"] = states;
+
     } else if (cmd == CmdSession) { // Session id. request
+
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
         body["cmd"] = CmdSession;
         body["sessionId"] = cfg.sessionId;
+
+    } else if (cmd == CmdProcHdl) { // Embedded is message to TskAgents
+
+        Message<MsgBodyCMD> relayMsg(m);
+        MsgBodyCMD body;
+        relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
+                     compName, "*",
+                     "", "", "");
+	relayMsg.buildBody(body);
+	c->setMsgOut(relayMsg.str());
+	TRC("Sending relay message via channel " + ChnlCmd);
+	TRC("with message: " + relayMsg.str());
+
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "*",
+                     "", "", "");
+        body["ans"] = "OK";
+
     } else if (cmd == CmdQuit) { // Session id. request
+
         requestQuit = true;
         return;
+
     }
 
     msg.buildBody(body);

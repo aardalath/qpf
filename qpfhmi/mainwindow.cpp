@@ -1333,18 +1333,32 @@ void MainWindow::showState()
         // Now processing host lines
         int j = 1;
         for (auto & kv : cfg.network.processingNodes()) {
-            h += QString("<br><b>%1</b>").arg(QString::fromStdString(kv.first));
+	    QString pnName(QString::fromStdString(kv.first));
+	    bool storeInMaps = (agentsInHost.find(pnName) == agentsInHost.end());
+            QStringList agList;
+            h += QString("<br><b>%1</b>").arg(pnName);
             p += "<br>";
             int numOfTskAgents = kv.second;
             for (unsigned int i = 0; i < numOfTskAgents; ++i) {
-                QString n = QString("TskAgent_%1_%2")
+                QString nn = QString("TskAgent_%1_%2")
                     .arg(j,2,10,QLatin1Char('0'))
                     .arg(i+1,2,10,QLatin1Char('0'));
-                std::string ss = nodeStates[n].toStdString();
+                std::string ss = nodeStates[nn].toStdString();
                 int stateId = getStateIdx(ss);
                 QString color = QString::fromStdString(stateColors[stateId]);
-                p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(n);
+                p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(nn);
+
+		if (storeInMaps) {
+		    agList << nn;
+		    TaskStatus stts = ((stateId >= RUNNING) ? TASK_RUNNING : TASK_STOPPED);
+		    agentProcStatus[nn] = stts;
+		    hostProcStatus[pnName]  = stts;
+		    hostForAgent[nn] = pnName;
+		}
             }
+	    if (storeInMaps) {
+		agentsInHost[pnName] = agList;
+	    }
             ++j;
         }
         
@@ -2214,22 +2228,22 @@ void MainWindow::initTasksMonitView()
 
     ui->tblvwTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    acWorkDir         = new QAction(tr("Open task working directory..."),       ui->tblvwTaskMonit);
-    acShowTaskInfo    = new QAction(tr("Display task information"),             ui->tblvwTaskMonit);
-    //acStopTask       = new QAction(tr("Stop"),                                 ui->tblvwTaskMonit);
-    //acRestartTask    = new QAction(tr("Restart"),                              ui->tblvwTaskMonit);
+    acWorkDir         = new QAction(tr("Open task working directory..."), ui->tblvwTaskMonit);
+    acShowTaskInfo    = new QAction(tr("Display task information"),       ui->tblvwTaskMonit);
+    //acStopTask       = new QAction(tr("Stop"),                           ui->tblvwTaskMonit);
+    //acRestartTask    = new QAction(tr("Restart"),                        ui->tblvwTaskMonit);
 
-    acTaskPause       = new QAction(tr("Pause Task"),                           ui->tblvwTaskMonit);
-    acTaskResume      = new QAction(tr("Resume Task"),                          ui->tblvwTaskMonit);
-    acTaskCancel      = new QAction(tr("Cancel Task"),                          ui->tblvwTaskMonit);
+    acTaskPause       = new QAction(tr("Pause Task"),                     ui->tblvwTaskMonit);
+    acTaskResume      = new QAction(tr("Resume Task"),                    ui->tblvwTaskMonit);
+    acTaskCancel      = new QAction(tr("Cancel Task"),                    ui->tblvwTaskMonit);
 
-    acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),             ui->tblvwTaskMonit);
-    acAgentStop       = new QAction(tr("Stop Agent Processing"),                ui->tblvwTaskMonit);
-    acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),          ui->tblvwTaskMonit);
+    acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),       ui->tblvwTaskMonit);
+    acAgentStop       = new QAction(tr("Stop Agent Processing"),          ui->tblvwTaskMonit);
+    acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),    ui->tblvwTaskMonit);
 
-    acHostSuspend     = new QAction(tr("Suspend Host Processing"),              ui->tblvwTaskMonit);
-    acHostStop        = new QAction(tr("Stop Host Processing"),                 ui->tblvwTaskMonit);
-    acHostReactivate  = new QAction(tr("Reactivate Host Processing"),           ui->tblvwTaskMonit);
+    acHostSuspend     = new QAction(tr("Suspend Host Processing"),        ui->tblvwTaskMonit);
+    acHostStop        = new QAction(tr("Stop Host Processing"),           ui->tblvwTaskMonit);
+    acHostReactivate  = new QAction(tr("Reactivate Host Processing"),     ui->tblvwTaskMonit);
 
     connect(acWorkDir,          SIGNAL(triggered()), this, SLOT(showWorkDir()));
     connect(acShowTaskInfo,     SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
@@ -2272,17 +2286,6 @@ void MainWindow::sortTaskViewByColumn(int c)
 //----------------------------------------------------------------------
 void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 {
-    /*
-    QList<QAction *> actions;
-    if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
-        actions.append(acWorkDir);
-        actions.append(acShowTaskInfo);
-        actions.append(acRestartTask);
-        actions.append(acStopTask);
-    }
-    if (actions.count() > 0) {
-        QMenu::exec(actions, ui->tblvwTaskMonit->mapToGlobal(p));
-    }*/
     if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
 	QMenu cm;
 
@@ -2293,21 +2296,20 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 
         cm.addSeparator();
 
-        cm.addAction(acTaskPause);
-        cm.addAction(acTaskResume);
-        cm.addAction(acTaskCancel);
+	QMenu * cmTask = cm.addMenu("Task control ...");
+        cmTask->addAction(acTaskPause);
+        cmTask->addAction(acTaskResume);
+        cmTask->addAction(acTaskCancel);
 
-        cm.addSeparator();
+	QMenu * cmAgent = cm.addMenu("Agent processing ...");
+        cmAgent->addAction(acAgentSuspend);
+        cmAgent->addAction(acAgentStop);
+        cmAgent->addAction(acAgentReactivate);
 
-        cm.addAction(acAgentSuspend);
-        cm.addAction(acAgentStop);
-        cm.addAction(acAgentReactivate);
-
-        cm.addSeparator();
-
-        cm.addAction(acHostSuspend);
-        cm.addAction(acHostStop);
-        cm.addAction(acHostReactivate);
+	QMenu * cmHost = cm.addMenu("Host processing ...");
+        cmHost->addAction(acHostSuspend);
+        cmHost->addAction(acHostStop);
+        cmHost->addAction(acHostReactivate);
 
         cm.exec(ui->tblvwTaskMonit->mapToGlobal(p));
     }
@@ -2334,9 +2336,9 @@ void MainWindow::showWorkDir()
     if (fs.exists()) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(localDir));
     } else {
-        int ret = QMessageBox::warning(this, tr("Folder does not exist"),
-                                       tr("The task folder does not exist in, or is not visible from this host.\n"
-                                          "This problem normally appears when the task has been executed in a processing host "
+	int ret = QMessageBox::warning(this, tr("Folder does not exist"),
+				       tr("The task folder does not exist in, or is not visible from this host.\n"
+					  "This problem normally appears when the task has been executed in a processing host "
                                           "that is not the host where the HMI is running"),
                                        QMessageBox::Ok);
     }
@@ -2381,6 +2383,20 @@ void MainWindow::displayTaskInfo()
 //----------------------------------------------------------------------
 void MainWindow::doTaskPause()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
+    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+
+    if (status == TASK_RUNNING) {
+	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+	Json::Reader reader;
+	Json::Value v;
+	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+	std::string taskId = v["Id"].asString();
+	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_PAUSE);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2389,6 +2405,20 @@ void MainWindow::doTaskPause()
 //----------------------------------------------------------------------
 void MainWindow::doTaskResume()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
+    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+
+    if (status == TASK_PAUSED) {
+	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+	Json::Reader reader;
+	Json::Value v;
+	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+	std::string taskId = v["Id"].asString();
+	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_RESUME);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2397,6 +2427,20 @@ void MainWindow::doTaskResume()
 //----------------------------------------------------------------------
 void MainWindow::doTaskCancel()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
+    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+
+    if ((status == TASK_PAUSED) || (status == TASK_RUNNING)) {
+	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+	Json::Reader reader;
+	Json::Value v;
+	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+	std::string taskId = v["Id"].asString();
+	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_CANCEL);
+    }
 }
 
 
@@ -2406,6 +2450,19 @@ void MainWindow::doTaskCancel()
 //----------------------------------------------------------------------
 void MainWindow::doAgentSuspend()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    std::string agentId = v["Info"]["Agent"].asString();
+    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    if (agentStatus == TASK_RUNNING) {
+	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_SUSPEND);
+	agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2414,6 +2471,19 @@ void MainWindow::doAgentSuspend()
 //----------------------------------------------------------------------
 void MainWindow::doAgentStop()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    std::string agentId = v["Info"]["Agent"].asString();
+    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    if ((agentStatus == TASK_RUNNING) || (agentStatus == TASK_PAUSED)) {
+	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_STOP);
+	agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2422,6 +2492,19 @@ void MainWindow::doAgentStop()
 //----------------------------------------------------------------------
 void MainWindow::doAgentReactivate()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    std::string agentId = v["Info"]["Agent"].asString();
+    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    if (agentStatus == TASK_PAUSED) {
+	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_REACTIVATE);
+	agentProcStatus[QString::fromStdString(agentId)] = TASK_RUNNING;
+    }
 }
 
 
@@ -2431,6 +2514,20 @@ void MainWindow::doAgentReactivate()
 //----------------------------------------------------------------------
 void MainWindow::doHostSuspend()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
+    std::string hostId = hostForAgent[agName].toStdString();
+    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    if (hostStatus == TASK_RUNNING) {
+	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_SUSPEND);
+	hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2439,6 +2536,20 @@ void MainWindow::doHostSuspend()
 //----------------------------------------------------------------------
 void MainWindow::doHostStop()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
+    std::string hostId = hostForAgent[agName].toStdString();
+    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    if ((hostStatus == TASK_RUNNING) || (hostStatus == TASK_PAUSED)) {
+	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_STOP);
+	hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -2447,6 +2558,20 @@ void MainWindow::doHostStop()
 //----------------------------------------------------------------------
 void MainWindow::doHostReactivate()
 {
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+	
+    QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
+    std::string hostId = hostForAgent[agName].toStdString();
+    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    if (hostStatus == TASK_PAUSED) {
+	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_REACTIVATE);
+	hostProcStatus[QString::fromStdString(hostId)] = TASK_RUNNING;
+    }
 }
 
 //----------------------------------------------------------------------

@@ -266,6 +266,8 @@ protected:
     virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
 
+    virtual void processSubcmdMsg(MessageString & m) {}
+
 protected:
     //----------------------------------------------------------------------
     // Method: raise

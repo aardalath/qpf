@@ -385,13 +385,18 @@ private:
 
     QMap<QString,QString> nodeStates;
 
+    QMap<QString,TaskStatus> agentProcStatus;
+    QMap<QString,TaskStatus> hostProcStatus;
+    QMap<QString,QStringList> agentsInHost;
+    QMap<QString,QString> hostForAgent;
+
     QPoint pointOfAction;
     //DBManager *       dbMng;
 
     bool isProductsCustomFilterActive;
     bool isAlertsCustomFilterActive;
 
-     QString newPathToWatch;
+    QString newPathToWatch;
 };
 
 }

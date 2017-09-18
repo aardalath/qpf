@@ -404,6 +404,10 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
             cfg.synchronizeSessionId(sessId);
         }
 
+    } else if (cmd == CmdProcHdl) {
+
+        processSubcmdMsg(m);
+
     } else {
 
         WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
