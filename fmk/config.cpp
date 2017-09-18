@@ -140,7 +140,7 @@ void Config::synchronizeSessionId(std::string newId)
     std::string newPATHSession(PATHRun + "/" + newId);
 
     if (rename(PATHSession.c_str(), newPATHSession.c_str()) != 0) {
-        perror("Change sessionId");
+        perror((compName + ": Change sessionId").c_str());
         TRC("Cannot rename PATHSession from " + PATHSession +
             " to " + newPATHSession);
         WarnMsg("Cannot rename PATHSession from " + PATHSession +
@@ -155,7 +155,7 @@ void Config::synchronizeSessionId(std::string newId)
     PATHTmp     = PATHSession + "/tmp";
     PATHTsk     = PATHSession + "/tsk";
     PATHMsg     = PATHSession + "/msg";
-}
+}2
 
 //----------------------------------------------------------------------
 // Method: fillData
