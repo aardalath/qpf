@@ -270,7 +270,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         std::string sessId = task.taskSession();
         DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
         if (sessId != cfg.sessionId) {
-            DBG(">> CHANGING SESSION ID");
+            DBG(compName + ">> CHANGING SESSION ID");
             str::replaceAll(workDir, cfg.sessionId, sessId);
             cfg.synchronizeSessionId(sessId);
         }
