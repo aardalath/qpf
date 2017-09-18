@@ -167,10 +167,24 @@ private slots:
 
     void sortTaskViewByColumn(int c);
     void showTaskMonitContextMenu(const QPoint & p);
+
     void showWorkDir();
     void displayTaskInfo();
-    void restartTask();
-    void stopTask();
+    //void restartTask();
+    //void stopTask();
+
+    void doTaskPause();
+    void doTaskResume();
+    void doTaskCancel();
+
+    void doAgentSuspend();
+    void doAgentStop();
+    void doAgentReactivate();
+
+    void doHostSuspend();
+    void doHostStop();
+    void doHostReactivate();
+
     bool runDockerCmd(QModelIndex idx, QString cmd);
     void dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t);
     void dumpToTree(const Json::Value & v, QTreeWidgetItem * t);
@@ -273,8 +287,8 @@ private:
     QAction *acProcessPath;
     QAction *acSaveAs;
 
-    QAction *acStopTask;
-    QAction *acRestartTask;
+    //QAction *acStopTask;
+    //QAction *acRestartTask;
 
     QAction *acRestart;
     QAction *acQuit;
@@ -325,8 +339,21 @@ private:
 
     QAction * acWorkDir;
     QAction * acShowTaskInfo;
+
     QAction * acRestartTask;
     QAction * acStopTask;
+
+    QAction * acTaskPause;
+    QAction * acTaskResume;
+    QAction * acTaskCancel;
+
+    QAction * acAgentSuspend;
+    QAction * acAgentStop;
+    QAction * acAgentReactivate;
+
+    QAction * acHostSuspend;
+    QAction * acHostStop;
+    QAction * acHostReactivate;
 
     QAction * acShowMsgInfo;
 

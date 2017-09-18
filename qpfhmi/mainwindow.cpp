@@ -2214,15 +2214,39 @@ void MainWindow::initTasksMonitView()
 
     ui->tblvwTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    acWorkDir      = new QAction(tr("Open task working directory..."), ui->tblvwTaskMonit);
-    acShowTaskInfo = new QAction(tr("Display task information"), ui->tblvwTaskMonit);
-    acStopTask     = new QAction(tr("Stop"), ui->tblvwTaskMonit);
-    acRestartTask  = new QAction(tr("Restart"), ui->tblvwTaskMonit);
+    acWorkDir         = new QAction(tr("Open task working directory..."),       ui->tblvwTaskMonit);
+    acShowTaskInfo    = new QAction(tr("Display task information"),             ui->tblvwTaskMonit);
+    //acStopTask       = new QAction(tr("Stop"),                                 ui->tblvwTaskMonit);
+    //acRestartTask    = new QAction(tr("Restart"),                              ui->tblvwTaskMonit);
 
-    connect(acWorkDir,      SIGNAL(triggered()), this, SLOT(showWorkDir()));
-    connect(acShowTaskInfo, SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
-    connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
-    connect(acRestartTask,  SIGNAL(triggered()), this, SLOT(restartTask()));
+    acTaskPause       = new QAction(tr("Pause Task"),                           ui->tblvwTaskMonit);
+    acTaskResume      = new QAction(tr("Resume Task"),                          ui->tblvwTaskMonit);
+    acTaskCancel      = new QAction(tr("Cancel Task"),                          ui->tblvwTaskMonit);
+
+    acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),             ui->tblvwTaskMonit);
+    acAgentStop       = new QAction(tr("Stop Agent Processing"),                ui->tblvwTaskMonit);
+    acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),          ui->tblvwTaskMonit);
+
+    acHostSuspend     = new QAction(tr("Suspend Host Processing"),              ui->tblvwTaskMonit);
+    acHostStop        = new QAction(tr("Stop Host Processing"),                 ui->tblvwTaskMonit);
+    acHostReactivate  = new QAction(tr("Reactivate Host Processing"),           ui->tblvwTaskMonit);
+
+    connect(acWorkDir,          SIGNAL(triggered()), this, SLOT(showWorkDir()));
+    connect(acShowTaskInfo,     SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
+    //connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
+    //connect(acRestartTask,  SIGNAL(triggered()), this, SLOT(restartTask()));
+
+    connect(acTaskPause,	SIGNAL(triggered()), this, SLOT(doTaskPause()));
+    connect(acTaskResume,	SIGNAL(triggered()), this, SLOT(doTaskResume()));
+    connect(acTaskCancel,	SIGNAL(triggered()), this, SLOT(doTaskCancel()));
+
+    connect(acAgentSuspend,	SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
+    connect(acAgentStop,	SIGNAL(triggered()), this, SLOT(doAgentStop()));
+    connect(acAgentReactivate,	SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
+
+    connect(acHostSuspend,	SIGNAL(triggered()), this, SLOT(doHostSuspend()));
+    connect(acHostStop,		SIGNAL(triggered()), this, SLOT(doHostStop()));
+    connect(acHostReactivate,	SIGNAL(triggered()), this, SLOT(doHostReactivate()));
 
     connect(ui->tblvwTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTaskMonitContextMenu(const QPoint &)));
@@ -2248,6 +2272,7 @@ void MainWindow::sortTaskViewByColumn(int c)
 //----------------------------------------------------------------------
 void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 {
+    /*
     QList<QAction *> actions;
     if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
         actions.append(acWorkDir);
@@ -2257,6 +2282,34 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
     }
     if (actions.count() > 0) {
         QMenu::exec(actions, ui->tblvwTaskMonit->mapToGlobal(p));
+    }*/
+    if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
+	QMenu cm;
+
+        cm.addAction(acWorkDir);
+        cm.addAction(acShowTaskInfo);
+        //cm.addAction(acRestartTask);
+        //cm.addAction(acStopTask);
+
+        cm.addSeparator();
+
+        cm.addAction(acTaskPause);
+        cm.addAction(acTaskResume);
+        cm.addAction(acTaskCancel);
+
+        cm.addSeparator();
+
+        cm.addAction(acAgentSuspend);
+        cm.addAction(acAgentStop);
+        cm.addAction(acAgentReactivate);
+
+        cm.addSeparator();
+
+        cm.addAction(acHostSuspend);
+        cm.addAction(acHostStop);
+        cm.addAction(acHostReactivate);
+
+        cm.exec(ui->tblvwTaskMonit->mapToGlobal(p));
     }
 }
 
@@ -2308,18 +2361,92 @@ void MainWindow::displayTaskInfo()
 // Method: restartTask
 // Restarts selected (paused) task
 //----------------------------------------------------------------------
-void MainWindow::restartTask()
-{
-    runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "start");
-}
+// void MainWindow::restartTask()
+// {
+//     runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "start");
+// }
 
 //----------------------------------------------------------------------
 // Method: stopTask
 // Stops selected task
 //----------------------------------------------------------------------
-void MainWindow::stopTask()
+// void MainWindow::stopTask()
+// {
+//     runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "stop");
+// }
+
+//----------------------------------------------------------------------
+// Method: doTaskPause
+// TaskPause
+//----------------------------------------------------------------------
+void MainWindow::doTaskPause()
 {
-    runDockerCmd(ui->tblvwTaskMonit->currentIndex(), "stop");
+}
+
+//----------------------------------------------------------------------
+// Method: doTaskResume
+// TaskResume
+//----------------------------------------------------------------------
+void MainWindow::doTaskResume()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: doTaskCancel
+// TaskCancel
+//----------------------------------------------------------------------
+void MainWindow::doTaskCancel()
+{
+}
+
+
+//----------------------------------------------------------------------
+// Method: doAgentSuspend
+// AgentSuspend
+//----------------------------------------------------------------------
+void MainWindow::doAgentSuspend()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: doAgentStop
+// AgentStop
+//----------------------------------------------------------------------
+void MainWindow::doAgentStop()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: doAgentReactivate
+// AgentReactivate
+//----------------------------------------------------------------------
+void MainWindow::doAgentReactivate()
+{
+}
+
+
+//----------------------------------------------------------------------
+// Method: doHostSuspend
+// HostSuspend
+//----------------------------------------------------------------------
+void MainWindow::doHostSuspend()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: doHostStop
+// HostStop
+//----------------------------------------------------------------------
+void MainWindow::doHostStop()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: doHostReactivate
+// HostReactivate
+//----------------------------------------------------------------------
+void MainWindow::doHostReactivate()
+{
 }
 
 //----------------------------------------------------------------------

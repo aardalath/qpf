@@ -92,7 +92,6 @@ set (qpfGuiLib_hdr
   txtblmodel.h
   types.h
   verbleveldlg.h
-  version.h
   txitem.h
   txitemdlg.h
   xmlsyntaxhighlight.h)
@@ -130,8 +129,9 @@ qt5_wrap_cpp(qpfGuiLib_hdr_moc ${qpfGuiLib_hdr})
 qt5_wrap_ui (qpfGuiLib_ui_moc  ${qpfGuiLib_ui})
 qt5_add_resources(qpfGuiLib_ui_qrc ${qpfGuiLib_qrc})
 
-include_directories (${PROJECT_SOURCE_DIR})
-include_directories (${PROJECT_BINARY_DIR})
+include_directories (. .. 
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR})
 link_directories (${PSQLDIR}/lib ${ZMQDIR}/lib ${CURLDIR}/lib
                   ${UUIDDIR}/lib ${PCRE2DIR}/lib)
 
