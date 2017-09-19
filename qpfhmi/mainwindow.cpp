@@ -2336,10 +2336,13 @@ void MainWindow::showWorkDir()
     if (fs.exists()) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(localDir));
     } else {
-	int ret = QMessageBox::warning(this, tr("Folder does not exist"),
-				       tr("The task folder does not exist in, or is not visible from this host.\n"
-					  "This problem normally appears when the task has been executed in a processing host "
-                                          "that is not the host where the HMI is running"),
+        int ret = QMessageBox::warning(this, tr("Folder does not exist"),
+                                       tr("The task folder does not exist in, "
+                                          "or is not visible from this host.\n"
+                                          "This problem normally appears when "
+                                          "the task has been executed in a processing host "
+                                          "that is not the host where the HMI "
+                                          "is running"),
                                        QMessageBox::Ok);
     }
 }
@@ -2388,14 +2391,14 @@ void MainWindow::doTaskPause()
     TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
 
     if (status == TASK_RUNNING) {
-	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
-
-	Json::Reader reader;
-	Json::Value v;
-	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
-	
-	std::string taskId = v["Id"].asString();
-	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_PAUSE);
+        QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+        
+        Json::Reader reader;
+        Json::Value v;
+        reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+        
+        std::string taskId = v["Id"].asString();
+        hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_PAUSE);
     }
 }
 
@@ -2410,14 +2413,14 @@ void MainWindow::doTaskResume()
     TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
 
     if (status == TASK_PAUSED) {
-	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
-
-	Json::Reader reader;
-	Json::Value v;
-	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
-	
-	std::string taskId = v["Id"].asString();
-	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_RESUME);
+        QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+        
+        Json::Reader reader;
+        Json::Value v;
+        reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+        
+        std::string taskId = v["Id"].asString();
+        hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_RESUME);
     }
 }
 
@@ -2432,14 +2435,14 @@ void MainWindow::doTaskCancel()
     TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
 
     if ((status == TASK_PAUSED) || (status == TASK_RUNNING)) {
-	QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
-
-	Json::Reader reader;
-	Json::Value v;
-	reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
-	
-	std::string taskId = v["Id"].asString();
-	hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_CANCEL);
+        QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+        
+        Json::Reader reader;
+        Json::Value v;
+        reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+        
+        std::string taskId = v["Id"].asString();
+        hmiNode->sendProcHdlCmd(PROC_TASK, taskId, PROC_HDL_CANCEL);
     }
 }
 
@@ -2455,13 +2458,14 @@ void MainWindow::doAgentSuspend()
 
     Json::Reader reader;
     Json::Value v;
+    TRC("Data for selected task: " + procTaskStatusModel->data(dataIdx).toString().toStdString());
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     std::string agentId = v["Info"]["Agent"].asString();
     TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
     if (agentStatus == TASK_RUNNING) {
-	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_SUSPEND);
-	agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+        hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_SUSPEND);
+        agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
     }
 }
 
@@ -2481,8 +2485,8 @@ void MainWindow::doAgentStop()
     std::string agentId = v["Info"]["Agent"].asString();
     TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
     if ((agentStatus == TASK_RUNNING) || (agentStatus == TASK_PAUSED)) {
-	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_STOP);
-	agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+        hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_STOP);
+        agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
     }
 }
 
@@ -2502,8 +2506,8 @@ void MainWindow::doAgentReactivate()
     std::string agentId = v["Info"]["Agent"].asString();
     TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
     if (agentStatus == TASK_PAUSED) {
-	hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_REACTIVATE);
-	agentProcStatus[QString::fromStdString(agentId)] = TASK_RUNNING;
+        hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_REACTIVATE);
+        agentProcStatus[QString::fromStdString(agentId)] = TASK_RUNNING;
     }
 }
 
@@ -2525,8 +2529,8 @@ void MainWindow::doHostSuspend()
     std::string hostId = hostForAgent[agName].toStdString();
     TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
     if (hostStatus == TASK_RUNNING) {
-	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_SUSPEND);
-	hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+        hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_SUSPEND);
+        hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
     }
 }
 
@@ -2547,8 +2551,8 @@ void MainWindow::doHostStop()
     std::string hostId = hostForAgent[agName].toStdString();
     TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
     if ((hostStatus == TASK_RUNNING) || (hostStatus == TASK_PAUSED)) {
-	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_STOP);
-	hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+        hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_STOP);
+        hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
     }
 }
 
@@ -2569,8 +2573,8 @@ void MainWindow::doHostReactivate()
     std::string hostId = hostForAgent[agName].toStdString();
     TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
     if (hostStatus == TASK_PAUSED) {
-	hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_REACTIVATE);
-	hostProcStatus[QString::fromStdString(hostId)] = TASK_RUNNING;
+        hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_REACTIVATE);
+        hostProcStatus[QString::fromStdString(hostId)] = TASK_RUNNING;
     }
 }
 
