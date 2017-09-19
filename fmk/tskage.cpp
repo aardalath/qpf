@@ -170,24 +170,24 @@ void TskAge::runEachIterationForContainers()
     case IDLE:
         ++idleCycles;
         // Request task for processing in case the agent is idle
-	if (isTaskRequestActive) {
-	    if (idleCycles > idleCyclesBeforeRequest) {
-		// Create message and send
-		Message<MsgBodyTSK> msg;
-		msg.buildHdr(ChnlTskProc, MsgTskRqst, CHNLS_IF_VERSION,
-			     compName, "TskMng",
-			     "", "", "");
-		
-		std::string chnl(ChnlTskProc + "_" + compName);
-		send(chnl, msg.str());
-		DBG("Sending request via channel " + chnl);
-		InfoMsg("Sending request via channel " + chnl);
-		
-		pStatus = WAITING;
-		InfoMsg("Switching to status " + ProcStatusName[pStatus]);
-		waitingCycles = 0;
-	    }
-	}
+        if (isTaskRequestActive) {
+            if (idleCycles > idleCyclesBeforeRequest) {
+                // Create message and send
+                Message<MsgBodyTSK> msg;
+                msg.buildHdr(ChnlTskProc, MsgTskRqst, CHNLS_IF_VERSION,
+                             compName, "TskMng",
+                             "", "", "");
+                
+                std::string chnl(ChnlTskProc + "_" + compName);
+                send(chnl, msg.str());
+                DBG("Sending request via channel " + chnl);
+                InfoMsg("Sending request via channel " + chnl);
+                
+                pStatus = WAITING;
+                InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+                waitingCycles = 0;
+            }
+        }
         break;
     case WAITING:
         ++waitingCycles;
