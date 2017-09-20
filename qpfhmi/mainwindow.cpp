@@ -2302,31 +2302,33 @@ void MainWindow::sortTaskViewByColumn(int c)
 void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 {
     if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
-	QMenu cm;
-
+        QMenu cm;
+        
         cm.addAction(acWorkDir);
         cm.addAction(acShowTaskInfo);
         //cm.addAction(acRestartTask);
         //cm.addAction(acStopTask);
-
+        
         cm.addSeparator();
-
-	QMenu * cmTask = cm.addMenu("Task control ...");
+        
+        QMenu * cmTask = cm.addMenu("Task control ...");
         cmTask->addAction(acTaskPause);
         cmTask->addAction(acTaskResume);
         cmTask->addAction(acTaskCancel);
-
-	QMenu * cmAgent = cm.addMenu("Agent processing ...");
+        
+        QMenu * cmAgent = cm.addMenu("Agent processing ...");
         cmAgent->addAction(acAgentSuspend);
         cmAgent->addAction(acAgentStop);
         cmAgent->addAction(acAgentReactivate);
 
-	QMenu * cmHost = cm.addMenu("Host processing ...");
+        QMenu * cmHost = cm.addMenu("Host processing ...");
         cmHost->addAction(acHostSuspend);
         cmHost->addAction(acHostStop);
         cmHost->addAction(acHostReactivate);
-
+        
+        isViewsUpdateActive = false;
         cm.exec(ui->tblvwTaskMonit->mapToGlobal(p));
+        isViewsUpdateActive = true;
     }
 }
 
@@ -2749,7 +2751,9 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
         }
     }
     if (actions.count() > 0) {
+        isViewsUpdateActive = false;
         QMenu::exec(actions, tblvw->mapToGlobal(p));
+        isViewsUpdateActive = true;
     }
 }
 
@@ -2830,7 +2834,9 @@ void MainWindow::showTxContextMenu(const QPoint & p)
 
     }
     if (actions.count() > 0) {
+        isViewsUpdateActive = false;
         QMenu::exec(actions, ui->tblvwTx->mapToGlobal(p));
+        isViewsUpdateActive = true;
     }
 }
 
