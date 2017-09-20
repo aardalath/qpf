@@ -218,20 +218,19 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     } else if (cmd == CmdProcHdl) { // Embedded is message to TskAgents
 
         Message<MsgBodyCMD> relayMsg(m);
-        MsgBodyCMD body;
         relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
-                     compName, "*",
-                     "", "", "");
-	relayMsg.buildBody(body);
-	c->setMsgOut(relayMsg.str());
-	TRC("Sending relay message via channel " + ChnlCmd);
-	TRC("with message: " + relayMsg.str());
-
+                          compName, "*",
+                          "", "", "");
+        relayMsg.buildBody(body);
+        c->setMsgOut(relayMsg.str());
+        TRC("Sending relay message via channel " + ChnlCmd);
+        TRC("with message: " + relayMsg.str());
+        
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
         body["ans"] = "OK";
-
+        
     } else if (cmd == CmdQuit) { // Session id. request
 
         requestQuit = true;
