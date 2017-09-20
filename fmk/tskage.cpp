@@ -334,7 +334,24 @@ void TskAge::processSubcmdMsg(MessageString & m)
 {
     TRC("Sub-command message received: " + m);
 
-    Message<MsgBodyTSK> msg(m);    
+    Message<MsgBodyTSK> msg(m);
+
+    std::string subCmd   = msg.body["subcmd"].asString();
+    SubjectId   subj     = (SubjectId)(masg.body["target_type"].asInt());
+    std::string subjName = msg.body["target"].asString();
+
+    switch (subj) {
+    case PROC_TASK:
+        break;
+    case PROC_AGENT:
+        if (compName == subjName) {
+            isTaskRequestActive = (subCmd == PROC_HDL_REACTIVATE);
+        }
+        break;
+    case PROC_HOST:
+        break;
+    default:
+    }
 }
 
 //----------------------------------------------------------------------
