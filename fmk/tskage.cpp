@@ -345,7 +345,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
         break;
     case PROC_AGENT:
         if (compName == subjName) {
-            isTaskRequestActive = (subCmd == PROC_HDL_REACTIVATE);
+            isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
     case PROC_HOST:
