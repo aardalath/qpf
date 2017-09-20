@@ -339,7 +339,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
     std::string subCmd   = msg.body["subcmd"].asString();
     SubjectId   subj     = (SubjectId)(msg.body["target_type"].asInt());
     std::string subjName = msg.body["target"].asString();
-
+    
     switch (subj) {
     case PROC_TASK:
         break;
@@ -351,6 +351,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
     case PROC_HOST:
         break;
     default:
+        break;
     }
 }
 
