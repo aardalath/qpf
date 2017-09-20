@@ -221,7 +221,6 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
                           compName, "*",
                           "", "", "");
-        relayMsg.buildBody(body);
         c->setMsgOut(relayMsg.str());
         TRC("Sending relay message via channel " + ChnlCmd);
         TRC("with message: " + relayMsg.str());
