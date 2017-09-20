@@ -364,7 +364,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
         }
         break;
     case PROC_HOST:
-        if (currentHostAddr == subjName) {
+        if (cfg.currentHostAddr == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
