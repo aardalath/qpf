@@ -339,11 +339,13 @@ void TskAge::processSubcmdMsg(MessageString & m)
     std::string subCmd   = msg.body["subcmd"].asString();
     SubjectId   subj     = (SubjectId)(msg.body["target_type"].asInt());
     std::string subjName = msg.body["target"].asString();
+
+    std::string currTaskId;
+    TaskInfo & task = (*runningTask);
     
     switch (subj) {
     case PROC_TASK:
-        TaskInfo & task = (*runningTask);
-        std::string currTaskId = task["taskData"]["Id"].asString();
+        currTaskId = task["taskData"]["Id"].asString();
         if (currTaskId == subjName) {
             if (subCmd == "PAUSE") {
                 dckMng->runCmd("pause", std::vector<std::string>(), subjName);
