@@ -337,7 +337,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
     Message<MsgBodyTSK> msg(m);
 
     std::string subCmd   = msg.body["subcmd"].asString();
-    SubjectId   subj     = (SubjectId)(masg.body["target_type"].asInt());
+    SubjectId   subj     = (SubjectId)(msg.body["target_type"].asInt());
     std::string subjName = msg.body["target"].asString();
 
     switch (subj) {
