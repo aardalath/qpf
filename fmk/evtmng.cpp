@@ -217,14 +217,19 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     } else if (cmd == CmdProcHdl) { // Embedded is message to TskAgents
 
+        // Send relay message
         Message<MsgBodyCMD> relayMsg(m);
         relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
                           compName, "*",
                           "", "", "");
-        c->setMsgOut(relayMsg.str());
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator
+            it = connections.find(ChnlCmd);
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(relayMsg.str());
         TRC("Sending relay message via channel " + ChnlCmd);
         TRC("with message: " + relayMsg.str());
-        
+
+        // Build HMICmd answer
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
