@@ -202,7 +202,8 @@ MainWindow::MainWindow(QString url, QString sessionName,
     QTimer * updateSystemViewTimer = new QTimer(this);
     connect(updateSystemViewTimer, SIGNAL(timeout()), this, SLOT(updateSystemView()));
     updateSystemViewTimer->start(1000);
-
+    isViewsUpdateActive = true;
+    
     //== Set log file watchers ========================================
     setLogWatch();
 }
@@ -1329,12 +1330,12 @@ void MainWindow::showState()
             QString color = QString::fromStdString(stateColors[stateId]);
             p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(QString::fromStdString(n));
         }
-
+        
         // Now processing host lines
         int j = 1;
         for (auto & kv : cfg.network.processingNodes()) {
-	    QString pnName(QString::fromStdString(kv.first));
-	    bool storeInMaps = (agentsInHost.find(pnName) == agentsInHost.end());
+            QString pnName(QString::fromStdString(kv.first));
+            bool storeInMaps = (agentsInHost.find(pnName) == agentsInHost.end());
             QStringList agList;
             h += QString("<br><b>%1</b>").arg(pnName);
             p += "<br>";
@@ -1347,18 +1348,19 @@ void MainWindow::showState()
                 int stateId = getStateIdx(ss);
                 QString color = QString::fromStdString(stateColors[stateId]);
                 p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(nn);
-
-		if (storeInMaps) {
-		    agList << nn;
-		    TaskStatus stts = ((stateId >= RUNNING) ? TASK_RUNNING : TASK_STOPPED);
-		    agentProcStatus[nn] = stts;
-		    hostProcStatus[pnName]  = stts;
-		    hostForAgent[nn] = pnName;
-		}
+                
+                if (storeInMaps) {
+                    agList << nn;
+                    hostForAgent[nn] = pnName;
+                }
+                TaskStatus stts = (((stateId == RUNNING) || (stateId == OPERATIONAL)) ?
+                                   TASK_RUNNING : TASK_STOPPED);
+                agentProcStatus[nn] = stts;
+                hostProcStatus[pnName]  = stts;
             }
-	    if (storeInMaps) {
-		agentsInHost[pnName] = agList;
-	    }
+            if (storeInMaps) {
+                agentsInHost[pnName] = agList;
+            }
             ++j;
         }
         
@@ -1415,40 +1417,42 @@ void MainWindow::updateSystemView()
         newPathToWatch.clear();
     }
 
-    //== 1. Processing tasks
-    procTaskStatusModel->setFullUpdate(true);
-    procTaskStatusModel->refresh();
-    if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
-        ui->tblvwTaskMonit->resizeColumnsToContents();
-        resTask = true;
+    if (isViewsUpdateActive) {
+        //== 1. Processing tasks
+        procTaskStatusModel->setFullUpdate(true);
+        procTaskStatusModel->refresh();
+        if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
+            ui->tblvwTaskMonit->resizeColumnsToContents();
+            resTask = true;
+        }
+        const int TaskDataCol = 9;
+        ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
+        
+        //== 2. System Alerts
+        sysAlertModel->refresh();
+        if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
+            ui->tblvwSysAlerts->resizeColumnsToContents();
+            resSysAlert = true;
+        }
+        
+        //== 3. Diagnostics Alerts
+        procAlertModel->refresh();
+        if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
+            ui->tblvwAlerts->resizeColumnsToContents();
+            resAlert = true;
+        }
+        
+        //== 4. Local Archive
+        localarchViewUpdate();
+        
+        //== 5. Transmissions
+        txModel->refresh();
+        const int MsgContentCol = 5;
+        ui->tblvwTx->setColumnHidden(MsgContentCol, true);
+
+        // 6. Agents Monit. Panel
+        updateAgentsMonitPanel();
     }
-    const int TaskDataCol = 9;
-    ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
-
-    //== 2. System Alerts
-    sysAlertModel->refresh();
-    if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
-        ui->tblvwSysAlerts->resizeColumnsToContents();
-        resSysAlert = true;
-    }
-
-    //== 3. Diagnostics Alerts
-    procAlertModel->refresh();
-    if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
-        ui->tblvwAlerts->resizeColumnsToContents();
-        resAlert = true;
-    }
-
-    //== 4. Local Archive
-    localarchViewUpdate();
-
-    //== 5. Transmissions
-    txModel->refresh();
-    const int MsgContentCol = 5;
-    ui->tblvwTx->setColumnHidden(MsgContentCol, true);
-
-    // 6. Agents Monit. Panel
-    updateAgentsMonitPanel();
 }
 
 //----------------------------------------------------------------------
@@ -1818,7 +1822,9 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
             acReprocess->setProperty("clickedItem", p);
         }
 
+        isViewsUpdateActive = false;
         menu.exec(ui->treevwArchive->mapToGlobal(p));
+        isViewsUpdateActive = true;
         //QMenu::exec(actions, ui->treevwArchive->mapToGlobal(p));
     }
 }
@@ -1989,7 +1995,10 @@ void MainWindow::showTabsContextMenu(const QPoint & p)
     menu.addAction(acTabClose);
     menu.addAction(acTabCloseAll);
     menu.addAction(acTabCloseOther);
+
+    isViewsUpdateActive = false;
     menu.exec(w->mapToGlobal(p));
+    isViewsUpdateActive = true;
 }
 
 //----------------------------------------------------------------------
@@ -2059,7 +2068,10 @@ void MainWindow::showTabsListMenu()
     }
     QMenu menu(w);
     menu.addActions(acList);
+
+    isViewsUpdateActive = false;
     menu.exec(w->mapToGlobal(p));
+    isViewsUpdateActive = true;
 }
 
 //----------------------------------------------------------------------
@@ -2119,7 +2131,10 @@ void MainWindow::showJsonContextMenu(const QPoint & p)
         menu.addAction(acCollS);
         menu.addAction(acCollA);
         pointOfAction = p;
+
+        isViewsUpdateActive = false;
         menu.exec(w->mapToGlobal(p));
+        isViewsUpdateActive = true;
     }
 }
 
@@ -2463,6 +2478,7 @@ void MainWindow::doAgentSuspend()
 	
     std::string agentId = v["Info"]["Agent"].asString();
     TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    TRC("Agent: " + agentId + " has status " + TaskStatusName[agentStatus]);
     if (agentStatus == TASK_RUNNING) {
         hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_SUSPEND);
         agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;

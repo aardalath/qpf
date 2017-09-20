@@ -397,6 +397,8 @@ private:
     bool isAlertsCustomFilterActive;
 
     QString newPathToWatch;
+
+    bool isViewsUpdateActive;
 };
 
 }
