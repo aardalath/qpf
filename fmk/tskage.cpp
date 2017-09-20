@@ -342,6 +342,19 @@ void TskAge::processSubcmdMsg(MessageString & m)
     
     switch (subj) {
     case PROC_TASK:
+        TaskInfo & task = (*runningTask);
+        std::string currTaskId = task["taskData"]["Id"].asString();
+        if (currTaskId == subjName) {
+            if (subCmd == "PAUSE") {
+                dckMng->runCmd("pause", std::vector<std::string>(), subjName);
+            } else if (subCmd == "RESUME") {
+                dckMng->runCmd("unpause", std::vector<std::string>(), subjName);
+            } else if (subCmd == "CANCEL") {
+                dckMng->runCmd("stop", std::vector<std::string>(), subjName);
+            } else {
+                //
+            }
+        }
         break;
     case PROC_AGENT:
         if (compName == subjName) {
@@ -349,6 +362,9 @@ void TskAge::processSubcmdMsg(MessageString & m)
         }
         break;
     case PROC_HOST:
+        if (currentHostAddr == subjName) {
+            isTaskRequestActive = (subCmd == "REACTIVATE");
+        }
         break;
     default:
         break;

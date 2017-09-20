@@ -147,6 +147,13 @@ public:
     //----------------------------------------------------------------------
     virtual bool shutdown(std::string srv) {}
 
+    //----------------------------------------------------------------------
+    // Method: runCmd
+    // Run Docker command with argument
+    //----------------------------------------------------------------------
+    virtual bool runCmd(std::string cmd, std::vector<std::string> args,
+                        std::string & containerId);
+
 };
 
 //}
