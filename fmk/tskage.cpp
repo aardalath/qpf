@@ -390,7 +390,7 @@ void TskAge::sendTaskReport()
     json taskData = jinfo.val()[0];
     task["taskData"] = taskData;
 
-    json jmounts = taskData["Mount"];
+    json jmounts = taskData["Mounts"];
     taskWorkingDir = jmounts[0]["Destination"].asString();
 
     json jstate = taskData["State"];
