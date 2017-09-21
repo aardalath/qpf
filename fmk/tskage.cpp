@@ -390,7 +390,7 @@ void TskAge::sendTaskReport()
     json taskData = jinfo.val()[0];
     task["taskData"] = taskData;
     
-    taskWorkingDir = task["Mount"][0]["Destination"].asString();
+    taskWorkingDir = taskData["Mount"][0]["Destination"].asString();
 
     json jstate = taskData["State"];
     std::string inspStatus = jstate["Status"].asString();
@@ -577,7 +577,9 @@ void TskAge::updateProgress()
                 if (porcEndsAt != std::string::npos) {
                     size_t porcBeginsAt = line.find_last_of(" ", 0, porcEndsAt);
                     if (porcBeginsAt != std::string::npos) {
-                        std::string percentage = line.substr(porcBeginsAt + 1, porcEndsAt - porcBeginsAt);
+                        std::string percentage =
+                            line.substr(porcBeginsAt + 1,
+                                        porcEndsAt - porcBeginsAt);
                         progress = std::stod(percentage);
                     }
                 }
