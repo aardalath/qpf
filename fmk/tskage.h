@@ -52,6 +52,7 @@
 #include <thread>
 #include <mutex>
 #include <sys/stat.h>
+#include <fstream>
 
 //------------------------------------------------------------
 // Topic: External packages
