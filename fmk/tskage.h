@@ -210,6 +210,7 @@ private:
 
     std::string              taskWorkingDir;
 
+    std::ifstream            logFileHdl;
     size_t                   logFilePos;
     std::string              logDir;
     std::string              logFile;
