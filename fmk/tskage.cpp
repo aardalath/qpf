@@ -390,9 +390,6 @@ void TskAge::sendTaskReport()
     json taskData = jinfo.val()[0];
     task["taskData"] = taskData;
 
-    json jmounts = taskData["Mounts"];
-    taskWorkingDir = jmounts[0]["Source"].asString();
-
     json jstate = taskData["State"];
     std::string inspStatus = jstate["Status"].asString();
     int         inspCode   = jstate["ExitCode"].asInt();
@@ -535,10 +532,10 @@ void TskAge::updateProgress()
     // First, check that file exists and is open
     if (! isLogFileOpen) {
         logFilePos = 0;
-        logDir = taskWorkingDir + "/log";
+        logDir = exchangeDir + "/log";
         logFile = "";
         
-        // Look for log file in <taskWorkDir>/log
+        // Look for log file in <exchangeDirr>/log
         DIR * dp = NULL;
         struct dirent * dirp;
         if ((dp = opendir(logDir.c_str())) == NULL) {

@@ -209,8 +209,6 @@ private:
 
     std::string              ruleBasedName;
 
-    std::string              taskWorkingDir;
-
     bool                     isLogFileOpen;
     std::ifstream            logFileHdl;
     size_t                   logFilePos;
