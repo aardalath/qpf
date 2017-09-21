@@ -575,9 +575,9 @@ void TskAge::updateProgress()
             if (line.find(":PROGRESS:") != std::string::npos) {
                 size_t porcEndsAt = line.find_first_of("%");
                 if (porcEndsAt != std::string::npos) {
-                    size_t procBeginsAt = line.find_last_of(" ", 0, porcEndsAt);
-                    if (procBeginsAt != std::string::npos) {
-                        std::string percentage = line.substr(procBeginsAt + 1, procEndsAt - procBeginsAt);
+                    size_t porcBeginsAt = line.find_last_of(" ", 0, porcEndsAt);
+                    if (porcBeginsAt != std::string::npos) {
+                        std::string percentage = line.substr(porcBeginsAt + 1, porcEndsAt - porcBeginsAt);
                         progress = std::stod(percentage);
                     }
                 }
