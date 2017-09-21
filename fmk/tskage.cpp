@@ -391,7 +391,7 @@ void TskAge::sendTaskReport()
     task["taskData"] = taskData;
 
     json jmounts = taskData["Mounts"];
-    taskWorkingDir = jmounts[0]["Destination"].asString();
+    taskWorkingDir = jmounts[0]["Source"].asString();
 
     json jstate = taskData["State"];
     std::string inspStatus = jstate["Status"].asString();
