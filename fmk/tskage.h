@@ -211,6 +211,7 @@ private:
 
     std::string              taskWorkingDir;
 
+    bool                     isLogFileOpen;
     std::ifstream            logFileHdl;
     size_t                   logFilePos;
     std::string              logDir;

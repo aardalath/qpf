@@ -389,8 +389,9 @@ void TskAge::sendTaskReport()
     JValue jinfo(info.str());
     json taskData = jinfo.val()[0];
     task["taskData"] = taskData;
-    
-    taskWorkingDir = taskData["Mount"][0]["Destination"].asString();
+
+    json jmounts = taskData["Mount"];
+    taskWorkingDir = jmounts[0]["Destination"].asString();
 
     json jstate = taskData["State"];
     std::string inspStatus = jstate["Status"].asString();
@@ -523,32 +524,7 @@ void TskAge::resetProgress()
     // Initialize progress and log related variables
     progress = 0;
     
-    logFilePos = 0;
-    logDir = taskWorkingDir + "/log";
-    logFile = "";
-
-    // Look for log file in <taskWorkDir>/log
-    DIR * dp = NULL;
-    struct dirent * dirp;
-    if ((dp = opendir(logDir.c_str())) == NULL) {
-        WarnMsg("Cannot open log directory " + logDir);
-        TRC("Cannot open log directory " + logDir);
-    } else {
-        while ((dirp = readdir(dp)) != NULL) {
-            if (dirp->d_name[0] != '.') {
-                std::string dname(dirp->d_name);
-                //if (dname.substr(0, 3) != "EUC") { continue; }
-                logFile = logDir + "/" + dname;
-                TRC("Found logfile " + logFile);
-            }
-        }
-        closedir(dp);
-    }
-
-    // Open log file
-    if (! logFile.empty()) {
-        logFileHdl.open(logFile);
-    }
+    isLogFileOpen = false;
 }
 
 //----------------------------------------------------------------------
@@ -556,6 +532,39 @@ void TskAge::resetProgress()
 //----------------------------------------------------------------------
 void TskAge::updateProgress()
 {
+    // First, check that file exists and is open
+    if (! isLogFileOpen) {
+        logFilePos = 0;
+        logDir = taskWorkingDir + "/log";
+        logFile = "";
+        
+        // Look for log file in <taskWorkDir>/log
+        DIR * dp = NULL;
+        struct dirent * dirp;
+        if ((dp = opendir(logDir.c_str())) == NULL) {
+            WarnMsg("Cannot open log directory " + logDir);
+            TRC("Cannot open log directory " + logDir);
+        } else {
+            while ((dirp = readdir(dp)) != NULL) {
+                if (dirp->d_name[0] != '.') {
+                    std::string dname(dirp->d_name);
+                    //if (dname.substr(0, 3) != "EUC") { continue; }
+                    logFile = logDir + "/" + dname;
+                    TRC("Found logfile " + logFile);
+                }
+            }
+            closedir(dp);
+        }
+        
+        // Open log file
+        if (! logFile.empty()) {
+            logFileHdl.open(logFile);
+            isLogFileOpen = true;
+        }
+    }
+
+    if (! isLogFileOpen) { return; }
+    
     // See if new content can be obtained from the log file
     logFileHdl.seekg (0, logFileHdl.end);
     int length = logFileHdl.tellg();
@@ -597,6 +606,7 @@ void TskAge::endProgress()
 {
     progress = 100;
     logFileHdl.close();
+    isLogFileOpen = false;
 }
 
 //}
