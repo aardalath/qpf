@@ -167,6 +167,21 @@ private:
     //----------------------------------------------------------------------
     void sendHostInfoUpdate();
 
+    //----------------------------------------------------------------------
+    // Method: resetProgress
+    //----------------------------------------------------------------------
+    void resetProgress();
+    
+    //----------------------------------------------------------------------
+    // Method: updateProgress
+    //----------------------------------------------------------------------
+    void updateProgress();
+    
+    //----------------------------------------------------------------------
+    // Method: endProgress
+    //----------------------------------------------------------------------
+    void endProgress();
+    
     Property(TskAge, std::string, workDir, WorkDir);
     Property(TskAge, std::string, sysDir,  SysDir);
     Property(TskAge, bool,        remote,  Remote);
@@ -192,7 +207,13 @@ private:
     std::string              exchgLog;
 
     std::string              ruleBasedName;
-    
+
+    std::string              taskWorkingDir;
+
+    size_t                   logFilePos;
+    std::string              logDir;
+    std::string              logFile;
+
     MessageString            origMsgString;
 
     int                      numTask;

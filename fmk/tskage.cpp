@@ -249,81 +249,79 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     // Return if not recipient
     if (msg.header.target() != compName) { return; }
 
-    if (pStatus == WAITING) {
+    if (pStatus != WAITING) { return; }
 
-        // Define and set task object
-        MsgBodyTSK & body = msg.body;
-        runningTask = new TaskInfo(body["info"]);
-        TaskInfo & task = (*runningTask);
+    // Define and set task object
+    MsgBodyTSK & body = msg.body;
+    runningTask = new TaskInfo(body["info"]);
+    TaskInfo & task = (*runningTask);
 
-        task["taskHost"]  = compAddress;
-        task["taskAgent"] = compName;
+    task["taskHost"]  = compAddress;
+    task["taskAgent"] = compName;
 
-        assert(compName == msg.header.target());
-        DBG(">>>>>>>>>> " << compName
-            << " RECEIVED TASK INFO FOR PROCESSING\n"
-            ">>>>>>>>>> Task name:" << msg.body("info")["name"].asString());
+    assert(compName == msg.header.target());
+    DBG(">>>>>>>>>> " << compName
+        << " RECEIVED TASK INFO FOR PROCESSING\n"
+        ">>>>>>>>>> Task name:" << msg.body("info")["name"].asString());
 
-        numTask++;
+    numTask++;
 
-        //---- Define processing environment
-        std::string sessId = task.taskSession();
-        DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
-        if (sessId != cfg.sessionId) {
-            DBG(compName + ">> CHANGING SESSION ID");
-            str::replaceAll(workDir, cfg.sessionId, sessId);
-            cfg.synchronizeSessionId(sessId);
-        }
+    //---- Define processing environment
+    std::string sessId = task.taskSession();
+    DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
+    if (sessId != cfg.sessionId) {
+        DBG(compName + ">> CHANGING SESSION ID");
+        str::replaceAll(workDir, cfg.sessionId, sessId);
+        cfg.synchronizeSessionId(sessId);
+    }
 
-        //---- Create exchange area
-        internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
-                               std::to_string(numTask));
+    //---- Create exchange area
+    internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
+                           std::to_string(numTask));
 
-        exchangeDir = workDir + "/" + internalTaskNameIdx;
-        exchgIn     = exchangeDir + "/in";
-        exchgOut    = exchangeDir + "/out";
-        exchgLog    = exchangeDir + "/log";
+    exchangeDir = workDir + "/" + internalTaskNameIdx;
+    exchgIn     = exchangeDir + "/in";
+    exchgOut    = exchangeDir + "/out";
+    exchgLog    = exchangeDir + "/log";
 
-        mkdir(exchangeDir.c_str(), 0755);
-        mkdir(exchgIn.c_str(),     0755);
-        mkdir(exchgOut.c_str(),    0755);
-        mkdir(exchgLog.c_str(),    0755);
+    mkdir(exchangeDir.c_str(), 0755);
+    mkdir(exchgIn.c_str(),     0755);
+    mkdir(exchgOut.c_str(),    0755);
+    mkdir(exchgLog.c_str(),    0755);
 
-        //---- Retrieve the input products
-        urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
-        if (remote) {
-            urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
-        }
+    //---- Retrieve the input products
+    urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
+    if (remote) {
+        urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
+    }
 
-        int i = 0;
-        for (auto & m : task.inputs.products) {
-            urlh.setProduct(m);
-            ProductMetadata & mg = urlh.fromGateway2Processing();
-            task.inputs.products.push_back(mg);
-            task["inputs"][i] = mg.val();
-            ++i;
-        }
+    int i = 0;
+    for (auto & m : task.inputs.products) {
+        urlh.setProduct(m);
+        ProductMetadata & mg = urlh.fromGateway2Processing();
+        task.inputs.products.push_back(mg);
+        task["inputs"][i] = mg.val();
+        ++i;
+    }
 
-        //----  * * * LAUNCH TASK * * *
-        if (dckMng->createContainer(task.taskPath(), exchangeDir, containerId)) {
+    //----  * * * LAUNCH TASK * * *
+    if (dckMng->createContainer(task.taskPath(), exchangeDir, containerId)) {
 
-            InfoMsg("Running task " + task.taskName() +
-                    " (" + task.taskPath() + ") within container " + containerId);
-            origMsgString = m;
-            sleep(1);
+        InfoMsg("Running task " + task.taskName() +
+                " (" + task.taskPath() + ") within container " + containerId);
+        origMsgString = m;
+        sleep(1);
 
-            // Set processing status
-            pStatus = PROCESSING;
-            workingDuring = 0;
-            progress = 0;
+        // Set processing status
+        pStatus = PROCESSING;
+        workingDuring = 0;
+        resetProgress();
             
-            // Send back information to Task Manager
-            sendTaskReport();
+        // Send back information to Task Manager
+        sendTaskReport();
 
-        } else {
-            WarnMsg("Couldn't execute docker container");
-        }
-
+    } else {
+        WarnMsg("Couldn't execute docker container");
     }
 }
 
@@ -346,6 +344,8 @@ void TskAge::processSubcmdMsg(MessageString & m)
     switch (subj) {
     case PROC_TASK:
         currTaskId = task["taskData"]["Id"].asString();
+        TRC("Trying to " + subCmd + " container with id " + subjName +
+            " (" + currTaskId + " / " + containerId + ")");
         if (currTaskId == subjName) {
             if (subCmd == "PAUSE") {
                 dckMng->runCmd("pause", std::vector<std::string>(), subjName);
@@ -359,11 +359,13 @@ void TskAge::processSubcmdMsg(MessageString & m)
         }
         break;
     case PROC_AGENT:
+        TRC("Trying to " + subCmd + " agent " + subjName);
         if (compName == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
     case PROC_HOST:
+        TRC("Trying to " + subCmd + " host " + subjName);
         if (cfg.currentHostAddr == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
@@ -387,6 +389,8 @@ void TskAge::sendTaskReport()
     JValue jinfo(info.str());
     json taskData = jinfo.val()[0];
     task["taskData"] = taskData;
+    
+    taskWorkingDir = task["Mount"][0]["Destination"].asString();
 
     json jstate = taskData["State"];
     std::string inspStatus = jstate["Status"].asString();
@@ -415,7 +419,7 @@ void TskAge::sendTaskReport()
         InfoMsg("Switching to status " + ProcStatusName[pStatus]);
     } else {
         workingDuring++;
-        progress = (int)(100. * (1. - 1. / (float)(workingDuring)));
+        updateProgress();
         task["taskData"]["State"]["Progress"] = std::to_string(progress);
     }
 
@@ -509,6 +513,88 @@ void TskAge::sendHostInfoUpdate()
                              "info", hostInfo.toJsonStr(), "");
 
     armHostInfoTimer();
+}
+
+//----------------------------------------------------------------------
+// Method: resetProgress
+//----------------------------------------------------------------------
+void TskAge::resetProgress()
+{
+    // Initialize progress and log related variables
+    progress = 0;
+    
+    logFilePos = 0;
+    logDir = taskWorkingDir + "/log";
+    logFile = "";
+
+    // Look for log file in <taskWorkDir>/log
+    DIR * dp = NULL;
+    struct dirent * dirp;
+    if ((dp = opendir(logDir.c_str())) == NULL) {
+        WarnMsg("Cannot open log directory " + logDir);
+        TRC("Cannot open log directory " + logDir);
+    } else {
+        while ((dirp = readdir(dp)) != NULL) {
+            if (dirp->d_name[0] != '.') {
+                std::string dname(dirp->d_name);
+                //if (dname.substr(0, 3) != "EUC") { continue; }
+                logFile = logDir + "/" + dname;
+                TRC("Found logfile " + logFile);
+            }
+        }
+        closedir(dp);
+    }
+
+    // Open log file
+    if (! logFile.empty()) {
+        logFileHdl.open(logFile);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: updateProgress
+//----------------------------------------------------------------------
+void TskAge::updateProgress()
+{
+    // See if new content can be obtained from the log file
+    logFileHdl.seekg (0, logFileHdl.end);
+    int length = logFileHdl.tellg();
+
+    // If new content is there, read it and process it
+    if (length > logFilePos) {
+        logFileHdl.seekg(logFilePos, logFileHdl.beg);
+
+        std::string line;
+        while (! logFileHdl.eof()) {
+            // Get line, look for progress mark, and parse it
+            // It is assumed that  progress is shown as follows:
+            // .....:PROGRESS:... XXX%
+            // where XXX is a float number representing the percentage
+            // of progress, and that no other % appears in the line
+            std::getline(logFileHdl, line);
+            if (line.find(":PROGRESS:") != std::string::npos) {
+                size_t porcEndsAt = line.find_first_of("%");
+                if (porcEndsAt != std::string::npos) {
+                    size_t procBeginsAt = line.find_last_of(" ", 0, porcEndsAt);
+                    if (procBeginsAt != std::string::npos) {
+                        std::string percentage = line.substr(procBeginsAt + 1, procEndsAt - procBeginsAt);
+                        progress = std::stod(percentage);
+                    }
+                }
+            }
+        }
+                    
+        logFilePos = length;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: endProgress
+//----------------------------------------------------------------------
+void TskAge::endProgress()
+{
+    progress = 100;
+    logFileHdl.close();
 }
 
 //}
