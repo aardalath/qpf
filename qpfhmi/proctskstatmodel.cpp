@@ -72,6 +72,10 @@ ProcTaskStatusModel::ProcTaskStatusModel()
     statusPalette["SCHEDULED"] = FgBgColors(QColor(Qt::gray),  QColor(Qt::white));
     statusPalette["RUNNING"]   = FgBgColors(QColor(Qt::blue),  QColor(Qt::white));
     statusPalette["FINISHED"]  = FgBgColors(QColor(Qt::black), QColor(Qt::green));
+    statusPalette["PAUSED"]    = FgBgColors(QColor(Qt::blue),  QColor(Qt::lightgrey));
+    statusPalette["FAILED"]    = FgBgColors(QColor(Qt::white), QColor(Qt::red));
+    statusPalette["STOPPED"]   = FgBgColors(QColor(Qt::white), QColor(Qt::orange));
+    statusPalette["ARCHIVED"]  = FgBgColors(QColor(Qt::black), QColor(Qt::grey));
     statusPalette["FAILED"]    = FgBgColors(QColor(Qt::white), QColor(Qt::red));
 
     TablePalette  tblPalette;
