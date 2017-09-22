@@ -34,7 +34,7 @@ if [ "$first" == "dummy.cfg" ]; then
     files=$(echo in/*)
     if [ "$files" == 'in/*' ]; then
         files="in/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.fits"
-        dd if=/dev/random of=$files count=4
+        dd if=/dev/random count=4 > $files
     fi
     output=$(echo $files |\
                  sed -e 's#in/#out/#g' \
@@ -380,7 +380,24 @@ EOF
     sleep 4
 done > $output
 
-cat $output > $log
+#cat $output > $log
+
+(
+theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
+echo "$theDate:INFO:process:Start processing . . ."
+k=0
+while [ $k -lt 101 ]; do
+    theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
+    echo "$theDate:INFO:process:Processing . . ."
+    sleep 1
+    theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
+    echo "$theDate:PROGRESS:process:Progress $k%"
+    sleep 2
+    k=$((k + 5))
+done
+theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
+echo "$theDate:INFO:process:Processing ended."
+) > $log
 
 exit 0
 
