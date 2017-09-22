@@ -2401,7 +2401,8 @@ void MainWindow::doTaskPause()
 {
     QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
     QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
-    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+    TaskStatus  status     = TaskStatusValue[procTaskStatusModel->data(statusIdx)
+                                             .toString().toStdString()];
 
     if (status == TASK_RUNNING) {
         QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
@@ -2423,7 +2424,8 @@ void MainWindow::doTaskResume()
 {
     QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
     QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
-    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+    TaskStatus  status     = TaskStatusValue[procTaskStatusModel->data(statusIdx)
+                                             .toString().toStdString()];
 
     if (status == TASK_PAUSED) {
         QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
@@ -2445,7 +2447,8 @@ void MainWindow::doTaskCancel()
 {
     QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
     QModelIndex statusIdx  = ui->tblvwTaskMonit->model()->index(idx.row(), 6);
-    TaskStatus status = (TaskStatus)(procTaskStatusModel->data(statusIdx).toInt());
+    TaskStatus  status     = TaskStatusValue[procTaskStatusModel->data(statusIdx)
+                                             .toString().toStdString()];
 
     if ((status == TASK_PAUSED) || (status == TASK_RUNNING)) {
         QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
