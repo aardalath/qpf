@@ -536,23 +536,22 @@ void TskAge::updateProgress()
         logFile = "";
         
         // Look for log file in <exchangeDirr>/log
-        DIR * dp = NULL;
-        struct dirent * dirp;
-        if ((dp = opendir(logDir.c_str())) == NULL) {
-            WarnMsg("Cannot open log directory " + logDir);
-            TRC("Cannot open log directory " + logDir);
-        } else {
-            while ((dirp = readdir(dp)) != NULL) {
-                if (dirp->d_name[0] != '.') {
-                    std::string dname(dirp->d_name);
-                    //if (dname.substr(0, 3) != "EUC") { continue; }
-                    logFile = logDir + "/" + dname;
-                    TRC("Found logfile " + logFile);
+        while (logFile.empty()) {
+            DIR * dp = NULL;
+            struct dirent * dirp;
+            if ((dp = opendir(logDir.c_str())) == NULL) {
+                WarnMsg("Cannot open log directory " + logDir);
+            } else {
+                while ((dirp = readdir(dp)) != NULL) {
+                    if (dirp->d_name[0] != '.') {
+                        std::string dname(dirp->d_name);
+                        //if (dname.substr(0, 3) != "EUC") { continue; }
+                        logFile = logDir + "/" + dname;
+                    }
                 }
+                closedir(dp);
             }
-            closedir(dp);
         }
-        
         // Open log file
         if (! logFile.empty()) {
             logFileHdl.open(logFile);
@@ -563,9 +562,11 @@ void TskAge::updateProgress()
     if (! isLogFileOpen) { return; }
     
     // See if new content can be obtained from the log file
-    logFileHdl.seekg (0, logFileHdl.end);
+    logFileHdl.seekg(0, logFileHdl.end);
     int length = logFileHdl.tellg();
-
+    
+    const std::string ProgressTag(":PROGRESS:");
+    
     // If new content is there, read it and process it
     if (length > logFilePos) {
         logFileHdl.seekg(logFilePos, logFileHdl.beg);
@@ -578,10 +579,13 @@ void TskAge::updateProgress()
             // where XXX is a float number representing the percentage
             // of progress, and that no other % appears in the line
             std::getline(logFileHdl, line);
-            if (line.find(":PROGRESS:") != std::string::npos) {
+            if (line.length() < 1) { break; }
+            size_t progressTagPos = line.find(ProgressTag);
+                      
+            if (progressTagPos != std::string::npos) {
                 size_t porcEndsAt = line.find_first_of("%");
                 if (porcEndsAt != std::string::npos) {
-                    size_t porcBeginsAt = line.find_last_of(" ", 0, porcEndsAt);
+                    size_t porcBeginsAt = line.find_last_of(" ");
                     if (porcBeginsAt != std::string::npos) {
                         std::string percentage =
                             line.substr(porcBeginsAt + 1,
@@ -591,7 +595,8 @@ void TskAge::updateProgress()
                 }
             }
         }
-                    
+        
+        logFileHdl.clear();
         logFilePos = length;
     }
 }
