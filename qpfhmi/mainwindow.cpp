@@ -1353,10 +1353,6 @@ void MainWindow::showState()
                     agList << nn;
                     hostForAgent[nn] = pnName;
                 }
-                TaskStatus stts = (((stateId == RUNNING) || (stateId == OPERATIONAL)) ?
-                                   TASK_RUNNING : TASK_STOPPED);
-                agentProcStatus[nn] = stts;
-                hostProcStatus[pnName]  = stts;
             }
             if (storeInMaps) {
                 agentsInHost[pnName] = agList;
@@ -2265,17 +2261,17 @@ void MainWindow::initTasksMonitView()
     //connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
     //connect(acRestartTask,  SIGNAL(triggered()), this, SLOT(restartTask()));
 
-    connect(acTaskPause,	SIGNAL(triggered()), this, SLOT(doTaskPause()));
-    connect(acTaskResume,	SIGNAL(triggered()), this, SLOT(doTaskResume()));
-    connect(acTaskCancel,	SIGNAL(triggered()), this, SLOT(doTaskCancel()));
+    connect(acTaskPause,       SIGNAL(triggered()), this, SLOT(doTaskPause()));
+    connect(acTaskResume,      SIGNAL(triggered()), this, SLOT(doTaskResume()));
+    connect(acTaskCancel,      SIGNAL(triggered()), this, SLOT(doTaskCancel()));
 
-    connect(acAgentSuspend,	SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
-    connect(acAgentStop,	SIGNAL(triggered()), this, SLOT(doAgentStop()));
-    connect(acAgentReactivate,	SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
+    connect(acAgentSuspend,    SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
+    connect(acAgentStop,       SIGNAL(triggered()), this, SLOT(doAgentStop()));
+    connect(acAgentReactivate, SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
 
-    connect(acHostSuspend,	SIGNAL(triggered()), this, SLOT(doHostSuspend()));
-    connect(acHostStop,		SIGNAL(triggered()), this, SLOT(doHostStop()));
-    connect(acHostReactivate,	SIGNAL(triggered()), this, SLOT(doHostReactivate()));
+    connect(acHostSuspend,     SIGNAL(triggered()), this, SLOT(doHostSuspend()));
+    connect(acHostStop,        SIGNAL(triggered()), this, SLOT(doHostStop()));
+    connect(acHostReactivate,  SIGNAL(triggered()), this, SLOT(doHostReactivate()));
 
     connect(ui->tblvwTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTaskMonitContextMenu(const QPoint &)));
@@ -2475,15 +2471,18 @@ void MainWindow::doAgentSuspend()
 
     Json::Reader reader;
     Json::Value v;
-    TRC("Data for selected task: " + procTaskStatusModel->data(dataIdx).toString().toStdString());
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     std::string agentId = v["Info"]["Agent"].asString();
-    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    QString qagentId = QString::fromStdString(agentId);
+    if (agentProcStatus.find(qagentId) == agentProcStatus.end()) {
+        agentProcStatus[qagentId] = TASK_RUNNING;
+    }
+    TaskStatus agentStatus = agentProcStatus[qagentId];
     TRC("Agent: " + agentId + " has status " + TaskStatusName[agentStatus]);
     if (agentStatus == TASK_RUNNING) {
         hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_SUSPEND);
-        agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+        agentProcStatus[qagentId] = TASK_PAUSED;
     }
 }
 
@@ -2501,10 +2500,14 @@ void MainWindow::doAgentStop()
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     std::string agentId = v["Info"]["Agent"].asString();
-    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    QString qagentId = QString::fromStdString(agentId);
+    if (agentProcStatus.find(qagentId) == agentProcStatus.end()) {
+        agentProcStatus[qagentId] = TASK_RUNNING;
+    }
+    TaskStatus agentStatus = agentProcStatus[qagentId];
     if ((agentStatus == TASK_RUNNING) || (agentStatus == TASK_PAUSED)) {
         hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_STOP);
-        agentProcStatus[QString::fromStdString(agentId)] = TASK_PAUSED;
+        agentProcStatus[qagentId] = TASK_PAUSED;
     }
 }
 
@@ -2522,10 +2525,15 @@ void MainWindow::doAgentReactivate()
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     std::string agentId = v["Info"]["Agent"].asString();
-    TaskStatus agentStatus = agentProcStatus[QString::fromStdString(agentId)];
+    QString qagentId = QString::fromStdString(agentId);
+    if (agentProcStatus.find(qagentId) == agentProcStatus.end()) {
+        agentProcStatus[qagentId] = TASK_RUNNING;
+        return;
+    }
+    TaskStatus agentStatus = agentProcStatus[qagentId];
     if (agentStatus == TASK_PAUSED) {
         hmiNode->sendProcHdlCmd(PROC_AGENT, agentId, PROC_HDL_REACTIVATE);
-        agentProcStatus[QString::fromStdString(agentId)] = TASK_RUNNING;
+        agentProcStatus[qagentId] = TASK_RUNNING;
     }
 }
 
@@ -2542,13 +2550,17 @@ void MainWindow::doHostSuspend()
     Json::Reader reader;
     Json::Value v;
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
-	
+
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
-    std::string hostId = hostForAgent[agName].toStdString();
-    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    QString qhostId = hostForAgent[agName];
+    std::string hostId = qhostId.toStdString();
+    if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
+        hostProcStatus[qhostId] = TASK_RUNNING;
+    }
+    TaskStatus hostStatus = hostProcStatus[qhostId];
     if (hostStatus == TASK_RUNNING) {
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_SUSPEND);
-        hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+        hostProcStatus[qhostId] = TASK_PAUSED;
     }
 }
 
@@ -2566,11 +2578,15 @@ void MainWindow::doHostStop()
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
-    std::string hostId = hostForAgent[agName].toStdString();
-    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    QString qhostId = hostForAgent[agName];
+    std::string hostId = qhostId.toStdString();
+    if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
+        hostProcStatus[qhostId] = TASK_RUNNING;
+    }
+    TaskStatus hostStatus = hostProcStatus[qhostId];
     if ((hostStatus == TASK_RUNNING) || (hostStatus == TASK_PAUSED)) {
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_STOP);
-        hostProcStatus[QString::fromStdString(hostId)] = TASK_PAUSED;
+        hostProcStatus[qhostId] = TASK_PAUSED;
     }
 }
 
@@ -2588,11 +2604,16 @@ void MainWindow::doHostReactivate()
     reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
 	
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
-    std::string hostId = hostForAgent[agName].toStdString();
-    TaskStatus hostStatus = hostProcStatus[QString::fromStdString(hostId)];
+    QString qhostId = hostForAgent[agName];
+    std::string hostId = qhostId.toStdString();
+    if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
+        hostProcStatus[qhostId] = TASK_RUNNING;
+        return;
+    }
+    TaskStatus hostStatus = hostProcStatus[qhostId];
     if (hostStatus == TASK_PAUSED) {
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_REACTIVATE);
-        hostProcStatus[QString::fromStdString(hostId)] = TASK_RUNNING;
+        hostProcStatus[qhostId] = TASK_RUNNING;
     }
 }
 

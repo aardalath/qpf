@@ -385,10 +385,10 @@ private:
 
     QMap<QString,QString> nodeStates;
 
-    QMap<QString,TaskStatus> agentProcStatus;
-    QMap<QString,TaskStatus> hostProcStatus;
+    QMap<QString,TaskStatus>  agentProcStatus;
+    QMap<QString,TaskStatus>  hostProcStatus;
     QMap<QString,QStringList> agentsInHost;
-    QMap<QString,QString> hostForAgent;
+    QMap<QString,QString>     hostForAgent;
 
     QPoint pointOfAction;
     //DBManager *       dbMng;
