@@ -339,11 +339,15 @@ void TskAge::processSubcmdMsg(MessageString & m)
     std::string subjName = msg.body["target"].asString();
 
     std::string currTaskId;
-    TaskInfo & task = (*runningTask);
     
     switch (subj) {
     case PROC_TASK:
-        currTaskId = task["taskData"]["Id"].asString();
+        if (runningTask == 0) {
+            return;
+        } else {
+            TaskInfo & task = (*runningTask);
+            currTaskId = task["taskData"]["Id"].asString();
+        }
         TRC("Trying to " + subCmd + " container with id " + subjName +
             " (" + currTaskId + " / " + containerId + ")");
         if (currTaskId == subjName) {
