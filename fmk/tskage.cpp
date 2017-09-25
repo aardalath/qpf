@@ -360,6 +360,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
             } else {
                 //
             }
+            sendTaskReport();
         }
         break;
     case PROC_AGENT:
