@@ -106,7 +106,7 @@ void TskAge::fromRunningToOperational()
         maxWaitingCycles        = 20;
         idleCyclesBeforeRequest = 30;
 
-        TRC("Agent Mode: CONTAINER");
+        TraceMsg("Agent Mode: CONTAINER");
 
     } else {
 
@@ -114,7 +114,7 @@ void TskAge::fromRunningToOperational()
         srvManager = nodes.at(0);
         nodes.erase(nodes.begin());
 
-        TRC("Agent Mode: SERVICE  - " + srvManager);
+        TraceMsg("Agent Mode: SERVICE  - " + srvManager);
 
         // Create Service Manager
         dckMng = new ServiceMng(srvManager, nodes);
@@ -330,7 +330,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskAge::processSubcmdMsg(MessageString & m)
 {
-    TRC("Sub-command message received: " + m);
+    DbgMsg("Sub-command message received: " + m);
 
     Message<MsgBodyTSK> msg(m);
 
@@ -348,8 +348,8 @@ void TskAge::processSubcmdMsg(MessageString & m)
             TaskInfo & task = (*runningTask);
             currTaskId = task["taskData"]["Id"].asString();
         }
-        TRC("Trying to " + subCmd + " container with id " + subjName +
-            " (" + currTaskId + " / " + containerId + ")");
+        TraceMsg("Trying to " + subCmd + " container with id " + subjName +
+                 " (" + currTaskId + " / " + containerId + ")");
         if (currTaskId == subjName) {
             if (subCmd == "PAUSE") {
                 dckMng->runCmd("pause", std::vector<std::string>(), subjName);
@@ -363,13 +363,13 @@ void TskAge::processSubcmdMsg(MessageString & m)
         }
         break;
     case PROC_AGENT:
-        TRC("Trying to " + subCmd + " agent " + subjName);
+        TraceMsg("Trying to " + subCmd + " agent " + subjName);
         if (compName == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
     case PROC_HOST:
-        TRC("Trying to " + subCmd + " host " + subjName);
+        TraceMsg("Trying to " + subCmd + " host " + subjName);
         if (cfg.currentHostAddr == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
@@ -468,14 +468,12 @@ void TskAge::retrieveOutputProducts()
     for (auto & vd : {exchgOut, exchgLog}) {
         if ((dp = opendir(vd.c_str())) == NULL) {
             WarnMsg("Cannot open output directory " + vd);
-            TRC("Cannot open output directory " + vd);
         } else {
             while ((dirp = readdir(dp)) != NULL) {
                 if (dirp->d_name[0] != '.') {
                     std::string dname(dirp->d_name);
                     //if (dname.substr(0, 3) != "EUC") { continue; }
                     std::string outputFile = vd + "/" + dname;
-                    TRC("Saving outfile " + outputFile);
                     outFiles.push_back(outputFile);
                 }
             }
@@ -483,7 +481,7 @@ void TskAge::retrieveOutputProducts()
         }
     }
 
-    TRC("outFiles has " << outFiles.size() << " elements");
+    TraceMsg("outFiles has " << outFiles.size() << " elements");
     task.outputs.products.clear();
 
     FileNameSpec fs;

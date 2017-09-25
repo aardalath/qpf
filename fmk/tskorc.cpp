@@ -296,7 +296,7 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
                 // a. Include the condition in the condition string
                 condStr += rule->condition;
                 // b. Evaluate condition
-                TRC("Evaluating condition: " << condStr << std::endl);
+                DbgMsg("Evaluating condition: " << condStr << std::endl);
                 ev.clear();
                 ev.set(condStr);
                 try {

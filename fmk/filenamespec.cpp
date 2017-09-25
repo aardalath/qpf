@@ -205,7 +205,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     // substrings start at m[1]
     unsigned int count = mre.size() - 1;
 #endif
-    TRC("size: " << mre.size() << count);
+    TraceMsg("size: " << mre.size() << count);
 
     for (unsigned int i = 0; i < count; ++i) {
         // Extract the matches of the regex
@@ -224,7 +224,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
             if (idx <= count + 1) { fld = mre[k]; }
             if (kv.second.find(idx) != kv.second.end()) {
                 std::string tpl(assignationsTpl[kv.first]);
-                TRC(k << idx << fld << ' ' << kv.first);
+                TraceMsg(k << idx << fld << ' ' << kv.first);
                 switch (kv.first) {
                 case 'M':
                     m["mission"]          = placeIn(m.mission(),      tpl, idx, fld);
@@ -314,7 +314,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        TraceMsg(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if ((m.procFunc() == "SIM") || (m.procFunc() == "LE1")) {
         // Instrument-ObsMode-ObsId-Exposure
         if (nParts < 4) { return; }
@@ -324,7 +324,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        TraceMsg(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if (m.procFunc()  == "QLA") {
         // OrigProcFunc-Instrument-ObsMode-ObsId-Exposure
         if (nParts < 5) { return; }
@@ -334,7 +334,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         expos            = signParts[3];
         m["obsMode"]     = signParts[4];
         m["productType"] = m.procFunc() + "_" + m.origin() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        TraceMsg(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else {
         // TBD
     }
@@ -353,7 +353,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
                    m.productVersion());
 
     m["signature"] = (obsId + "-" + m.obsMode() + "-" + expos);
-    TRC("Final: " << m.productType() << " / " << m.signature());
+    TraceMsg("Final: " << m.productType() << " / " << m.signature());
 }
 
 std::string FileNameSpec::buildProductId(ProductMetadata & m)

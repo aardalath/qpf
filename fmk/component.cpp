@@ -115,7 +115,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     InfoMsg("New state: " + getStateName(getState()));
 
     if (! compAddress.empty()) {
-        TRC("Creating thread for " << compName << " in " << compAddress);
+        DbgMsg("Creating thread for " << compName << " in " << compAddress);
         thrId = std::thread(&Component::run, this);
         thrId.detach();
     }
@@ -431,7 +431,7 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 
     if (cmd == CmdPing) { // This is any component but EvtMng
 
-        TRC(compName + " received a " + CmdPing + " and sends " + getStateName(getState()));
+        TraceMsg(compName + " received a " + CmdPing + " and sends " + getStateName(getState()));
         MsgBodyCMD body;
         msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
                      compName, msg.header.source(),
@@ -449,7 +449,7 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
     } else if (cmd == CmdStates) { // This should be EvtMng
 
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
-        TRC(compName + " received from " + msg.header.source() + " from " + compName);
+        TraceMsg(compName + " received from " + msg.header.source() + " from " + compName);
 
     } else {
 

@@ -99,7 +99,6 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 
     while (std::getline(ifs, line)) {
         lines.push_back(line);
-        TRC(line);
         // if (!initSwarm.running() ||
         //     !procxx::running(initSwarm.id()) ||
         //     !running(initSwarm)) {
@@ -111,8 +110,6 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     std::vector<std::string> tokens;
     tokens = str::split(str::ltrim(lines.at(lines.size() - 5), " \t"), ' ');
     workerToken = tokens.at(1);
-
-    TRC(managerConnectAddr << " -- " << workerToken << ": " << code);
 
     return (code == 0);
 }

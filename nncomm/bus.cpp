@@ -31,5 +31,5 @@ void Bus::init(int elemCls, const char * addr) {
 }
 
 void Bus::processMessageString(MessageString & m) {
-    DBG("BUS MessageString: '" << m << "'");
+    TRC("BUS MessageString: '" << m << "'");
 }

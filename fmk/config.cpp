@@ -102,9 +102,9 @@ void Config::init(std::string fName)
 {
     isLive = false;
     sessionId = timeTag();
-    TRC("Provided fName='" << fName << "'");
+    DbgMsg("Provided fName='" << fName << "'");
     if (fName.compare(0,5,"db://") == 0) {
-        TRC("A database URL!");
+        DbgMsg("A database URL!");
         // fName in fact is a db url in the form:
         //   db://user:pwd@host:port/dbname
         // So, take the fields
@@ -114,13 +114,13 @@ void Config::init(std::string fName)
         DBHost = url.substr(0, url.find(":")); url.erase(0, url.find(":") + 1); // take host
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
-        TRC(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+        DbgMsg(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
-        TRC("Configuration is retrieved from db: " << fName);
+        DbgMsg("Configuration is retrieved from db: " << fName);
         readConfigFromDB();
         isActualFile = false;
     } else {
-        TRC("Configuration is retrieved from file: " << fName);
+        DbgMsg("Configuration is retrieved from file: " << fName);
         setConfigFile(fName);
         readConfigFromFile();
         if (weAreOnMaster) { saveConfigToDB(); }
@@ -141,10 +141,8 @@ void Config::synchronizeSessionId(std::string newId)
 
     if (rename(PATHSession.c_str(), newPATHSession.c_str()) != 0) {
         perror("Change sessionId");
-        TRC("Cannot rename PATHSession from " + PATHSession +
-            " to " + newPATHSession);
-        WarnMsg("Cannot rename PATHSession from " + PATHSession +
-                " to " + newPATHSession);
+        ErrorMsg("Cannot rename PATHSession from " + PATHSession +
+                 " to " + newPATHSession);
         return;
     }
 
@@ -177,7 +175,7 @@ void Config::fillData()
     DBUser = db.user();
     DBPwd  = db.pwd();
 
-    TRC(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+    TraceMsg(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
     weAreOnMaster = (network.masterNode() == currentHostAddr);
 }
@@ -203,8 +201,8 @@ void Config::setConfigFile(std::string fName)
     ptr = realpath(fName.c_str(), actualpath);
     cfgFileName = std::string(ptr);
     cfgFilePath = std::string(dirname(ptr));
-    TRC("cfgFileName set to: " << cfgFileName);
-    TRC("cfgFilePath set to: " << cfgFilePath);
+    TraceMsg("cfgFileName set to: " << cfgFileName);
+    TraceMsg("cfgFilePath set to: " << cfgFilePath);
 }
 
 //----------------------------------------------------------------------
@@ -216,7 +214,7 @@ void Config::readConfigFromFile()
     std::ifstream cfgFile(cfgFileName);
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
-    TRC("CONFIG FROM FILE:\n" + buffer.str());
+    TraceMsg("CONFIG FROM FILE:\n" + buffer.str());
     fromStr(buffer.str());
 }
 
@@ -237,7 +235,7 @@ void Config::readConfigFromDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        TRC("ERROR Trying to open connection to DB");
+        DBG("ERROR Trying to open connection to DB");
         Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
@@ -255,11 +253,11 @@ void Config::readConfigFromDB()
         cfg.fromStr(configData);
         cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
-        TRC("ERROR Trying to retrieve configuration table");
+        DBG("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-        TRC("ERROR Trying to retrieve configuration table");
+        DBG("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR,
                  "Unexpected error accessing "
                  "database for retrieval of system configuration");
@@ -299,7 +297,7 @@ void Config::readConfigFromDB()
             return;
         }
     }
-    TRC("SessionId: " << sessionId);
+    TraceMsg("SessionId: " << sessionId);
 
     // Close connection
     dbHdl->closeConnection();
@@ -418,7 +416,7 @@ void Config::processConfig()
 
     for (auto & p : std::vector<std::string>
                       { PATHSession, PATHLog, PATHRlog,
-                        PATHTmp, PATHTsk, PATHMsg }) { TRC(p); }
+                        PATHTmp, PATHTsk, PATHMsg }) { TraceMsg(p); }
 
     storage.inbox    = PATHData + "/inbox";
     storage.archive  = PATHData + "/archive";

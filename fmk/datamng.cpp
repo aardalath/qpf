@@ -134,8 +134,8 @@ void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m
     std::string taskName  = task.taskName();
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
 
-    TRC("DataMng: Processing TaskReport: " << taskName
-        << " has status " << TaskStatusName[taskStatus]);
+    TraceMsg("DataMng: Processing TaskReport: " << taskName
+             << " has status " << TaskStatusName[taskStatus]);
 
     saveTaskToDB(m);
 }
@@ -217,7 +217,7 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
         URLHandler urlh;
 
         // Check version of products in gateway against DB
-        TRC("Will try to sanitize product versions:\n" + m);
+        TraceMsg("Will try to sanitize product versions:\n" + m);
         sanitizeProductVersions(taskInfo.outputs);
 
         // Move products to local archive
@@ -272,7 +272,7 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
         for (auto & m : prodList.products) {
             std::string sgnt = m.signature();
             m.dump();
-            TRC("Checking signature " << sgnt << " and version " << ver);
+            TraceMsg("Checking signature " << sgnt << " and version " << ver);
             if (dbHdl->checkSignature(sgnt, ver)) {
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion();

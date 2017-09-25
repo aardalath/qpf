@@ -170,7 +170,8 @@ MainWindow::MainWindow(QString url, QString sessionName,
 
     defineValidTransitions();
 
-    std::string msg = QString("masterAddress: %1    startingPort:  %2").arg(masterAddress).arg(startingPort).toStdString();
+    std::string msg = QString("masterAddress: %1    startingPort:  %2")
+        .arg(masterAddress).arg(startingPort).toStdString();
     TRC(msg);
 
     init();

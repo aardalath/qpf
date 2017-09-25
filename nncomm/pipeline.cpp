@@ -46,6 +46,6 @@ void Pipeline::getIncommingMessageStrings()
 void Pipeline::processMessageString(MessageString & m)
 {
     if (elemClass == NN_PULL) {
-        DBG("I (" << elemName << ") got a message: '" << m << "'");
+        TRC("I (" << elemName << ") got a message: '" << m << "'");
     }
 }

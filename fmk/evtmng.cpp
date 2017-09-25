@@ -191,7 +191,6 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     Message<MsgBodyCMD> msg(m);
     MsgBodyCMD body;
     std::string cmd = msg.body["cmd"].asString();
-    TRC("MSG: " + m);
 
     if (cmd == CmdStates) { // Component states request
 
@@ -202,7 +201,7 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         json states;
         states[compName] = getStateName(getState());
         for(auto & kv : cfg.nodeStates) {
-            TRC(kv.first + " => " + kv.second);
+            TraceMsg(kv.first + " => " + kv.second);
             states[kv.first] = kv.second;
         }
         body["states"] = states;
@@ -226,8 +225,6 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             it = connections.find(ChnlCmd);
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(relayMsg.str());
-        TRC("Sending relay message via channel " + ChnlCmd);
-        TRC("with message: " + relayMsg.str());
 
         // Build HMICmd answer
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
@@ -244,8 +241,6 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     msg.buildBody(body);
     c->setMsgOut(msg.str());
-    TRC("Sending answer via channel " + ChnlHMICmd);
-    TRC("with message: " + msg.str());
 }
 
 //----------------------------------------------------------------------
@@ -259,9 +254,6 @@ void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     std::string taskName  = task.taskName();
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
-
-    TRC("EvtMng: Processing TaskReport: " << taskName
-        << " has status " << TaskStatusName[taskStatus]);
 }
 
 //----------------------------------------------------------------------
@@ -276,7 +268,7 @@ void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     HostInfo hostInfo;
     hostInfo.fromStr(hostInfoData.str());
 
-    DBG(hostInfo.dump() + "\n");
+    TraceMsg(hostInfo.dump() + "\n");
 }
 
 //}

@@ -95,7 +95,7 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 
     // This method should only be called once the download has been done,
     // hence the only action left is setting the url
-    TRC("Changing URL from " << productUrl << " to " << newUrl);
+    TraceMsg("Changing URL from " << productUrl << " to " << newUrl);
 
     // Change url in processing task
     product["url"]      = newUrl;
@@ -120,8 +120,6 @@ ProductMetadata & URLHandler::fromOutbox2External()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromFolder2Inbox()
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -156,8 +154,6 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromInbox2LocalArch(bool tx)
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -212,8 +208,6 @@ ProductMetadata & URLHandler::fromInbox2LocalArch(bool tx)
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromLocalArch2Gateway()
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -249,8 +243,6 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromGateway2Processing()
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -290,8 +282,6 @@ ProductMetadata & URLHandler::fromGateway2Processing()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromProcessing2Gateway()
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -335,8 +325,6 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromGateway2LocalArch()
 {
-    TRC(__FUNCTION__ << ':' << __LINE__);
-
     productUrl      = product.url();
     productUrlSpace = product.urlSpace();
 
@@ -402,24 +390,24 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     switch(method) {
     case LINK:
         retVal = link(sFrom.c_str(), sTo.c_str());
-        TRC("LINK: Hard link of " << sFrom << " to " << sTo);
+        TraceMsg("LINK: Hard link of " << sFrom << " to " << sTo);
         break;
     case SYMLINK:
         retVal = symlink(sFrom.c_str(), sTo.c_str());
-        TRC("SYMLINK: Soft link of " << sFrom << " to " << sTo);
+        TraceMsg("SYMLINK: Soft link of " << sFrom << " to " << sTo);
         break;
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
-        TRC("MOVE: Moving file from " << sFrom << " to " << sTo);
+        TraceMsg("MOVE: Moving file from " << sFrom << " to " << sTo);
         break;
     case COPY:
         retVal = copyfile(sFrom, sTo);
-        TRC("COPY: Copying file from " << sFrom << " to " << sTo);
+        TraceMsg("COPY: Copying file from " << sFrom << " to " << sTo);
         break;
     case COPY_TO_REMOTE:
     case COPY_TO_MASTER:
         retVal = rcopyfile(sFrom, sTo, method == COPY_TO_REMOTE);
-        TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
+        TraceMsg(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
             << "Transferring file from " << sFrom << " to " << sTo);
         break;
     default:
@@ -468,7 +456,7 @@ int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
     } else {
         cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
     }
-    TRC("CMD: " << cmd);
+    TraceMsg("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -482,7 +470,7 @@ int URLHandler::runlink(std::string & f)
 {
     std::string cmd;
     cmd = "ssh " + master_address + " rm " + f;
-    TRC("CMD: " << cmd);
+    TraceMsg("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -497,7 +485,7 @@ void URLHandler::setRemoteCopyParams(std::string maddr, std::string raddr)
     master_address = maddr;
     remote_address = raddr;
     isRemote = true;
-    TRC("Master addr: " << maddr << "  Remote addr: " << raddr);
+    TraceMsg("Master addr: " << maddr << "  Remote addr: " << raddr);
 }
 
 //----------------------------------------------------------------------
@@ -509,8 +497,8 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     intTaskDir = tskDir;
 
     taskExchgDir = workDir + "/" + intTaskDir;
-    TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
-        << "  => TaskExchgDir: " << taskExchgDir);
+    TraceMsg("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
+             << "  => TaskExchgDir: " << taskExchgDir);
 }
 
 //}

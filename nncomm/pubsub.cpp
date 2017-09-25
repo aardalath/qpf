@@ -47,6 +47,6 @@ void PubSub::getIncommingMessageStrings()
 void PubSub::processMessageString(MessageString & m)
 {
     if (elemClass == NN_SUB) {
-        DBG("I (" << elemName << ") got a message: '" << m << "'");
+        TRC("I (" << elemName << ") got a message: '" << m << "'");
     }
 }

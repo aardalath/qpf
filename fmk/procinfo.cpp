@@ -219,7 +219,6 @@ void ProcessingFrameworkInfo::fromStr(std::string s)
         std::string key = itr.key().asString();
         std::map<std::string, ProcessingHostInfo*>::iterator it = hostsInfo.find(key);
         ProcessingHostInfo * ph = 0;
-        TRC(fastWriter.write(*itr));
         // if (it != hostsInfo.end()) {
         //     ph = it->second;
         //     ph->fromStr(fastWriter.write(*itr));
@@ -235,7 +234,6 @@ void ProcessingFrameworkInfo::fromStr(std::string s)
         std::string key = itr.key().asString();
         std::map<std::string, SwarmInfo*>::iterator it = swarmInfo.find(key);
         SwarmInfo * sw = 0;
-        TRC(fastWriter.write(*itr));
         //if (it != swarmInfo.end()) {
         //    sw = it->second;
         //    sw->fromStr(fastWriter.write(*itr));

@@ -47,6 +47,6 @@ void Pair::getIncommingMessageStrings()
 void Pair::processMessageString(MessageString & m)
 {
     if (elemClass == NN_PAIR) {
-        DBG("I (" << elemName << ") got a message: '" << m << "'");
+        TRC("I (" << elemName << ") got a message: '" << m << "'");
     }
 }

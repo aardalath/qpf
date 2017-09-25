@@ -143,7 +143,7 @@ void TskMng::runEachIteration()
                          "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
                          );
     if (trace != lastTrace) {
-        TRC(trace);
+        TraceMsg(trace);
         lastTrace = trace;
     }
 }
@@ -199,7 +199,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     std::string taskName;
     TaskStatus  taskStatus;
 
-    TRC("Pool of tasks has size of " << listOfTasks->size());
+    TraceMsg("Pool of tasks has size of " << listOfTasks->size());
 
     if (listOfTasks->size() > 0) {
         json taskInfoData = listOfTasks->front().val();
@@ -225,7 +225,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     // Task info is sent, register the task and status
     if (isTaskSent) {
-        TRC("Task " + taskName + "sent to " << agName);
+        TraceMsg("Task " + taskName + "sent to " << agName);
         taskRegistry[taskName] = taskStatus;
         if (isSrvRqst) {
             serviceTaskStatus[taskStatus]++;
@@ -251,7 +251,7 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
     TaskStatus oldStatus  = taskRegistry[taskName];
 
-    TRC("Processing TaskReport: status: " << TaskStatusName[oldStatus] <<
+    TraceMsg("Processing TaskReport: status: " << TaskStatusName[oldStatus] <<
         " ==> " << TaskStatusName[taskStatus]);
 
     // Update registry and status maps if needed
@@ -270,12 +270,12 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 
             const std::string & hostIp = task.taskHost();
             ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
-            TRC("HOSTIP: " + hostIp);
+            TraceMsg("HOSTIP: " + hostIp);
             for (auto & agi : procHostInfo->agInfo) {
-                TRC("-- AGNAME: " + agi.name);
+                TraceMsg("-- AGNAME: " + agi.name);
                 if (agi.name == agName) {
                     agi.taskStatus = spec;
-                    TRC("Placing spectrum " + spec.toJsonStr() +
+                    TraceMsg("Placing spectrum " + spec.toJsonStr() +
                         " placed for " + agName);
                 }
             }
@@ -337,7 +337,7 @@ TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
                            getNumOf(TASK_STOPPED),
                            getNumOf(TASK_FAILED),
                            getNumOf(TASK_FINISHED));
-    TRC("~~~~~> " << agName << ": "
+    TraceMsg("~~~~~> " << agName << ": "
         << spec.scheduled << ", "
         << spec.running << ", "
         << spec.paused << ", "
@@ -387,7 +387,7 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     std::string s(fastWriter.write(body["info"]));
     HostInfo hostInfo(s);
     std::string hostIp = hostInfo.hostIp;
-    TRC("Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
+    TraceMsg("Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
                                 " (CONT) " :
                                 " (SRV) ") + " for host " + hostIp);
     
@@ -464,8 +464,8 @@ void TskMng::sendProcFmkInfoUpdate()
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
-        DBG("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
-        TRC(s);
+        DbgMsg("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
+        TraceMsg(s);
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
         RaiseSysAlert(Alert(Alert::System,

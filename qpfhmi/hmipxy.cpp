@@ -125,7 +125,7 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         while (it != mp.end()) {
             std::string node(it.key().asString());
             std::string stat((*it).asString());
-            TRC(compName + " received the information that " +
+            TraceMsg(compName + " received the information that " +
                 node + " has state " + stat);
             cfg.nodeStates[node] = stat;
             ++it;
@@ -154,7 +154,7 @@ void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & 
     std::string taskName  = task.taskName();
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
 
-    TRC("EvtMng: Processing TaskReport: " << taskName
+    TraceMsg("EvtMng: Processing TaskReport: " << taskName
         << " has status " << TaskStatusName[taskStatus]);
 }
 
@@ -167,10 +167,10 @@ void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     MsgBodyTSK & body = msg.body;
     JValue fmkInfoData(body["info"]);
 
-    TRC(fmkInfoData.str());
-    TRC(Config::procFmkInfo->toJsonStr());
+    TraceMsg(fmkInfoData.str());
+    TraceMsg(Config::procFmkInfo->toJsonStr());
     Config::procFmkInfo->fromStr(fmkInfoData.str());
-    TRC("@@@@@@@@@@ RECEIVED UOPDATE OF FMK INFO @@@@@@@@@@");
+    TraceMsg("@@@@@@@@@@ RECEIVED UOPDATE OF FMK INFO @@@@@@@@@@");
 }
 
 //----------------------------------------------------------------------
@@ -211,7 +211,7 @@ void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId sub
 
     msg.buildBody(body);
     send(ChnlHMICmd, msg.str()); 
-    TRC("Sending message: " + msg.str());
+    TraceMsg("Sending message: " + msg.str());
 }
 
 //----------------------------------------------------------------------

@@ -17,13 +17,13 @@ void Survey::setMsgOut(MessageString m)
 {
     if (elemClass == NN_RESPONDENT) {
         ScalabilityProtocolRole::setMsgOut(m);
-        //DBG("++ Sending answer >> " << m);
+        //TRC("++ Sending answer >> " << m);
     } else {
         if (readyToGo) {
             sck->send((void*)(m.c_str()), m.size(), 0);
             surveyorWaiting = true;
-            //DBG("++ Sending msg >> " << m);
-            //DBG("++ Waiting for answers . . . ");
+            //TRC("++ Sending msg >> " << m);
+            //TRC("++ Waiting for answers . . . ");
             /*
             int numResp = 1;
             try {
@@ -82,12 +82,12 @@ void Survey::getIncommingMessageStrings()
 void Survey::processMessageString(MessageString & m)
 {
     if (elemClass == NN_SURVEYOR) {
-        DBG("I (" << elemName << ") got one answer: '" << m << "'");
+        TRC("I (" << elemName << ") got one answer: '" << m << "'");
     } else {
         std::string answer("My name is ");
         answer += elemName;
-        DBG("Master asks: " << m);
-        DBG("I (" << elemName << ") answer: '" << answer << "'");
+        TRC("Master asks: " << m);
+        TRC("I (" << elemName << ") answer: '" << answer << "'");
         setMsgOut(answer);
     }
 }

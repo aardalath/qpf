@@ -36,5 +36,5 @@ void ReqRep::getIncommingMessageStrings()
 
 void ReqRep::processMessageString(MessageString & m)
 {
-    DBG("I (" << elemName << ") got a message: '" << m << "'");
+    TRC("I (" << elemName << ") got a message: '" << m << "'");
 }
