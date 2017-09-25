@@ -498,7 +498,7 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
 
     taskExchgDir = workDir + "/" + intTaskDir;
     TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
-             << "  => TaskExchgDir: " << taskExchgDir);
+        << "  => TaskExchgDir: " << taskExchgDir);
 }
 
 //}
