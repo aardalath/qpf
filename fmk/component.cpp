@@ -115,7 +115,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     InfoMsg("New state: " + getStateName(getState()));
 
     if (! compAddress.empty()) {
-        DbgMsg("Creating thread for " << compName << " in " << compAddress);
+        DbgMsg("Creating thread for " + compName + " in " + compAddress);
         thrId = std::thread(&Component::run, this);
         thrId.detach();
     }

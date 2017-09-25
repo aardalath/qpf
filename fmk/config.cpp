@@ -102,7 +102,7 @@ void Config::init(std::string fName)
 {
     isLive = false;
     sessionId = timeTag();
-    DbgMsg("Provided fName='" << fName << "'");
+    DbgMsg("Provided fName='" + fName + "'");
     if (fName.compare(0,5,"db://") == 0) {
         DbgMsg("A database URL!");
         // fName in fact is a db url in the form:
@@ -114,13 +114,13 @@ void Config::init(std::string fName)
         DBHost = url.substr(0, url.find(":")); url.erase(0, url.find(":") + 1); // take host
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
-        DbgMsg(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+        DbgMsg(DBUser + ":" + DBPwd + "@" + DBHost + ":" + DBPort + "/" + DBName);
 
-        DbgMsg("Configuration is retrieved from db: " << fName);
+        DbgMsg("Configuration is retrieved from db: " + fName);
         readConfigFromDB();
         isActualFile = false;
     } else {
-        DbgMsg("Configuration is retrieved from file: " << fName);
+        DbgMsg("Configuration is retrieved from file: " + fName);
         setConfigFile(fName);
         readConfigFromFile();
         if (weAreOnMaster) { saveConfigToDB(); }
@@ -141,8 +141,8 @@ void Config::synchronizeSessionId(std::string newId)
 
     if (rename(PATHSession.c_str(), newPATHSession.c_str()) != 0) {
         perror("Change sessionId");
-        ErrorMsg("Cannot rename PATHSession from " + PATHSession +
-                 " to " + newPATHSession);
+        TRC("Cannot rename PATHSession from " + PATHSession +
+            " to " + newPATHSession);
         return;
     }
 
@@ -175,7 +175,7 @@ void Config::fillData()
     DBUser = db.user();
     DBPwd  = db.pwd();
 
-    TraceMsg(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+    TraceMsg(DBUser + ":" + DBPwd + "@" + DBHost + ":" + DBPort + "/" + DBName);
 
     weAreOnMaster = (network.masterNode() == currentHostAddr);
 }
@@ -201,8 +201,8 @@ void Config::setConfigFile(std::string fName)
     ptr = realpath(fName.c_str(), actualpath);
     cfgFileName = std::string(ptr);
     cfgFilePath = std::string(dirname(ptr));
-    TraceMsg("cfgFileName set to: " << cfgFileName);
-    TraceMsg("cfgFilePath set to: " << cfgFilePath);
+    TraceMsg("cfgFileName set to: " + cfgFileName);
+    TraceMsg("cfgFilePath set to: " + cfgFilePath);
 }
 
 //----------------------------------------------------------------------
@@ -297,7 +297,7 @@ void Config::readConfigFromDB()
             return;
         }
     }
-    TraceMsg("SessionId: " << sessionId);
+    TraceMsg("SessionId: " + sessionId);
 
     // Close connection
     dbHdl->closeConnection();

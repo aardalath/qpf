@@ -199,7 +199,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     std::string taskName;
     TaskStatus  taskStatus;
 
-    TraceMsg("Pool of tasks has size of " << listOfTasks->size());
+    TraceMsg("Pool of tasks has size of " + std::to_string(listOfTasks->size()));
 
     if (listOfTasks->size() > 0) {
         json taskInfoData = listOfTasks->front().val();
@@ -225,7 +225,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     // Task info is sent, register the task and status
     if (isTaskSent) {
-        TraceMsg("Task " + taskName + "sent to " << agName);
+        TraceMsg("Task " + taskName + "sent to " + agName);
         taskRegistry[taskName] = taskStatus;
         if (isSrvRqst) {
             serviceTaskStatus[taskStatus]++;
@@ -251,8 +251,8 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
     TaskStatus oldStatus  = taskRegistry[taskName];
 
-    TraceMsg("Processing TaskReport: status: " << TaskStatusName[oldStatus] <<
-        " ==> " << TaskStatusName[taskStatus]);
+    TraceMsg("Processing TaskReport: status: " + TaskStatusName[oldStatus] +
+             " ==> " + TaskStatusName[taskStatus]);
 
     // Update registry and status maps if needed
     if (oldStatus != taskStatus) {
@@ -337,14 +337,14 @@ TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
                            getNumOf(TASK_STOPPED),
                            getNumOf(TASK_FAILED),
                            getNumOf(TASK_FINISHED));
-    TraceMsg("~~~~~> " << agName << ": "
-        << spec.scheduled << ", "
-        << spec.running << ", "
-        << spec.paused << ", "
-        << spec.stopped << ", "
-        << spec.failed << ", "
-        << spec.finished << " = "
-        << spec.total);
+    TraceMsg("~~~~~> " + agName + ": "
+             + std::to_string(spec.scheduled) + ", "
+             + std::to_string(spec.running) + ", "
+             + std::to_string(spec.paused) + ", "
+             + std::to_string(spec.stopped) + ", "
+             + std::to_string(spec.failed) + ", "
+             + std::to_string(spec.finished) + " = "
+             + std::to_string(spec.total));
 
     return spec;
 

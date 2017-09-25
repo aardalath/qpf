@@ -135,8 +135,8 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
 
     for (auto & m : prodList.products) {
         ss.str("");
-        TraceMsg("Building SQL statement:");
-        TraceMsg(m.startTime() << ", " << m.endTime() << ", " << timeTag());
+        TRC("Building SQL statement:");
+        TRC(m.startTime() << ", " << m.endTime() << ", " << timeTag());
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
            << "obs_id, soc_id, "
@@ -157,9 +157,9 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
            << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
            << str::quoted(m.url()) << ")";
-        TraceMsg("PSQL> "+ ss.str());
+        TRC("PSQL> "+ ss.str());
         try { result = runCmd(ss.str()); } catch(...) { throw; }
-        TraceMsg("Exeecuted.");
+        TRC("Exeecuted.");
         PQclear(res);
         nInsProd++;
     }
@@ -255,7 +255,7 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
        << str::quoted(taskData) << ")";
-    TraceMsg("PSQL> " << ss.str());
+    TRC("PSQL> " << ss.str());
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 
@@ -663,7 +663,7 @@ bool DBHdlPostgreSQL::updateTable(std::string table, std::string cond,
     }
     std::string cmd("UPDATE " + table + " SET " + newValStr);
     if (!cond.empty()) { cmd += " WHERE " + cond; }
-    TraceMsg("PSQL> " << cmd);
+    TRC("PSQL> " << cmd);
     return runCmd(cmd);
 }
 

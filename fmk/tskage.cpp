@@ -481,7 +481,7 @@ void TskAge::retrieveOutputProducts()
         }
     }
 
-    TraceMsg("outFiles has " << outFiles.size() << " elements");
+    TraceMsg("outFiles has " + std::to_string(outFiles.size()) + " elements");
     task.outputs.products.clear();
 
     FileNameSpec fs;

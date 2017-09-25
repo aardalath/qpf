@@ -253,13 +253,13 @@ void Deployer::readConfiguration()
     cfg.startingPort = initialPort;
     cfg.generateProcFmkInfoStructure();
 
-    DbgMsg("Master host: " << cfg.network.masterNode());
-    DbgMsg("Current host: " << currentHostAddr << "/"
-           << cfg.currentHostAddr);
-    DbgMsg("Running in a "
-           << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
-           << " Host.");
-
+    TRC("Master host: " << cfg.network.masterNode());
+    TRC("Current host: " << currentHostAddr << "/"
+        << cfg.currentHostAddr);
+    TRC("Running in a "
+        << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
+        << " Host.");
+    
     TRC(cfg.general.appName());
     TRC(cfg.network.masterNode());
     for (auto & kv : cfg.network.processingNodes()) {

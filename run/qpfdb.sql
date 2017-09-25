@@ -493,11 +493,14 @@ COPY pvc  (id, date, counter, version, name, comment) FROM stdin;
 -- ----------------------------------------------------------------------
 -- Data for Name: task_status; Type: TABLE DATA; Schema: public; Owner: eucops
 COPY task_status (task_status_id, status_desc) FROM stdin;
+-2	SCHEDULED
 -1	FAILED
 0	FINISHED
 1	RUNNING
-2	WAITING
--2	SCHEDULED
+2	PAUSED
+3	STOPPED
+4	ARCHIVED
+5	UNKNOWN
 \.
 
 -- ----------------------------------------------------------------------
