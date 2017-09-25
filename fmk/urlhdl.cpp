@@ -95,7 +95,7 @@ ProductMetadata & URLHandler::fromExternal2Inbox()
 
     // This method should only be called once the download has been done,
     // hence the only action left is setting the url
-    TraceMsg("Changing URL from " << productUrl << " to " << newUrl);
+    TRC("Changing URL from " << productUrl << " to " << newUrl);
 
     // Change url in processing task
     product["url"]      = newUrl;
@@ -390,24 +390,24 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     switch(method) {
     case LINK:
         retVal = link(sFrom.c_str(), sTo.c_str());
-        TraceMsg("LINK: Hard link of " << sFrom << " to " << sTo);
+        TRC("LINK: Hard link of " << sFrom << " to " << sTo);
         break;
     case SYMLINK:
         retVal = symlink(sFrom.c_str(), sTo.c_str());
-        TraceMsg("SYMLINK: Soft link of " << sFrom << " to " << sTo);
+        TRC("SYMLINK: Soft link of " << sFrom << " to " << sTo);
         break;
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
-        TraceMsg("MOVE: Moving file from " << sFrom << " to " << sTo);
+        TRC("MOVE: Moving file from " << sFrom << " to " << sTo);
         break;
     case COPY:
         retVal = copyfile(sFrom, sTo);
-        TraceMsg("COPY: Copying file from " << sFrom << " to " << sTo);
+        TRC("COPY: Copying file from " << sFrom << " to " << sTo);
         break;
     case COPY_TO_REMOTE:
     case COPY_TO_MASTER:
         retVal = rcopyfile(sFrom, sTo, method == COPY_TO_REMOTE);
-        TraceMsg(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
+        TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
             << "Transferring file from " << sFrom << " to " << sTo);
         break;
     default:
@@ -456,7 +456,7 @@ int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
     } else {
         cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
     }
-    TraceMsg("CMD: " << cmd);
+    TRC("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -470,7 +470,7 @@ int URLHandler::runlink(std::string & f)
 {
     std::string cmd;
     cmd = "ssh " + master_address + " rm " + f;
-    TraceMsg("CMD: " << cmd);
+    TRC("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -485,7 +485,7 @@ void URLHandler::setRemoteCopyParams(std::string maddr, std::string raddr)
     master_address = maddr;
     remote_address = raddr;
     isRemote = true;
-    TraceMsg("Master addr: " << maddr << "  Remote addr: " << raddr);
+    TRC("Master addr: " << maddr << "  Remote addr: " << raddr);
 }
 
 //----------------------------------------------------------------------
@@ -497,7 +497,7 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     intTaskDir = tskDir;
 
     taskExchgDir = workDir + "/" + intTaskDir;
-    TraceMsg("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
+    TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
              << "  => TaskExchgDir: " << taskExchgDir);
 }
 
