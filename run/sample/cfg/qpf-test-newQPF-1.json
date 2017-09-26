@@ -241,6 +241,7 @@
         "groupTaskAgentLogs": false,
         "allowReprocessing": true,
         "intermediateProducts": false,
-        "sendOutputsToMainArchive": false
+        "sendOutputsToMainArchive": false,
+        "progressString": ":PROGRESS:"
     }
 }

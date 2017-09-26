@@ -240,6 +240,7 @@ public:
         DUMPJBOOL(allowReprocessing);
         DUMPJBOOL(intermediateProducts);
         DUMPJBOOL(sendOutputsToMainArchive);
+        DUMPJSTR(progressString);
     }
     JSTRVEC(msgsToDisk);
     JSTRVEC(msgsToDb);
@@ -248,6 +249,7 @@ public:
     JBOOL(allowReprocessing);
     JBOOL(intermediateProducts);
     JBOOL(sendOutputsToMainArchive);
+    JSTR(progressString);
 };
 
 //==========================================================================

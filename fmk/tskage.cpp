@@ -568,7 +568,7 @@ void TskAge::updateProgress()
     logFileHdl.seekg(0, logFileHdl.end);
     int length = logFileHdl.tellg();
     
-    const std::string ProgressTag(":PROGRESS:");
+    const std::string ProgressTag(cfg.flags.progressString());
     
     // If new content is there, read it and process it
     if (length > logFilePos) {
