@@ -162,8 +162,8 @@ void TskAge::runEachIteration()
 void TskAge::runEachIterationForContainers()
 {
     // Declare status
-    InfoMsg("Status is " + ProcStatusName[pStatus] +
-            " at iteration " + str::toStr<int>(iteration));
+    DbgMsg("Status is " + ProcStatusName[pStatus] +
+           " at iteration " + str::toStr<int>(iteration));
 
     // Upon status, perform the required action
     switch (pStatus) {
@@ -181,7 +181,7 @@ void TskAge::runEachIterationForContainers()
                 std::string chnl(ChnlTskProc + "_" + compName);
                 send(chnl, msg.str());
                 DBG("Sending request via channel " + chnl);
-                InfoMsg("Sending request via channel " + chnl);
+                DbgMsg("Sending request via channel " + chnl);
                 
                 pStatus = WAITING;
                 InfoMsg("Switching to status " + ProcStatusName[pStatus]);
@@ -198,13 +198,18 @@ void TskAge::runEachIterationForContainers()
         }
         break;
     case PROCESSING:
-        sendTaskReport();
+        for (auto const & kv : containerEpoch) {
+            std::string & contIf = kv.first;
+            if ((time() - kv.second) < (time_t)(86400)) {
+                sendTaskReport(contId);
+            } else {
+                auto it = containerToTaskMap.find(contId);
+                containerToTaskMap.erase(it);
+                containerEpoch.erase(kv);
+            }
+        }
         break;
     case FINISHING:
-        if (runningTask != 0) {
-            delete runningTask;
-            runningTask = 0;
-        }
         pStatus = IDLE;
         InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
         idleCycles = 0;
@@ -310,7 +315,10 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         InfoMsg("Running task " + task.taskName() +
                 " (" + task.taskPath() + ") within container " + containerId);
         origMsgString = m;
-        taskInfoMap[containerId] = runningTask;
+
+        // Save container info
+        containerToTaskMap[containerId]  = runningTask;
+        containerEpoch[containerId]      = time();
         
         usleep(50000); // 50 ms
 
@@ -320,10 +328,15 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         resetProgress();
             
         // Send back information to Task Manager
-        sendTaskReport();
+        //sendTaskReport(containerId);
 
     } else {
         WarnMsg("Couldn't execute docker container");
+        
+        delete runningTask;
+        runningTask = 0;
+
+        pStatus = IDLE;
     }
 }
 
@@ -345,25 +358,18 @@ void TskAge::processSubcmdMsg(MessageString & m)
     
     switch (subj) {
     case PROC_TASK:
-        if (runningTask == 0) {
-            return;
+        if (containerToTaskMap.find(subjName) == containerToTaskMap.end()) { return; }
+
+        TRC("Trying to " + subCmd + " container with id " + subjName);
+
+        if (subCmd == "PAUSE") {
+            dckMng->runCmd("pause",   noargs, subjName);
+        } else if (subCmd == "RESUME") {
+            dckMng->runCmd("unpause", noargs, subjName);
+        } else if (subCmd == "CANCEL") {
+            dckMng->runCmd("stop",    noargs, subjName);
         } else {
-            TaskInfo & task = (*runningTask);
-            currTaskId = task["taskData"]["Id"].asString();
-        }
-        TraceMsg("Trying to " + subCmd + " container with id " + subjName +
-                 " (" + currTaskId + " / " + containerId + ")");
-        if (currTaskId == subjName) {
-            if (subCmd == "PAUSE") {
-                dckMng->runCmd("pause",   noargs, subjName);
-            } else if (subCmd == "RESUME") {
-                dckMng->runCmd("unpause", noargs, subjName);
-            } else if (subCmd == "CANCEL") {
-                dckMng->runCmd("stop",    noargs, subjName);
-            } else {
-                //
-            }
-            sendTaskReport(subjName);
+            //
         }
         break;
     case PROC_AGENT:
@@ -391,8 +397,8 @@ void TskAge::sendTaskReport(std::string contId)
     if (contId.empty()) { contId = containerId; }
         
     // Define and set task object
-    std::map<std::string, TaskInfo*>::iterator itTaskInfo = taskInfoMap.find(contId);
-    if (itTaskInfo == taskInfoMap.end()) { return; }
+    auto & itTaskInfo = containerToTaskMap.find(contId);
+    if (itTaskInfo == containerToTaskMap.end()) { return; }
     
     TaskInfo & task = (*(itTaskInfo->second));
 
@@ -437,7 +443,7 @@ void TskAge::sendTaskReport(std::string contId)
     if (taskStatus == TASK_FINISHED) {
         retrieveOutputProducts(task);
         task["taskData"]["State"]["Progress"] = "100";
-        taskInfoMap.erase(itTaskInfo);
+        containerToTaskMap.erase(itTaskInfo);
     }
 
     // Put declared status in task info structure...

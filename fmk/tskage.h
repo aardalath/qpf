@@ -53,6 +53,7 @@
 #include <mutex>
 #include <sys/stat.h>
 #include <fstream>
+#include <time.h>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -198,7 +199,8 @@ private:
 
     std::string              containerId;
 
-    std::map<std::string, TaskInfo*> taskInfoMap;
+    std::map<std::string, TaskInfo*> containerToTaskMap;
+    std::map<std::string, time_t>    containerEpoch;
     
     TaskInfo *               runningTask;
     TaskStatus               taskStatus;
