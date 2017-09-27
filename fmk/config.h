@@ -422,6 +422,8 @@ public:
     static bool           isLive;
 
     static ProcessingFrameworkInfo * procFmkInfo;
+
+    static const int      MaxContainerAge;    
 };
 
 namespace Configuration {

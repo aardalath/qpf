@@ -157,7 +157,7 @@ private:
     //----------------------------------------------------------------------
     // Method: sendTaskReport
     //----------------------------------------------------------------------
-    void sendTaskReport(std::string contId = std::string());
+    void sendTaskReport(std::string contId);
 
     //----------------------------------------------------------------------
     // Method: retrieveOutputProducts
@@ -196,8 +196,6 @@ private:
     ServiceInfo *            serviceInfo;
     std::string              srvManager;
     std::vector<std::string> nodes;
-
-    std::string              containerId;
 
     std::map<std::string, TaskInfo*> containerToTaskMap;
     std::map<std::string, time_t>    containerEpoch;

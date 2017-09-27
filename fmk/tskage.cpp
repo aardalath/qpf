@@ -198,15 +198,6 @@ void TskAge::runEachIterationForContainers()
         }
         break;
     case PROCESSING:
-        for (auto const & kv : containerEpoch) {
-            std::string contId = kv.first;
-            if ((time(0) - kv.second) < (time_t)(86400)) {
-                sendTaskReport(contId);
-            } else {
-                containerToTaskMap.erase(containerToTaskMap.find(contId));
-                containerEpoch.erase(containerEpoch.find(contId));
-            }
-        }
         break;
     case FINISHING:
         pStatus = IDLE;
@@ -215,6 +206,18 @@ void TskAge::runEachIterationForContainers()
         break;
     default:
         break;
+    }
+
+    // Update status for running containers
+    for (auto const & kv : containerEpoch) {
+        std::string & contId = kv.first;
+        // Send new update on container info, unless it is too old
+        if ((time(0) - kv.second) < cfg.MaxContainerAge) {
+            sendTaskReport(contId);
+        } else {
+            containerToTaskMap.erase(containerToTaskMap.find(contId));
+            containerEpoch.erase(containerEpoch.find(contId));
+        }
     }
 
 }
@@ -309,26 +312,21 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     }
 
     //----  * * * LAUNCH TASK * * *
-    if (dckMng->createContainer(task.taskPath(), exchangeDir, containerId)) {
-
+    if (dckMng->createContainer(task.taskPath(), exchangeDir, contId)) {
         InfoMsg("Running task " + task.taskName() +
-                " (" + task.taskPath() + ") within container " + containerId);
+                " (" + task.taskPath() + ") within container " + contId);
         origMsgString = m;
 
         // Save container info
-        containerToTaskMap[containerId]  = runningTask;
-        containerEpoch[containerId]      = time(0);
+        containerToTaskMap[contId]  = runningTask;
+        containerEpoch[contId]      = time(0);
         
         usleep(50000); // 50 ms
 
         // Set processing status
         pStatus = PROCESSING;
         workingDuring = 0;
-        resetProgress();
-            
-        // Send back information to Task Manager
-        //sendTaskReport(containerId);
-
+        resetProgress();            
     } else {
         WarnMsg("Couldn't execute docker container");
         
@@ -336,6 +334,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         runningTask = 0;
 
         pStatus = IDLE;
+        InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
+        idleCycles = 0;
     }
 }
 
@@ -393,8 +393,6 @@ void TskAge::processSubcmdMsg(MessageString & m)
 //----------------------------------------------------------------------
 void TskAge::sendTaskReport(std::string contId)
 {
-    if (contId.empty()) { contId = containerId; }
-        
     // Define and set task object
     auto const & itTaskInfo = containerToTaskMap.find(contId);
     if (itTaskInfo == containerToTaskMap.end()) { return; }
@@ -412,7 +410,7 @@ void TskAge::sendTaskReport(std::string contId)
     std::string inspStatus = jstate["Status"].asString();
     int         inspCode   = jstate["ExitCode"].asInt();
 
-    if      (inspStatus == "running") {
+    if        (inspStatus == "running") {
         taskStatus = TASK_RUNNING;
     } else if (inspStatus == "paused") {
         taskStatus = TASK_PAUSED;
@@ -442,7 +440,6 @@ void TskAge::sendTaskReport(std::string contId)
     if (taskStatus == TASK_FINISHED) {
         retrieveOutputProducts(task);
         task["taskData"]["State"]["Progress"] = "100";
-        containerToTaskMap.erase(itTaskInfo);
     }
 
     // Put declared status in task info structure...
