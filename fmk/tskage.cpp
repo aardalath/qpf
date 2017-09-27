@@ -210,7 +210,7 @@ void TskAge::runEachIterationForContainers()
 
     // Update status for running containers
     for (auto const & kv : containerEpoch) {
-        std::string & contId = kv.first;
+        std::string contId = kv.first;
         // Send new update on container info, unless it is too old
         if ((time(0) - kv.second) < cfg.MaxContainerAge) {
             sendTaskReport(contId);
@@ -312,6 +312,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     }
 
     //----  * * * LAUNCH TASK * * *
+    std::string contId;
+    
     if (dckMng->createContainer(task.taskPath(), exchangeDir, contId)) {
         InfoMsg("Running task " + task.taskName() +
                 " (" + task.taskPath() + ") within container " + contId);
