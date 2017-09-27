@@ -310,7 +310,9 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         InfoMsg("Running task " + task.taskName() +
                 " (" + task.taskPath() + ") within container " + containerId);
         origMsgString = m;
-        sleep(1);
+        taskInfoMap[containerId] = runningTask;
+        
+        usleep(50000); // 50 ms
 
         // Set processing status
         pStatus = PROCESSING;
@@ -339,6 +341,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
     std::string subjName = msg.body["target"].asString();
 
     std::string currTaskId;
+    std::vector<std::string> noargs;
     
     switch (subj) {
     case PROC_TASK:
@@ -352,15 +355,15 @@ void TskAge::processSubcmdMsg(MessageString & m)
                  " (" + currTaskId + " / " + containerId + ")");
         if (currTaskId == subjName) {
             if (subCmd == "PAUSE") {
-                dckMng->runCmd("pause", std::vector<std::string>(), subjName);
+                dckMng->runCmd("pause",   noargs, subjName);
             } else if (subCmd == "RESUME") {
-                dckMng->runCmd("unpause", std::vector<std::string>(), subjName);
+                dckMng->runCmd("unpause", noargs, subjName);
             } else if (subCmd == "CANCEL") {
-                dckMng->runCmd("stop", std::vector<std::string>(), subjName);
+                dckMng->runCmd("stop",    noargs, subjName);
             } else {
                 //
             }
-            sendTaskReport();
+            sendTaskReport(subjName);
         }
         break;
     case PROC_AGENT:
@@ -383,13 +386,18 @@ void TskAge::processSubcmdMsg(MessageString & m)
 //----------------------------------------------------------------------
 // Method: sendTaskReport
 //----------------------------------------------------------------------
-void TskAge::sendTaskReport()
+void TskAge::sendTaskReport(std::string contId = std::string())
 {
+    if (contId.empty()) { contId = containerId; }
+        
     // Define and set task object
-    TaskInfo & task = (*runningTask);
+    std::map<std::string, TaskInfo*>::iterator itTaskInfo = taskInfoMap.find(contId);
+    if (itTaskInfo == taskInfoMap.end()) { return; }
+    
+    TaskInfo & task = (*(*itTaskInfo));
 
     std::stringstream info;
-    while (!dckMng->getInfo(containerId, info)) {}
+    while (!dckMng->getInfo(contId, info)) {}
 
     JValue jinfo(info.str());
     json taskData = jinfo.val()[0];
@@ -427,8 +435,9 @@ void TskAge::sendTaskReport()
     }
 
     if (taskStatus == TASK_FINISHED) {
-        retrieveOutputProducts();
+        retrieveOutputProducts(task);
         task["taskData"]["State"]["Progress"] = "100";
+        taskInfoMap.erase(itTaskInfo);
     }
 
     // Put declared status in task info structure...
@@ -453,11 +462,8 @@ void TskAge::sendTaskReport()
 //----------------------------------------------------------------------
 // Method: retrieveOutputProducts
 //----------------------------------------------------------------------
-void TskAge::retrieveOutputProducts()
+void TskAge::retrieveOutputProducts(TaskInfo & task)
 {
-    // Define and set task object
-    TaskInfo & task = (*runningTask);
-
     DBG("Retrieving output products for task: " << task.taskName());
 
     //-------------------------------------------------------------------

@@ -156,12 +156,12 @@ private:
     //----------------------------------------------------------------------
     // Method: sendTaskReport
     //----------------------------------------------------------------------
-    void sendTaskReport();
+    void sendTaskReport(std::string contId = std::string());
 
     //----------------------------------------------------------------------
     // Method: retrieveOutputProducts
     //----------------------------------------------------------------------
-    void retrieveOutputProducts();
+    void retrieveOutputProducts(TaskInfo & task);
 
     //----------------------------------------------------------------------
     // Method: sendHostInfoUpdate
@@ -198,6 +198,8 @@ private:
 
     std::string              containerId;
 
+    std::map<std::string, TaskInfo*> taskInfoMap;
+    
     TaskInfo *               runningTask;
     TaskStatus               taskStatus;
 
