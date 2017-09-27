@@ -386,7 +386,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
 //----------------------------------------------------------------------
 // Method: sendTaskReport
 //----------------------------------------------------------------------
-void TskAge::sendTaskReport(std::string contId = std::string())
+void TskAge::sendTaskReport(std::string contId)
 {
     if (contId.empty()) { contId = containerId; }
         
@@ -394,7 +394,7 @@ void TskAge::sendTaskReport(std::string contId = std::string())
     std::map<std::string, TaskInfo*>::iterator itTaskInfo = taskInfoMap.find(contId);
     if (itTaskInfo == taskInfoMap.end()) { return; }
     
-    TaskInfo & task = (*(*itTaskInfo));
+    TaskInfo & task = (*(itTaskInfo->second));
 
     std::stringstream info;
     while (!dckMng->getInfo(contId, info)) {}
