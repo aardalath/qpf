@@ -199,13 +199,12 @@ void TskAge::runEachIterationForContainers()
         break;
     case PROCESSING:
         for (auto const & kv : containerEpoch) {
-            std::string & contIf = kv.first;
-            if ((time() - kv.second) < (time_t)(86400)) {
+            std::string contId = kv.first;
+            if ((time(0) - kv.second) < (time_t)(86400)) {
                 sendTaskReport(contId);
             } else {
-                auto it = containerToTaskMap.find(contId);
-                containerToTaskMap.erase(it);
-                containerEpoch.erase(kv);
+                containerToTaskMap.erase(containerToTaskMap.find(contId));
+                containerEpoch.erase(containerEpoch.find(contId));
             }
         }
         break;
@@ -318,7 +317,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         // Save container info
         containerToTaskMap[containerId]  = runningTask;
-        containerEpoch[containerId]      = time();
+        containerEpoch[containerId]      = time(0);
         
         usleep(50000); // 50 ms
 
@@ -397,7 +396,7 @@ void TskAge::sendTaskReport(std::string contId)
     if (contId.empty()) { contId = containerId; }
         
     // Define and set task object
-    auto & itTaskInfo = containerToTaskMap.find(contId);
+    auto const & itTaskInfo = containerToTaskMap.find(contId);
     if (itTaskInfo == containerToTaskMap.end()) { return; }
     
     TaskInfo & task = (*(itTaskInfo->second));
