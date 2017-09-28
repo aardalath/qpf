@@ -199,7 +199,6 @@ private:
 
     std::map<std::string, TaskInfo*> containerToTaskMap;
     std::map<std::string, time_t>    containerEpoch;
-    std::map<std::string, time_t>    containerEpoch;
     
     TaskInfo *               runningTask;
     TaskStatus               taskStatus;
