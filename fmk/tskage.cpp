@@ -356,39 +356,47 @@ void TskAge::processSubcmdMsg(MessageString & m)
 
     std::string currTaskId;
     std::vector<std::string> noargs;
-    bool updateAfterDockerCall = true;
     
     switch (subj) {
     case PROC_TASK:
         if (containerToTaskMap.find(subjName) == containerToTaskMap.end()) { return; }
 
         TRC("Trying to " + subCmd + " container with id " + subjName);
-
-        if (subCmd == "PAUSE") {
-            dckMng->runCmd("pause",   noargs, subjName);
-        } else if (subCmd == "RESUME") {
-            dckMng->runCmd("unpause", noargs, subjName);
-        } else if (subCmd == "CANCEL") {
-            dckMng->runCmd("stop",    noargs, subjName);
-        } else {
-            updateAfterDockerCall = false;
-        }
         
-        if (updateAfterDockerCall) { sendTaskReport(subjName); }
+        applyActionOnContainer(subCmd, subjName);
+        sendTaskReport(subjName);
 
         break;
 
     case PROC_AGENT:
         TraceMsg("Trying to " + subCmd + " agent " + subjName);
         if (compName == subjName) {
-            isTaskRequestActive = (subCmd == "REACTIVATE");
+            for (auto const & kv : containerEpoch) {
+                std::string contId = kv.first;
+                TaskInfo & task = (*(*(containerToTaskMap[contId])));
+                TaskStatus taskStatus = TaskStatus(task.taskStatus());
+                // Send new update on container info, unless it is too old
+                if ((taskStatus != TASK_FAILED) && (taskStatus != TASK_FINISHED) &&
+                    (time(0) - kv.second) < cfg.MaxContainerAge) {
+                    applyActionOnContainer(subCmd, contId);
+                }
+            }
         }
         break;
 
     case PROC_HOST:
         TraceMsg("Trying to " + subCmd + " host " + subjName);
         if (cfg.currentHostAddr == subjName) {
-            isTaskRequestActive = (subCmd == "REACTIVATE");
+            for (auto const & kv : containerEpoch) {
+                std::string contId = kv.first;
+                TaskInfo & task = (*(*(containerToTaskMap[contId])));
+                TaskStatus taskStatus = TaskStatus(task.taskStatus());
+                // Send new update on container info, unless it is too old
+                if ((taskStatus != TASK_FAILED) && (taskStatus != TASK_FINISHED) &&
+                    (time(0) - kv.second) < cfg.MaxContainerAge) {
+                    applyActionOnContainer(subCmd, contId);
+                }
+            }
         }
         break;
 
@@ -396,6 +404,25 @@ void TskAge::processSubcmdMsg(MessageString & m)
         break;
     }
     TRC("Processing of subcmd message done.");
+}
+
+//----------------------------------------------------------------------
+// Method: applyActionOnContainer
+//----------------------------------------------------------------------
+void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
+{
+    isTaskRequestActive = true;
+
+    if ((act == "PAUSE") || (act == "SUSPEND")) {
+        dckMng->runCmd("pause",   noargs, contId);
+        isTaskRequestActive = false;
+    } else if ((act == "RESUME") || (act == "REACTIVATE")) {
+        dckMng->runCmd("unpause", noargs, contId);
+    } else if (act == "CANCEL") || (act == "STOP")) {
+        dckMng->runCmd("stop",    noargs, contId);
+    } else {
+        //
+    }    
 }
 
 //----------------------------------------------------------------------
@@ -540,11 +567,10 @@ void TskAge::sendHostInfoUpdate()
 //----------------------------------------------------------------------
 // Method: resetProgress
 //----------------------------------------------------------------------
-void TskAge::resetProgress()
+void TskAge::resetProgress(TaskInfo & tsk)
 {
     // Initialize progress and log related variables
     progress = 0;
-    
     isLogFileOpen = false;
 }
 
