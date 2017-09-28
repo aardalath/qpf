@@ -354,9 +354,6 @@ void TskAge::processSubcmdMsg(MessageString & m)
     SubjectId   subj     = (SubjectId)(msg.body["target_type"].asInt());
     std::string subjName = msg.body["target"].asString();
 
-    std::string currTaskId;
-    std::vector<std::string> noargs;
-    
     switch (subj) {
     case PROC_TASK:
         if (containerToTaskMap.find(subjName) == containerToTaskMap.end()) { return; }
@@ -411,6 +408,8 @@ void TskAge::processSubcmdMsg(MessageString & m)
 //----------------------------------------------------------------------
 void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
 {
+    std::vector<std::string> noargs;
+    
     isTaskRequestActive = true;
 
     if ((act == "PAUSE") || (act == "SUSPEND")) {
