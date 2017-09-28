@@ -216,6 +216,7 @@ public:
     }
     json & val() { return value; }
     int size() { return value.size(); }
+    bool has(const char * key) { return value.isMember(key); }
 protected:
     json value;
 };

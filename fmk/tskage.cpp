@@ -400,7 +400,7 @@ void TskAge::sendTaskReport(std::string contId)
     if (itTaskInfo == containerToTaskMap.end()) { return; }
     
     TaskInfo & task = (*(itTaskInfo->second));
-    if (task.isMember("taskData")) {
+    if (task.has("taskData")) {
         TaskStatus currTaskStatus =
             (TaskStatus)(task["taskData"]["State"]["TaskStatus"].asInt());
         if ((taskStatus == TASK_FAILED) ||
