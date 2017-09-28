@@ -400,7 +400,14 @@ void TskAge::sendTaskReport(std::string contId)
     if (itTaskInfo == containerToTaskMap.end()) { return; }
     
     TaskInfo & task = (*(itTaskInfo->second));
+    if (task.isMember("taskData")) {
+        TaskStatus currTaskStatus =
+            (TaskStatus)(task["taskData"]["State"]["TaskStatus"].asInt());
+        if ((taskStatus == TASK_FAILED) ||
+            (taskStatus == TASK_FINISHED)) { return; }
+    }
 
+    // Get updated Docker info
     std::stringstream info;
     while (!dckMng->getInfo(contId, info)) {}
 
