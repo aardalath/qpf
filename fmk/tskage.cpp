@@ -468,6 +468,7 @@ void TskAge::sendTaskReport(std::string contId)
         (taskStatus == TASK_FINISHED) ||
         (taskStatus == TASK_UNKNOWN_STATE)) {
         InfoMsg("Task container monitoring finished");
+        endProgress();
         pStatus = FINISHING;
         InfoMsg("Switching to status " + ProcStatusName[pStatus]);
     } else {
