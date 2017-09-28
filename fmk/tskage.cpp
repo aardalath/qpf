@@ -242,7 +242,7 @@ void TskAge::runEachIterationForServices()
 //----------------------------------------------------------------------
 void TskAge::armHostInfoTimer()
 {
-    Timer * hstnfoSender = new Timer(6000, true,
+    Timer * hstnfoSender = new Timer(10000, true,
                                      &TskAge::sendHostInfoUpdate, this);
 }
 
@@ -356,6 +356,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
 
     std::string currTaskId;
     std::vector<std::string> noargs;
+    bool updateAfterDockerCall = true;
     
     switch (subj) {
     case PROC_TASK:
@@ -370,24 +371,31 @@ void TskAge::processSubcmdMsg(MessageString & m)
         } else if (subCmd == "CANCEL") {
             dckMng->runCmd("stop",    noargs, subjName);
         } else {
-            //
+            updateAfterDockerCall = false;
         }
+        
+        if (updateAfterDockerCall) { sendTaskReport(subjName); }
+
         break;
+
     case PROC_AGENT:
         TraceMsg("Trying to " + subCmd + " agent " + subjName);
         if (compName == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
+
     case PROC_HOST:
         TraceMsg("Trying to " + subCmd + " host " + subjName);
         if (cfg.currentHostAddr == subjName) {
             isTaskRequestActive = (subCmd == "REACTIVATE");
         }
         break;
+
     default:
         break;
     }
+    TRC("Processing of subcmd message done.");
 }
 
 //----------------------------------------------------------------------
@@ -400,12 +408,8 @@ void TskAge::sendTaskReport(std::string contId)
     if (itTaskInfo == containerToTaskMap.end()) { return; }
     
     TaskInfo & task = (*(itTaskInfo->second));
-    if (task.has("taskData")) {
-        TaskStatus currTaskStatus =
-            (TaskStatus)(task["taskData"]["State"]["TaskStatus"].asInt());
-        if ((taskStatus == TASK_FAILED) ||
-            (taskStatus == TASK_FINISHED)) { return; }
-    }
+    if ((task.taskStatus() == TASK_FAILED) ||
+        (task.taskStatus() == TASK_FINISHED)) { return; }
 
     // Get updated Docker info
     std::stringstream info;
