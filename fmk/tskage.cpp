@@ -417,7 +417,7 @@ void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
         isTaskRequestActive = false;
     } else if ((act == "RESUME") || (act == "REACTIVATE")) {
         dckMng->runCmd("unpause", noargs, contId);
-    } else if (act == "CANCEL") || (act == "STOP")) {
+    } else if ((act == "CANCEL") || (act == "STOP")) {
         dckMng->runCmd("stop",    noargs, contId);
     } else {
         //
