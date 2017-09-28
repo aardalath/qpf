@@ -373,7 +373,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
         if (compName == subjName) {
             for (auto const & kv : containerEpoch) {
                 std::string contId = kv.first;
-                TaskInfo & task = (*(*(containerToTaskMap[contId])));
+                TaskInfo & task = (*(containerToTaskMap[contId]));
                 TaskStatus taskStatus = TaskStatus(task.taskStatus());
                 // Send new update on container info, unless it is too old
                 if ((taskStatus != TASK_FAILED) && (taskStatus != TASK_FINISHED) &&
@@ -389,7 +389,7 @@ void TskAge::processSubcmdMsg(MessageString & m)
         if (cfg.currentHostAddr == subjName) {
             for (auto const & kv : containerEpoch) {
                 std::string contId = kv.first;
-                TaskInfo & task = (*(*(containerToTaskMap[contId])));
+                TaskInfo & task = (*(containerToTaskMap[contId]));
                 TaskStatus taskStatus = TaskStatus(task.taskStatus());
                 // Send new update on container info, unless it is too old
                 if ((taskStatus != TASK_FAILED) && (taskStatus != TASK_FINISHED) &&
