@@ -566,7 +566,7 @@ void TskAge::sendHostInfoUpdate()
 //----------------------------------------------------------------------
 // Method: resetProgress
 //----------------------------------------------------------------------
-void TskAge::resetProgress(TaskInfo & tsk)
+void TskAge::resetProgress()
 {
     // Initialize progress and log related variables
     progress = 0;
