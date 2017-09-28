@@ -150,6 +150,11 @@ private:
     void runEachIterationForServices();
 
     //----------------------------------------------------------------------
+    // Method: applyActionOnContainer
+    //----------------------------------------------------------------------
+    void applyActionOnContainer(std::string & act, std::string & contId);
+
+    //----------------------------------------------------------------------
     // Method: armHostInfoTimer
     //----------------------------------------------------------------------
     void armHostInfoTimer();
