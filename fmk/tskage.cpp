@@ -474,24 +474,25 @@ void TskAge::sendTaskReport(std::string contId)
     } else {
         workingDuring++;
         updateProgress();
-        task["taskData"]["State"]["Progress"] = std::to_string(progress);
     }
+
+    // Update progress
+    task["taskData"]["State"]["Progress"] = std::to_string(progress);
+
+    // Put declared status in task info structure...
+    // ... and add it as well to the taskData JSON structure
+    task["taskStatus"] = taskStatus;
+    task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
     if (taskStatus == TASK_FINISHED) {
         retrieveOutputProducts(task);
-        task["taskData"]["State"]["Progress"] = "100";
     }
-
-    // Put declared status in task info structure...
-    task["taskStatus"] = taskStatus;
-    // ... and add it as well to the taskData JSON structure
-    task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
     // Include additional info
     json addInfo;
     addInfo["TaskName"] = task.taskName();
-    addInfo["Agent"] = compName;
-    addInfo["Proc"] = task.taskPath();
+    addInfo["Agent"]    = compName;
+    addInfo["Proc"]     = task.taskPath();
     task["taskData"]["Info"] = addInfo;
     
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
