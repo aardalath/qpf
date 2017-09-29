@@ -92,7 +92,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     synchro     = s;
 
     iteration = 0;
-    stepSize  = 50;
+    stepSize  = 100;
 
     // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)

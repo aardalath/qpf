@@ -143,7 +143,7 @@ void EvtMng::runEachIteration()
     }
 
     bool sendInit = ((iteration + 1) == 100);
-    bool sendPing = ((iteration % 20) == 0);
+    bool sendPing = ((iteration % 200) == 0);
     bool sendQuit = requestQuit; //(iteration > 1000) || requestQuit;
 
     if (sendInit || sendPing || sendQuit) {
