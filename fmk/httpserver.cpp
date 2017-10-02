@@ -513,7 +513,7 @@ void HttpServer::start()
 
     server = new Server(8080);
     server->registerController(this);
-    server->setOption("document_root", ".");
+    server->setOption("document_root", Config::PATHWww.c_str());
     server->setOption("enable_directory_listing", "false");
     server->start();
 
