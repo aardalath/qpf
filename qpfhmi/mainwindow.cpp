@@ -356,7 +356,6 @@ void MainWindow::readConfig(QString dbUrl)
 
     std::vector<std::string> runPaths {
         Config::PATHSession,
-            Config::PATHWww,
             Config::PATHLog,
             Config::PATHRlog,
             Config::PATHTmp,
@@ -369,6 +368,12 @@ void MainWindow::readConfig(QString dbUrl)
         }
     }
 
+    int mkdirStat = mkdir(Config::PATHWww.c_str(), Config::PATHMode);
+    if ((mkdirStat != 0) || (errno != EEXIST)) {
+        std::perror(("mkdir " + p).c_str());
+        exit(EXIT_FAILURE);
+    }
+    
     Log::setLogBaseDir(Config::PATHLog);
 
     putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfg.cfgFileName)));

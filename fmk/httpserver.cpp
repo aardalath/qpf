@@ -375,14 +375,6 @@ void HttpServer::info(Request &request, StreamResponse &response)
     wc.addPar("This is a simple test", WebComposer::Right);
     wc.addHeading("Hi, again!", 1, WebComposer::Right);
     wc.addPar("This is another simple test", WebComposer::Right);
-    wc.addHeading("But there is more...", 2, WebComposer::Right);
-    wc.addPar("Yep, this is a second level heading and paragraph!", WebComposer::Right);
-    wc.startMenu("Simple Menu", WebComposer::Right);
-    wc.addMenuItem("Home", "../info", WebComposer::Right);
-    wc.addMenuItem("Sesssion", "../session", WebComposer::Right);
-    wc.addMenuItem("Form", "../form", WebComposer::Right);
-    wc.addMenuItem("Hello", "../hello", WebComposer::Right);
-    wc.endMenu(WebComposer::Right);
     
     // Center Column
     wc.addSec("QLA General Information");
