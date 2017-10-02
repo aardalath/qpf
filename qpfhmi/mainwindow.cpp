@@ -370,7 +370,7 @@ void MainWindow::readConfig(QString dbUrl)
 
     int mkdirStat = mkdir(Config::PATHWww.c_str(), Config::PATHMode);
     if ((mkdirStat != 0) || (errno != EEXIST)) {
-        std::perror(("mkdir " + p).c_str());
+        std::perror(("mkdir " + Config::PATHWww).c_str());
         exit(EXIT_FAILURE);
     }
     
