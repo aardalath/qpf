@@ -56,6 +56,277 @@ using Configuration::cfg;
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+class WebComposer {
+private:
+    static const std::string PageBegin;
+    static const std::string PageEnd;
+    static const std::string HeadBegin;
+    static const std::string HeadEnd;
+    static const std::string BodyBegin;
+    static const std::string BodyEnd;
+    static const std::string Style;
+    static const std::string FootMsg;
+
+public:
+    enum Column { Center, Right, Left };
+
+private:
+    std::map<Column,std::string> content;
+    std::string title;
+
+public:    
+    void reset() {
+        content.clear();
+        title = "New Page";
+    }
+
+    void setTitle(std::string tit) {
+        title = tit;
+    }
+    
+    void addHeading(std::string heading, int level, Column col = Center) {
+        content[col] += ("<h" + std::to_string(level) + ">" + heading +
+                         "</h" + std::to_string(level) + ">\n");
+    }
+    
+    void addPar(std::string par, Column col = Center) {
+        content[col] += "<p>" + par + "</p>\n";
+    }
+    
+    void addSpace(Column col = Center) {
+        content[col] += "<p><br></br></p>\n";
+    }
+    
+    void addSec(std::string sec) {
+        content[Center] += "<div class="banner">" + sec + "</div>\n";
+    }
+    
+    void startMenu(std::string tit, Column col = Left) {
+        content[col] += ("<p><strong>" + tit + "</strong><br/></p>\n" +
+                         "<div id="navigation"><ul>\n");
+    }
+
+    void addMenuItem(std::string txt, std::string url, Column col = Left) {
+        content[col] += ("<li><a href=\"" + url + "\">" + txt + "</a></li>\n");
+    }
+
+    void endMenu(Column col = Left) {
+        content[col] += ("</ul></div>\n");
+    }
+
+    void addImg(std::string fileName, int height = 104, int width = 125,
+                std::string url = std::string(),
+                Column col = Center,
+                std::string title = std::string(),
+                std::string cls = "thumbnail") {
+        content[col] += ("<p><a href=\"" + url + "\"><img src=\"" + fileName + "\" " +
+                         "height=\"" + std::to_string(height) +
+                         "\" width=\"" + std::to_string(width) +
+                         "\" class=\"" + cls + "\" alt=\"" + title +
+                         "\" align=\"middle\"/></a></p>\n");
+    }
+
+    std::string pageContent() {
+        page = (PageBegin +
+                HeadBegin + "<title>" + title + "</title>" + Style + HeadEnd +
+                BodyBegin);
+        page += "<div id=\"right1\">\n" + content[Left] + "</div>\n"; 
+        page += "<div id=\"center\">\n" + content[Center] + FootMsg + "</div>\n"; 
+        page += "<div id=\"right2\">\n" + content[right] + "</div>\n"; 
+        page += BodyEnd + PageEnd;
+        return page;
+    }
+};
+
+const std::string WebComposer::PageBegin = std::string
+    ("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n"
+     "<html>\n");
+const std::string WebComposer::PageEnd = std::string
+    ("</html>\n");
+const std::string WebComposer::HeadBegin = std::string
+    ("<head>");
+const std::string WebComposer::HeadEnd = std::string
+    ("</head>\n");
+const std::string WebComposer::BodyBegin = std::string
+    ("<body>");
+const std::string WebComposer::BodyEnd = std::string
+    ("</body>\n");
+const std::string WebComposer::Style = std::string
+    ("<style>\n"
+     "      body {\n"
+     "        margin:20px 10px 0px 10px;\n"
+     "        padding:0px;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 1em;\n"
+     "        color: #666;\n"
+     "      }\n"
+     "      #center {\n"
+     "        width:45%;\n"
+     "        float:left;\n"
+     "        background:#fff;\n"
+     "        padding-bottom:10px;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 0.65em;\n"
+     "        color: #666;\n"
+     "        line-height: 1.2em;\n"
+     "      }\n"
+     "      #right1 {\n"
+     "        width:20%;\n"
+     "        float:left;\n"
+     "        background:#eee;\n"
+     "        padding-bottom:10px;\n"
+     "        line-height: 1.2em;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 0.65em;\n"
+     "        color: #666;\n"
+     "        border-right: 1px solid;\n"
+     "        border-color: #ccc;\n"
+     "      }\n"
+     "      #right2 {\n"
+     "        width:15%;\n"
+     "        float:left;\n"
+     "        background:#fff;\n"
+     "        padding-bottom:10px;\n"
+     "        border-left: 1px solid #eee;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 0.65em;\n"
+     "        color: #666;\n"
+     "      }\n"
+     "      .banner {\n"
+     "        background:#6493C4;\n"
+     "        margin-left: 10px;\n"
+     "        margin-right: 10px;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 1em;\n"
+     "        color: #333333;\n"
+     "        font-weight: bold;\n"
+     "        text-transform: uppercase;\n"
+     "      }\n"
+     "      #footer {\n"
+     "        padding-top: 10px;\n"
+     "        margin-left: 10px;\n"
+     "        margin-right: 10px;\n"
+     "        font-family: Arial, Helvetica, sans-serif;\n"
+     "        font-size: 0.8em;\n"
+     "        color: #999;\n"
+     "        font-weight: normal;\n"
+     "        text-transform: none;\n"
+     "        text-align: center;\n"
+     "      }\n"
+     "      #navigation p {\n"
+     "        display: none;\n"
+     "      }\n"
+     "      #navigation {\n"
+     "        color: #8A1E30;\n"
+     "        text-decoration: none;\n"
+     "        font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 1em;\n"
+     "        font-weight: bold;\n"
+     "        padding: 0;\n"
+     "        margin-bottom: 1em;\n"
+     "        background-color: #eee;\n"
+     "      }\n"
+     "      #navigation ul {\n"
+     "        list-style: none;\n"
+     "        margin: 0;\n"
+     "        padding: 0;\n"
+     "        border-top: 1px dotted #ccc;\n"
+     "      }\n"
+     "      #navigation ul li {\n"
+     "        margin: 0;\n"
+     "      }\n"
+     "      #navigation ul li a {\n"
+     "        display: block;\n"
+     "        padding: 2px 2px 2px 1em;\n"
+     "        background-color: #eee;\n"
+     "        text-decoration: none;\n"
+     "        width: 100%;\n"
+     "      }\n"
+     "      html>body #navigation ul li a {\n"
+     "        width:auto;\n"
+     "      }\n"
+     "      #navigation ul li a:hover {\n"
+     "        background-color: #8EABD1;\n"
+     "        color: #fff;\n"
+     "      }\n"
+     "      p,h1,pre {\n"
+     "        margin:0px 10px 10px 10px;\n"
+     "      }\n"
+     "      a {\n"
+     "        color: #5578AA;\n"
+     "        text-decoration: none;\n"
+     "        font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 1.2em;\n"
+     "        font-weight: bold\n"
+     "      }\n"
+     "      a:hover {\n"
+     "        text-decoration: underline;\n"
+     "      }\n"
+     "      a:visited:hover {\n"
+     "        color: #e7eff2;\n"
+     "        text-decoration: underline;\n"
+     "      }\n"
+     "      h1 {\n"
+     "        font-size:12px;\n"
+     "        padding-top:10px;\n"
+     "      }\n"
+     "      #center p {\n"
+     "        padding-left: 10px;\n"
+     "      }\n"
+     "      #right1 a {\n"
+     "        font-size: 1.1em;\n"
+     "      }\n"
+     "      #right2 a {\n"
+     "        font-size: 1.1em;\n"
+     "      }\n"
+     "      #center h1 {\n"
+     "        font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 30px;\n"
+     "        font-weight: normal;\n"
+     "        color: #6493C4;\n"
+     "        padding-left: 10px;\n"
+     "        margin-top: 10px;\n"
+     "        margin-bottom: 20px;\n"
+     "      }\n"
+     "      #center h2 { font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 18px;\n"
+     "        font-weight: normal;\n"
+     "        color: #6493C4;\n"
+     "        padding-left: 15px;\n"
+     "        margin-top: 25px;\n"
+     "        margin-bottom: 20px;\n"
+     "      }\n"
+     "      #right1 h1 { font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 18px;\n"
+     "        font-weight: normal;\n"
+     "        color: #333333;\n"
+     "        padding-top: 10px;\n"
+     "        padding-left: 5px;\n"
+     "        margin-bottom: 15px;\n"
+     "      }\n"
+     "      #right2 h1 { font-family: Arial,Helvetica,sans-serif;\n"
+     "        font-size: 18px;\n"
+     "        font-weight: normal;\n"
+     "        color: #333333;\n"
+     "        padding-top: 10px;\n"
+     "        padding-left: 5px;\n"
+     "        margin-bottom: 15px;\n"
+     "      }\n"
+     "      #right1 li { border-left: 1px dotted #ccc;\n"
+     "        border-right: 1px dotted #ccc;\n"
+     "        border-bottom: 1px dotted #ccc;\n"
+     "      }\n"
+     "    </style>\n");
+const std::string WebComposer::FootMsg = std::string
+    ("<div id=\"footer\">Copyright 2015-2017 The Euclid SOC Team @ ESAC<br>\n"
+     "<center><a href=\"https://www.cosmos.esa.int/web/euclid/euclid-at-esac\" "
+     "title=\"The Euclid QLA Processing Framework\" "
+     "target=\"_blank\">The Euclid QLA Processing Framework</a><br>\n"
+     "<center><a href=\"https://www.cosmos.esa.int/web/euclid/home\" "
+     "title=\"Euclid - A Space Mission to map the Dark Universe\" "
+     "target=\"_blank\">Euclid - A Space Mission to map the Dark Universe</a></center>\n"
+     "</div>\n");
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -86,229 +357,44 @@ void HttpServer::hello(Request &request, StreamResponse &response)
 //----------------------------------------------------------------------
 void HttpServer::info(Request &request, StreamResponse &response)
 {
-    const std::string HtmlStr(
+    WebComposer wc;
+    wc.reset();
 
-"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">"
-"<html>"
-"  <head>"
-"    <title>Your Home Page</title>"
-"    <style>"
-"      body {"
-"        margin:20px 10px 0px 10px;"
-"        padding:0px;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 1em;"
-"        color: #666;"
-"      }"
-"      #center {"
-"        width:45%;"
-"        float:left;"
-"        background:#fff;"
-"        padding-bottom:10px;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 0.65em;"
-"        color: #666;"
-"        line-height: 1.2em;"
-"      }"
-"      #right1 {"
-"        width:20%;"
-"        float:left;"
-"        background:#eee;"
-"        padding-bottom:10px;"
-"        line-height: 1.2em;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 0.65em;"
-"        color: #666;"
-"        border-right: 1px solid;"
-"        border-color: #ccc;"
-"      }"
-"      #right2 {"
-"        width:15%;"
-"        float:left;"
-"        background:#fff;"
-"        padding-bottom:10px;"
-"        border-left: 1px solid #eee;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 0.65em;"
-"        color: #666;"
-"      }"
-"      .banner {"
-"        background:#6493C4;"
-"        margin-left: 10px;"
-"        margin-right: 10px;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 1em;"
-"        color: #333333;"
-"        font-weight: bold;"
-"        text-transform: uppercase;"
-"      }"
-"      #footer {"
-"        padding-top: 10px;"
-"        margin-left: 10px;"
-"        margin-right: 10px;"
-"        font-family: Arial, Helvetica, sans-serif;"
-"        font-size: 0.8em;"
-"        color: #999;"
-"        font-weight: normal;"
-"        text-transform: none;"
-"        text-align: center;"
-"      }"
-"      #navigation p {"
-"        display: none;"
-"      }"
-"      #navigation {"
-"        color: #8A1E30;"
-"        text-decoration: none;"
-"        font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 1em;"
-"        font-weight: bold;"
-"        padding: 0;"
-"        margin-bottom: 1em;"
-"        background-color: #eee;"
-"      }"
-"      #navigation ul {"
-"        list-style: none;"
-"        margin: 0;"
-"        padding: 0;"
-"        border-top: 1px dotted #ccc;"
-"      }"
-"      #navigation ul li {"
-"        margin: 0;"
-"      }"
-"      #navigation ul li a {"
-"        display: block;"
-"        padding: 2px 2px 2px 1em;"
-"        background-color: #eee;"
-"        text-decoration: none;"
-"        width: 100%;"
-"      }"
-"      html>body #navigation ul li a {"
-"        width:auto;"
-"      }"
-"      #navigation ul li a:hover {"
-"        background-color: #8EABD1;"
-"        color: #fff;"
-"      }"
-"      p,h1,pre {"
-"        margin:0px 10px 10px 10px;"
-"      }"
-"      a {"
-"        color: #5578AA;"
-"        text-decoration: none;"
-"        font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 1.2em;"
-"        font-weight: bold"
-"      }"
-"      a:hover {"
-"        text-decoration: underline;"
-"      }"
-"      a:visited:hover {"
-"        color: #e7eff2;"
-"        text-decoration: underline;"
-"      }"
-"      h1 {"
-"        font-size:12px;"
-"        padding-top:10px;"
-"      }"
-"      #center p {"
-"        padding-left: 10px;"
-"      }"
-"      #right1 a {"
-"        font-size: 1.1em;"
-"      }"
-"      #right2 a {"
-"        font-size: 1.1em;"
-"      }"
-"      #center h1 {"
-"        font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 30px;"
-"        font-weight: normal;"
-"        color: #6493C4;"
-"        padding-left: 10px;"
-"        margin-top: 10px;"
-"        margin-bottom: 20px;"
-"      }"
-"      #center h2 { font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 18px;"
-"        font-weight: normal;"
-"        color: #6493C4;"
-"        padding-left: 15px;"
-"        margin-top: 25px;"
-"        margin-bottom: 20px;"
-"      }"
-"      #right1 h1 { font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 18px;"
-"        font-weight: normal;"
-"        color: #333333;"
-"        padding-top: 10px;"
-"        padding-left: 5px;"
-"        margin-bottom: 15px;"
-"      }"
-"      #right2 h1 { font-family: Arial,Helvetica,sans-serif;"
-"        font-size: 18px;"
-"        font-weight: normal;"
-"        color: #333333;"
-"        padding-top: 10px;"
-"        padding-left: 5px;"
-"        margin-bottom: 15px;"
-"      }"
-"      #right1 li { border-left: 1px dotted #ccc;"
-"        border-right: 1px dotted #ccc;"
-"        border-bottom: 1px dotted #ccc;"
-"      }"
-"    </style>"
-"  </head>"
-"  <body>"
-"    <div id=\"right1\">"
-"      <h1>Welcome!</h1>"
-"      <p>\"There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...\""
-"      </p>"
-"      <p>"
-"        <strong>Menu"
-"        </strong><br/></p>"
-"      <div id=\"navigation\">"
-"        <ul>"
-"          <li><a href=\"\">Home</a></li>"
-"          <li><a href=\"\">Abot us</a></li>"
-"          <li><a href=\"\">News</a></li>"
-"          <li><a href=\"\">Contact</a></li>"
-"          <li><a href=\"\">Links</a></li>"
-"        </ul>"
-"      </div>"
-"    </div>"
-"    <div id=\"center\">"
-"      <div class=\"banner\">info</div>"
-"      <h1>Your Home Page</h1>"
-"      <p><strong>What is Lorem Ipsum?</strong></p>"
-"      <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>"
-"      <h2>Why do we use it?</h2>"
-"      <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>"
-"      <h2>Where does it come from?</h2>"
-"      <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.</p>"
-"      <p>The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</p>"
-"      <p><br></br></p>"
-"      <div class=\"banner\">donate</div>"
-"      <p></p>"
-"      <p>If you use this site regularly and would like to help keep the site on the Internet, please consider donating a small sum to help pay for the hosting and bandwidth bill. There is no minimum donation, any sum is appreciated - click here to donate using PayPal. Thank you for your support.</p>"
-"      <div id=\"footer\">Copyright 2006 Your Home Page"
-"        <!-- Designed by DreamTemplate. Please leave link unmodified. -->"
-"        <br><center><a href=\"http://www.dreamtemplate.com\" title=\"Website Templates\" target=\"_blank\">Website templates</a></center>"
-"          "
-"        </div>"
-"      </div>"
-"      <div id=\"right2\">"
-"        <h1>About Us</h1>"
-"        <p>\"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"</p>"
-"        <h1>Photos</h1>"
-"        <p><a href=\"\"><img src=\"pic1.jpg\" height=\"104\" width=\"125\" class=\"thumbnail\" alt=\"Included colors\" align=\"middle\"/></a></p>"
-"        <p><a href=\"\"><img src=\"pic2.jpg\" height=\"104\" width=\"125\" class=\"thumbnail\" alt=\"Included colors\" align=\"middle\"/></a></p>"
-"        <p><a href=\"\"><img src=\"pic3.jpg\" height=\"104\" width=\"125\" class=\"thumbnail\" alt=\"Included colors\" align=\"middle\"/></a></p>"
-"        <p align=\"right\"><a href=\"\">More...</a></p>"
-"      </div>"
-"    </body>"
-"  </html>"
-                              );
-    response << HtmlStr << std::endl;
+    // Left Column
+    wc.addHeading("Hi!", 1, Left);
+    wc.addPar("This is a simple test", Left);
+    wc.startMenu("Simple Menu", Left);
+    wc.addMenuItem("Home", "../info", Left);
+    wc.addMenuItem("Sesssion", "../session", Left);
+    wc.addMenuItem("Form", "../form", Left);
+    wc.addMenuItem("Hello", "../hello", Left);
+    wc.endMenu(Left);
+
+    // Right Column
+    wc.addHeading("Hi!", 1, Right);
+    wc.addPar("This is a simple test", Right);
+    wc.addHeading("Hi, again!", 1, Right);
+    wc.addPar("This is another simple test", Right);
+    wc.addHeading("But there is more...", 2, Right);
+    wc.addPar("Yep, this is a second level heading and paragraph!", Right);
+    wc.startMenu("Simple Menu", Right);
+    wc.addMenuItem("Home", "../info", Right);
+    wc.addMenuItem("Sesssion", "../session", Right);
+    wc.addMenuItem("Form", "../form", Right);
+    wc.addMenuItem("Hello", "../hello", Right);
+    wc.endMenu(Right);
+    
+    // Center Column
+    wc.addSec("QLA General Information");
+    wc.addHeading("General", 1);
+    wc.addPar("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
+    wc.addHeading("Why do we use it?", 2);
+    wc.addPar("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).");
+    wc.addHeading("Where does it come from?", 2);
+    wc.addPar("Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of 'de Finibus Bonorum et Malorum' (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, 'Lorem ipsum dolor sit amet..', comes from a line in section 1.10.32.");
+    wc.addPar("The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.");
+    
+    response << wc.page() << std::endl;
 }
 
 //----------------------------------------------------------------------
