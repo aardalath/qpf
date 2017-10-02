@@ -361,28 +361,28 @@ void HttpServer::info(Request &request, StreamResponse &response)
     wc.reset();
 
     // Left Column
-    wc.addHeading("Hi!", 1, Left);
-    wc.addPar("This is a simple test", Left);
-    wc.startMenu("Simple Menu", Left);
-    wc.addMenuItem("Home", "../info", Left);
-    wc.addMenuItem("Sesssion", "../session", Left);
-    wc.addMenuItem("Form", "../form", Left);
-    wc.addMenuItem("Hello", "../hello", Left);
-    wc.endMenu(Left);
+    wc.addHeading("Hi!", 1, WebComposer::Left);
+    wc.addPar("This is a simple test", WebComposer::Left);
+    wc.startMenu("Simple Menu", WebComposer::Left);
+    wc.addMenuItem("Home", "../info", WebComposer::Left);
+    wc.addMenuItem("Sesssion", "../session", WebComposer::Left);
+    wc.addMenuItem("Form", "../form", WebComposer::Left);
+    wc.addMenuItem("Hello", "../hello", WebComposer::Left);
+    wc.endMenu(WebComposer::Left);
 
     // Right Column
-    wc.addHeading("Hi!", 1, Right);
-    wc.addPar("This is a simple test", Right);
-    wc.addHeading("Hi, again!", 1, Right);
-    wc.addPar("This is another simple test", Right);
-    wc.addHeading("But there is more...", 2, Right);
-    wc.addPar("Yep, this is a second level heading and paragraph!", Right);
-    wc.startMenu("Simple Menu", Right);
-    wc.addMenuItem("Home", "../info", Right);
-    wc.addMenuItem("Sesssion", "../session", Right);
-    wc.addMenuItem("Form", "../form", Right);
-    wc.addMenuItem("Hello", "../hello", Right);
-    wc.endMenu(Right);
+    wc.addHeading("Hi!", 1, WebComposer::Right);
+    wc.addPar("This is a simple test", WebComposer::Right);
+    wc.addHeading("Hi, again!", 1, WebComposer::Right);
+    wc.addPar("This is another simple test", WebComposer::Right);
+    wc.addHeading("But there is more...", 2, WebComposer::Right);
+    wc.addPar("Yep, this is a second level heading and paragraph!", WebComposer::Right);
+    wc.startMenu("Simple Menu", WebComposer::Right);
+    wc.addMenuItem("Home", "../info", WebComposer::Right);
+    wc.addMenuItem("Sesssion", "../session", WebComposer::Right);
+    wc.addMenuItem("Form", "../form", WebComposer::Right);
+    wc.addMenuItem("Hello", "../hello", WebComposer::Right);
+    wc.endMenu(WebComposer::Right);
     
     // Center Column
     wc.addSec("QLA General Information");
