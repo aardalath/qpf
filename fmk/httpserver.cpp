@@ -127,7 +127,7 @@ public:
     }
 
     std::string pageContent() {
-        str::string page = (PageBegin +
+        std::string page = (PageBegin +
                             HeadBegin + "<title>" + title + "</title>" + Style + HeadEnd +
                             BodyBegin);
         page += "<div id=\"right1\">\n" + content[Left] + "</div>\n"; 
