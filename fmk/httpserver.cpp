@@ -98,12 +98,12 @@ public:
     }
     
     void addSec(std::string sec) {
-        content[Center] += "<div class="banner">" + sec + "</div>\n";
+        content[Center] += "<div class=\"banner\">" + sec + "</div>\n";
     }
     
     void startMenu(std::string tit, Column col = Left) {
         content[col] += ("<p><strong>" + tit + "</strong><br/></p>\n" +
-                         "<div id="navigation"><ul>\n");
+                         "<div id=\"navigation\"><ul>\n");
     }
 
     void addMenuItem(std::string txt, std::string url, Column col = Left) {
@@ -132,7 +132,7 @@ public:
                 BodyBegin);
         page += "<div id=\"right1\">\n" + content[Left] + "</div>\n"; 
         page += "<div id=\"center\">\n" + content[Center] + FootMsg + "</div>\n"; 
-        page += "<div id=\"right2\">\n" + content[right] + "</div>\n"; 
+        page += "<div id=\"right2\">\n" + content[Right] + "</div>\n"; 
         page += BodyEnd + PageEnd;
         return page;
     }
