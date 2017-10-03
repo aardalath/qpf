@@ -398,7 +398,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.addSec("QLA General Information");
 
     wc.addHeading("Configuration", 1);
-    wc.addPre(cfg.toJsonStr());
+    wc.addPre(cfg.str());
     
     response << wc.pageContent() << std::endl;
 }
