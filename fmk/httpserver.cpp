@@ -93,6 +93,10 @@ public:
         content[col] += "<p>" + par + "</p>\n";
     }
     
+    void addPre(std::string txt, Column col = Center) {
+        content[col] += "<pre>" + txt + "</pre>\n";
+    }
+    
     void addSpace(Column col = Center) {
         content[col] += "<p><br></br></p>\n";
     }
@@ -360,33 +364,104 @@ void HttpServer::info(Request &request, StreamResponse &response)
     WebComposer wc;
     wc.reset();
 
-    // Left Column
-    wc.addHeading("Hi!", 1, WebComposer::Left);
-    wc.addPar("This is a simple test", WebComposer::Left);
-    wc.startMenu("Simple Menu", WebComposer::Left);
-    wc.addMenuItem("Home", "../info", WebComposer::Left);
-    wc.addMenuItem("Sesssion", "../session", WebComposer::Left);
-    wc.addMenuItem("Form", "../form", WebComposer::Left);
-    wc.addMenuItem("Hello", "../hello", WebComposer::Left);
-    wc.endMenu(WebComposer::Left);
-
-    // Right Column
-    wc.addHeading("Hi!", 1, WebComposer::Right);
-    wc.addPar("This is a simple test", WebComposer::Right);
-    wc.addHeading("Hi, again!", 1, WebComposer::Right);
-    wc.addPar("This is another simple test", WebComposer::Right);
+    genPageLeftColumn(wc);
+    genPageRightColumn(wc);
     
     // Center Column
     wc.addSec("QLA General Information");
+
     wc.addHeading("General", 1);
     wc.addPar("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
+
     wc.addHeading("Why do we use it?", 2);
     wc.addPar("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).");
+
     wc.addHeading("Where does it come from?", 2);
     wc.addPar("Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of 'de Finibus Bonorum et Malorum' (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, 'Lorem ipsum dolor sit amet..', comes from a line in section 1.10.32.");
     wc.addPar("The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.");
     
     response << wc.pageContent() << std::endl;
+}
+
+//----------------------------------------------------------------------
+// Method: config
+//----------------------------------------------------------------------
+void HttpServer::config(Request &request, StreamResponse &response)
+{
+    WebComposer wc;
+    wc.reset();
+
+    genPageLeftColumn(wc);
+    genPageRightColumn(wc);
+    
+    // Center Column
+    wc.addSec("QLA General Information");
+
+    wc.addHeading("Configuration", 1);
+    wc.addPre(cfg.toJsonStr());
+    
+    response << wc.pageContent() << std::endl;
+}
+
+//----------------------------------------------------------------------
+// Method: stat
+//----------------------------------------------------------------------
+void HttpServer::stat(Request &request, StreamResponse &response)
+{
+    WebComposer wc;
+    wc.reset();
+
+    genPageLeftColumn(wc);
+    genPageRightColumn(wc);
+    
+    // Center Column
+    wc.addSec("QLA General Information");
+
+    wc.addHeading("General", 1);
+    wc.addPar("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
+
+    wc.addHeading("Why do we use it?", 2);
+    wc.addPar("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).");
+
+    wc.addHeading("Where does it come from?", 2);
+    wc.addPar("Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of 'de Finibus Bonorum et Malorum' (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, 'Lorem ipsum dolor sit amet..', comes from a line in section 1.10.32.");
+    wc.addPar("The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.");
+    
+    response << wc.pageContent() << std::endl;
+}
+
+//----------------------------------------------------------------------
+// Method: genPageLeftColumn()
+//----------------------------------------------------------------------
+void HttpServer::genPageLeftColumn(WebComposer & wc)
+{
+    // Left Column
+    wc.addHeading("QLA Processing Framework", 1, WebComposer::Left);
+    wc.addPar("These are the pages generated by the Euclid QLA Processing "
+              "Framework, to provide the users with information on the "
+              "configuration and processing status of the running QPF.",
+              WebComposer::Left);
+    
+    wc.startMenu("Simple Menu", WebComposer::Left);
+    wc.addMenuItem("Home", "../info", WebComposer::Left);
+    wc.addMenuItem("Configuration", "../config", WebComposer::Left);
+    wc.addMenuItem("Statistics", "../stat", WebComposer::Left);
+    wc.addMenuItem("Form", "../form", WebComposer::Left);
+    wc.addMenuItem("Hello", "../hello", WebComposer::Left);
+    wc.endMenu(WebComposer::Left);
+}
+
+//----------------------------------------------------------------------
+// Method: genPageRightColumn()
+//----------------------------------------------------------------------
+void HttpServer::genPageRightColumn(WebComposer & wc)
+{
+    // Right Column
+    wc.addHeading("Hi!", 1, WebComposer::Right);
+    wc.addPar("This is a simple test", WebComposer::Right);
+
+    wc.addHeading("Hi, again!", 1, WebComposer::Right);
+    wc.addPar("This is another simple test", WebComposer::Right);
 }
 
 //----------------------------------------------------------------------
@@ -494,8 +569,10 @@ void HttpServer::setup()
     // 403 demo
     addRoute("GET",  "/403",       HttpServer, forbid);
 
-    // 403 demo
+    // Main pages
     addRoute("GET",  "/info",      HttpServer, info);
+    addRoute("GET",  "/config",    HttpServer, config);
+    addRoute("GET",  "/stat",      HttpServer, stat);
 
     // File upload demo
     addRoute("GET",  "/upload",    HttpServer, uploadForm);
