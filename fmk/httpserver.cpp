@@ -480,14 +480,40 @@ void HttpServer::config(Request &request, StreamResponse &response)
             json mp = cfg.network["processingNodes"];
             Json::Value::iterator it = mp.begin();
             while (it != mp.end()) {
-                wc.addHTML("<tr><td>" + it.key().asString() +
-                           "</td><td>" + std::to_string((*it).asInt()) + " agents</td>");
+                wc.addHTML("<tr><td><b>" + it.key().asString() +
+                           "</b></td><td>" + std::to_string((*it).asInt()) + " agents</td>");
                 ++it;
             }                          
             wc.addHTML("</table></td>");
         }
         wc.endTRow();
-        
+
+        wc.begTRow();
+        wc.addHCell("Swarms configuration");
+        for (auto & skv : cfg.network.swarms()) {
+            std::string & swrmName = skv.first;
+            CfgGrpSwarm & swrm = skv.second;
+            std::string ip = swrm.serviceNodes().at(0);
+            {
+                wc.addHTML("<td><table>\n");
+                wc.addHTML("<tr><td><b>" + swrmName + "</b></td><td><table>\n");
+                
+                wc.addHTML("<tr><td>Nodes:</td><td>");
+                for (auto & s : swrm.serviceNodes()) { wc.addHTML(s + "<br>\n"); }
+                wc.addHTML("</td></tr>\n");
+                    
+                wc.addHTML("<tr><td>Srv.Name:</td><td>" + swrm.name() + "</td></tr>\n");
+                wc.addHTML("<tr><td>Scale:</td><td>" + std::to_string(swrm.scale()) + "</td></tr>\n");
+                wc.addHTML("<tr><td>Image:</td><td>" + swrm.image() + "</td></tr>\n");
+                wc.addHTML("<tr><td>Executable:</td><td>" + swrm.exec() + "</td></tr>\n");
+                wc.addHTML("<tr><td>Arguments:</td><td>");
+                for (auto & s : swrm.args()) { wc.addHTML(s + " "); }
+                wc.addHTML("</td></tr>\n");
+                wc.addHTML("</table></td>");
+            }
+        }
+        endTRow();
+
         // DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
         
         // DUMPJSTRVEC(serviceNodes);
