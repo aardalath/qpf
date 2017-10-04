@@ -508,8 +508,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
                 wc.addHTML("<tr><td>Executable:</td><td>" + swrm.exec() + "</td></tr>\n");
                 wc.addHTML("<tr><td>Arguments:</td><td>");
                 for (auto & s : swrm.args()) { wc.addHTML(s + " "); }
-                wc.addHTML("</td></tr>\n");
-                wc.addHTML("</table></td>");
+                wc.addHTML("</td></tr></table></td></tr></table></td>\n");
             }
         }
         wc.endTRow();
