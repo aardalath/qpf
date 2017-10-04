@@ -552,7 +552,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
     
     wc.begTable();
     {
-        wc.addHTML("<tr><td>Product Types:</td><td>");
+        wc.addHTML("<tr><td id=\"heading\">Product Types:</td><td>");
         for (auto & s : cfg.products.productTypes()) { wc.addHTML(s + "<br>\n"); }
         wc.addHTML("</td></tr>\n");
         
@@ -594,7 +594,8 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.begTable();
     {
         CfgGrpUserDefToolsList & uts = cfg.userDefTools;
-        for (int i = 0; i < uts.size(); ++i) {
+        int numTools = cfg.userDefTools.size();
+        for (int i = 0; i < numTools; ++i) {
             wc.begTRow();
             wc.addHCell("Name:");                  wc.addTCell(uts.name(i));
             wc.addHCell("Description:");           wc.addTCell(uts.description(i));
