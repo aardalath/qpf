@@ -491,7 +491,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
         wc.begTRow();
         wc.addHCell("Swarms configuration");
         for (auto & skv : cfg.network.swarms()) {
-            std::string & swrmName = skv.first;
+            const std::string & swrmName = skv.first;
             CfgGrpSwarm & swrm = skv.second;
             std::string ip = swrm.serviceNodes().at(0);
             {
@@ -512,7 +512,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
                 wc.addHTML("</table></td>");
             }
         }
-        endTRow();
+        wc.endTRow();
 
         // DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
         
