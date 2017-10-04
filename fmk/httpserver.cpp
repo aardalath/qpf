@@ -595,13 +595,13 @@ void HttpServer::config(Request &request, StreamResponse &response)
     {
         CfgGrpUserDefToolsList & uts = cfg.userDefTools;
         for (int i = 0; i < uts.size(); ++i) {
-            begTRow();
-            addHCell("Name:"); addTCell(uts.name(i));
-            addHCell("Description:"); addTCell(uts.description(i));
-            addHCell("Executable:"); addTCell(uts.executable(i));
-            addHCell("Arguments:"); addTCell(uts.arguments(i));
-            addHCell("Associated Prod.Types:"); addTCell(uts.productTypes(i));
-            endTRow();
+            wc.begTRow();
+            wc.addHCell("Name:"); addTCell(uts.name(i));
+            wc.addHCell("Description:"); addTCell(uts.description(i));
+            wc.addHCell("Executable:"); addTCell(uts.executable(i));
+            wc.addHCell("Arguments:"); addTCell(uts.arguments(i));
+            wc.addHCell("Associated Prod.Types:"); addTCell(uts.productTypes(i));
+            wc.endTRow();
         }
     }
     wc.endTable();
