@@ -130,7 +130,19 @@ public:
                          "\" align=\"middle\"/></a></p>\n");
     }
 
-    std::string pageContent() {
+    void begTable(Column col = Center) { content[col] += "<table>\n"; }
+    void endTable(Column col = Center) { content[col] += "</table>\n"; }
+    
+    void begTRow(Column col = Center) { content[col] += "<tr>"; }
+    void endTRow(Column col = Center) { content[col] += "</tr>\n"; }
+    
+    void addTCell(std::string s, Column col = Center) { content[col] += "<td>" + s + "</td>"; }
+
+    void addHTML(std::string html, Column col = Center) {
+        content[col] += html;
+    }
+    
+    std::string getPage() {
         std::string page = (PageBegin +
                             HeadBegin + "<title>" + title + "</title>" + Style + HeadEnd +
                             BodyBegin);
@@ -380,7 +392,7 @@ void HttpServer::info(Request &request, StreamResponse &response)
     wc.addPar("Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of 'de Finibus Bonorum et Malorum' (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, 'Lorem ipsum dolor sit amet..', comes from a line in section 1.10.32.");
     wc.addPar("The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.");
     
-    response << wc.pageContent() << std::endl;
+    response << wc.getPage() << std::endl;
 }
 
 //----------------------------------------------------------------------
@@ -397,10 +409,207 @@ void HttpServer::config(Request &request, StreamResponse &response)
     // Center Column
     wc.addSec("QLA General Information");
 
+    //============================================================
     wc.addHeading("Configuration", 1);
-    wc.addPre(cfg.str());
+
+    //------------------------------------------------------------
+    wc.addHeading("General", 2);
+
+    wc.begTable();
+    {
+        wc.begTRow();
+        wc.addTCell("Application Name");
+        wc.addTCell(cfg.general.appName());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Application Version");
+        wc.addTCell(cfg.general.appVersion());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Last Access Date");
+        wc.addTCell(cfg.general.lastAccess());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Work Area Folder");
+        wc.addTCell(cfg.general.workArea());
+        wc.endTRow();
+    }
+    wc.endTable();
     
-    response << wc.pageContent() << std::endl;
+    //------------------------------------------------------------
+    wc.addHeading("Network", 2);
+    
+    wc.begTable();
+    {
+        wc.begTRow();
+        wc.addTCell("Master Node");
+        wc.addTCell(cfg.network.masterNode());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Starting Port");
+        wc.addTCell(std::to_string(cfg.network.startingPort()));
+        wc.endTRow();
+        
+        // DUMPJSTRINTMAP(processingNodes);
+        
+        // DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
+        
+        // DUMPJSTRVEC(serviceNodes);
+        /*
+        wc.begTRow();
+        wc.addTCell("scale");
+        wc.addTCell(std::to_string(cfg.network.scale()));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("name");
+        wc.addTCell(cfg.network.name());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("image");
+        wc.addTCell(cfg.network.image());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("exec");
+        wc.addTCell(cfg.network.exec());
+        wc.endTRow();
+        */
+        // DUMPJSTRVEC(args);
+    }
+    wc.endTable();
+
+    //------------------------------------------------------------
+    wc.addHeading("Database", 2);
+    
+    wc.begTable();
+    {
+        wc.begTRow();
+        wc.addTCell("Host");
+        wc.addTCell(cfg.db.host());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Port");
+        wc.addTCell(cfg.db.port());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Data Base name");
+        wc.addTCell(cfg.db.name());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("User");
+        wc.addTCell(cfg.db.user());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Password");
+        wc.addTCell(cfg.db.pwd());
+        wc.endTRow();
+    }
+    wc.endTable();    
+
+    //------------------------------------------------------------
+    wc.addHeading("Products", 2);
+    
+    wc.begTable();
+    {
+        // DUMPJSTRVEC(productTypes);
+        
+        wc.begTRow();
+        wc.addTCell("Parsing RegEx");
+        wc.addTCell(cfg.products.parsingRegEx());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Parsing Assign");
+        wc.addTCell(cfg.products.parsingAssign());
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("Product Id Template");
+        wc.addTCell(cfg.products.productIdTpl());
+        wc.endTRow();
+        
+        // DUMPJSTRSTRMAP(extensions);
+    }
+    wc.endTable();
+
+    //------------------------------------------------------------
+    wc.addHeading("Orchestration", 2);
+    
+    // DUMPJSTRIDX(i,inputs);
+    
+    // DUMPJSTRIDX(i,outputs);
+    
+    // DUMPJSTRIDX(i,processing);
+    
+    // DUMPJSTRIDX(i,condition);    
+
+    // DUMPJSTRSTRMAP(processors);
+    
+    //------------------------------------------------------------
+    wc.addHeading("User Defined Tools", 2);
+    
+    // DUMPJSTRIDX(i,name);
+    
+    // DUMPJSTRIDX(i,description);
+    
+    // DUMPJSTRIDX(i,arguments);
+    
+    // DUMPJSTRIDX(i,executable);
+    
+    // DUMPJSTRIDX(i,productTypes);
+    
+    //------------------------------------------------------------
+    wc.addHeading("Flags", 2);
+    
+    wc.begTable();
+    {
+        // DUMPJSTRVEC(msgsToDisk);
+        
+        // DUMPJSTRVEC(msgsToDb);
+        
+        wc.begTRow();
+        wc.addTCell("notifyMsgArrival");
+        wc.addTCell((cfg.flags.notifyMsgArrival() ? "YES" : "NO"));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("groupTaskAgentLogs");
+        wc.addTCell((cfg.flags.groupTaskAgentLogs() ? "YES" : "NO"));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("allowReprocessing");
+        wc.addTCell((cfg.flags.allowReprocessing() ? "YES" : "NO"));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("intermediateProducts");
+        wc.addTCell((cfg.flags.intermediateProducts() ? "YES" : "NO"));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("sendOutputsToMainArchive");
+        wc.addTCell((cfg.flags.sendOutputsToMainArchive() ? "YES" : "NO"));
+        wc.endTRow();
+        
+        wc.begTRow();
+        wc.addTCell("progressString");
+        wc.addTCell(cfg.flags.progressString());
+        wc.endTRow();
+    }
+    wc.endTable();
+    
+    response << wc.getPage() << std::endl;
 }
 
 //----------------------------------------------------------------------
@@ -427,7 +636,7 @@ void HttpServer::stat(Request &request, StreamResponse &response)
     wc.addPar("Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of 'de Finibus Bonorum et Malorum' (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, 'Lorem ipsum dolor sit amet..', comes from a line in section 1.10.32.");
     wc.addPar("The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.");
     
-    response << wc.pageContent() << std::endl;
+    response << wc.getPage() << std::endl;
 }
 
 //----------------------------------------------------------------------
