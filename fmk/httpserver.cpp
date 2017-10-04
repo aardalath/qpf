@@ -553,7 +553,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.begTable();
     {
         wc.addHTML("<tr><td>Product Types:</td><td>");
-        for (auto & s : cfg.productTypes()) { wc.addHTML(s + "<br>\n"); }
+        for (auto & s : cfg.products.productTypes()) { wc.addHTML(s + "<br>\n"); }
         wc.addHTML("</td></tr>\n");
         
         wc.begTRow();
@@ -596,11 +596,11 @@ void HttpServer::config(Request &request, StreamResponse &response)
         CfgGrpUserDefToolsList & uts = cfg.userDefTools;
         for (int i = 0; i < uts.size(); ++i) {
             wc.begTRow();
-            wc.addHCell("Name:"); addTCell(uts.name(i));
-            wc.addHCell("Description:"); addTCell(uts.description(i));
-            wc.addHCell("Executable:"); addTCell(uts.executable(i));
-            wc.addHCell("Arguments:"); addTCell(uts.arguments(i));
-            wc.addHCell("Associated Prod.Types:"); addTCell(uts.productTypes(i));
+            wc.addHCell("Name:");                  wc.addTCell(uts.name(i));
+            wc.addHCell("Description:");           wc.addTCell(uts.description(i));
+            wc.addHCell("Executable:");            wc.addTCell(uts.executable(i));
+            wc.addHCell("Arguments:");             wc.addTCell(uts.arguments(i));
+            wc.addHCell("Associated Prod.Types:"); wc.addTCell(uts.productTypes(i));
             wc.endTRow();
         }
     }
