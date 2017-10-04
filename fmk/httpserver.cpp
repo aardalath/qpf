@@ -130,8 +130,12 @@ public:
                          "\" align=\"middle\"/></a></p>\n");
     }
 
-    void begTable(Column col = Center) { content[col] += "<blockquote><table>\n"; }
-    void endTable(Column col = Center) { content[col] += "</table></blockquote>\n"; }
+    void begTable(Column col = Center) { 
+        content[col] += "<blockquote><table cellspacing=\"0\" cellpadding=\"0\">\n";
+    }
+    void endTable(Column col = Center) { 
+        content[col] += "</table></blockquote>\n"; 
+    }
     
     void begTRow(Column col = Center) { content[col] += "<tr>"; }
     void endTRow(Column col = Center) { content[col] += "</tr>\n"; }
@@ -178,7 +182,7 @@ const std::string WebComposer::Style = std::string
      "        color: #666;\n"
      "      }\n"
      "      #center {\n"
-     "        width:45%;\n"
+     "        width:55%;\n"
      "        float:left;\n"
      "        background:#fff;\n"
      "        padding-bottom:10px;\n"
@@ -200,7 +204,7 @@ const std::string WebComposer::Style = std::string
      "        border-color: #ccc;\n"
      "      }\n"
      "      #right2 {\n"
-     "        width:15%;\n"
+     "        width:20%;\n"
      "        float:left;\n"
      "        background:#fff;\n"
      "        padding-bottom:10px;\n"
@@ -349,7 +353,7 @@ const std::string WebComposer::Style = std::string
      "      }\n"
      "    </style>\n");
 const std::string WebComposer::FootMsg = std::string
-    ("<div id=\"footer\">Copyright 2015-2017 The Euclid SOC Team @ ESAC<br>\n"
+    ("<hr><div id=\"footer\">Copyright 2015-2017 The Euclid SOC Team @ ESAC<br>\n"
      "<center><a href=\"https://www.cosmos.esa.int/web/euclid/euclid-at-esac\" "
      "title=\"The Euclid QLA Processing Framework\" "
      "target=\"_blank\">The Euclid QLA Processing Framework</a><br>\n"
