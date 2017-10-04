@@ -512,32 +512,6 @@ void HttpServer::config(Request &request, StreamResponse &response)
             }
         }
         wc.endTRow();
-
-        // DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
-        
-        // DUMPJSTRVEC(serviceNodes);
-        /*
-        wc.begTRow();
-        wc.addHCell("scale");
-        wc.addTCell(std::to_string(cfg.network.scale()));
-        wc.endTRow();
-        
-        wc.begTRow();
-        wc.addHCell("name");
-        wc.addTCell(cfg.network.name());
-        wc.endTRow();
-        
-        wc.begTRow();
-        wc.addHCell("image");
-        wc.addTCell(cfg.network.image());
-        wc.endTRow();
-        
-        wc.begTRow();
-        wc.addHCell("exec");
-        wc.addTCell(cfg.network.exec());
-        wc.endTRow();
-        */
-        // DUMPJSTRVEC(args);
     }
     wc.endTable();
 
@@ -578,7 +552,9 @@ void HttpServer::config(Request &request, StreamResponse &response)
     
     wc.begTable();
     {
-        // DUMPJSTRVEC(productTypes);
+        wc.addHTML("<tr><td>Product Types:</td><td>");
+        for (auto & s : cfg.productTypes()) { wc.addHTML(s + "<br>\n"); }
+        wc.addHTML("</td></tr>\n");
         
         wc.begTRow();
         wc.addHCell("Parsing RegEx");
@@ -615,15 +591,20 @@ void HttpServer::config(Request &request, StreamResponse &response)
     //------------------------------------------------------------
     wc.addHeading("User Defined Tools", 2);
     
-    // DUMPJSTRIDX(i,name);
-    
-    // DUMPJSTRIDX(i,description);
-    
-    // DUMPJSTRIDX(i,arguments);
-    
-    // DUMPJSTRIDX(i,executable);
-    
-    // DUMPJSTRIDX(i,productTypes);
+    wc.begTable();
+    {
+        CfgGrpUserDefToolsList & uts = cfg.userDefTools;
+        for (int i = 0; i < uts.size(); ++i) {
+            begTRow();
+            addHCell("Name:"); addTCell(uts.name(i));
+            addHCell("Description:"); addTCell(uts.description(i));
+            addHCell("Executable:"); addTCell(uts.executable(i));
+            addHCell("Arguments:"); addTCell(uts.arguments(i));
+            addHCell("Associated Prod.Types:"); addTCell(uts.productTypes(i));
+            endTRow();
+        }
+    }
+    wc.endTable();
     
     //------------------------------------------------------------
     wc.addHeading("Flags", 2);
