@@ -288,7 +288,6 @@ const std::string WebComposer::Style = std::string
      "        padding-top:10px;\n"
      "      }\n"
      "      table {\n"
-     "        padding-left: 30px;\n"
      "        border-collapse: collapse;\n"
      "      }\n"
      "      table, th, td {\n"
@@ -470,7 +469,20 @@ void HttpServer::config(Request &request, StreamResponse &response)
         wc.addTCell(std::to_string(cfg.network.startingPort()));
         wc.endTRow();
         
-        // DUMPJSTRINTMAP(processingNodes);
+        wc.begTRow();
+        wc.addHCell("Processing nodes");
+        {
+            wc.addHTML("<td><table>");
+            json mp = cfg.network["processingNodes"];
+            Json::Value::iterator it = mp.begin();
+            while (it != mp.end()) {
+                wc.addHTML("<tr><td>" + it.key().asString() +
+                           "</td><td>" + std::to_string((*it).asInt()) + " agents</td>");
+                ++it;
+            }                          
+            wc.addHTML("</table></td>");
+        }
+        wc.endTRow();
         
         // DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
         
