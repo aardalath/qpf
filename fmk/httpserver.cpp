@@ -137,6 +137,7 @@ public:
     void endTRow(Column col = Center) { content[col] += "</tr>\n"; }
     
     void addTCell(std::string s, Column col = Center) { content[col] += "<td>" + s + "</td>"; }
+    void addHCell(std::string s, Column col = Center) { content[col] += "<td id=\"heading\">" + s + "</td>"; }
 
     void addHTML(std::string html, Column col = Center) {
         content[col] += html;
@@ -286,6 +287,15 @@ const std::string WebComposer::Style = std::string
      "        font-size:12px;\n"
      "        padding-top:10px;\n"
      "      }\n"
+     "      table {\n"
+     "        width: 80%;\n"
+     "        padding-top:10px;\n"
+     "      }\n"
+     "      #heading {\n"
+     "        background:#86B5D6;\n"
+     "        color: #DDDDDD;\n"
+     "        font-weight: bold;\n"
+     "      }\n"
      "      #center p {\n"
      "        padding-left: 10px;\n"
      "      }\n"
@@ -418,22 +428,22 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.begTable();
     {
         wc.begTRow();
-        wc.addTCell("Application Name");
+        wc.addHCell("Application Name");
         wc.addTCell(cfg.general.appName());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Application Version");
+        wc.addHCell("Application Version");
         wc.addTCell(cfg.general.appVersion());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Last Access Date");
+        wc.addHCell("Last Access Date");
         wc.addTCell(cfg.general.lastAccess());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Work Area Folder");
+        wc.addHCell("Work Area Folder");
         wc.addTCell(cfg.general.workArea());
         wc.endTRow();
     }
@@ -445,12 +455,12 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.begTable();
     {
         wc.begTRow();
-        wc.addTCell("Master Node");
+        wc.addHCell("Master Node");
         wc.addTCell(cfg.network.masterNode());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Starting Port");
+        wc.addHCell("Starting Port");
         wc.addTCell(std::to_string(cfg.network.startingPort()));
         wc.endTRow();
         
@@ -461,22 +471,22 @@ void HttpServer::config(Request &request, StreamResponse &response)
         // DUMPJSTRVEC(serviceNodes);
         /*
         wc.begTRow();
-        wc.addTCell("scale");
+        wc.addHCell("scale");
         wc.addTCell(std::to_string(cfg.network.scale()));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("name");
+        wc.addHCell("name");
         wc.addTCell(cfg.network.name());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("image");
+        wc.addHCell("image");
         wc.addTCell(cfg.network.image());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("exec");
+        wc.addHCell("exec");
         wc.addTCell(cfg.network.exec());
         wc.endTRow();
         */
@@ -490,27 +500,27 @@ void HttpServer::config(Request &request, StreamResponse &response)
     wc.begTable();
     {
         wc.begTRow();
-        wc.addTCell("Host");
+        wc.addHCell("Host");
         wc.addTCell(cfg.db.host());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Port");
+        wc.addHCell("Port");
         wc.addTCell(cfg.db.port());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Data Base name");
+        wc.addHCell("Data Base name");
         wc.addTCell(cfg.db.name());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("User");
+        wc.addHCell("User");
         wc.addTCell(cfg.db.user());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Password");
+        wc.addHCell("Password");
         wc.addTCell(cfg.db.pwd());
         wc.endTRow();
     }
@@ -524,17 +534,17 @@ void HttpServer::config(Request &request, StreamResponse &response)
         // DUMPJSTRVEC(productTypes);
         
         wc.begTRow();
-        wc.addTCell("Parsing RegEx");
+        wc.addHCell("Parsing RegEx");
         wc.addTCell(cfg.products.parsingRegEx());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Parsing Assign");
+        wc.addHCell("Parsing Assign");
         wc.addTCell(cfg.products.parsingAssign());
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("Product Id Template");
+        wc.addHCell("Product Id Template");
         wc.addTCell(cfg.products.productIdTpl());
         wc.endTRow();
         
@@ -578,32 +588,32 @@ void HttpServer::config(Request &request, StreamResponse &response)
         // DUMPJSTRVEC(msgsToDb);
         
         wc.begTRow();
-        wc.addTCell("notifyMsgArrival");
+        wc.addHCell("notifyMsgArrival");
         wc.addTCell((cfg.flags.notifyMsgArrival() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("groupTaskAgentLogs");
+        wc.addHCell("groupTaskAgentLogs");
         wc.addTCell((cfg.flags.groupTaskAgentLogs() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("allowReprocessing");
+        wc.addHCell("allowReprocessing");
         wc.addTCell((cfg.flags.allowReprocessing() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("intermediateProducts");
+        wc.addHCell("intermediateProducts");
         wc.addTCell((cfg.flags.intermediateProducts() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("sendOutputsToMainArchive");
+        wc.addHCell("sendOutputsToMainArchive");
         wc.addTCell((cfg.flags.sendOutputsToMainArchive() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addTCell("progressString");
+        wc.addHCell("progressString");
         wc.addTCell(cfg.flags.progressString());
         wc.endTRow();
     }
