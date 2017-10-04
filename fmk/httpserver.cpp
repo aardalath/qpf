@@ -130,8 +130,8 @@ public:
                          "\" align=\"middle\"/></a></p>\n");
     }
 
-    void begTable(Column col = Center) { content[col] += "<table>\n"; }
-    void endTable(Column col = Center) { content[col] += "</table>\n"; }
+    void begTable(Column col = Center) { content[col] += "<blockquote><table>\n"; }
+    void endTable(Column col = Center) { content[col] += "</table></blockquote>\n"; }
     
     void begTRow(Column col = Center) { content[col] += "<tr>"; }
     void endTRow(Column col = Center) { content[col] += "</tr>\n"; }
