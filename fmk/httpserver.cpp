@@ -607,11 +607,12 @@ void HttpServer::config(Request &request, StreamResponse &response)
         for (int i = 0; i < numRules; ++i) {
             wc.begTRow();
             wc.addHCell(std::to_string(i));
-            wc.addTCell(cfg.orchestration.processing(i));
-            wc.addTCell(cfg.orchestration.inputs(i));
-            wc.addTCell(cfg.orchestration.outputs(i));
-            wc.addTCell(cfg.orchestration.condition(i));
+            wc.addTCell(cfg.orchestration.rules.processing(i));
+            wc.addTCell(cfg.orchestration.rules.inputs(i));
+            wc.addTCell(cfg.orchestration.rules.outputs(i));
+            wc.addTCell(cfg.orchestration.rules.condition(i));
             wc.endTRow();
+        }
     }
     wc.endTable();
 
