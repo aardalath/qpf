@@ -593,7 +593,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
     
     wc.begTable();
     {
-	wc.addPar("<strong>" + std::to_string(uts.size()) + "</strong>");
+        CfgGrpUserDefToolsList & uts = cfg.userDefTools;
         for (int i = 0; i < uts.size(); ++i) {
             wc.begTRow();
             wc.addHCell(uts.name(i));
@@ -618,6 +618,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
             }
             wc.addHTML("</table></td>\n");
             wc.endTRow();
+        }
     }
     wc.endTable();
     
