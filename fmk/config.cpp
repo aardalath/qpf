@@ -503,7 +503,7 @@ void Config::generateProcFmkInfoStructure()
         ++h;
     }
 
-    //dump();
+    dump();
 }
 
 //----------------------------------------------------------------------

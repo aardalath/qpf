@@ -593,27 +593,27 @@ void HttpServer::config(Request &request, StreamResponse &response)
     
     wc.begTable();
     {
-        int numTools = cfg.userDefTools.size();
-        for (int i = 0; i < numTools; ++i) {
+	wc.addPar("<strong>" + std::to_string(uts.size()) + "</strong>");
+        for (int i = 0; i < uts.size(); ++i) {
             wc.begTRow();
-            wc.addHCell(cfg.userDefTools.name(i));
+            wc.addHCell(uts.name(i));
             wc.addHTML("<td><table>\n");
             {
                 wc.begTRow();
                 wc.addHCell("Description:");
-                wc.addTCell(cfg.userDefTools.description(i));
+                wc.addTCell(uts.description(i));
                 wc.endTRow();
                 wc.begTRow();
                 wc.addHCell("Executable:");
-                wc.addTCell(cfg.userDefTools.executable(i));
+                wc.addTCell(uts.executable(i));
                 wc.endTRow();
                 wc.begTRow();
                 wc.addHCell("Arguments:");
-                wc.addTCell(cfg.userDefTools.arguments(i));
+                wc.addTCell(uts.arguments(i));
                 wc.endTRow();
                 wc.begTRow();
                 wc.addHCell("Associated Prod.Types:");
-                wc.addTCell(cfg.userDefTools.productTypes(i));
+                wc.addTCell(uts.productTypes(i));
                 wc.endTRow();
             }
             wc.addHTML("</table></td>\n");
