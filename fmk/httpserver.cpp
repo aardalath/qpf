@@ -571,22 +571,65 @@ void HttpServer::config(Request &request, StreamResponse &response)
         wc.addTCell(cfg.products.productIdTpl());
         wc.endTRow();
         
-        // DUMPJSTRSTRMAP(extensions);
+        wc.begTRow();
+        wc.addHCell("Extensions");
+        {
+            wc.addHTML("<td><table>");
+            json mp = cfg.products["extensions"];
+            Json::Value::iterator it = mp.begin();
+            while (it != mp.end()) {
+                wc.addHTML("<tr><td><b>" + it.key().asString() +
+                           "</b></td><td>" + (*it).asString() + "</td>");
+                ++it;
+            }                          
+            wc.addHTML("</table></td>");
+        }
+        wc.endTRow();
     }
     wc.endTable();
 
     //------------------------------------------------------------
     wc.addHeading("Orchestration", 2);
-    
-    // DUMPJSTRIDX(i,inputs);
-    
-    // DUMPJSTRIDX(i,outputs);
-    
-    // DUMPJSTRIDX(i,processing);
-    
-    // DUMPJSTRIDX(i,condition);    
 
-    // DUMPJSTRSTRMAP(processors);
+    wc.addHeading("Rules", 3);
+
+    wc.begTable();
+    {
+        wc.begTRow();
+        wc.addHCell("Rule #");
+        wc.addHCell("Processor");
+        wc.addHCell("Inputs");
+        wc.addHCell("Outputs");
+        wc.addHCell("Condition");
+        wc.endTRow();
+        
+        int numRules = cfg.orchestration.rules.size();
+        for (int i = 0; i < numRules; ++i) {
+            wc.begTRow();
+            wc.addHCell(std::to_string(i));
+            wc.addTCell(cfg.orchestration.processing(i));
+            wc.addTCell(cfg.orchestration.inputs(i));
+            wc.addTCell(cfg.orchestration.outputs(i));
+            wc.addTCell(cfg.orchestration.condition(i));
+            wc.endTRow();
+    }
+    wc.endTable();
+
+    wc.addHeading("Processors", 3);
+
+    wc.begTable();
+    {
+        json mp = cfg.orchestration["processors"];
+        Json::Value::iterator it = mp.begin();
+        while (it != mp.end()) {
+            wc.begTRow();
+            wc.addHCell(it.key().asString());
+            wc.addTCell((*it).asString());
+            wc.endTRow();
+            ++it;
+        }                          
+    }
+    wc.endTable();
     
     //------------------------------------------------------------
     wc.addHeading("User Defined Tools", 2);
@@ -627,38 +670,42 @@ void HttpServer::config(Request &request, StreamResponse &response)
     
     wc.begTable();
     {
-        // DUMPJSTRVEC(msgsToDisk);
-        
-        // DUMPJSTRVEC(msgsToDb);
+        wc.addHTML("<tr><td id=\"heading\">MsgsToDisk:</td><td>");
+        for (auto & s : cfg.flags.msgsToDisk()) { wc.addHTML(s + "<br>\n"); }
+        wc.addHTML("</td></tr>\n");
+
+        wc.addHTML("<tr><td id=\"heading\">MsgsToDB:</td><td>");
+        for (auto & s : cfg.flags.msgsToDb()) { wc.addHTML(s + "<br>\n"); }
+        wc.addHTML("</td></tr>\n");
         
         wc.begTRow();
-        wc.addHCell("notifyMsgArrival");
+        wc.addHCell("NotifyMsgArrival");
         wc.addTCell((cfg.flags.notifyMsgArrival() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addHCell("groupTaskAgentLogs");
+        wc.addHCell("GroupTaskAgentLogs");
         wc.addTCell((cfg.flags.groupTaskAgentLogs() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addHCell("allowReprocessing");
+        wc.addHCell("AllowReprocessing");
         wc.addTCell((cfg.flags.allowReprocessing() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addHCell("intermediateProducts");
+        wc.addHCell("IntermediateProducts");
         wc.addTCell((cfg.flags.intermediateProducts() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addHCell("sendOutputsToMainArchive");
+        wc.addHCell("SendOutputsToMainArchive");
         wc.addTCell((cfg.flags.sendOutputsToMainArchive() ? "YES" : "NO"));
         wc.endTRow();
         
         wc.begTRow();
-        wc.addHCell("progressString");
-        wc.addTCell(cfg.flags.progressString());
+        wc.addHCell("Progress Mark String in Logs");
+        wc.addTCell("\"" + cfg.flags.progressString() + "\"");
         wc.endTRow();
     }
     wc.endTable();
