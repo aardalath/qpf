@@ -267,7 +267,7 @@ void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     HostInfo hostInfo;
     hostInfo.fromStr(hostInfoData.str());
-
+    
     TraceMsg(hostInfo.dump() + "\n");
 }
 
