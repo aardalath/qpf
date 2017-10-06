@@ -231,9 +231,9 @@ void TskAge::runEachIterationForServices()
     // host, and if it is update the hostInfo structure, and send it
     // to the TskMng
     
-    //if ((iteration % 20) == 0) {
-    //    sendHostInfoUpdate();
-    //}
+    if ((iteration % 50) == 0) {
+        sendHostInfoUpdate();
+    }
 }
 
 //----------------------------------------------------------------------
