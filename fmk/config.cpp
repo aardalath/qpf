@@ -540,7 +540,7 @@ bool Config::isLive = false;
 
 ProcessingFrameworkInfo * Config::procFmkInfo = new ProcessingFrameworkInfo;
 
-const int Config::MaxContainerAge = 180;    
+const int Config::MaxContainerAge = 3600;    
 
 std::map<std::string, AgentMode> Config::agentMode;
 

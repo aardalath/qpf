@@ -96,8 +96,6 @@ TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
 //----------------------------------------------------------------------
 void TskAge::fromRunningToOperational()
 {
-    cfg.MaxContainerAge = 2000;
-    
     if (agentMode == CONTAINER) {
 
         // Create Container Manager
@@ -214,12 +212,12 @@ void TskAge::runEachIterationForContainers()
     for (auto const & kv : containerEpoch) {
         std::string contId = kv.first;
         // Send new update on container info, unless it is too old
-        if ((time(0) - kv.second) < cfg.MaxContainerAge) {
+        //        if ((time(0) - kv.second) < cfg.MaxContainerAge) {
             sendTaskReport(contId);
-        } else {
-            containerToTaskMap.erase(containerToTaskMap.find(contId));
-            containerEpoch.erase(containerEpoch.find(contId));
-        }
+            //} else {
+            //containerToTaskMap.erase(containerToTaskMap.find(contId));
+            //containerEpoch.erase(containerEpoch.find(contId));
+            // }
     }
 
 }
@@ -293,10 +291,10 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     exchgOut    = exchangeDir + "/out";
     exchgLog    = exchangeDir + "/log";
 
-    mkdir(exchangeDir.c_str(), 0755);
-    mkdir(exchgIn.c_str(),     0755);
-    mkdir(exchgOut.c_str(),    0755);
-    mkdir(exchgLog.c_str(),    0755);
+    mkdir(exchangeDir.c_str(), Config::PATHMode);
+    mkdir(exchgIn.c_str(),     Config::PATHMode);
+    mkdir(exchgOut.c_str(),    Config::PATHMode);
+    mkdir(exchgLog.c_str(),    Config::PATHMode);
 
     //---- Retrieve the input products
     urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
