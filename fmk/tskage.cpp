@@ -96,6 +96,8 @@ TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
 //----------------------------------------------------------------------
 void TskAge::fromRunningToOperational()
 {
+    cfg.MaxContainerAge = 2000;
+    
     if (agentMode == CONTAINER) {
 
         // Create Container Manager
