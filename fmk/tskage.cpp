@@ -468,9 +468,9 @@ void TskAge::sendTaskReport(std::string contId)
         (taskStatus == TASK_FINISHED) ||
         (taskStatus == TASK_UNKNOWN_STATE)) {
         InfoMsg("Task container monitoring finished");
-        endProgress();
-        pStatus = FINISHING;
-        InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+        if (taskStatus == TASK_FINISHED) {
+            endProgress();
+        }
     } else {
         workingDuring++;
         updateProgress();
@@ -500,6 +500,14 @@ void TskAge::sendTaskReport(std::string contId)
                              compName, "TskMng",
                              "info", task.str(),
                              origMsgString);
+
+    if ((taskStatus == TASK_STOPPED) ||
+        (taskStatus == TASK_FAILED) ||
+        (taskStatus == TASK_FINISHED) ||
+        (taskStatus == TASK_UNKNOWN_STATE)) {
+        pStatus = FINISHING;
+        InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+    }
 }
 
 //----------------------------------------------------------------------
