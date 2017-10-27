@@ -19,7 +19,7 @@
 #==============================================================================
 
 # Base Docker image
-FROM qla-srv-debian:base
+FROM qla-srv-debian:baseext
 MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
 
 LABEL esa.euclid.soc.qla.content="QDT caller as service" \
@@ -27,5 +27,7 @@ LABEL esa.euclid.soc.qla.content="QDT caller as service" \
       esa.euclid.soc.qla.release-date="2017-07-31"
 
 # install QDT caller
-COPY qdtwrp.tgz /tmp/
-RUN mkdir -p /qlabin && tar xvzfC /tmp/qdtwrp.tgz /qlabin && rm -f /tmp/qdtwrp.tgz
+COPY QDT.src.tgz /tmp/
+RUN mkdir -p /qlabin && tar xvzfC /tmp/QDT.src.tgz /qlabin && rm -f /tmp/QDT.src.tgz
+WORKDIR /qlabin
+ENTRYPOINT ["python","./QDTsrv.py"]

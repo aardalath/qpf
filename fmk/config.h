@@ -171,12 +171,14 @@ class CfgGrpRulesList : public JRecord {
 public:
     CfgGrpRulesList() {}
     CfgGrpRulesList(json v) : JRecord(v) {}
+    JSTRIDX(tag);
     JSTRIDX(inputs);
     JSTRIDX(outputs);
     JSTRIDX(processing);
     JSTRIDX(condition);
     virtual void dump() {
         FOREACH(i) {
+            DUMPJSTRIDX(i,tag);
             DUMPJSTRIDX(i,inputs);
             DUMPJSTRIDX(i,outputs);
             DUMPJSTRIDX(i,processing);

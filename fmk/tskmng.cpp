@@ -184,55 +184,51 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     Message<MsgBodyTSK> msg(m);
     std::string agName(msg.header.source());
     DBG("TASK REQUEST FROM " << agName << " RECEIVED");
+    
+    // Task Requests ONLY should come from container agents (not from swarm agents)
+    bool isSrvRqst = (agName.find("Swarm") != std::string::npos);
+    if (isSrvRqst) {
+        // Raise alert (TODO)
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Task Request received as coming from Swarm "
+                            + agName,
+                            0));
+        return;
+    }
 
     // Create message
     msg.buildHdr(ChnlTskProc, MsgTskProc, CHNLS_IF_VERSION,
                  compName, agName, "", "", "");
-
     MsgBodyTSK body;
 
     // Select task to send
-    bool isSrvRqst = (agName.find("Swarm") != std::string::npos);
-    std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
-
     bool isTaskSent = false;
     std::string taskName;
-    TaskStatus  taskStatus;
 
-    TraceMsg("Pool of tasks has size of " + std::to_string(listOfTasks->size()));
+    TraceMsg("Pool of tasks has size of " + std::to_string(containerTasks.size()));
 
-    if (listOfTasks->size() > 0) {
-        json taskInfoData = listOfTasks->front().val();
-        taskName = ((isSrvRqst ? "Swarm" : agName) + "_" +
-                    taskInfoData["taskName"].asString());
+    if (containerTasks.size() > 0) {        
+        json taskInfoData = containerTasks.front().val();
+
+        std::string taskName = agName + "_" + taskInfoData["taskName"].asString();
         taskInfoData["taskName"] = taskName;
-        taskStatus = TASK_SCHEDULED; //TaskStatus(taskInfoData["taskStatus"].asInt());
+        
         body["info"] = taskInfoData;
-        listOfTasks->pop_front();
+        containerTasks.pop_front();
 
         msg.buildBody(body);
 
-        // Send msg
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        ChannelDescriptor chnl(ChnlTskProc + "_" + agName);
-        it = connections.find(chnl);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-            isTaskSent = true;
-        }
-    }
-
-    // Task info is sent, register the task and status
-    if (isTaskSent) {
+        send(ChnlTskProc + "_" + agName, msg.str());
+        
         TraceMsg("Task " + taskName + "sent to " + agName);
+        
+        TaskStatus  taskStatus = TASK_SCHEDULED; //TaskStatus(taskInfoData["taskStatus"].asInt());
         taskRegistry[taskName] = taskStatus;
-        if (isSrvRqst) {
-            serviceTaskStatus[taskStatus]++;
-        } else {
-            containerTaskStatus[taskStatus]++;
-            containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
-        }
+        containerTaskStatus[taskStatus]++;
+        containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
     }
 }
 

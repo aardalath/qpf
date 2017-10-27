@@ -97,6 +97,7 @@ void TskOrc::defineOrchestrationParams()
         std::string ipTypes = jobj[i]["inputs"].asString();
         std::string opTypes = jobj[i]["outputs"].asString();
         rule->name              = "Rule_" + str::toStr<int>(i);
+        rule->tag               = jobj[i]["tag"].asString();
         rule->inputs            = str::split(ipTypes, ',');
         rule->outputs           = str::split(opTypes, ',');
         rule->processingElement = jobj[i]["processing"].asString();
@@ -373,6 +374,7 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
 
     MsgBodyTSK body;
     body["info"] = task.val();
+    body["tag"]  = rule->tag;
     msg.buildBody(body);
 
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;

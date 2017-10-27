@@ -597,6 +597,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
     {
         wc.begTRow();
         wc.addHCell("Rule #");
+        wc.addHCell("Tag");
         wc.addHCell("Processor");
         wc.addHCell("Inputs");
         wc.addHCell("Outputs");
@@ -607,6 +608,7 @@ void HttpServer::config(Request &request, StreamResponse &response)
         for (int i = 0; i < numRules; ++i) {
             wc.begTRow();
             wc.addHCell(std::to_string(i));
+            wc.addTCell(cfg.orchestration.rules.tag(i));
             wc.addTCell(cfg.orchestration.rules.processing(i));
             wc.addTCell(cfg.orchestration.rules.inputs(i));
             wc.addTCell(cfg.orchestration.rules.outputs(i));
@@ -885,6 +887,11 @@ void HttpServer::setup()
     addRoute("GET",  "/info",      HttpServer, info);
     addRoute("GET",  "/config",    HttpServer, config);
     addRoute("GET",  "/stat",      HttpServer, stat);
+
+    // Data server
+    addRoute("GET",  "/get_task",      HttpServer, info);
+    addRoute("GET",  "/config",    HttpServer, config);
+    addRoute("GET",  "/end_task",      HttpServer, stat);
 
     // File upload demo
     addRoute("GET",  "/upload",    HttpServer, uploadForm);

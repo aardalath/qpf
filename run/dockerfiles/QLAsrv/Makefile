@@ -12,9 +12,13 @@
 ###############################################################################
 
 IMAGE_NAME_BASE=qla-srv-debian:base
+IMAGE_NAME_BASE_EXT=qla-srv-debian:baseext
 IMAGE_NAME=qla-srv-debian:a
 
-.PHONY: image baseimage complete mrproper clean
+WRP=$(HOME)/ws/QPF/qpf-processors/WA/bin/QDT-srv
+QDT=$(HOME)/ws/QDT/tags/V1.2_RC6
+
+.PHONY: image baseimage baseimageext complete mrproper clean
 
 .SILENT:
 
@@ -24,10 +28,16 @@ complete: mrproper image
 
 baseimage:
 	docker image inspect $(IMAGE_NAME_BASE) >/dev/null 2>&1 \
-	&& echo "Image $(IAMGE_NAME_BASE) already exists. Continuing." \
+	&& echo "Image $(IMAGE_NAME_BASE) already exists. Continuing." \
 	|| docker build -t $(IMAGE_NAME_BASE) -f Dockerfile-base .
 
-image: baseimage
+baseimageext: baseimage
+	docker image inspect $(IMAGE_NAME_BASE_EXT) >/dev/null 2>&1 \
+	&& echo "Image $(IMAGE_NAME_BASE_EXT) already exists. Continuing." \
+	|| docker build -t $(IMAGE_NAME_BASE_EXT) -f Dockerfile-base-ext .
+
+image: baseimageext
+	./Build-QDTsrv-image.sh -w $(WRP) -q $(QDT) 
 	docker rmi -f $(IMAGE_NAME)  \
 	|| echo "Cannot remove image $(IMAGE_NAME). Continuing."
 	docker build -t $(IMAGE_NAME) .
@@ -36,7 +46,9 @@ clean:
 	-echo "Cleanning . . ."
 
 mrproper:
-	docker rmi -f $(IMAGE_NAME_NAME)  \
+	docker rmi -f $(IMAGE_NAME_BASE)  \
 	|| echo "Cannot remove image $(IMAGE_NAME_BASE). Continuing."
+	docker rmi -f $(IMAGE_NAME_NAME_EXT)  \
+	|| echo "Cannot remove image $(IMAGE_NAME_BASE_EXT). Continuing."
 	docker rmi -f $(IMAGE_NAME)  \
 	|| echo "Cannot remove image $(IMAGE_NAME). Continuing."

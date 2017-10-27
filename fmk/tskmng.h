@@ -185,6 +185,8 @@ private:
     std::list<TaskInfo>              serviceTasks;
     std::list<TaskInfo>              containerTasks;
 
+    typedef std::map<std::string, TaskInfo>  RuleTagInputs;
+
     std::map<std::string, TaskStatus> taskRegistry;
 
     std::map<TaskStatus, int> containerTaskStatus;
