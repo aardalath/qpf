@@ -469,7 +469,8 @@ void Config::generateProcFmkInfoStructure()
             sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
             agName.push_back(std::string(sAgName));
             agPortTsk.push_back(portnum(startingPort + ContainerAgentsOffset, h, i));
-
+            agHost.push_back(ip);
+            
             AgentInfo agInfo;
             agInfo.name       = agName.back();
             agInfo.taskStatus = TaskStatusSpectra();
@@ -497,6 +498,7 @@ void Config::generateProcFmkInfoStructure()
         sprintf(sAgName, "Swarm_%s", ip.c_str());
         agName.push_back(std::string(sAgName));
         agPortTsk.push_back(portnum(startingPort + SwarmAgentsOffset, h, 0));
+        agHost.push_back(ip);
 
         SwarmInfo * sw = new SwarmInfo;
         sw->name       = ip;
@@ -513,6 +515,10 @@ void Config::generateProcFmkInfoStructure()
     }
 
     dump();
+
+    for (int i = 0; i < agName.size(); ++i) {
+        TRC(agHost.at(i) + ": \t" + agName.at(i) + " : " + std::to_string(agPortTsk.at(i)));
+    }
 }
 
 //----------------------------------------------------------------------
