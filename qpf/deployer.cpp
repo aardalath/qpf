@@ -646,13 +646,32 @@ void Deployer::createElementsNetwork()
 
     // CHANNEL TASK-PROCESSING - REQREP
     // - Out/In: TskAge*/TskMng
+    // Note that this channel is used to send from TskAgents to TskManager:
+    // 1. Processing requests
+    // 2. Processing status reports
+    // 3. Processing completion messages
     int k = 0;
     for (auto & p : agPortTsk) {
         chnl = ChnlTskProc + "_" + agName.at(k);
         TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
         m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+        if (ag.at(k) != 0) {
+            connAddr = bindAddr;
+            ag.at(k)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+        }
         ++k;
+    }
+
+    int j = 0;
+    for (auto & p : agPortTsk) {
+        if (ag.at(j) != 0) {
+            chnl = ChnlTskProc + "_" + agName.at(j);
+            TRC("### Connections for channel " << chnl);
+            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+            ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+        }
+        ++j;
     }
 
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
