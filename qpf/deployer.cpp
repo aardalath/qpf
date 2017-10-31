@@ -490,6 +490,10 @@ void Deployer::createElementsNetwork()
         ++h;
     }
 
+    for (int i = 0; i < ag.size(); ++i) {
+        TRC("Agent 0x" + std::to_string((long)(ag.at(i))));
+    }
+
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
 
