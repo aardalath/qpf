@@ -663,17 +663,6 @@ void Deployer::createElementsNetwork()
         ++k;
     }
 
-    int j = 0;
-    for (auto & p : agPortTsk) {
-        if (ag.at(j) != 0) {
-            chnl = ChnlTskProc + "_" + agName.at(j);
-            TRC("### Connections for channel " << chnl);
-            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-            ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
-        }
-        ++j;
-    }
-
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
