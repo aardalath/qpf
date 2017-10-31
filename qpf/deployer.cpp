@@ -445,10 +445,10 @@ void Deployer::createElementsNetwork()
     // Agent names, hosts and ports (port range starts with initialPort)
     const char * sAgName = 0;
     std::vector<std::string> & agName    = cfg.agentNames;
-    //std::vector<std::string> & agHost    = cfg.agHost;
+    std::vector<std::string> & agHost    = cfg.agHost;
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
 
-    for (auto & a : agName) { TRC(" ===>> " << a); }
+    for (auto & a : agName)     { TRC(" ===>> " << a); }
     for (auto & ap : agPortTsk) { TRC(" ===>> " << ap); }
 
     // Connection addresses and channel
@@ -464,37 +464,38 @@ void Deployer::createElementsNetwork()
 
     int j = 0;
     
+    //-----------------------------------------------------------------
+    // Fill agents vector with container agents for this host
+    // (Swarm hosts are assumed not to have container agents)
+    //-----------------------------------------------------------------
+    
+    int h = 1;
+    for (auto & kv : cfg.network.processingNodes()) {
+        int numOfTskAgents = kv.second;
+        if (thisHost == kv.first) {
+            for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
+                sAgName = agName.at(i).c_str();
+                TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
+                // By default, task agents are assumed to live in remote hosts
+                tskag->setRemote(true);
+                tskag->setSysDir(Config::PATHRun);
+                tskag->setWorkDir(Config::PATHTsk);
+                ag.push_back(tskag);
+            }
+        } else {
+            for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
+                ag.push_back(0);
+            }
+        }
+        ++h;
+    }
+
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
 
         //-----------------------------------------------------------------
-        // a. Fill agents vector with as agents for this host
-        //-----------------------------------------------------------------
-
-        int h = 1;
-        for (auto & kv : cfg.network.processingNodes()) {
-            int numOfTskAgents = kv.second;
-            if (thisHost == kv.first) {
-              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
-                    sAgName = agName.at(i).c_str();
-                    TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
-                    // By default, task agents are assumed to live in remote hosts
-                    tskag->setRemote(true);
-                    tskag->setSysDir(Config::PATHRun);
-                    tskag->setWorkDir(Config::PATHTsk);
-                    ag.push_back(tskag);
-                }
-            } else {
-              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
-                    ag.push_back(0);
-                }
-            }
-            ++h;
-        }
-
-        //-----------------------------------------------------------------
-        // b. Create Swarm Manager if serviceNodes is not empty and the
-        //    current host is the first in the list (Swam Manager)
+        // Create Swarm Manager if serviceNodes is not empty and the
+        // current host is the first in the list (Swam Manager)
         //-----------------------------------------------------------------
 
         for (auto & it : cfg.network.swarms()) {
@@ -579,7 +580,6 @@ void Deployer::createElementsNetwork()
     m.logMng = new LogMng  ("LogMng", masterAddress, &synchro);
     m.tskOrc = new TskOrc  ("TskOrc", masterAddress, &synchro);
     m.tskMng = new TskMng  ("TskMng", masterAddress, &synchro);
-
 
     //-----------------------------------------------------------------
     // b. Create component connections
