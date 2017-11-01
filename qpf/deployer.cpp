@@ -465,8 +465,7 @@ void Deployer::createElementsNetwork()
     int j = 0;
     
     //-----------------------------------------------------------------
-    // Fill agents vector with container agents for this host
-    // (Swarm hosts are assumed not to have container agents)
+    // Create Container Agents and place them in agents vector 
     //-----------------------------------------------------------------
     
     int h = 1;
@@ -490,39 +489,40 @@ void Deployer::createElementsNetwork()
         ++h;
     }
 
+    //-----------------------------------------------------------------
+    // Create Swarm Manager if serviceNodes is not empty and the
+    // current host is the first in the list (Swam Manager)
+    //-----------------------------------------------------------------
+    
+    for (auto & it : cfg.network.swarms()) {
+        sAgName = agName.at(j).c_str();
+        CfgGrpSwarm & swrm = it.second;
+        if ((thisHost == swrm.serviceNodes().at(0)) && (swrm.serviceNodes().size() > 0)) {
+            TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
+            serviceInfo->service    = swrm.name();
+            serviceInfo->serviceImg = swrm.image();
+            serviceInfo->scale      = swrm.scale();
+            serviceInfo->exe        = swrm.exec();
+            for (auto & a: swrm.args()) {
+                serviceInfo->args.push_back(a);
+            }
+            ag.push_back(new TskAge(sAgName, thisHost, &synchro,
+                                    SERVICE, swrm.serviceNodes(),
+                                    serviceInfo));
+        } else {
+            ag.push_back(0);
+        }
+        ++h;
+        ++j;
+    }
+
+    // Show agents created
     for (int i = 0; i < ag.size(); ++i) {
         TRC("Agent 0x" + std::to_string((long)(ag.at(i))));
     }
 
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
-
-        //-----------------------------------------------------------------
-        // Create Swarm Manager if serviceNodes is not empty and the
-        // current host is the first in the list (Swam Manager)
-        //-----------------------------------------------------------------
-
-        for (auto & it : cfg.network.swarms()) {
-            sAgName = agName.at(j).c_str();
-            CfgGrpSwarm & swrm = it.second;
-            if ((thisHost == swrm.serviceNodes().at(0)) && (swrm.serviceNodes().size() > 0)) {
-                TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
-                serviceInfo->service    = swrm.name();
-                serviceInfo->serviceImg = swrm.image();
-                serviceInfo->scale      = swrm.scale();
-                serviceInfo->exe        = swrm.exec();
-                for (auto & a: swrm.args()) {
-                        serviceInfo->args.push_back(a);
-                }
-                ag.push_back(new TskAge(sAgName, thisHost, &synchro,
-                                        SERVICE, swrm.serviceNodes(),
-                                        serviceInfo));
-            } else {
-                ag.push_back(0);
-            }
-            ++h;
-            ++j;
-        }
 
         //-----------------------------------------------------------------
         // c. Create agent connections
