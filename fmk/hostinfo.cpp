@@ -228,9 +228,9 @@ void HostInfo::fromStr(std::string s)
     l.load1min  = hl["load1min"].asFloat();
     l.load5min  = hl["load5min"].asFloat();
     l.load15min = hl["load15min"].asFloat();
-    l.runProc   = hl["runProc"].asInt();
-    l.totalProc = hl["totalProc"].asInt();
-    l.lastPid   = hl["lastPid"].asInt();
+    l.runProc   = hl["runProc"].asUInt();
+    l.totalProc = hl["totalProc"].asUInt();
+    l.lastPid   = hl["lastPid"].asUInt();
 
     JValue hc(h["cpuInfo"]);
     c.vendor            = hc["vendor"].asString();
@@ -246,22 +246,22 @@ void HostInfo::fromStr(std::string s)
 
     CPULoad & co = c.overallCpuLoad;
     JValue hco(hc["overallCpuLoad"]);
-    co.workJiffies   = hco["jiffies"][0].asInt();
-    co.totalJiffies  = hco["jiffies"][1].asInt();
-    co.workJiffies2  = hco["jiffies"][2].asInt();
-    co.totalJiffies2 = hco["jiffies"][3].asInt();
-    co.timeInterval  = hco["timeInterval"].asInt();
+    co.workJiffies   = hco["jiffies"][0].asUInt();
+    co.totalJiffies  = hco["jiffies"][1].asUInt();
+    co.workJiffies2  = hco["jiffies"][2].asUInt();
+    co.totalJiffies2 = hco["jiffies"][3].asUInt();
+    co.timeInterval  = hco["timeInterval"].asUInt();
     co.computedLoad  = hco["computedLoad"].asFloat();
 
     for (int i = 0; i < c.numCpus; ++i) {
         c.cpuLoad.push_back(CPULoad());
         CPULoad & co = c.cpuLoad[i];
         JValue hco(hc["cpuLoad"][i]);
-        co.workJiffies   = hco["jiffies"][0].asInt();
-        co.totalJiffies  = hco["jiffies"][1].asInt();
-        co.workJiffies2  = hco["jiffies"][2].asInt();
-        co.totalJiffies2 = hco["jiffies"][3].asInt();
-        co.timeInterval  = hco["timeInterval"].asInt();
+        co.workJiffies   = hco["jiffies"][0].asUInt();
+        co.totalJiffies  = hco["jiffies"][1].asUInt();
+        co.workJiffies2  = hco["jiffies"][2].asUInt();
+        co.totalJiffies2 = hco["jiffies"][3].asUInt();
+        co.timeInterval  = hco["timeInterval"].asUInt();
         co.computedLoad  = hco["computedLoad"].asFloat();
     }
 }
