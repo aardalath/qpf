@@ -127,8 +127,8 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
 void Component::addConnection(ChannelDescriptor & chnl,
                               ScalabilityProtocolRole * conct)
 {
-    TRC(">>> Connection object is 0x" << conct);
-    TRC(">>> Creating connection: " + chnl + " - " + conct->getName() + "/" + conct->getAddress());
+    //TRC(">>> Connection object is 0x" << conct);
+    //TRC(">>> Creating connection: " + chnl + " - " + conct->getName() + "/" + conct->getAddress());
     conct->setName(compName);
     connections[chnl] = conct;
 }
