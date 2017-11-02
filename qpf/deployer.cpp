@@ -439,8 +439,9 @@ void Deployer::createElementsNetwork()
     TRC("MasterAddress is " << masterAddress);
 
     //======================================================================
-    // 2. Create the elements and connections for the host we are running on
-    //======================================================================
+    // 2. Create the elements for the perspective of the host we are
+    // running on
+    // ======================================================================
 
     // Agent names, hosts and ports (port range starts with initialPort)
     const char * sAgName = 0;
@@ -465,18 +466,17 @@ void Deployer::createElementsNetwork()
     int j = 0;
     
     //-----------------------------------------------------------------
-    // Create Container Agents and place them in agents vector 
+    // 2.a Container Agents
     //-----------------------------------------------------------------
     
-    int h = 1;
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
         if (thisHost == kv.first) {
             for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
-                sAgName = agName.at(i).c_str();
+                sAgName = agName.at(j).c_str();
                 TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                 // By default, task agents are assumed to live in remote hosts
-                tskag->setRemote(true);
+                tskag->setRemote(!isMasterHost);
                 tskag->setSysDir(Config::PATHRun);
                 tskag->setWorkDir(Config::PATHTsk);
                 ag.push_back(tskag);
@@ -486,18 +486,17 @@ void Deployer::createElementsNetwork()
                 ag.push_back(0);
             }
         }
-        ++h;
     }
 
     //-----------------------------------------------------------------
-    // Create Swarm Manager if serviceNodes is not empty and the
-    // current host is the first in the list (Swam Manager)
+    // 2.b Swarm Managers
     //-----------------------------------------------------------------
     
     for (auto & it : cfg.network.swarms()) {
-        sAgName = agName.at(j).c_str();
         CfgGrpSwarm & swrm = it.second;
-        if ((thisHost == swrm.serviceNodes().at(0)) && (swrm.serviceNodes().size() > 0)) {
+        if (swrm.serviceNodes().size() < 1) { continue; }
+
+        if (thisHost == swrm.serviceNodes().at(0)) { 
             TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
             serviceInfo->service    = swrm.name();
             serviceInfo->serviceImg = swrm.image();
@@ -506,13 +505,13 @@ void Deployer::createElementsNetwork()
             for (auto & a: swrm.args()) {
                 serviceInfo->args.push_back(a);
             }
+            sAgName = agName.at(j).c_str();
             ag.push_back(new TskAge(sAgName, thisHost, &synchro,
                                     SERVICE, swrm.serviceNodes(),
                                     serviceInfo));
         } else {
             ag.push_back(0);
         }
-        ++h;
         ++j;
     }
 
@@ -521,12 +520,12 @@ void Deployer::createElementsNetwork()
         TRC("Agent 0x" + std::to_string((long)(ag.at(i))));
     }
 
-    //=== If we are running on a processing host ==========================
-    if (! isMasterHost) {
+    //======================================================================
+    // 3. Create the connections
+    // ======================================================================
 
-        //-----------------------------------------------------------------
-        // c. Create agent connections
-        //-----------------------------------------------------------------
+    //=== PROCESSING HOSTS =========================================
+    if (! isMasterHost) {
 
         // CHANNEL CMD - PUBSUB
         // - Publisher: EvtMng
@@ -562,11 +561,12 @@ void Deployer::createElementsNetwork()
         // 3. Processing completion messages
         int j = 0;
         for (auto & p : cfg.agPortTsk) {
-            if (ag.at(j) != 0) {
+            auto & a = ag.at(j);
+            if (a != 0) {
                 chnl = ChnlTskProc + "_" + agName.at(j);
                 TRC("### Connections for channel " << chnl);
                 connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-                ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+                a->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
             }
             ++j;
         }
@@ -574,7 +574,7 @@ void Deployer::createElementsNetwork()
         return;
     }
 
-    //=== Else, we are running on the master host =========================
+    //=== MASTER HOST ==============================================
 
     //-----------------------------------------------------------------
     // a. Create master node elements
@@ -660,9 +660,10 @@ void Deployer::createElementsNetwork()
         TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
         m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
-        if (ag.at(k) != 0) {
+        auto & a = ag.at(k);
+        if (a != 0) {
             connAddr = bindAddr;
-            ag.at(k)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            a->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
         }
         ++k;
     }

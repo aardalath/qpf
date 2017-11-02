@@ -450,8 +450,12 @@ void Config::generateProcFmkInfoStructure()
     procFmkInfo->numSrvTasks = 0;
 
     agName.clear();
+    agHost.clear();
     agPortTsk.clear();
 
+    // Create, for each agent (container runner or swarm manager) a name, a port
+    // number, and same its host ip
+    
     int h = 1;
     for (auto & ckv : cfg.network.processingNodes()) {
         int numOfTskAgents = ckv.second;
@@ -493,6 +497,8 @@ void Config::generateProcFmkInfoStructure()
     for (auto & skv : cfg.network.swarms()) {
         hi.update();
         CfgGrpSwarm & swrm = skv.second;
+        if (swrm.serviceNodes().size() < 1) { continue; }
+
         std::string ip = swrm.serviceNodes().at(0);
 
         sprintf(sAgName, "Swarm_%s", ip.c_str());
