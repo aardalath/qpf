@@ -129,6 +129,7 @@ void Component::addConnection(ChannelDescriptor & chnl,
 {
     conct->setName(compName);
     connections[chnl] = conct;
+    TRC(">>> Creating connection: " + chnl + " - " + conct->getName() + "/" + conct->getAddress());
 }
 
 //----------------------------------------------------------------------
