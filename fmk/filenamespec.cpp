@@ -150,7 +150,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 {
     if (! initialized) { setFileNameSpec(reStr, assignationsStr); }
 
-    DBG("Trying to parse '" << fileName << "' with the regex '" << reStr << "'");
+    //DBG("Trying to parse '" << fileName << "' with the regex '" << reStr << "'");
 
     // First, get path name out of the name
     char *dirc, *basec, *bname, *dname;
@@ -205,7 +205,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     // substrings start at m[1]
     unsigned int count = mre.size() - 1;
 #endif
-    TRC("size: " << mre.size() << count);
+    //TRC("size: " << mre.size() << count);
 
     for (unsigned int i = 0; i < count; ++i) {
         // Extract the matches of the regex
@@ -224,7 +224,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
             if (idx <= count + 1) { fld = mre[k]; }
             if (kv.second.find(idx) != kv.second.end()) {
                 std::string tpl(assignationsTpl[kv.first]);
-                TRC(k << idx << fld << ' ' << kv.first);
+                //TRC(k << idx << fld << ' ' << kv.first);
                 switch (kv.first) {
                 case 'M':
                     m["mission"]          = placeIn(m.mission(),      tpl, idx, fld);
@@ -271,7 +271,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
 
     struct stat buf;
     if (stat(fileName.c_str(), &buf) != 0) {
-        TRC("PROBLEM in FileNameSpec!!");
+        //TRC("PROBLEM in FileNameSpec!!");
     }
 
     decodeSignature(m);
@@ -284,7 +284,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     m["url"]            = "file://" + fileName;
     m["urlSpace"]       = space;
 
-    DBG("Signature: '" + m.signature() + "'");
+    //DBG("Signature: '" + m.signature() + "'");
 
     return (m.mission() == Euclid::MissionAcronym[Euclid::EUC_Mission]);
 }
@@ -314,7 +314,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        //TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if ((m.procFunc() == "SIM") || (m.procFunc() == "LE1")) {
         // Instrument-ObsMode-ObsId-Exposure
         if (nParts < 4) { return; }
@@ -324,7 +324,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        //TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if (m.procFunc()  == "QLA") {
         // OrigProcFunc-Instrument-ObsMode-ObsId-Exposure
         if (nParts < 5) { return; }
@@ -334,7 +334,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         expos            = signParts[3];
         m["obsMode"]     = signParts[4];
         m["productType"] = m.procFunc() + "_" + m.origin() + "_" + m.instrument();
-        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
+        //TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else {
         // TBD
     }
@@ -353,7 +353,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
                    m.productVersion());
 
     m["signature"] = (obsId + "-" + m.obsMode() + "-" + expos);
-    TRC("Final: " << m.productType() << " / " << m.signature());
+    //TRC("Final: " << m.productType() << " / " << m.signature());
 }
 
 std::string FileNameSpec::buildProductId(ProductMetadata & m)
