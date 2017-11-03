@@ -450,6 +450,7 @@ void Deployer::createElementsNetwork()
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
 
     for (auto & a : agName)     { TRC(" ===>> " << a); }
+    for (auto & a : agHost)     { TRC(" ===>> " << a); }
     for (auto & ap : agPortTsk) { TRC(" ===>> " << ap); }
 
     // Connection addresses and channel

@@ -103,7 +103,7 @@ void TskAge::fromRunningToOperational()
 
         // Set parameters for requesting tasks and waiting
         idleCycles              =  0;
-        maxWaitingCycles        = 20;
+        maxWaitingCycles        = 40;
         idleCyclesBeforeRequest = 30;
 
         TraceMsg("Agent Mode: CONTAINER");
@@ -179,13 +179,13 @@ void TskAge::runEachIterationForContainers()
                              "", "", "");
                 
                 std::string chnl(ChnlTskProc + "_" + compName);
-                send(chnl, msg.str());
-                DBG("Sending request via channel " + chnl);
-                DbgMsg("Sending request via channel " + chnl);
-                
                 pStatus = WAITING;
                 InfoMsg("Switching to status " + ProcStatusName[pStatus]);
                 waitingCycles = 0;
+                send(chnl, msg.str());
+
+                DBG("Sending request via channel " + chnl);
+                DbgMsg("Sending request via channel " + chnl);
             }
         }
         break;
