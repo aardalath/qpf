@@ -485,7 +485,7 @@ void TskAge::sendTaskReport(std::string contId)
     task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
     if (taskStatus == TASK_FINISHED) {
-        retrieveOutputProducts(task);
+        transferOutputProducts(task);
     }
 
     // Include additional info
@@ -511,11 +511,11 @@ void TskAge::sendTaskReport(std::string contId)
 }
 
 //----------------------------------------------------------------------
-// Method: retrieveOutputProducts
+// Method: transferOutputProducts
 //----------------------------------------------------------------------
-void TskAge::retrieveOutputProducts(TaskInfo & task)
+void TskAge::transferOutputProducts(TaskInfo & task)
 {
-    DBG("Retrieving output products for task: " << task.taskName());
+    DBG("Transferring output products for task: " << task.taskName());
 
     //-------------------------------------------------------------------
     // Get output data

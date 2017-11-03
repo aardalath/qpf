@@ -308,7 +308,7 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 
     if (isRemote) {
         (void)relocate(file, newFile, COPY_TO_MASTER);
-        runlink(file);
+        unlink(file);
     } else {
         (void)relocate(file, newFile, LINK);
     }

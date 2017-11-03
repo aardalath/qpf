@@ -165,9 +165,9 @@ private:
     void sendTaskReport(std::string contId);
 
     //----------------------------------------------------------------------
-    // Method: retrieveOutputProducts
+    // Method: transferOutputProducts
     //----------------------------------------------------------------------
-    void retrieveOutputProducts(TaskInfo & task);
+    void transferOutputProducts(TaskInfo & task);
 
     //----------------------------------------------------------------------
     // Method: sendHostInfoUpdate
