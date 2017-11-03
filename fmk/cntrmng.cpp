@@ -84,6 +84,9 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
         cnt.add_argument(kv.first + ":" + kv.second);
     }
 
+    cnt.add_argument("-u");
+    cnt.add_argument("eucops");
+    
     std::string tmpFileName;
     (void)mkTmpFileName(fileIdTpl, tmpFileName);
 
