@@ -44,7 +44,7 @@
 #include "dbhdlpostgre.h"
 #include "except.h"
 
-#include "tools.h"
+//#include "tools.h"
 #include "str.h"
 
 #include "config.h"
@@ -54,8 +54,6 @@ using Configuration::cfg;
 //#include <sys/time.h>
 //#include <unistd.h>
 //#include <time.h>
-
-#define WRITE_MSGS_TO_DISK
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -91,8 +89,10 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     compAddress = addr;
     synchro     = s;
 
+    writeMsgToDisk = false;
+
     iteration = 0;
-    stepSize  = 100;
+    stepSize  = 300;
 
     // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)
@@ -208,9 +208,9 @@ void Component::processIncommingMessages()
             if ((tgt != "*") && (tgt != compName)) { continue; }
             std::string type(msg.header.type());
             DbgMsg("(FROM component.cpp:) "  + compName + " received the message [" + m + "]");
-#ifdef WRITE_MSGS_TO_DISK
-            writeMsgToFile(Recv, chnl, m);
-#endif        
+
+            if (writeMsgsToDisk) { writeMsgToFile(Recv, chnl, m); }
+
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlEvtMng)     { processEvtMngMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
@@ -291,9 +291,7 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(m);
-#ifdef WRITE_MSGS_TO_DISK
-        writeMsgToFile(Send, chnl, m);
-#endif        
+        if (writeMsgsToDisk) { writeMsgToFile(Recv, chnl, m); }
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
         RaiseSysAlert(Alert(Alert::System,
@@ -584,12 +582,30 @@ void Component::writeMsgToFile(SendOrRecv sor,
     }
 
     char fileName[256];
-    sprintf(fileName, "/tmp/%lld.%09ld_%c_%s.mson",
-            (long long)timesp.tv_sec, timesp.tv_nsec, 
+    sprintf(fileName, "%s/%lld.%09ld_%s_%c_%s.mson",
+            Config::PATHSession,
+            (long long)timesp.tv_sec, timesp.tv_nsec, compName, 
             (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
     fclose(fHdl);
 }
+
+//----------------------------------------------------------------------
+// Method: setWriteMsgsToDisk
+//----------------------------------------------------------------------
+void Component::setWriteMsgsToDisk(bool b = true)
+{
+    writeMsgsToDisk = b;
+}
+
+//----------------------------------------------------------------------
+// Method: getWriteMsgsToDisk
+//----------------------------------------------------------------------
+bool Component::getWriteMsgsToDisk()
+{
+    return writeMsgsToDisk;
+}
+
 
 //}

@@ -186,6 +186,16 @@ public:
     //----------------------------------------------------------------------
     virtual std::string getAddress() { return compAddress; }
 
+    //----------------------------------------------------------------------
+    // Method: setWriteMsgsToDisk
+    //----------------------------------------------------------------------
+    void setWriteMsgsToDisk(bool b = true);
+
+    //----------------------------------------------------------------------
+    // Method: getWriteMsgsToDisk
+    //----------------------------------------------------------------------
+    bool getWriteMsgsToDisk();
+
 protected:
     //----------------------------------------------------------------------
     // Method: send
@@ -308,6 +318,8 @@ protected:
     Synchronizer * synchro;
     int iteration;
     int stepSize;
+
+    bool writeMsgsToDisk;
 };
 
 #endif
