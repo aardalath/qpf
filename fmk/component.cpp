@@ -89,7 +89,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     compAddress = addr;
     synchro     = s;
 
-    writeMsgToDisk = false;
+    writeMsgsToDisk = false;
 
     iteration = 0;
     stepSize  = 300;
@@ -583,7 +583,7 @@ void Component::writeMsgToFile(SendOrRecv sor,
 
     char fileName[256];
     sprintf(fileName, "%s/%lld.%09ld_%s_%c_%s.mson",
-            Config::PATHSession,
+            Config::PATHSession.c_str(),
             (long long)timesp.tv_sec, timesp.tv_nsec, compName, 
             (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
