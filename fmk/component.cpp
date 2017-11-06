@@ -577,8 +577,15 @@ void Component::raise(Alert a, Alert::Group grp)
 void Component::writeMsgToFile(SendOrRecv sor,
                                ChannelDescriptor chnl, MessageString m)
 {
+    struct timespec timesp;
+    if (clock_gettime(CLOCK_REALTIME_COARSE, &timesp) != 0) {
+        perror("clock_gettime");
+        exit(1);
+    }
+
     char fileName[256];
-    sprintf(fileName, "/tmp/%10u_%c_%s.mson", preciseTimeTag().c_str(),
+    sprintf(fileName, "/tmp/%010u.09ld_%c_%s.mson",
+            timesp.tv_sec, timesp.tv_nsec, 
             (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
