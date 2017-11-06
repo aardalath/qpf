@@ -377,13 +377,6 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     body["tag"]  = rule->tag;
     msg.buildBody(body);
 
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    it = connections.find(ChnlTskSched);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
-        return true;
-    } else {
-        return false;
-    }
+    this->send(ChnlTskSched, msg.str());
+    return true;
 }

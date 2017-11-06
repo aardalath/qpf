@@ -133,12 +133,7 @@ void EvtMng::runEachIteration()
             body["products"][0] = m.val();
             msg.buildBody(body);
 
-            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-            it = connections.find(ChnlInData);
-            if (it != connections.end()) {
-                ScalabilityProtocolRole * conn = it->second;
-                conn->setMsgOut(msg.str());
-            }
+            this->send(ChnlInData, msg.str());
         }
     }
 
@@ -147,22 +142,17 @@ void EvtMng::runEachIteration()
     bool sendQuit = requestQuit; //(iteration > 1000) || requestQuit;
 
     if (sendInit || sendPing || sendQuit) {
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         Message<MsgBodyCMD> msg;
 
         if (sendPing) {
-            it = connections.find(ChnlEvtMng);
             msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
                          compName, "*",
                          "", "", "");
         } else {
-            it = connections.find(ChnlCmd);
             msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
                          compName, "*",
                          "", "", "");
         }
-
-        ScalabilityProtocolRole * conn = it->second;
 
         MsgBodyCMD body;
         body["iteration"] = std::to_string(iteration);
@@ -177,7 +167,8 @@ void EvtMng::runEachIteration()
         }
 
         msg.buildBody(body);
-        conn->setMsgOut(msg.str());
+
+        this->send(sendPing ? ChnlEvtMng : ChnlCmd, msg.str());
 
         if (sendQuit) { transitTo(RUNNING); }
     }
@@ -221,11 +212,8 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
                           compName, "*",
                           "", "", "");
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator
-            it = connections.find(ChnlCmd);
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(relayMsg.str());
-
+        this->send(ChnlCmd, relayMsg.str());
+                    
         // Build HMICmd answer
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
@@ -240,7 +228,8 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     }
 
     msg.buildBody(body);
-    c->setMsgOut(msg.str());
+
+    this->send(ChnlHMICmd, msg.str());
 }
 
 //----------------------------------------------------------------------

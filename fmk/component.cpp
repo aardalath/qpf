@@ -245,13 +245,7 @@ void Component::sendPeriodicMsgs()
         for (auto & kkv: kv.second) {
             int period = kkv.first;
             if (((iteration + 1) % period) == 0) {
-                std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-                it = connections.find(chnl);
-                if (it != connections.end()) {
-                    ScalabilityProtocolRole * conn = it->second;
-                    MessageString & msg = kkv.second;
-                    conn->setMsgOut(msg);
-                }
+                this->send(chnl, msg);
             }
         }
     }
@@ -447,12 +441,7 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
         body["cmd"]   = CmdStates;
         body["state"] = getStateName(getState());
         msg.buildBody(body);
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlEvtMng);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-        }
+        this->send(ChnlEvtMng, msg.str());
 
     } else if (cmd == CmdStates) { // This should be EvtMng
 
@@ -588,7 +577,8 @@ void Component::writeMsgToFile(SendOrRecv sor,
                                ChannelDescriptor chnl, MessageString m)
 {
     char fileName[256];
-    sprintf(fileName, "/tmp/%10u_%c_%s.mson", time(0), (sor == Send ? 'S' : 'R'), chnl.c_str());
+    sprintf(fileName, "/tmp/%10u_%c_%s.mson", preciseTimeTag().c_str(),
+            (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
     fclose(fHdl);

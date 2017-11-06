@@ -422,14 +422,9 @@ bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgT
     msg.buildHdr(ChnlTskRepDist, msgType, CHNLS_IF_VERSION,
                  compName, "*", "", "", "");
     // Send msg
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    ChannelDescriptor chnl(ChnlTskRepDist);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
-        retVal = true;
-    }
+    this->send(ChnlTskRepDist, msg.str());
+    retVal = true;
+    
     return retVal;
 }
 
@@ -453,24 +448,11 @@ void TskMng::sendProcFmkInfoUpdate()
     // Set message header
     msg.buildHdr(ChnlTskRepDist, MsgFmkMon, CHNLS_IF_VERSION,
                  compName, "*", "", "", "");
+
     // Send msg
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    ChannelDescriptor chnl(ChnlTskRepDist);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
-        DbgMsg("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
-        TraceMsg(s);
-    } else {
-        ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
-        RaiseSysAlert(Alert(Alert::System,
-                            Alert::Error,
-                            Alert::Comms,
-                            std::string(__FILE__ ":" Stringify(__LINE__)),
-                            "Couldn't send updated ProcFmkInfo data",
-                            0));
-    }
+    this->send(ChnlTskRepDist, msg.str());    
+    TraceMsg("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
+    TraceMsg(s);
 
     // Arm new timer
     if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
