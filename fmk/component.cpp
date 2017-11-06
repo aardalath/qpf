@@ -584,8 +584,8 @@ void Component::writeMsgToFile(SendOrRecv sor,
     }
 
     char fileName[256];
-    sprintf(fileName, "/tmp/%010u.09ld_%c_%s.mson",
-            timesp.tv_sec, timesp.tv_nsec, 
+    sprintf(fileName, "/tmp/%lld.%09ld_%c_%s.mson",
+            (long long)timesp.tv_sec, timesp.tv_nsec, 
             (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
