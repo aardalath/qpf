@@ -55,7 +55,7 @@ using Configuration::cfg;
 //#include <unistd.h>
 //#include <time.h>
 
-//#define WRITE_MESSAGE_FILES
+#define WRITE_MSGS_TO_DISK
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -208,6 +208,9 @@ void Component::processIncommingMessages()
             if ((tgt != "*") && (tgt != compName)) { continue; }
             std::string type(msg.header.type());
             DbgMsg("(FROM component.cpp:) "  + compName + " received the message [" + m + "]");
+#ifdef WRITE_MSGS_TO_DISK
+            writeMsgToFile(Recv, chnl, m);
+#endif        
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlEvtMng)     { processEvtMngMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
@@ -293,6 +296,9 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(m);
+#ifdef WRITE_MSGS_TO_DISK
+        writeMsgToFile(Send, chnl, m);
+#endif        
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
         RaiseSysAlert(Alert(Alert::System,
@@ -575,5 +581,17 @@ void Component::raise(Alert a, Alert::Group grp)
     Log::log(compName, lvl, alertMsg);
 }
 
+//----------------------------------------------------------------------
+// Method: step
+//----------------------------------------------------------------------
+void Component::writeMsgToFile(SendOrRecv sor,
+                               ChannelDescriptor chnl, MessageString m)
+{
+    char fileName[256];
+    sprintf(fileName, "/tmp/%10u_%c_%s.mson", time(0), (sor == Send ? 'S' : 'R'), chnl);
+    FILE * fHdl = fopen(fileName, "w");
+    fprintf(fHdl, m);
+    fclose(fHdl);
+}
 
 //}

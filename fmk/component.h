@@ -286,6 +286,14 @@ private:
     //----------------------------------------------------------------------
     virtual void step();
 
+    enum SendOrRecv {Send, Recv};
+
+    //----------------------------------------------------------------------
+    // Method: step
+    //----------------------------------------------------------------------
+    void writeMsgToFile(SendOrRecv sor,
+                        ChannelDescriptor chnl, MessageString m);
+    
 protected:
     std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;
     std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;
