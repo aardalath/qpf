@@ -242,10 +242,12 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     TaskInfo task(body["info"]);
 
     std::string taskName  = task.taskName();
-    std::string agName    = task.taskAgent();
+    TaskStatus oldStatus  = taskRegistry[taskName];
+
+    if (oldStatus == TASK_FINISHED) { return; }
 
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
-    TaskStatus oldStatus  = taskRegistry[taskName];
+    std::string agName    = task.taskAgent();
 
     TraceMsg("Processing TaskReport: status: " + TaskStatusName[oldStatus] +
              " ==> " + TaskStatusName[taskStatus]);
