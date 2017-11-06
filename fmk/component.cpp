@@ -588,9 +588,9 @@ void Component::writeMsgToFile(SendOrRecv sor,
                                ChannelDescriptor chnl, MessageString m)
 {
     char fileName[256];
-    sprintf(fileName, "/tmp/%10u_%c_%s.mson", time(0), (sor == Send ? 'S' : 'R'), chnl);
+    sprintf(fileName, "/tmp/%10u_%c_%s.mson", time(0), (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
-    fprintf(fHdl, m);
+    fprintf(fHdl, m.c_str());
     fclose(fHdl);
 }
 
