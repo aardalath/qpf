@@ -584,7 +584,8 @@ void Component::writeMsgToFile(SendOrRecv sor,
     char fileName[256];
     sprintf(fileName, "%s/%lld.%09ld_%s_%c_%s.mson",
             Config::PATHSession.c_str(),
-            (long long)timesp.tv_sec, timesp.tv_nsec, compName, 
+            (long long)timesp.tv_sec, timesp.tv_nsec,
+            compName.c_str(), 
             (sor == Send ? 'S' : 'R'), chnl.c_str());
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
@@ -594,7 +595,7 @@ void Component::writeMsgToFile(SendOrRecv sor,
 //----------------------------------------------------------------------
 // Method: setWriteMsgsToDisk
 //----------------------------------------------------------------------
-void Component::setWriteMsgsToDisk(bool b = true)
+void Component::setWriteMsgsToDisk(bool b)
 {
     writeMsgsToDisk = b;
 }
