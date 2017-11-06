@@ -44,7 +44,7 @@
 #include "dbhdlpostgre.h"
 #include "except.h"
 
-//#include "tools.h"
+#include "tools.h"
 #include "str.h"
 
 #include "config.h"
@@ -245,6 +245,7 @@ void Component::sendPeriodicMsgs()
         for (auto & kkv: kv.second) {
             int period = kkv.first;
             if (((iteration + 1) % period) == 0) {
+                MessageString & msg = kkv.second;
                 this->send(chnl, msg);
             }
         }
