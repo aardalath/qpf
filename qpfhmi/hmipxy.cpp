@@ -162,9 +162,9 @@ void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & 
     msgAns.buildHdr(ChnlTskRepDist, ChnlTskRepDist, CHNLS_IF_VERSION,
                  compName, "EvtMng",
                  "", "", "");
-    MsgBodyTSK body;
-    body["ans"] = "OK";
-    msgAns.buildBody(body);
+    MsgBodyTSK bodyAns;
+    bodyAns["ans"] = "OK";
+    msgAns.buildBody(bodyAns);
     this->send(ChnlTskRepDist, msgAns.str());
 }
 
