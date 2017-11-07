@@ -451,11 +451,13 @@ void TskAge::sendTaskReport(std::string contId)
 
     // Clean-up sections not needed
     json removedItem;
-    taskData.removeMember("Mounts",          &removedItem);
-    taskData.removeMember("Config",          &removedItem);
-    taskData.removeMember("HostConfig",      &removedItem);
-    taskData.removeMember("NetworkSettings", &removedItem);
-    
+    for (auto & sec : {"AppArmorProfile", "HostsPath", "RestartCount",
+                "ExecIDs", "ResolvConfPath", "LogPath", "HostnamePath", "Driver",
+                "GraphDriver", "NetworkSettings", "Config", "HostConfig"}) {        
+        taskData.removeMember(sec, &removedItem);
+    }
+
+    // Once taskData is clean, include in the task structure
     task["taskData"] = taskData;
 
     json jstate = taskData["State"];
