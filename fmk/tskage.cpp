@@ -451,10 +451,10 @@ void TskAge::sendTaskReport(std::string contId)
 
     // Clean-up sections not needed
     json removedItem;
-    taskData.remove("Mounts",          &removedItem);
-    taskData.remove("Config",          &removedItem);
-    taskData.remove("HostConfig",      &removedItem);
-    taskData.remove("NetworkSettings", &removedItem);
+    taskData.removeMember("Mounts",          &removedItem);
+    taskData.removeMember("Config",          &removedItem);
+    taskData.removeMember("HostConfig",      &removedItem);
+    taskData.removeMember("NetworkSettings", &removedItem);
     
     task["taskData"] = taskData;
 
