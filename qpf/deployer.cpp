@@ -671,11 +671,10 @@ void Deployer::createElementsNetwork()
 
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
     // - Publisher: TskMng
-    // - Subscriber: DataMng EvtMng QPFHMI
+    // - Subscriber: DataMng EvtMng
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist) + ".ipc";
-    //bindAddr = "inproc://" + chnl;
+    bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {

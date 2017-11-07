@@ -91,8 +91,10 @@ bool DockerMng::runCmd(std::string cmd, std::vector<std::string> args,
 {
     procxx::process dckCmd("docker", cmd);
     dckCmd.add_argument(containerId);
-    for (auto & a : args) { dckCmd.add_argument(a); }
-
+    if (args.size() > 0) {
+        for (auto & a : args) { dckCmd.add_argument(a); }
+    }
+    
     dckCmd.exec();
 
     dckCmd.wait();
