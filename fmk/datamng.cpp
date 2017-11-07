@@ -127,6 +127,8 @@ void DataMng::processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString &
 //----------------------------------------------------------------------
 void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    saveTaskToDB(m);
+
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     TaskInfo task(body["info"]);
@@ -137,7 +139,15 @@ void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m
     TraceMsg("DataMng: Processing TaskReport: " + taskName
              + " has status " + TaskStatusName[taskStatus]);
 
-    saveTaskToDB(m);
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(ChnlTskRepDist, ChnlTskRepDist, CHNLS_IF_VERSION,
+                 compName, "TskMng",
+                 "", "", "");
+    MsgBodyTSK body;
+    body["ans"] = "OK";
+    msgAns.buildBody(body);
+    this->send(ChnlTskRepDist, msgAns.str());
 }
 
 //----------------------------------------------------------------------

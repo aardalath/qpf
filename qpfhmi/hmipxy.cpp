@@ -156,6 +156,16 @@ void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & 
 
     TraceMsg("EvtMng: Processing TaskReport: " + taskName +
              " has status " + TaskStatusName[taskStatus]);
+
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(ChnlTskRepDist, ChnlTskRepDist, CHNLS_IF_VERSION,
+                 compName, "EvtMng",
+                 "", "", "");
+    MsgBodyTSK body;
+    body["ans"] = "OK";
+    msgAns.buildBody(body);
+    this->send(ChnlTskRepDist, msgAns.str());
 }
 
 //----------------------------------------------------------------------

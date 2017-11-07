@@ -243,6 +243,16 @@ void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     std::string taskName  = task.taskName();
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
+
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(ChnlTskRepDist, ChnlTskRepDist, CHNLS_IF_VERSION,
+                 compName, "TskMng",
+                 "", "", "");
+    MsgBodyTSK body;
+    body["ans"] = "OK";
+    msgAns.buildBody(body);
+    this->send(ChnlTskRepDist, msgAns.str());
 }
 
 //----------------------------------------------------------------------

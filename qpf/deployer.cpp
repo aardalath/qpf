@@ -677,9 +677,9 @@ void Deployer::createElementsNetwork()
     bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist) + ".ipc";
     //bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
-    m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        c->addConnection(chnl, new ReqRep(NN_REP, connAddr));
     }
 
 }
