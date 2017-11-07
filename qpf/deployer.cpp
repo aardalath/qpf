@@ -622,7 +622,7 @@ void Deployer::createElementsNetwork()
     // - Out/In: QPFHMI/EvtMng
     chnl     = ChnlHMICmd;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortHMICmd);
+    bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortHMICmd) + ".ipc";
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
 
     // CHANNEL INDATA -  PUBSUB
@@ -674,7 +674,7 @@ void Deployer::createElementsNetwork()
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist);
+    bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist) + ".ipc";
     //bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
