@@ -1127,13 +1127,12 @@ void MainWindow::init()
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
-#ifdef COMMENTED_OUT    
     chnl      = ChnlTskRepDist;
     qconnAddr = QString("ipc:///tmp/%1:%2.ipc")
       .arg(masterAddress).arg(startingPort + PortTskRepDist);
     connAddr  = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-#endif
+
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     synchro.notify();
