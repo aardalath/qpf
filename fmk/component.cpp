@@ -92,7 +92,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     writeMsgsToDisk = false;
 
     iteration = 0;
-    stepSize  = 300;
+    stepSize  = 200;
 
     // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)

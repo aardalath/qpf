@@ -429,6 +429,11 @@ void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
 //----------------------------------------------------------------------
 void TskAge::sendTaskReport(std::string contId)
 {
+    static TaskStatus  prevTaskStatus(TASK_UNKNOWN_STATE);
+    static int         prevProgress(-1);
+    static std::string prevInspStatus("");
+    static int         prevInspCode(-127);
+        
     // Define and set task object
     auto const & itTaskInfo = containerToTaskMap.find(contId);
     if (itTaskInfo == containerToTaskMap.end()) { return; }
@@ -476,6 +481,16 @@ void TskAge::sendTaskReport(std::string contId)
         updateProgress();
     }
 
+    if ((taskStatus == prevTaskStatus) && 
+        (progress   == prevProgress) &&
+        (inspStatus == prevInspStatus) &&
+        (inspCode   == prevInspCode)) { return; }
+
+    prevTaskStatus = taskStatus; 
+    prevProgress   = progress; 
+    prevInspStatus = inspStatus; 
+    prevInspCode   = inspCode;
+    
     // Update progress
     task["taskData"]["State"]["Progress"] = std::to_string(progress);
 
