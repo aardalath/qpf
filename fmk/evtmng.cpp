@@ -248,7 +248,7 @@ void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
     Message<MsgBodyTSK> msgAns;
     msgAns.buildHdr(ChnlTskRepDist + "_" + compName, ChnlTskRepDist, CHNLS_IF_VERSION,
                     compName, "TskMng",
-                 "", "", "");
+                    "", "", "");
     MsgBodyTSK bodyAns;
     bodyAns["ans"] = "OK";
     msgAns.buildBody(bodyAns);

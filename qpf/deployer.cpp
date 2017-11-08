@@ -672,15 +672,16 @@ void Deployer::createElementsNetwork()
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
-    TRC("### Connections for channel " << chnl);
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
         chnl     = ChnlTskRepDist + "_" + c->getName();
-        bindAddr = "ipc:///tmp/" + chnl + "." + m.tskMng->getName() + "-" + c->getName() + ".ipc";
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "ipc:///tmp/" + ChnlTskRepDist + "." + m.tskMng->getName() + "-" + c->getName() + ".ipc";
         connAddr = bindAddr;
         m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
         c->addConnection(chnl, new ReqRep(NN_REP, connAddr));
     }
     chnl     = ChnlTskRepDist + "_QPFHMI";
+    TRC("### Connections for channel " << chnl);
     bindAddr = "ipc:///tmp/" + chnl + "." + m.tskMng->getName() + "-QPFHMI.ipc";
     m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
 
