@@ -1127,7 +1127,7 @@ void MainWindow::init()
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
-    chnl      = ChnlTskRepDist;
+    chnl      = ChnlTskRepDist + "_QPFHMI";
     connAddr  = "ipc:///tmp/" + chnl + ".TskMng-QPFHMI.ipc";
     hmiNode->addConnection(chnl, new ReqRep(NN_REP, connAddr));
 

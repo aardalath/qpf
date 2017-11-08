@@ -418,14 +418,16 @@ bool TskMng::sendTaskAgMsg(MessageString & m,
 //----------------------------------------------------------------------
 bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)
 {
-    bool retVal = false;
+    bool retVal = true;
     // Set message header
     Message<MsgBodyTSK> msg(m);
-    msg.buildHdr(ChnlTskRepDist, msgType, CHNLS_IF_VERSION,
-                 compName, "*", "", "", "");
-    // Send msg
-    this->send(ChnlTskRepDist, msg.str());
-    retVal = true;
+    for (auto & c : {"DatMng", "EvtMng", "QPFHMI"}) {
+        ChannelDescriptor chnl = ChnlTskRepDist + "_" + c;
+        msg.buildHdr(chnl, msgType, CHNLS_IF_VERSION,
+                     compName, c, "", "", "");
+        // Send msg
+        this->send(chnl, msg.str());
+    }
     
     return retVal;
 }

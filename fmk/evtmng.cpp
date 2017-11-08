@@ -246,13 +246,13 @@ void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     // Send reply
     Message<MsgBodyTSK> msgAns;
-    msgAns.buildHdr(ChnlTskRepDist, ChnlTskRepDist, CHNLS_IF_VERSION,
-                 compName, "TskMng",
+    msgAns.buildHdr(ChnlTskRepDist + "_" + compName, ChnlTskRepDist, CHNLS_IF_VERSION,
+                    compName, "TskMng",
                  "", "", "");
     MsgBodyTSK bodyAns;
     bodyAns["ans"] = "OK";
     msgAns.buildBody(bodyAns);
-    this->send(ChnlTskRepDist, msgAns.str());
+    this->send(ChnlTskRepDist + "_" + compName, msgAns.str());
 }
 
 //----------------------------------------------------------------------
