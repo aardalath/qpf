@@ -423,7 +423,7 @@ bool TskMng::sendTaskAgMsg(MessageString & m,
 bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)
 {
     // Send msg
-    this->send(ChnlTskRepDist, msg.str());
+    this->send(ChnlTskRepDist, m);
     return true;;
 }
 
