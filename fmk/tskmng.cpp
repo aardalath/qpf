@@ -60,6 +60,8 @@ using Configuration::cfg;
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+const int FMK_INFO_TIMER = 5000;
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -284,7 +286,9 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
         InfoMsg("Finished task " + taskName);
     }
 
-    sendTskRepDistMsg(m, MsgTskRepDist);
+    msg.buildHdr(ChnlTskRepDist, MsgTskRepDist, CHNLS_IF_VERSION,
+                 compName, "*", "", "", "");
+    this->send(ChnlTskRepDist, msg.str());
 }
 
 //----------------------------------------------------------------------
@@ -309,7 +313,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::armProcFmkInfoMsgTimer()
 {
-    Timer * fmkSender = new Timer(3000, true,
+    Timer * fmkSender = new Timer(FMK_INFO_TIMER, true,
                                   &TskMng::sendProcFmkInfoUpdate, this);
 }
 
@@ -418,16 +422,9 @@ bool TskMng::sendTaskAgMsg(MessageString & m,
 //----------------------------------------------------------------------
 bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)
 {
-    bool retVal = false;
-    // Set message header
-    Message<MsgBodyTSK> msg(m);
-    msg.buildHdr(ChnlTskRepDist, msgType, CHNLS_IF_VERSION,
-                 compName, "*", "", "", "");
     // Send msg
     this->send(ChnlTskRepDist, msg.str());
-    retVal = true;
-    
-    return retVal;
+    return true;;
 }
 
 //----------------------------------------------------------------------
