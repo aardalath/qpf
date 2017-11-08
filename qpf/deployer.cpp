@@ -682,7 +682,7 @@ void Deployer::createElementsNetwork()
     }
     chnl     = ChnlTskRepDist + "_QPFHMI";
     TRC("### Connections for channel " << chnl);
-    bindAddr = "ipc:///tmp/" + chnl + "." + m.tskMng->getName() + "-QPFHMI.ipc";
+    bindAddr = "ipc:///tmp/" + ChnlTskRepDist + "." + m.tskMng->getName() + "-QPFHMI.ipc";
     m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
 
 }

@@ -1128,7 +1128,7 @@ void MainWindow::init()
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl      = ChnlTskRepDist + "_QPFHMI";
-    connAddr  = "ipc:///tmp/" + chnl + ".TskMng-QPFHMI.ipc";
+    connAddr  = "ipc:///tmp/" + ChnlTskRepDist + ".TskMng-QPFHMI.ipc";
     hmiNode->addConnection(chnl, new ReqRep(NN_REP, connAddr));
 
     // START!
