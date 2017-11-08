@@ -674,13 +674,14 @@ void Deployer::createElementsNetwork()
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist) + ".ipc";
-    //bindAddr = "inproc://" + chnl;
-    connAddr = bindAddr;
-    m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
+        bindAddr = "ipc:///tmp/" + chnl + "." + m.tskMng->getName() + "-" + c->getName() + ".ipc";
+        connAddr = bindAddr;
+        m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
         c->addConnection(chnl, new ReqRep(NN_REP, connAddr));
     }
+    bindAddr = "ipc:///tmp/" + chnl + "." + m.tskMng->getName() + "-QPFHMI.ipc";
+    m.tskMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
 
 }
 
