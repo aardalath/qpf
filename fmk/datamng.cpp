@@ -155,6 +155,7 @@ void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m
 //----------------------------------------------------------------------
 void DataMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    /*
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     JValue hostInfoData(body["info"]);
@@ -163,6 +164,7 @@ void DataMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     hostInfo.fromStr(hostInfoData.str());
 
     DBG(hostInfo.dump() + "\n");
+    */
 }
 
 //----------------------------------------------------------------------

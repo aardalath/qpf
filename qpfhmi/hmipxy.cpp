@@ -181,6 +181,16 @@ void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     TraceMsg(Config::procFmkInfo->toJsonStr());
     Config::procFmkInfo->fromStr(fmkInfoData.str());
     TraceMsg("@@@@@@@@@@ RECEIVED UOPDATE OF FMK INFO @@@@@@@@@@");
+
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(ChnlTskRepDist + "_QPFHMI", ChnlTskRepDist, CHNLS_IF_VERSION,
+                    "QPFHMI", "TskMng",
+                    "", "", "");
+    MsgBodyTSK bodyAns;
+    bodyAns["ans"] = "OK";
+    msgAns.buildBody(bodyAns);
+    this->send(ChnlTskRepDist + "_QPFHMI", msgAns.str());
 }
 
 //----------------------------------------------------------------------
