@@ -461,6 +461,22 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
+// Method: processFmkMonMsg
+//----------------------------------------------------------------------
+void Component::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(ChnlTskRepDist + "_" + compName, MsgFmkMon, CHNLS_IF_VERSION,
+                    compName, "TskMng",
+                    "", "", "");
+    MsgBodyTSK bodyAns;
+    bodyAns["ans"] = "OK";
+    msgAns.buildBody(bodyAns);
+    this->send(ChnlTskRepDist + "_" + compName, msgAns.str());
+}
+
+//----------------------------------------------------------------------
 // Method: defineValidTransitions
 // Define the valid state transitions for the node
 //----------------------------------------------------------------------

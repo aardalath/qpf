@@ -449,12 +449,15 @@ void TskMng::sendProcFmkInfoUpdate()
     body["info"] = fmkInfoValue.val();
     msg.buildBody(body);
 
-    // Set message header
-    msg.buildHdr(ChnlTskRepDist + "_QPFHMI", MsgFmkMon, CHNLS_IF_VERSION,
-                 compName, "QPFHMI", "", "", "");
-
-    // Send msg
-    this->send(ChnlTskRepDist + "_QPFHMI", msg.str());    
+    for (auto & c : {"DataMng", "EvtMng", "QPFHMI"}) {
+        // Set message header
+        msg.buildHdr(ChnlTskRepDist + "_" + c, MsgFmkMon, CHNLS_IF_VERSION,
+                     compName, c, "", "", "");
+        
+        // Send msg
+        this->send(ChnlTskRepDist + "_" + c, msg.str());
+    }
+    
     TraceMsg("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
     TraceMsg(s);
 

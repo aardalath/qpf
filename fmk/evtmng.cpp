@@ -260,7 +260,6 @@ void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    /*
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     JValue hostInfoData(body["info"]);
@@ -269,7 +268,6 @@ void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     hostInfo.fromStr(hostInfoData.str());
     
     TraceMsg(hostInfo.dump() + "\n");
-    */
 }
 
 //}
