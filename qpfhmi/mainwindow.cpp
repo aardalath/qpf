@@ -1128,7 +1128,7 @@ void MainWindow::init()
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl      = ChnlTskRepDist;
-    qconnAddr = QString("tcp://%1:%2")
+    qconnAddr = QString("ipc:///tmp/%1:%2.ipc")
       .arg(masterAddress).arg(startingPort + PortTskRepDist);
     connAddr  = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
