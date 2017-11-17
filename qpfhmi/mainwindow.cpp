@@ -97,6 +97,7 @@
 
 #include "reqrep.h"
 #include "pubsub.h"
+#include "pipeline.h"
 
 using Configuration::cfg;
 
@@ -1124,14 +1125,12 @@ void MainWindow::init()
     std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 
-    // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
-    // - Publisher: TskMng
-    // - Subscriber: DataMng EvtMng QPFHMI
-    chnl      = ChnlTskRepDist;
-    qconnAddr = QString("ipc:///tmp/%1:%2.ipc")
-      .arg(masterAddress).arg(startingPort + PortTskRepDist);
-    connAddr  = qconnAddr.toStdString();
-    hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    // CHANNEL FRAMEWORK MONITORING - PIPELINE
+    // - Requester: TskMng
+    // - Replier: QPFHMI
+    chnl      = ChnlFmkMon;
+    connAddr  = "ipc:///tmp/" + chnl + ".ipc";
+    hmiNode->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

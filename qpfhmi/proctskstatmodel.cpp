@@ -52,7 +52,7 @@ ProcTaskStatusModel::ProcTaskStatusModel()
                 "t.task_data#>>'{Info,Agent}' AS agent, "
                 "t.task_path AS proc, "
                 "tt.status_desc AS status, "
-                "t.task_data#>>'{State,Progress}' AS progress, "
+                "t.task_progress AS progress, "
                 "t.task_data#>>'{State,ExitCode}' AS exit_code, "
                 "t.task_data AS task_data "
                 "FROM tasks_info t "

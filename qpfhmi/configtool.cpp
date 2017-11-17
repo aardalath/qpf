@@ -45,6 +45,7 @@
 
 #include "exttooledit.h"
 #include "config.h"
+#include "tskorc.h"
 
 #include <QHostInfo>
 #include <QFileInfo>
@@ -185,25 +186,26 @@ ConfigTool::ConfigTool(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    monitMsgFlags.append(FlagSt({ "START",       ui->chkMsgsSTARTToDisk     , ui->chkMsgsSTARTToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "INDATA"     , ui->chkMsgsINDATAToDisk    , ui->chkMsgsINDATAToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "DATA_RQST"  , ui->chkMsgsDATARQSTToDisk  , ui->chkMsgsDATARQSTToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "DATA_INFO"  , ui->chkMsgsDATAINFOToDisk  , ui->chkMsgsDATAINFOToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "MONIT_RQST" , ui->chkMsgsMONITRQSTToDisk , ui->chkMsgsMONITRQSTToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "MONIT_INFO" , ui->chkMsgsMONITINFOToDisk , ui->chkMsgsMONITINFOToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "TASK_PROC"  , ui->chkMsgsTASKPROCToDisk  , ui->chkMsgsTASKPROCToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "TASK_RES"   , ui->chkMsgsTASKRESToDisk   , ui->chkMsgsTASKRESToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "CMD"        , ui->chkMsgsCMDToDisk       , ui->chkMsgsCMDToDisk_2 }));
-    monitMsgFlags.append(FlagSt({ "STOP"       , ui->chkMsgsSTOPToDisk      , ui->chkMsgsSTOPToDisk_2 }));
-
-
+    monitMsgFlags.append(FlagSt({ "CMD",      ui->chkCmd }));    
+    monitMsgFlags.append(FlagSt({ "EVTMNG",   ui->chkEvtMngCmd })); 
+    monitMsgFlags.append(FlagSt({ "HMICMD",   ui->chkHmiCmd })); 
+    monitMsgFlags.append(FlagSt({ "INDATA",   ui->chkInData }));                                        
+    monitMsgFlags.append(FlagSt({ "TSKSCHED", ui->chkTskSched }));
+    monitMsgFlags.append(FlagSt({ "TSKREG",   ui->chkTskReg })); 
+    monitMsgFlags.append(FlagSt({ "TSKRQST",  ui->chkTskRqst }));                                       
+    monitMsgFlags.append(FlagSt({ "TSKPROC",  ui->chkTskProc }));
+    monitMsgFlags.append(FlagSt({ "TSKREP",   ui->chkTskRep })); 
+    monitMsgFlags.append(FlagSt({ "FMKMON",   ui->chkFmkMon })); 
+    monitMsgFlags.append(FlagSt({ "HOSTMON",  ui->chkHostMon }));
+                                       
     // Hide non-yet-implemented widgets
-    ui->btngrpSection->setId(ui->tbtnGeneral       , PageGeneral);
-    ui->btngrpSection->setId(ui->tbtnMachines      , PageMachines);
-    ui->btngrpSection->setId(ui->tbtnProdProc      , PageProdProc);
-    ui->btngrpSection->setId(ui->tbtnOrchestration , PageOrchestration);
-    ui->btngrpSection->setId(ui->tbtnExtTools      , PageExtTools);
-    ui->btngrpSection->setId(ui->tbtnFlags         , PageFlags);
+    ui->btngrpCfgSections->setId(ui->tbtnGeneral       , PageGeneral);
+    ui->btngrpCfgSections->setId(ui->tbtnMachines      , PageMachines);
+    ui->btngrpCfgSections->setId(ui->tbtnDB            , PageDatabase);
+    ui->btngrpCfgSections->setId(ui->tbtnProdProc      , PageProdProc);
+    ui->btngrpCfgSections->setId(ui->tbtnOrchestration , PageOrchestration);
+    ui->btngrpCfgSections->setId(ui->tbtnExtTools      , PageExtTools);
+    ui->btngrpCfgSections->setId(ui->tbtnFlags         , PageFlags);
 }
 
 //----------------------------------------------------------------------
@@ -392,6 +394,25 @@ void ConfigTool::addHost()
 void ConfigTool::removeHost()
 {
     removeFromTable(ui->tblviewHosts, "host");
+}
+
+//----------------------------------------------------------------------
+// Slot: addSwarm
+// Adds a new row to the swarms table to allow the addition of a new swarm
+//----------------------------------------------------------------------
+void ConfigTool::addSwarm()
+{
+    QTableView * vw = ui->tblviewSwarms;
+    vw->model()->insertRow(vw->model()->rowCount());
+}
+
+//----------------------------------------------------------------------
+// Slot: removeSwarm
+// Removes the selected row with information of a configured swarm
+//----------------------------------------------------------------------
+void ConfigTool::removeSwarm()
+{
+    removeFromTable(ui->tblviewSwarms, "swarm");
 }
 
 //----------------------------------------------------------------------
@@ -603,6 +624,7 @@ void ConfigTool::transferCfgToGUI()
     // Generate values for Config. display
     QVector<QStringList> netTable;
     QVector<QStringList> hostsTable;
+    QVector<QStringList> swarmsTable;
     QVector<QStringList> rulesTable;
     QStringList hostsList;
     QStringList data;
@@ -613,14 +635,11 @@ void ConfigTool::transferCfgToGUI()
     QMap<QString, int> machineAgents;
 
     // Create Agents table
-    data << QS(cfg.network.masterNode())
-         << tr("Master Host")
-         << tr("0");
-    hostsTable.append(data);
+    std::string masterHost = cfg.network.masterNode();
     for (auto & kv : cfg.network.processingNodes()) {
         data.clear();
         data << QS(kv.first)
-             << tr("Processing Host")
+             << tr((kv.first == masterHost) ? "Master Host" : "Processing Host")
              << QString("%1").arg(kv.second);
         hostsTable.append(data);
     }
@@ -628,19 +647,45 @@ void ConfigTool::transferCfgToGUI()
     Peer * peer = cfg.peersCfgByName[std::string("QPFHMI")];
     QString qpfhmiServerAddr = QS(peer->serverAddr);
     int basePort = qpfhmiServerAddr.mid(qpfhmiServerAddr.lastIndexOf(":") + 1).toInt();
+    */
+    for (auto & kv : cfg.network.swarms()) {
+        CfgGrpSwarm & swrm = kv.second;
+        std::string manager("");
+        std::string workers("");
+        for (auto & nd : swrm.serviceNodes()) {
+            if (manager.empty()) {
+                manager = nd;
+            } else {
+                workers += nd + " ";
+            }
+        }
+        std::string args;
+        for (auto & s : swrm.args()) {
+            args += s + " ";
+        }
 
-    int numRules = cfg.orcParams.rules.size();
-    for (i = 0; i < numRules; ++i) {
-        Rule * const rule = cfg.orcParams.rules.at(i);
         data.clear();
-        data << QS(rule->name)
-             << QS(join(rule->inputs, ", "))
-             << QS(rule->condition)
-             << QS(rule->processingElement)
-             << QS(join(rule->outputs, ", "));
+        data << QS(kv.first)
+             << QS(manager) << QS(workers)
+             << QS(std::to_string(swrm.scale()))
+             << QS(swrm.image())
+             << QS(swrm.exec())
+             << QS(args);
+        swarmsTable.append(data);          
+    }
+
+    json rules = cfg.orchestration.rules.val();
+    for (int i = 0; i < rules.size(); ++i) {
+        json & rule = rules[i]; 
+        data.clear();
+        data << QS(rule["name"].asString())
+             << QS(rule["inputs"].asString())
+             << QS(rule["condition"].asString())
+             << QS(rule["processing"].asString())
+             << QS(rule["outputs"].asString());
         rulesTable.append(data);
     }
-    */
+
     // Now, put data in the GUI
 
     ui->lblConfigName->setText(C("Source: " + cfg.cfgFileName));
@@ -656,7 +701,6 @@ void ConfigTool::transferCfgToGUI()
     ui->nedInbox->setText(C(cfg.storage.inbox));
     ui->nedOutbox->setText(C(cfg.storage.gateway));
 
-
     // 1.2 Environment
     ui->edUser->setText(qgetenv("USER"));
     ui->edHost->setText(QHostInfo::localHostName());
@@ -671,31 +715,43 @@ void ConfigTool::transferCfgToGUI()
     ModelView * mvHosts = createTableModelView(ui->tblviewHosts, hostsTable, hdr);
     (void)(mvHosts);
 
-    // 3. PRODUCTS & PROCESSORS
-    /*
-    // 3.1 Products
+    hdr.clear();
+    hdr << "Swarm name" << "Manager" << "Workers" << "Scale" << "Image" << "Exec" << "Args";
+    ModelView * mvSwarms = createTableModelView(ui->tblviewSwarms, swarmsTable, hdr);
+    (void)(mvSwarms);
+
+    // 3. DATABASE
+    ui->edDBHost->setText(C(cfg.db.host()));
+    ui->edDBPort->setText(C(cfg.db.port()));
+    ui->edDBName->setText(C(cfg.db.name()));
+    ui->edDBUser->setText(C(cfg.db.user()));
+    ui->edDBPwd->setText(C(cfg.db.pwd()));
+
+    // 4. PRODUCTS & PROCESSORS
+    
+    // 4.1 Products
     data.clear();
-    for (auto & s : cfg.orcParams.productTypes) data << QS(s);
+    for (auto & s : cfg.products.productTypes()) { data << QS(s); }
     ModelView * mvPT = createListModelView(ui->listProductTypes, data, "Product Type");
     (void)(mvPT);
 
-    // 3.2 Processors
+    // 4.2 Processors
     data.clear();
-    for (auto & kv : cfg.orcParams.processors) data << QS(kv.first);
-    ModelView * mvProcs = createListModelView(ui->listProcs, data, "Processors");
+    for (auto & kv : cfg.orchestration.processors()) { data << QS(kv.first); }
+    ModelView * mvProcs = createListModelView(ui->listProcs, data, "Processor Name");
     (void)(mvProcs);
-    */
-    // 4. RULES
+    
+    // 5. RULES
     hdr.clear();
     hdr << "Rule name" << "Inputs" << "Condition" << "Processor" << "Outputs";
     ModelView * mvRules = createTableModelView(ui->tblviewRules, rulesTable, hdr);
     (void)(mvRules);
 
-    // 5. USER DEFINED TOOLS
+    // 6. USER DEFINED TOOLS
 
     // Already set
 
-    // 6. FLAGS
+    // 7. FLAGS
     transferFlagsFromCfgToGUI();
 
 }

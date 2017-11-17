@@ -677,10 +677,6 @@ void HttpServer::config(Request &request, StreamResponse &response)
         for (auto & s : cfg.flags.msgsToDisk()) { wc.addHTML(s + "<br>\n"); }
         wc.addHTML("</td></tr>\n");
 
-        wc.addHTML("<tr><td id=\"heading\">MsgsToDB:</td><td>");
-        for (auto & s : cfg.flags.msgsToDb()) { wc.addHTML(s + "<br>\n"); }
-        wc.addHTML("</td></tr>\n");
-        
         wc.begTRow();
         wc.addHCell("NotifyMsgArrival");
         wc.addTCell((cfg.flags.notifyMsgArrival() ? "YES" : "NO"));

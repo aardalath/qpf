@@ -46,7 +46,8 @@ void ScalabilityProtocolRole::setMsgOut(MessageString m)
 {
     if (readyToGo) {
         sck->send((void*)(m.c_str()), m.size(), 0);
-        //TRC("++ Sending msg. " << m);
+        //TRC("++ Sending " << std::to_string(m.length()) 
+        //    << " bytes msg. <<<" << m << ">>>");
     }
 }
 
@@ -115,21 +116,16 @@ int ScalabilityProtocolRole::getevents(int s, int events, int timeout)
 {
     int rc;
     fd_set pollset;
-#if defined NN_HAVE_WINDOWS
-    SOCKET rcvfd;
-    SOCKET sndfd;
-#else
     int rcvfd;
     int sndfd;
     int maxfd;
-#endif
+
     size_t fdsz;
     struct timeval tv;
     int revents;
 
-#if !defined NN_HAVE_WINDOWS
     maxfd = 0;
-#endif
+
     FD_ZERO(&pollset);
 
     if (events & NN_IN) {
@@ -138,9 +134,8 @@ int ScalabilityProtocolRole::getevents(int s, int events, int timeout)
         errno_assert(rc == 0);
         nn_assert(fdsz == sizeof(rcvfd));
         FD_SET(rcvfd, &pollset);
-#if !defined NN_HAVE_WINDOWS
+
         if (rcvfd + 1 > maxfd) { maxfd = rcvfd + 1; }
-#endif
     }
 
     if (events & NN_OUT) {
@@ -149,22 +144,17 @@ int ScalabilityProtocolRole::getevents(int s, int events, int timeout)
         errno_assert(rc == 0);
         nn_assert(fdsz == sizeof(sndfd));
         FD_SET(sndfd, &pollset);
-#if !defined NN_HAVE_WINDOWS
+
         if (sndfd + 1 > maxfd) { maxfd = sndfd + 1; }
-#endif
     }
 
     if (timeout >= 0) {
         tv.tv_sec = timeout / 1000;
         tv.tv_usec = (timeout % 1000) * 1000;
     }
-#if defined NN_HAVE_WINDOWS
-    rc = select(0, &pollset, 0, 0, timeout < 0 ? 0 : &tv);
-    wsa_assert(rc != SOCKET_ERROR);
-#else
     rc = select(maxfd, &pollset, 0, 0, timeout < 0 ? 0 : &tv);
     errno_assert(rc >= 0);
-#endif
+
     revents = 0;
 
     if ((events & NN_IN) && FD_ISSET(rcvfd, &pollset))  { revents |= NN_IN; }

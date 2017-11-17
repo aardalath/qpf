@@ -4,7 +4,7 @@
 --
 -- Version:  2.0
 --
--- Date:     2017/07/28
+-- Date:     2017/11/14
 --
 -- Author:   J C Gonzalez
 --
@@ -352,6 +352,7 @@ CREATE TABLE tasks_info (
     id integer NOT NULL,
     task_id character varying(128) NOT NULL,
     task_status_id integer,
+    task_progress integer,
     task_exitcode integer,
     task_path character varying(1024),
     task_size integer,

@@ -245,17 +245,18 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 
     ss.str("");
     ss << "INSERT INTO tasks_info "
-       << "(task_id, task_status_id, task_exitcode, task_path, "
-       << "task_size, registration_time, task_data) "
+       << "(task_id, task_status_id, task_progress, task_exitcode, "
+       << "task_path, task_size, registration_time, start_time, task_data) "
        << "VALUES ("
        << str::quoted(task.taskName()) << ", "
        << task.taskStatus() << ", "
+       << 0 << ", "
        << task.taskExitCode() << ", "
        << str::quoted(taskPath) << ", "
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
+       << str::quoted(task.taskStart()) << ", "
        << str::quoted(taskData) << ")";
-    //TRC("PSQL> " << ss.str());
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 
@@ -307,15 +308,24 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     }
 
     if (result) {
+        TaskStatus taskStatus = TaskStatus(task.taskStatus());
         updates.clear();
-        updates.push_back(eqKeyValue("task_status_id", (int)(task.taskStatus())));
-        updates.push_back(eqKeyValue("start_time", task.taskStart()));
-        if (!task.taskEnd().empty()) {
-            updates.push_back(eqKeyValue("end_time", task.taskEnd()));
-        }
-        updates.push_back(eqKeyValue("task_path", task.taskPath())); 
-        updates.push_back(eqKeyValue("task_data", task["taskData"]));
-        
+        updates.push_back(eqKeyValue("task_status_id", (int)(taskStatus)));
+        updates.push_back(eqKeyValue("task_progress", 
+				     taskData["State"]["Progress"].asString()));
+	
+	bool isFinished = ((taskStatus == TASK_STOPPED) ||
+			   (taskStatus == TASK_FAILED) ||
+			   (taskStatus == TASK_FINISHED) ||
+			   (taskStatus == TASK_UNKNOWN_STATE));
+	//if (isFinished) {
+	    updates.push_back(eqKeyValue("start_time", task.taskStart()));
+	    if (!task.taskEnd().empty()) {
+	        updates.push_back(eqKeyValue("end_time", task.taskEnd()));
+	    }
+	    updates.push_back(eqKeyValue("task_path", task.taskPath())); 
+	    updates.push_back(eqKeyValue("task_data", task["taskData"]));
+	    //}
         result &= updateTable("tasks_info",
                               eqKeyValue("task_id", id),
                               updates);

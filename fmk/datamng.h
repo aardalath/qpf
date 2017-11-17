@@ -110,14 +110,9 @@ protected:
     virtual void processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: processTskRepDistMsg
+    // Method: processTskRegMsg
     //----------------------------------------------------------------------
-    virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
-    // Method: processHostMonMsg
-    //----------------------------------------------------------------------
-    virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
+    virtual void processTskRegMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 protected:
 
@@ -140,6 +135,12 @@ protected:
     // Save the information on generated output products to the archive
     //----------------------------------------------------------------------
     void saveTaskToDB(MessageString & msg, bool initialStore = false);
+
+    //----------------------------------------------------------------------
+    // Method: saveTaskToDB
+    // Save the information on generated output products to the archive
+    //----------------------------------------------------------------------
+    void saveTaskToDB(TaskInfo & taskInfo, bool initialStore = false);
 
     //----------------------------------------------------------------------
     // Method: sanitizeProductVersions

@@ -147,11 +147,6 @@ protected:
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: processTskRepDistMsg
-    //----------------------------------------------------------------------
-    virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
     // Method: processFmkMonMsg
     //----------------------------------------------------------------------
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m);

@@ -141,6 +141,11 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
 bool ContainerMng::getInfo(std::string id, std::stringstream & info)
 {
     procxx::process cntInspect("docker", "inspect");
+    std::string fmt = info.str();
+    if (fmt.length() > 0) {
+        cntInspect.add_argument("--format");
+        cntInspect.add_argument(fmt);
+    }
     cntInspect.add_argument(id);
     cntInspect.exec();
 

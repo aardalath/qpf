@@ -216,7 +216,7 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
                     
         // Build HMICmd answer
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
-                     compName, "*",
+                     compName, "HMIProxy",
                      "", "", "");
         body["ans"] = "OK";
         
@@ -230,34 +230,6 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     msg.buildBody(body);
 
     this->send(ChnlHMICmd, msg.str());
-}
-
-//----------------------------------------------------------------------
-// Method: processTskRepDistMsg
-//----------------------------------------------------------------------
-void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"]);
-
-    std::string taskName  = task.taskName();
-    TaskStatus taskStatus = TaskStatus(task.taskStatus());
-}
-
-//----------------------------------------------------------------------
-// Method: processHostMonMsg
-//----------------------------------------------------------------------
-void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    JValue hostInfoData(body["info"]);
-
-    HostInfo hostInfo;
-    hostInfo.fromStr(hostInfoData.str());
-    
-    TraceMsg(hostInfo.dump() + "\n");
 }
 
 //}

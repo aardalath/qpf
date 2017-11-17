@@ -18,9 +18,9 @@
         T(TSKPROC),                             \
         T(TSKRQST),                             \
         T(TSKREP),                              \
+        T(TSKREG),                              \
         T(HOSTMON),                             \
-        T(FMKMON),                              \
-        T(TSKREPDIST)
+        T(FMKMON),                              
 
 #define T(x) TX_ID_ ## x
 enum TxId { TLISTOF_TX_IDS };
@@ -38,6 +38,22 @@ const ChannelDescriptor ChnlTskSched   (ChannelAcronym[TX_ID_TSKSCHED]);
 const ChannelDescriptor ChnlTskProc    (ChannelAcronym[TX_ID_TSKPROC]);
 //const ChannelDescriptor ChnlTskRqst    (ChannelAcronym[TX_ID_TSKRQST]);
 //const ChannelDescriptor ChnlTskRep     (ChannelAcronym[TX_ID_TSKREP]);
-const ChannelDescriptor ChnlTskRepDist (ChannelAcronym[TX_ID_TSKREPDIST]);
+const ChannelDescriptor ChnlTskReg     (ChannelAcronym[TX_ID_TSKREG]);
+const ChannelDescriptor ChnlFmkMon     (ChannelAcronym[TX_ID_FMKMON]);
+
+enum Message_Tag {
+    Tag_ChnlCmd      = 0b0000000000000001,
+    Tag_ChnlEvtMng   = 0b0000000000000010,
+    Tag_ChnlHMICmd   = 0b0000000000000100,
+    Tag_ChnlInData   = 0b0000000000001000,
+    Tag_ChnlTskSched = 0b0000000000010000,
+    Tag_ChnlTskReg   = 0b0000000000100000,
+    Tag_ChnlFmkMon   = 0b0000000001000000,
+    Tag_MsgTskRqst   = 0b0000000010000000,
+    Tag_MsgTskProc   = 0b0000000100000000,
+    Tag_MsgTskRep    = 0b0000001000000000,
+    Tag_MsgHostMon   = 0b0000010000000000,
+    Tag_UNKNOWN      = 0b1000000000000000,
+};    
 
 #endif

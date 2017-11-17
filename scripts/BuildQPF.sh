@@ -350,18 +350,18 @@ if [ "${INSTALL}" == "yes" ]; then
 
     cd "${BUILD_PATH}"
     make install
-    ln -s ${WORK_AREA}/qpf/bin/qpfcore ${WORK_AREA}/qpf/bin/qpf
+    ln -sf ${WORK_AREA}/qpf/bin/qpfcore ${WORK_AREA}/qpf/bin/qpf
     if [ "${HMI}" == "yes" ]; then
-        ln -s ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
+        ln -sf ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
     fi
 
     install_scpt RunQPF.sh
 
-    QPF_INI="${RUN_PATH}/QPFHMI.conf"
-    if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
-        mkdir -p ${HOME}/.config/QPF
-        cp "${QPF_INI}" ${HOME}/.config/QPF
-    fi
+    #QPF_INI="${RUN_PATH}/QPFHMI.conf"
+    #if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
+    #    mkdir -p ${HOME}/.config/QPF
+    #    cp "${QPF_INI}" ${HOME}/.config/QPF
+    #fi
 fi
 
 ## Creating initial config file for current host

@@ -72,7 +72,7 @@ const std::string TskAge::ProcStatusName[] { TLIST_PSTATUS };
 const int HOST_INFO_TIMER            = 10000;
 
 const int MAX_WAITING_CYCLES         = 50;
-const int IDLE_CYCLES_BEFORE_REQUEST = 50;
+const int IDLE_CYCLES_BEFORE_REQUEST = 1;
 
 //----------------------------------------------------------------------
 // Constructor
@@ -133,9 +133,13 @@ void TskAge::fromRunningToOperational()
     }
 
     numTask = 0;
-    runningTask = 0;
 
     isTaskRequestActive = true;
+
+    prevTaskStatus = TASK_UNKNOWN_STATE;
+    prevProgress = -1;
+    prevInspStatus = "";
+    prevInspCode = -127;
 
     // Get initial values for Host Info structure
     hostInfo.hostIp = compAddress;
@@ -216,13 +220,7 @@ void TskAge::runEachIterationForContainers()
     // Update status for running containers
     for (auto const & kv : containerEpoch) {
         std::string contId = kv.first;
-        // Send new update on container info, unless it is too old
-        //        if ((time(0) - kv.second) < cfg.MaxContainerAge) {
-            sendTaskReport(contId);
-            //} else {
-            //containerToTaskMap.erase(containerToTaskMap.find(contId));
-            //containerEpoch.erase(containerEpoch.find(contId));
-            // }
+        sendTaskReport(contId);
     }
 
 }
@@ -261,11 +259,11 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     // Return if not recipient
     if (msg.header.target() != compName) { return; }
 
-    if (pStatus != WAITING) { return; }
+    if ((pStatus != WAITING) && (pStatus != IDLE)) { return; }
 
     // Define and set task object
     MsgBodyTSK & body = msg.body;
-    runningTask = new TaskInfo(body["info"]);
+    TaskInfo * runningTask = new TaskInfo(body["info"]);
     TaskInfo & task = (*runningTask);
 
     task["taskHost"]  = compAddress;
@@ -338,7 +336,6 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         WarnMsg("Couldn't execute docker container");
         
         delete runningTask;
-        runningTask = 0;
 
         pStatus = IDLE;
         InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
@@ -351,7 +348,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskAge::processSubcmdMsg(MessageString & m)
 {
-    DbgMsg("Sub-command message received: " + m);
+    TRC("Sub-command message received: " + m);
 
     Message<MsgBodyTSK> msg(m);
 
@@ -434,11 +431,6 @@ void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
 //----------------------------------------------------------------------
 void TskAge::sendTaskReport(std::string contId)
 {
-    static TaskStatus  prevTaskStatus(TASK_UNKNOWN_STATE);
-    static int         prevProgress(-1);
-    static std::string prevInspStatus("");
-    static int         prevInspCode(-127);
-        
     // Define and set task object
     auto const & itTaskInfo = containerToTaskMap.find(contId);
     if (itTaskInfo == containerToTaskMap.end()) { return; }
@@ -448,49 +440,21 @@ void TskAge::sendTaskReport(std::string contId)
         (task.taskStatus() == TASK_FINISHED)) { return; }
 
     // Get updated Docker info
-    std::stringstream info;
-    while (!dckMng->getInfo(contId, info)) {}
+    json taskData = retrieveDockerInfo(contId, false);
 
-    JValue jinfo(info.str());
-    json taskData = jinfo.val()[0];
+    std::string inspStatus = taskData["State"]["Status"].asString();
+    int         inspCode   = taskData["State"]["ExitCode"].asInt();
 
-    // Clean-up sections not needed
-    json removedItem;
-    for (auto & sec : {"AppArmorProfile", "HostsPath", "RestartCount",
-                "ExecIDs", "ResolvConfPath", "LogPath", "HostnamePath", "Driver",
-                "GraphDriver", "NetworkSettings", "Config", "HostConfig"}) {        
-        taskData.removeMember(sec, &removedItem);
-    }
+    taskStatus = computeTaskStatus(inspStatus, inspCode);
 
-    // Once taskData is clean, include in the task structure
-    task["taskData"] = taskData;
+    bool taskHasEnded = taskEnded(taskStatus);
 
-    json jstate = taskData["State"];
-    std::string inspStatus = jstate["Status"].asString();
-    int         inspCode   = jstate["ExitCode"].asInt();
-
-    if        (inspStatus == "running") {
-        taskStatus = TASK_RUNNING;
-    } else if (inspStatus == "paused") {
-        taskStatus = TASK_PAUSED;
-    } else if (inspStatus == "created") {
-        taskStatus = TASK_STOPPED;
-    } else if (inspStatus == "dead") {
-        taskStatus = TASK_STOPPED;
-    } else if (inspStatus == "exited") {
-        taskStatus = (inspCode == 0) ? TASK_FINISHED : TASK_FAILED;
-    } else {
-        taskStatus = TASK_UNKNOWN_STATE;
-    }
-
-    if ((taskStatus == TASK_STOPPED) ||
-        (taskStatus == TASK_FAILED) ||
-        (taskStatus == TASK_FINISHED) ||
-        (taskStatus == TASK_UNKNOWN_STATE)) {
+    if (taskHasEnded) {
         InfoMsg("Task container monitoring finished");
-        if (taskStatus == TASK_FINISHED) {
-            endProgress();
+        if (taskStatus == TASK_FINISHED) { 
+            endProgress(); 
         }
+        taskData = retrieveDockerInfo(contId, true);
     } else {
         workingDuring++;
         updateProgress();
@@ -508,37 +472,95 @@ void TskAge::sendTaskReport(std::string contId)
     prevInspCode   = inspCode;
 
     // Update progress
-    task["taskData"]["State"]["Progress"] = std::to_string(progress);
+    taskData["State"]["Progress"] = std::to_string(progress);
 
     // Put declared status in task info structure...
     // ... and add it as well to the taskData JSON structure
     task["taskStatus"] = taskStatus;
-    task["taskData"]["State"]["TaskStatus"] = taskStatus;
-
-    if (taskStatus == TASK_FINISHED) {
-        transferOutputProducts(task);
-    }
+    taskData["State"]["TaskStatus"] = taskStatus;
 
     // Include additional info
     json addInfo;
     addInfo["TaskName"] = task.taskName();
     addInfo["Agent"]    = compName;
     addInfo["Proc"]     = task.taskPath();
-    task["taskData"]["Info"] = addInfo;
+    taskData["Info"] = addInfo;
     
+    // Place all taskdata information into task structure
+    task["taskData"] = taskData;
+
+    if (taskStatus == TASK_FINISHED) {
+        transferOutputProducts(task);
+    }
+
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
                              ChnlTskProc + "_" + compName, MsgTskRep,
                              compName, "TskMng",
                              "info", task.str(),
                              origMsgString);
 
-    if ((taskStatus == TASK_STOPPED) ||
-        (taskStatus == TASK_FAILED) ||
-        (taskStatus == TASK_FINISHED) ||
-        (taskStatus == TASK_UNKNOWN_STATE)) {
+    if (taskHasEnded) {
         pStatus = FINISHING;
         InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+        
+        containerToTaskMap.erase(containerToTaskMap.find(contId));
+        containerEpoch.erase(containerEpoch.find(contId));
     }
+    
+}
+
+//----------------------------------------------------------------------
+// Method: computeTaskStatus
+//----------------------------------------------------------------------
+TaskStatus TskAge::computeTaskStatus(std::string & inspStatus, int & inspCode)
+{
+    if        (inspStatus == "running") {
+        return TASK_RUNNING;
+    } else if (inspStatus == "paused") {
+        return TASK_PAUSED;
+    } else if (inspStatus == "created") {
+        return TASK_STOPPED;
+    } else if (inspStatus == "dead") {
+        return TASK_STOPPED;
+    } else if (inspStatus == "exited") {
+        return (inspCode == 0) ? TASK_FINISHED : TASK_FAILED;
+    } else {
+        return TASK_UNKNOWN_STATE;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: taskEnded
+//----------------------------------------------------------------------
+bool TskAge::taskEnded(TaskStatus & taskStatus)
+{
+    return ((taskStatus == TASK_STOPPED) ||
+            (taskStatus == TASK_FAILED) ||
+            (taskStatus == TASK_FINISHED) ||
+            (taskStatus == TASK_UNKNOWN_STATE));
+}
+
+//----------------------------------------------------------------------
+// Method: retrieveDockerInfo
+//----------------------------------------------------------------------
+json TskAge::retrieveDockerInfo(std::string & contId, bool fullInfo)
+{
+    static std::string inspectSelection("{\"Id\":{{json .Id}},"
+                                        "\"State\":{{json .State}},"
+                                        "\"Path\":{{json .Path}},"
+                                        "\"Args\":{{json .Args}}}");
+    std::stringstream info;
+    bool ok = true;
+    do {
+        if (fullInfo) {
+            info.str(""); 
+        } else {
+            info.str(inspectSelection);
+        }
+        ok = dckMng->getInfo(contId, info);
+    } while (! ok);
+
+    return ((fullInfo) ? JValue(info.str()).val()[0] : JValue(info.str()).val());
 }
 
 //----------------------------------------------------------------------

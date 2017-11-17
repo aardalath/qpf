@@ -154,6 +154,12 @@ private:
     void armProcFmkInfoMsgTimer();
 
     //----------------------------------------------------------------------
+    // Method: armTskRepMsgTimer
+    // Arm new timer for sending Task Report messages
+    //----------------------------------------------------------------------
+    void armTskRepMsgTimer();
+
+    //----------------------------------------------------------------------
     // Method: convertTaskStatusToSpectra
     // Convert set of status for an agent to a spectra tuple
     //----------------------------------------------------------------------
@@ -166,24 +172,24 @@ private:
                        std::string agName);
 
     //----------------------------------------------------------------------
-    // Method: sendTskRepDistMsg
-    // Send a HostInfo message to EvtMng/QPFHMI/DataMng
-    //----------------------------------------------------------------------
-    bool sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType);
-
-    //----------------------------------------------------------------------
     // Method: sendProcFmkInfoUpdate
     // Send an update on the ProcessingFrameworkInfo structure
     //----------------------------------------------------------------------
     void sendProcFmkInfoUpdate();
+    
+    //----------------------------------------------------------------------
+    // Method: sendTskRepMsgUpdate
+    // Send an update on the Task Report information
+    //----------------------------------------------------------------------
+    void sendTskRepMsgUpdate();
 
 private:
     typedef std::pair<std::string, TaskStatus>  TaskStatusPerAgent;
     std::vector<std::string>         agents;
     std::map<std::string, AgentInfo> agentInfo;
 
-    std::list<TaskInfo>              serviceTasks;
-    std::list<TaskInfo>              containerTasks;
+    std::list<TaskInfo> serviceTasks;
+    std::list<TaskInfo> containerTasks;
 
     typedef std::map<std::string, TaskInfo>  RuleTagInputs;
 
@@ -193,6 +199,7 @@ private:
     std::map<TaskStatus, int> serviceTaskStatus;
 
     std::map<TaskStatusPerAgent, int> containerTaskStatusPerAgent;
+    std::map<std::string, MessageString> containerTaskLastMessage;
 
     HttpServer * httpSrv;
 
@@ -200,6 +207,10 @@ private:
 
     bool sendingPeriodicFmkInfo;
 
+    std::mutex mtxTskRegMsg;
+
+    bool sendingTskRegInfo;
+    std::map<std::string, std::string> tskRegMsgs;
 };
 
 //}

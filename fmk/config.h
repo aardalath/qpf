@@ -235,8 +235,8 @@ public:
     CfgGrpFlags() {}
     CfgGrpFlags(json v) : JRecord(v) {}
     virtual void dump() {
+        DUMPJSTR(writeMsgsToDisk);
         DUMPJSTRVEC(msgsToDisk);
-        DUMPJSTRVEC(msgsToDb);
         DUMPJBOOL(notifyMsgArrival);
         DUMPJBOOL(groupTaskAgentLogs);
         DUMPJBOOL(allowReprocessing);
@@ -244,8 +244,8 @@ public:
         DUMPJBOOL(sendOutputsToMainArchive);
         DUMPJSTR(progressString);
     }
+    JSTR(writeMsgsToDisk);
     JSTRVEC(msgsToDisk);
-    JSTRVEC(msgsToDb);
     JBOOL(notifyMsgArrival);
     JBOOL(groupTaskAgentLogs);
     JBOOL(allowReprocessing);

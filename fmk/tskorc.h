@@ -77,7 +77,7 @@ class TskOrc : public Component {
 public:
     struct Rule {
         std::string              name;
-        std::string              tag;
+        //std::string              tag;
         std::vector<std::string> inputs;
         std::vector<std::string> outputs;
         std::string              processingElement;

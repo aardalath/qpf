@@ -100,7 +100,7 @@
           <bool>false</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -126,7 +126,33 @@
           <bool>true</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="tbtnDB">
+         <property name="styleSheet">
+          <string notr="true">QPushButton { text-align: left; padding: 5px; }</string>
+         </property>
+         <property name="text">
+          <string>Database</string>
+         </property>
+         <property name="icon">
+          <iconset resource="configtool.qrc">
+           <normaloff>:/img/img/storage.png</normaloff>:/img/img/storage.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>48</width>
+           <height>48</height>
+          </size>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -153,7 +179,7 @@ Processors</string>
           <bool>true</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -179,7 +205,7 @@ Processors</string>
           <bool>true</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -205,7 +231,7 @@ Processors</string>
           <bool>true</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -231,7 +257,7 @@ Processors</string>
           <bool>true</bool>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">btngrpSection</string>
+          <string notr="true">btngrpCfgSections</string>
          </attribute>
         </widget>
        </item>
@@ -259,7 +285,7 @@ Processors</string>
         <enum>QFrame::Raised</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>6</number>
        </property>
        <widget class="QWidget" name="pageGeneral">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -797,75 +823,289 @@ Processors</string>
            <item>
             <widget class="QGroupBox" name="gpboxHosts">
              <property name="title">
-              <string>Host machines</string>
+              <string>Host machines &amp; Swarms Network</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_6">
-              <property name="spacing">
-               <number>0</number>
-              </property>
+             <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1000,1">
               <item>
-               <widget class="QTableView" name="tblviewHosts">
-                <property name="dragEnabled">
-                 <bool>true</bool>
+               <widget class="QSplitter" name="splitter">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="dragDropOverwriteMode">
-                 <bool>false</bool>
-                </property>
-                <property name="dragDropMode">
-                 <enum>QAbstractItemView::InternalMove</enum>
-                </property>
-                <property name="defaultDropAction">
-                 <enum>Qt::TargetMoveAction</enum>
-                </property>
-                <property name="alternatingRowColors">
-                 <bool>true</bool>
-                </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::SingleSelection</enum>
-                </property>
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="gridStyle">
-                 <enum>Qt::SolidLine</enum>
-                </property>
+                <widget class="QWidget" name="">
+                 <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <item>
+                   <widget class="QLabel" name="label_2">
+                    <property name="text">
+                     <string>Container Hosts</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTableView" name="tblviewHosts">
+                    <property name="dragEnabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="dragDropOverwriteMode">
+                     <bool>false</bool>
+                    </property>
+                    <property name="dragDropMode">
+                     <enum>QAbstractItemView::InternalMove</enum>
+                    </property>
+                    <property name="defaultDropAction">
+                     <enum>Qt::TargetMoveAction</enum>
+                    </property>
+                    <property name="alternatingRowColors">
+                     <bool>true</bool>
+                    </property>
+                    <property name="selectionMode">
+                     <enum>QAbstractItemView::SingleSelection</enum>
+                    </property>
+                    <property name="selectionBehavior">
+                     <enum>QAbstractItemView::SelectRows</enum>
+                    </property>
+                    <property name="gridStyle">
+                     <enum>Qt::SolidLine</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_18">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="btnAddHost">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Add new host to list</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="configtool.qrc">
+                        <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnRemoveHost">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Remove host from list</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="configtool.qrc">
+                        <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_9">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="">
+                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <item>
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>Swarms</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTableView" name="tblviewSwarms">
+                    <property name="dragEnabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="dragDropOverwriteMode">
+                     <bool>false</bool>
+                    </property>
+                    <property name="dragDropMode">
+                     <enum>QAbstractItemView::InternalMove</enum>
+                    </property>
+                    <property name="defaultDropAction">
+                     <enum>Qt::TargetMoveAction</enum>
+                    </property>
+                    <property name="alternatingRowColors">
+                     <bool>true</bool>
+                    </property>
+                    <property name="selectionMode">
+                     <enum>QAbstractItemView::SingleSelection</enum>
+                    </property>
+                    <property name="selectionBehavior">
+                     <enum>QAbstractItemView::SelectRows</enum>
+                    </property>
+                    <property name="gridStyle">
+                     <enum>Qt::SolidLine</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_19">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="btnAddSwarm">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Add new host to list</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="configtool.qrc">
+                        <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnRemoveSwarm">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>18</width>
+                        <height>18</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Remove host from list</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="configtool.qrc">
+                        <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_11">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_18">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
-                 <widget class="QPushButton" name="btnAddHost">
-                  <property name="toolTip">
-                   <string>Add new host to list</string>
-                  </property>
+                 <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="configtool.qrc">
-                    <normaloff>:/img/img/plus.png</normaloff>:/img/img/plus.png</iconset>
+                   <string>Communications starting port number:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="btnRemoveHost">
-                  <property name="toolTip">
-                   <string>Remove host from list</string>
+                 <widget class="QSpinBox" name="spboxStartingPort">
+                  <property name="minimum">
+                   <number>1000</number>
                   </property>
-                  <property name="text">
-                   <string/>
+                  <property name="maximum">
+                   <number>65000</number>
                   </property>
-                  <property name="icon">
-                   <iconset resource="configtool.qrc">
-                    <normaloff>:/img/img/minus.png</normaloff>:/img/img/minus.png</iconset>
+                  <property name="singleStep">
+                   <number>10</number>
+                  </property>
+                  <property name="value">
+                   <number>50000</number>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer_9">
+                 <spacer name="horizontalSpacer_4">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -883,6 +1123,277 @@ Processors</string>
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page">
+        <layout class="QVBoxLayout" name="verticalLayout_24">
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Database</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,10,20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="applicationNameLabel_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>180</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Server Host</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edDBHost">
+                <property name="echoMode">
+                 <enum>QLineEdit::Normal</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,10,20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lastAccessLabel_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>180</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Port number</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edDBPort">
+                <property name="echoMode">
+                 <enum>QLineEdit::Normal</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="10,10,20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lastAccessLabel_3">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>180</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Database name</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edDBName">
+                <property name="echoMode">
+                 <enum>QLineEdit::Normal</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="10,10,20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lastAccessLabel_4">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>180</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>User name</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edDBUser">
+                <property name="echoMode">
+                 <enum>QLineEdit::Normal</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="10,10,20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lastAccessLabel_5">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>180</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Password</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edDBPwd">
+                <property name="echoMode">
+                 <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_15">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>282</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -1253,7 +1764,7 @@ Processors</string>
          <item>
           <widget class="QGroupBox" name="groupBox_3">
            <property name="title">
-            <string>Monitoring</string>
+            <string>Monitoring flags</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="50,50">
             <item>
@@ -1263,11 +1774,14 @@ Processors</string>
                 <property name="title">
                  <string>Write internal messages to disk</string>
                 </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_15">
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsINDATAToDisk">
+                  <widget class="QCheckBox" name="chkCmd">
                    <property name="text">
-                    <string>Write INDATA messages</string>
+                    <string>Internal command messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1275,9 +1789,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsDATARQSTToDisk">
+                  <widget class="QCheckBox" name="chkEvtMngCmd">
                    <property name="text">
-                    <string>Write DATA_RQST messages</string>
+                    <string>Event manager notifications</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1285,9 +1799,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsDATAINFOToDisk">
+                  <widget class="QCheckBox" name="chkHmiCmd">
                    <property name="text">
-                    <string>Write DATA_INFO messages</string>
+                    <string>HMI command &amp;&amp; requests</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1295,9 +1809,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsMONITRQSTToDisk">
+                  <widget class="QCheckBox" name="chkInData">
                    <property name="text">
-                    <string>Write MONIT_RQST messages</string>
+                    <string>Incoming product events</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1305,9 +1819,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsMONITINFOToDisk">
+                  <widget class="QCheckBox" name="chkTskSched">
                    <property name="text">
-                    <string>Write MONIT_INFO messages</string>
+                    <string>Task Scheduling messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1315,9 +1829,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsTASKPROCToDisk">
+                  <widget class="QCheckBox" name="chkTskReg">
                    <property name="text">
-                    <string>Write TASK_PROC messages</string>
+                    <string>Task Registration messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1325,9 +1839,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsTASKRESToDisk">
+                  <widget class="QCheckBox" name="chkTskRqst">
                    <property name="text">
-                    <string>Write TASK_RES messages</string>
+                    <string>Task Requests messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1335,9 +1849,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsSTARTToDisk">
+                  <widget class="QCheckBox" name="chkTskProc">
                    <property name="text">
-                    <string>Write START messages</string>
+                    <string>Task Processing messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1345,9 +1859,9 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsSTOPToDisk">
+                  <widget class="QCheckBox" name="chkTskRep">
                    <property name="text">
-                    <string>Write STOP messages</string>
+                    <string>Task Reporting messages</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1355,9 +1869,19 @@ Processors</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsCMDToDisk">
+                  <widget class="QCheckBox" name="chkFmkMon">
                    <property name="text">
-                    <string>Write CMD messages</string>
+                    <string>Framework Monitoring information</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="chkHostMon">
+                   <property name="text">
+                    <string>Host information data</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1365,16 +1889,6 @@ Processors</string>
                   </widget>
                  </item>
                 </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chkMsgsIncommingInLog">
-                <property name="text">
-                 <string>Show message arrival in logs</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
                </widget>
               </item>
              </layout>
@@ -1384,103 +1898,13 @@ Processors</string>
               <item>
                <widget class="QGroupBox" name="grpboxWriteMsgsDisk_2">
                 <property name="title">
-                 <string>Store internal messages in DB</string>
+                 <string>Additional message-related flags</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_16">
                  <item>
-                  <widget class="QCheckBox" name="chkMsgsINDATAToDisk_2">
+                  <widget class="QCheckBox" name="chkMsgsIncommingInLog">
                    <property name="text">
-                    <string>Store INDATA messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsDATARQSTToDisk_2">
-                   <property name="text">
-                    <string>Store DATA_RQST messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsDATAINFOToDisk_2">
-                   <property name="text">
-                    <string>Store DATA_INFO messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsMONITRQSTToDisk_2">
-                   <property name="text">
-                    <string>Store MONIT_RQST messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsMONITINFOToDisk_2">
-                   <property name="text">
-                    <string>Store MONIT_INFO messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsTASKPROCToDisk_2">
-                   <property name="text">
-                    <string>Store TASK_PROC messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsTASKRESToDisk_2">
-                   <property name="text">
-                    <string>Store TASK_RES messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsSTARTToDisk_2">
-                   <property name="text">
-                    <string>Store START messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsSTOPToDisk_2">
-                   <property name="text">
-                    <string>Store STOP messages</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkMsgsCMDToDisk_2">
-                   <property name="text">
-                    <string>Store CMD messages</string>
+                    <string>Show message arrival in logs</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1491,79 +1915,80 @@ Processors</string>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="chkGroupTskAgentLogs">
-                <property name="text">
-                 <string>Group Task Agents logs (still not implemented)</string>
+               <widget class="QGroupBox" name="groupBox_4">
+                <property name="title">
+                 <string>Processing</string>
                 </property>
+                <layout class="QVBoxLayout" name="verticalLayout_13">
+                 <item>
+                  <widget class="QCheckBox" name="chkAllowReproc">
+                   <property name="text">
+                    <string>Allow products reprocessing</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="chkGenerateIntermedProd">
+                   <property name="text">
+                    <string>Activate intermediate products (still not implemented)</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_6">
+                <property name="title">
+                 <string>Archiving</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <item>
+                  <widget class="QCheckBox" name="chkSendOutputsToArchive">
+                   <property name="text">
+                    <string>Send generated output products to Central Archive</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_8">
+                <property name="title">
+                 <string>HMI</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_20">
+                 <item>
+                  <widget class="QCheckBox" name="chkGroupTskAgentLogs">
+                   <property name="text">
+                    <string>Group Task Agents logs (still not implemented)</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
            </layout>
           </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="50,50">
-           <item>
-            <widget class="QGroupBox" name="groupBox_4">
-             <property name="title">
-              <string>Processing</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_13">
-              <item>
-               <widget class="QCheckBox" name="chkAllowReproc">
-                <property name="text">
-                 <string>Allow products reprocessing</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chkGenerateIntermedProd">
-                <property name="text">
-                 <string>Activate intermediate products (still not implemented)</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_20">
-             <item>
-              <widget class="QGroupBox" name="groupBox_6">
-               <property name="title">
-                <string>Archiving</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_19">
-                <item>
-                 <widget class="QCheckBox" name="chkSendOutputsToArchive">
-                  <property name="text">
-                   <string>Send generated output products to Central Archive</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>1</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-          </layout>
          </item>
          <item>
           <spacer name="verticalSpacer_5">
@@ -1687,30 +2112,14 @@ Processors</string>
    </hints>
   </connection>
   <connection>
-   <sender>btngrpSection</sender>
-   <signal>buttonClicked(int)</signal>
-   <receiver>gpboxProc</receiver>
-   <slot>setCurrentIndex(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>439</x>
-     <y>246</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnAddNewUdefTool</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
    <slot>addNewTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>224</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1725,8 +2134,8 @@ Processors</string>
    <slot>editTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>293</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>941</x>
@@ -1741,8 +2150,8 @@ Processors</string>
    <slot>removeTool()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>252</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>925</x>
@@ -1757,8 +2166,8 @@ Processors</string>
    <slot>editTool(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>220</x>
-     <y>70</y>
+     <x>416</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel">
      <x>517</x>
@@ -1789,8 +2198,8 @@ Processors</string>
    <slot>addHost()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>225</x>
+     <y>537</y>
     </hint>
     <hint type="destinationlabel">
      <x>664</x>
@@ -1805,8 +2214,8 @@ Processors</string>
    <slot>removeHost()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>253</x>
+     <y>537</y>
     </hint>
     <hint type="destinationlabel">
      <x>776</x>
@@ -1821,8 +2230,8 @@ Processors</string>
    <slot>addRule()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>224</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1837,8 +2246,8 @@ Processors</string>
    <slot>removeRule()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>252</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -1853,8 +2262,8 @@ Processors</string>
    <slot>addProduct()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>224</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>141</x>
@@ -1869,8 +2278,8 @@ Processors</string>
    <slot>removeProduct()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>252</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>238</x>
@@ -1885,8 +2294,8 @@ Processors</string>
    <slot>addProcessor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>620</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>985</x>
@@ -1901,8 +2310,8 @@ Processors</string>
    <slot>removeProcessor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>95</y>
+     <x>648</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>986</x>
@@ -1917,12 +2326,60 @@ Processors</string>
    <slot>closeDoNothing()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>582</x>
-     <y>567</y>
+     <x>612</x>
+     <y>591</y>
     </hint>
     <hint type="destinationlabel">
      <x>292</x>
      <y>589</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btngrpCfgSections</sender>
+   <signal>buttonClicked(int)</signal>
+   <receiver>gpboxProc</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>576</x>
+     <y>313</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddSwarm</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>addSwarm()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>589</x>
+     <y>495</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>494</x>
+     <y>300</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemoveSwarm</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>removeSwarm()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>607</x>
+     <y>495</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>494</x>
+     <y>300</y>
     </hint>
    </hints>
   </connection>
@@ -1967,8 +2424,10 @@ Processors</string>
   <slot>addProcessor()</slot>
   <slot>removeProcessor()</slot>
   <slot>closeDoNothing()</slot>
+  <slot>addSwarm()</slot>
+  <slot>removeSwarm()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="btngrpSection"/>
+  <buttongroup name="btngrpCfgSections"/>
  </buttongroups>
 </ui>

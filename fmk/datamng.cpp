@@ -123,36 +123,28 @@ void DataMng::processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString &
 }
 
 //----------------------------------------------------------------------
-// Method: processTskRepDistMsg
+// Method: processTskRegMsg
 //----------------------------------------------------------------------
-void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
+void DataMng::processTskRegMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"]);
 
-    std::string taskName  = task.taskName();
-    TaskStatus taskStatus = TaskStatus(task.taskStatus());
+    json & multiBody = body["info"];
 
-    TraceMsg("DataMng: Processing TaskReport: " + taskName
-             + " has status " + TaskStatusName[taskStatus]);
+    for (Json::ValueIterator itr = multiBody.begin();
+         itr != multiBody.end(); ++itr) {
 
-    saveTaskToDB(m);
-}
+	TaskInfo task(*itr);
 
-//----------------------------------------------------------------------
-// Method: processHostMonMsg
-//----------------------------------------------------------------------
-void DataMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    JValue hostInfoData(body["info"]);
+	std::string taskName  = task.taskName();
+	TaskStatus taskStatus = TaskStatus(task.taskStatus());
 
-    HostInfo hostInfo;
-    hostInfo.fromStr(hostInfoData.str());
+	TraceMsg("DataMng: Processing TaskReport: " + taskName
+		 + " has status " + TaskStatusName[taskStatus]);
 
-    DBG(hostInfo.dump() + "\n");
+	saveTaskToDB(task);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -189,6 +181,15 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
     MsgBodyTSK & body = msg.body;
     TaskInfo taskInfo(body["info"]);
 
+    saveTaskToDB(taskInfo, initialStore);
+}
+
+//----------------------------------------------------------------------
+// Method: saveTaskToDB
+// Save the information on generated output products to the archive
+//----------------------------------------------------------------------
+void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
+{
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
@@ -211,13 +212,12 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
     // In case the task has finished, save output products metadata
     if (taskInfo.taskStatus() == TASK_FINISHED) {
 
-        DBG("TASK FINISHED at " + msg.header.source() +
-            ": Storing outputs into local archive...");
+        DBG("TASK FINISHED : Storing outputs into local archive...");
 
         URLHandler urlh;
 
         // Check version of products in gateway against DB
-        TraceMsg("Will try to sanitize product versions:\n" + m);
+        TraceMsg("Will try to sanitize product versions:");
         sanitizeProductVersions(taskInfo.outputs);
 
         // Move products to local archive

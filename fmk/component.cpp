@@ -63,6 +63,16 @@ using Configuration::cfg;
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+const int HEART_BEAT_STEP_SIZE = 250;
+
+#include <csignal>
+
+void signalHandler( int signum ) {
+    std::cout << "Interrupt signal (" << signum << ") received.\n";
+
+    exit(signum);  
+}
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -89,10 +99,13 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     compAddress = addr;
     synchro     = s;
 
-    writeMsgsToDisk = false;
+    writeMsgsToDisk = true;
+
+    // register signal SIGINT and signal handler  
+    signal(SIGABRT, signalHandler);  
 
     iteration = 0;
-    stepSize  = 300;
+    stepSize  = HEART_BEAT_STEP_SIZE;
 
     // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)
@@ -198,7 +211,8 @@ void Component::updateConnections()
 void Component::processIncommingMessages()
 {
     MessageString m;
-    TraceMsg("Component::processIncommingmessages()");
+    Message_Tag incommMsgTag;
+    
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
@@ -209,20 +223,32 @@ void Component::processIncommingMessages()
             std::string type(msg.header.type());
             DbgMsg("(FROM component.cpp:) "  + compName + " received the message [" + m + "]");
 
-            if (writeMsgsToDisk) { writeMsgToFile(Recv, chnl, m); }
+            if      (chnl == ChnlCmd)      { incommMsgTag = Tag_ChnlCmd; }
+            else if (chnl == ChnlEvtMng)   { incommMsgTag = Tag_ChnlEvtMng; }
+            else if (chnl == ChnlHMICmd)   { incommMsgTag = Tag_ChnlHMICmd; }
+            else if (chnl == ChnlInData)   { incommMsgTag = Tag_ChnlInData; }
+            else if (chnl == ChnlTskSched) { incommMsgTag = Tag_ChnlTskSched; }
+            else if (chnl == ChnlTskReg)   { incommMsgTag = Tag_ChnlTskReg; }
+            else if (chnl == ChnlFmkMon)   { incommMsgTag = Tag_ChnlFmkMon; }
+            else if (type == MsgTskRqst)   { incommMsgTag = Tag_MsgTskRqst; }
+            else if (type == MsgTskProc)   { incommMsgTag = Tag_MsgTskProc; }
+            else if (type == MsgTskRep)    { incommMsgTag = Tag_MsgTskRep; }
+            else if (type == MsgHostMon)   { incommMsgTag = Tag_MsgHostMon; }
+            else                           { incommMsgTag = Tag_UNKNOWN; }
 
-            if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
-            else if (chnl == ChnlEvtMng)     { processEvtMngMsg(conn, m); }
-            else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
-            else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
-            else if (chnl == ChnlTskSched)   { processTskSchedMsg(conn, m); }
-            else if (type == MsgTskRqst)     { processTskRqstMsg(conn, m); }
-            else if (type == MsgTskProc)     { processTskProcMsg(conn, m); }
-            else if (type == MsgTskRep)      { processTskRepMsg(conn, m); }
-            else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
-            else if (type == MsgFmkMon)      { processFmkMonMsg(conn, m); }
-            else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
-            else    {
+            switch (incommMsgTag) {
+            case Tag_ChnlCmd:      processCmdMsg(conn, m);      break;
+            case Tag_ChnlEvtMng:   processEvtMngMsg(conn, m);   break;
+            case Tag_ChnlHMICmd:   processHMICmdMsg(conn, m);   break;
+            case Tag_ChnlInData:   processInDataMsg(conn, m);   break;
+            case Tag_ChnlTskSched: processTskSchedMsg(conn, m); break;
+            case Tag_ChnlTskReg:   processTskRegMsg(conn, m);   break;
+            case Tag_ChnlFmkMon:   processFmkMonMsg(conn, m);   break;
+            case Tag_MsgTskRqst:   processTskRqstMsg(conn, m);  break;
+            case Tag_MsgTskProc:   processTskProcMsg(conn, m);  break;
+            case Tag_MsgTskRep:    processTskRepMsg(conn, m);   break;
+            case Tag_MsgHostMon:   processHostMonMsg(conn, m);  break;
+            default:
                 WarnMsg("Message from unidentified channel " + chnl);
                 RaiseSysAlert(Alert(Alert::System,
                                     Alert::Warning,
@@ -230,6 +256,11 @@ void Component::processIncommingMessages()
                                     std::string(__FILE__ ":" Stringify(__LINE__)),
                                     "Message from unidentified channel " + chnl,
                                     0));
+            }
+
+            if (writeMsgsToDisk &&
+                (static_cast<int>(incommMsgTag) & writeMsgsMask != 0)) {
+                writeMsgToFile(Recv, chnl, m);
             }
         }
     }
@@ -447,6 +478,14 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
         TraceMsg(compName + " received from " + msg.header.source() + " from " + compName);
 
+    } else if (cmd == CmdMsgMask) { // This should be any component
+
+        writeMsgsToDisk = msg.body["write_to_disk"].asBool(); 
+        writeMsgsMask   = msg.body["mask"].asInt();
+        TraceMsg("Message writing to disk " +
+                 std::string(writeMsgsToDisk ? "ACTIVATED" : "DEACTIVATED") +
+                 " (mask = " + std::to_string(writeMsgsMask) + ")");
+
     } else {
 
         WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
@@ -458,6 +497,24 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
                             0));
 
     }
+}
+
+//----------------------------------------------------------------------
+// Method: sendAns
+// Send basic answer as a REP node
+//----------------------------------------------------------------------
+void Component::sendAns(ChannelDescriptor chnl, MessageDescriptor msgd, 
+                        std::string to, std::string ans)
+{
+    // Send reply
+    Message<MsgBodyTSK> msgAns;
+    msgAns.buildHdr(chnl, msgd, CHNLS_IF_VERSION,
+                   compName, to,
+                   "", "", "");
+    MsgBodyTSK bodyAns;
+    bodyAns["ans"] = ans;
+    msgAns.buildBody(bodyAns);
+    this->send(chnl, msgAns.str());
 }
 
 //----------------------------------------------------------------------
@@ -608,5 +665,20 @@ bool Component::getWriteMsgsToDisk()
     return writeMsgsToDisk;
 }
 
+//----------------------------------------------------------------------
+// Method: setWriteMsgsMask
+//----------------------------------------------------------------------
+void Component::setWriteMsgsMask(int msk)
+{
+    writeMsgsMask = msk;
+}
+
+//----------------------------------------------------------------------
+// Method: getWriteMsgsMask
+//----------------------------------------------------------------------
+int Component::getWriteMsgsMask()
+{
+    return writeMsgsMask;
+}
 
 //}

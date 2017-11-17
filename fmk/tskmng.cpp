@@ -42,6 +42,7 @@
 
 #include <sys/time.h>
 #include <array>
+#include <memory>
 
 #include "channels.h"
 #include "str.h"
@@ -61,6 +62,7 @@ using Configuration::cfg;
 //namespace QPF {
 
 const int FMK_INFO_TIMER = 5000;
+const int TSK_REP_TIMER  = 3000;
 
 //----------------------------------------------------------------------
 // Constructor
@@ -111,8 +113,8 @@ void TskMng::fromRunningToOperational()
                              cfg.network.swarms().size() > 0);
     httpSrv->start();
 
-    // Deactivate sending ProcessingFrameworkInfo updates
     sendingPeriodicFmkInfo = false;
+    sendingTskRegInfo      = false;
 
     // Transit to Operational
     transitTo(OPERATIONAL);
@@ -124,28 +126,28 @@ void TskMng::fromRunningToOperational()
 //----------------------------------------------------------------------
 void TskMng::runEachIteration()
 {
-    // Each iteration the Task Manager, apart from processing incoming
-    // messages, performs the following actions:
-    // 1. Send Task Status Reports to
     static std::string lastTrace;
 
-    std::string trace = ("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
-                         "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
-                         "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
-                         "P(" + std::to_string(serviceTaskStatus[TASK_PAUSED]) + ")" +
-                         "S(" + std::to_string(serviceTaskStatus[TASK_STOPPED]) + ")" +
-                         "E(" + std::to_string(serviceTaskStatus[TASK_FAILED]) + ")" +
-                         "F(" + std::to_string(serviceTaskStatus[TASK_FINISHED]) + ")" +
-                         "   CONT.: Q(" + std::to_string(containerTasks.size()) + ")" +
-                         "R(" + std::to_string(containerTaskStatus[TASK_RUNNING]) + ")" +
-                         "W(" + std::to_string(containerTaskStatus[TASK_SCHEDULED]) + ")" +
-                         "P(" + std::to_string(containerTaskStatus[TASK_PAUSED]) + ")" +
-                         "S(" + std::to_string(containerTaskStatus[TASK_STOPPED]) + ")" +
-                         "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
-                         "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
-                         );
+    // Send pending messages just in case there are any in the buffer
+
+    std::string trace = 
+        ("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
+         "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
+         "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
+         "P(" + std::to_string(serviceTaskStatus[TASK_PAUSED]) + ")" +
+         "S(" + std::to_string(serviceTaskStatus[TASK_STOPPED]) + ")" +
+         "E(" + std::to_string(serviceTaskStatus[TASK_FAILED]) + ")" +
+         "F(" + std::to_string(serviceTaskStatus[TASK_FINISHED]) + ")" +
+         "   CONT.: Q(" + std::to_string(containerTasks.size()) + ")" +
+         "R(" + std::to_string(containerTaskStatus[TASK_RUNNING]) + ")" +
+         "W(" + std::to_string(containerTaskStatus[TASK_SCHEDULED]) + ")" +
+         "P(" + std::to_string(containerTaskStatus[TASK_PAUSED]) + ")" +
+         "S(" + std::to_string(containerTaskStatus[TASK_STOPPED]) + ")" +
+         "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
+         "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
+         );
     if (trace != lastTrace) {
-        TraceMsg(trace);
+        TRC(trace);
         lastTrace = trace;
     }
 }
@@ -201,37 +203,51 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
         return;
     }
 
+    // Check that no previous message was sent (and the Agent was not
+    // aware of if).  In that case, resend it.
+    std::map<std::string, MessageString>::iterator it = containerTaskLastMessage.find(agName);
+    if (it != containerTaskLastMessage.end()) {
+        // There is a message send to this agent.  A new request by
+        // this agent without a removal of this last message from the
+        // map containerTaskLastMessage means that the message was not
+        // noticed by the agent.  Therefore, we resend the same
+        // message.
+        MessageString & msgStr = it->second;
+        send(ChnlTskProc + "_" + agName, msgStr);
+        DBG("Task message resent to " + agName);
+        return;
+    }
+    
+    // Select task to send
+    TraceMsg("Pool of tasks has size of " + std::to_string(containerTasks.size()));
+    if (containerTasks.size() < 1) { return; }        
+
+    json taskInfoData = containerTasks.front().val();
+    containerTasks.pop_front();
+    
+    std::string taskName = agName + "_" + taskInfoData["taskName"].asString();
+    taskInfoData["taskName"] = taskName;
+    
     // Create message
     msg.buildHdr(ChnlTskProc, MsgTskProc, CHNLS_IF_VERSION,
                  compName, agName, "", "", "");
     MsgBodyTSK body;
+    
+    body["info"] = taskInfoData;
+    msg.buildBody(body);
 
-    // Select task to send
-    bool isTaskSent = false;
-    std::string taskName;
+    MessageString msgStr(msg.str());
+    send(ChnlTskProc + "_" + agName, msgStr);
 
-    TraceMsg("Pool of tasks has size of " + std::to_string(containerTasks.size()));
-
-    if (containerTasks.size() > 0) {        
-        json taskInfoData = containerTasks.front().val();
-
-        std::string taskName = agName + "_" + taskInfoData["taskName"].asString();
-        taskInfoData["taskName"] = taskName;
-        
-        body["info"] = taskInfoData;
-        containerTasks.pop_front();
-
-        msg.buildBody(body);
-
-        send(ChnlTskProc + "_" + agName, msg.str());
-        
-        TraceMsg("Task " + taskName + "sent to " + agName);
-        
-        TaskStatus  taskStatus = TASK_SCHEDULED; //TaskStatus(taskInfoData["taskStatus"].asInt());
-        taskRegistry[taskName] = taskStatus;
-        containerTaskStatus[taskStatus]++;
-        containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
-    }
+    containerTaskLastMessage[agName] = msgStr;
+    
+    taskRegistry[taskName] = TASK_SCHEDULED;
+    containerTaskStatus[TASK_SCHEDULED]++;
+    containerTaskStatusPerAgent[std::make_pair(agName, TASK_SCHEDULED)]++;
+    
+    DBG("Task " + taskName + "sent to " + agName);
+    
+    if (!sendingTskRegInfo) { armTskRepMsgTimer(); }       
 }
 
 //----------------------------------------------------------------------
@@ -266,6 +282,13 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
             containerTaskStatusPerAgent[std::make_pair(agName, oldStatus)]--;
             containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
 
+            if ((taskStatus == TASK_STOPPED) ||
+                (taskStatus == TASK_FAILED) ||
+                (taskStatus == TASK_FINISHED) ||
+                (taskStatus == TASK_UNKNOWN_STATE)){
+                containerTaskLastMessage.erase(containerTaskLastMessage.find(agName));
+            }
+
             TaskStatusSpectra spec = convertTaskStatusToSpectra(agName);
 
             const std::string & hostIp = task.taskHost();
@@ -286,9 +309,7 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
         InfoMsg("Finished task " + taskName);
     }
 
-    msg.buildHdr(ChnlTskRepDist, MsgTskRepDist, CHNLS_IF_VERSION,
-                 compName, "*", "", "", "");
-    this->send(ChnlTskRepDist, msg.str());
+    tskRegMsgs[taskName] = task.str();
 }
 
 //----------------------------------------------------------------------
@@ -298,7 +319,6 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Place new information in general structure
     consolidateMonitInfo(m);
-    //sendProcFmkInfoUpdate();
 
     // If sending updates is not yet activated, activate it
     if (!sendingPeriodicFmkInfo) {
@@ -308,13 +328,24 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
+// Method: armTskRepMsgTimer
+// Arm new timer for sending Task Report messages
+//----------------------------------------------------------------------
+void TskMng::armTskRepMsgTimer()
+{
+    std::unique_ptr<Timer> tskRepSender(new Timer(TSK_REP_TIMER, true,
+                                                  &TskMng::sendTskRepMsgUpdate, this));
+    sendingTskRegInfo = true;
+}
+
+//----------------------------------------------------------------------
 // Method: armProcFmkInfoMsgTimer
 // Arm new timer for sending ProcessingFrameworkInfo updates
 //----------------------------------------------------------------------
 void TskMng::armProcFmkInfoMsgTimer()
 {
-    Timer * fmkSender = new Timer(FMK_INFO_TIMER, true,
-                                  &TskMng::sendProcFmkInfoUpdate, this);
+    std::unique_ptr<Timer> fmkSender(new Timer(FMK_INFO_TIMER, true,
+                                               &TskMng::sendProcFmkInfoUpdate, this));
 }
 
 //----------------------------------------------------------------------
@@ -417,14 +448,43 @@ bool TskMng::sendTaskAgMsg(MessageString & m,
 }
 
 //----------------------------------------------------------------------
-// Method: sendTskRepDistMsg
-// Send a HostInfo message to EvtMng/QPFHMI/DataMng
+// Method: sendTskRepMsgUpdate
+// Send an update on the Task Report information
 //----------------------------------------------------------------------
-bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)
+void TskMng::sendTskRepMsgUpdate()
 {
-    // Send msg
-    this->send(ChnlTskRepDist, m);
-    return true;;
+    std::unique_lock<std::mutex> ulck(mtxTskRegMsg);
+
+    if (! tskRegMsgs.empty()) {
+
+        // Prepare message and send it
+        Message<MsgBodyTSK> msg;
+        MsgBodyTSK body;
+        int maxSize = MAX_MESSAGE_SIZE - 400; // header must be added
+
+        std::string multiMsg;
+        for (auto & kv : tskRegMsgs) {
+            if ((multiMsg.length() + kv.second.length()) < maxSize) {
+                multiMsg += "\"" + kv.first + "\":" + kv.second + ",";
+                tskRegMsgs.erase(kv.first);
+            }
+        }
+        multiMsg.pop_back();
+
+        JValue tskRegValue("{" + multiMsg + "}");
+        body["info"] = tskRegValue.val();
+        msg.buildBody(body);
+
+        // Set message header
+        msg.buildHdr(ChnlTskReg, MsgTskReg, CHNLS_IF_VERSION,
+                     compName, "DatMng", "", "", "");
+
+        // Send msg
+        this->send(ChnlTskReg, msg.str());    
+    }
+    
+    // Arm new timer
+    armTskRepMsgTimer();
 }
 
 //----------------------------------------------------------------------
@@ -445,14 +505,12 @@ void TskMng::sendProcFmkInfoUpdate()
     msg.buildBody(body);
 
     // Set message header
-    msg.buildHdr(ChnlTskRepDist, MsgFmkMon, CHNLS_IF_VERSION,
-                 compName, "*", "", "", "");
+    msg.buildHdr(ChnlFmkMon, MsgFmkMon, CHNLS_IF_VERSION,
+                 compName, "HMIProxy", "", "", "");
 
     // Send msg
-    this->send(ChnlTskRepDist, msg.str());    
-    TraceMsg("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
-    TraceMsg(s);
-
+    this->send(ChnlFmkMon, msg.str());    
+    
     // Arm new timer
     if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
 }

@@ -22,7 +22,7 @@
 
 #define NN_BUS_MASTER     NN_BUS & 0x8000
 
-#define MAX_MESSAGE_SIZE  10240
+#define MAX_MESSAGE_SIZE  65536 // 64KB!
 
 #define WAIT_BINDING      100000
 #define DEADLINE          100000

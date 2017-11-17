@@ -165,6 +165,21 @@ private:
     void sendTaskReport(std::string contId);
 
     //----------------------------------------------------------------------
+    // Method: computeTaskStatus
+    //----------------------------------------------------------------------
+    TaskStatus computeTaskStatus(std::string & inspStatus, int & inspCode);
+    
+    //----------------------------------------------------------------------
+    // Method: taskEnded
+    //----------------------------------------------------------------------
+    bool taskEnded(TaskStatus & taskStatus);
+    
+    //----------------------------------------------------------------------
+    // Method: retrieveDockerInfo
+    //----------------------------------------------------------------------
+    json retrieveDockerInfo(std::string & contId, bool fullInfo);
+    
+    //----------------------------------------------------------------------
     // Method: transferOutputProducts
     //----------------------------------------------------------------------
     void transferOutputProducts(TaskInfo & task);
@@ -205,7 +220,6 @@ private:
     std::map<std::string, TaskInfo*> containerToTaskMap;
     std::map<std::string, time_t>    containerEpoch;
     
-    TaskInfo *               runningTask;
     TaskStatus               taskStatus;
 
     std::string              internalTaskNameIdx;
@@ -232,6 +246,11 @@ private:
     int                      workingDuring;
 
     int                      progress;
+
+    TaskStatus               prevTaskStatus;
+    int                      prevProgress;
+    std::string              prevInspStatus;
+    int                      prevInspCode;
     
     URLHandler               urlh;
 

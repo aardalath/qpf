@@ -224,7 +224,7 @@ if [ "${NNMSG}" == "yes" ]; then
     wget ${NNMSG_URL} -o nanomsg.log -O ${NNMSG_PKG}
     tar xzf ${NNMSG_PKG}
     cd ${NNMSG_NAME}
-    mkdir build && cd build
+    mkdir -p build && cd build
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     make && sudo make install
     cd ${curdir}

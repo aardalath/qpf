@@ -129,11 +129,10 @@ public:
     enum PageIndex {
         PageGeneral,
         PageMachines,
+        PageDatabase,
         PageProdProc,
-        PageNetwork,
         PageOrchestration,
         PageExtTools,
-        PageStorage,
         PageFlags,
     };
 
@@ -153,6 +152,9 @@ public slots:
 private slots:
     void addHost();
     void removeHost();
+
+    void addSwarm();
+    void removeSwarm();
 
     void addProduct();
     void removeProduct();
@@ -192,7 +194,6 @@ private:
     struct FlagSt {
         std::string  msgName;
         QCheckBox  * chkDisk;
-        QCheckBox  * chkDB;
     };
 
 private:

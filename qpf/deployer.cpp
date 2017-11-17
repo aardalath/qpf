@@ -596,10 +596,14 @@ void Deployer::createElementsNetwork()
     chnl     = ChnlCmd;
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
-    connAddr = bindAddr;
     m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-    for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    connAddr = bindAddr;
+    std::vector<CommNode*> cs1({m.datMng, m.logMng, m.tskOrc, m.tskMng});
+    cs1.insert(cs1.end(), ag.begin(), ag.end());
+    for (auto & c : cs1) {
+        if (c != 0) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
     }
 
     // CHANNEL EVTMNG Related - SURVEY
@@ -610,9 +614,9 @@ void Deployer::createElementsNetwork()
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
     m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
     connAddr = bindAddr;
-    std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
-    cs.insert(cs.end(), ag.begin(), ag.end());
-    for (auto & c : cs) {
+    std::vector<CommNode*> cs2({m.datMng, m.logMng, m.tskOrc, m.tskMng});
+    cs2.insert(cs2.end(), ag.begin(), ag.end());
+    for (auto & c : cs2) {
         if (c != 0) {
             c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
         }
@@ -669,17 +673,25 @@ void Deployer::createElementsNetwork()
         ++k;
     }
 
-    // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
-    // - Publisher: TskMng
-    // - Subscriber: DataMng EvtMng QPFHMI
-    chnl     = ChnlTskRepDist;
+    // CHANNEL TASK-REGISTRATION - PIPELINE
+    // - Requester: TskMng
+    // - Replier: DataMng
+    chnl     = ChnlTskReg;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "ipc:///tmp/" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist) + ".ipc";
+    bindAddr = "ipc:///tmp/" + chnl + ".ipc";
     connAddr = bindAddr;
-    m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-    for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-    }
+    m.tskMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
+    m.datMng->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
+
+    // CHANNEL FRAMEWORK MONITORING - PIPELINE
+    // - Requester: TskMng
+    // - Replier: QPFHMI
+    chnl     = ChnlFmkMon;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "ipc:///tmp/" + chnl + ".ipc";
+    connAddr = bindAddr;
+    m.tskMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
+    // PULL end is created by HMIProxy
 
 }
 

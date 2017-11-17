@@ -143,22 +143,6 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
-// Method: processTskRepDistMsg
-//----------------------------------------------------------------------
-void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"]);
-
-    std::string taskName  = task.taskName();
-    TaskStatus taskStatus = TaskStatus(task.taskStatus());
-
-    TraceMsg("EvtMng: Processing TaskReport: " + taskName +
-             " has status " + TaskStatusName[taskStatus]);
-}
-
-//----------------------------------------------------------------------
 // Method: processFmkMonMsg
 //----------------------------------------------------------------------
 void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
