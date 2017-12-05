@@ -283,6 +283,8 @@ bool FileNameSpec::parseFileName(std::string fileName,
     m["regTime"]        = timeTag();
     m["url"]            = "file://" + fileName;
     m["urlSpace"]       = space;
+    m["procTargetType"] = UA_NOMINAL;
+    m["procTarget"]     = "";
 
     //DBG("Signature: '" + m.signature() + "'");
 

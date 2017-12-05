@@ -244,6 +244,27 @@ public:
 // Running mode of the agent.  If SERVICE, a Docker Swarm is created
 enum AgentMode { CONTAINER, SERVICE };
 
+#undef T
+
+#define TLISTOF_USER_AREA_TYPES \
+    T(NOMINAL),                              \
+    T(AUTO),                                 \
+    T(LOCAL),                                \
+    T(VOSPACE)
+
+#define T(x) UA_ ## x
+enum UserAreaId { TLISTOF_USER_AREA_TYPES };
+#undef T
+
+#define T(x) std::string( #x )
+const std::string UserAreaName[] = { TLISTOF_USER_AREA_TYPES };
+#undef T
+
+const std::map<std::string, UserAreaId> UserAreaIdx = { {UserAreaName[UA_NOMINAL], UA_NOMINAL},
+                                                        {UserAreaName[UA_AUTO],    UA_AUTO},
+                                                        {UserAreaName[UA_LOCAL],   UA_LOCAL},
+                                                        {UserAreaName[UA_VOSPACE], UA_VOSPACE} };
+
 //------------------------------------------------------------
 // Topic: Elementary types
 //------------------------------------------------------------
@@ -305,6 +326,8 @@ struct ProductMetadata : public JRecord {
         DUMPJSTR(extension);
         DUMPJSTR(url);
         DUMPJSTR(urlSpace);
+        DUMPJINT(procTargetType);
+        DUMPJSTR(procTarget);
         DUMPJBOOL(hadNoVersion);
     }
     JSTR(mission);        // %M
@@ -334,6 +357,8 @@ struct ProductMetadata : public JRecord {
     JSTR(extension);
     JSTR(url);
     JSTR(urlSpace);
+    JINT(procTargetType);
+    JSTR(procTarget);
     JBOOL(hadNoVersion);
 };
 

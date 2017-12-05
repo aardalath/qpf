@@ -933,11 +933,11 @@ void ConfigTool::transferCfgToGUI()
     ui->nedOutbox->setText(C(cfg.storage.gateway));
 
     std::string userWAType = cfg.general.userAreaType();
-    if (userWAType == "auto") {
+    if (userWAType == UserAreaName[UA_AUTO]) {
         ui->btngrpUserWA->button(Auto)->setChecked(true);
-    } else if (userWAType == "local") {
+    } else if (userWAType == UserAreaName[UA_LOCAL]) {
         ui->btngrpUserWA->button(LocalFolder)->setChecked(true);
-    } else if (userWAType == "vospace") {
+    } else if (userWAType == UserAreaName[UA_VOSPACE]) {
         ui->btngrpUserWA->button(VOSpaceFolder)->setChecked(true);
     } else {
         // Nothing
@@ -1033,15 +1033,15 @@ bool ConfigTool::transferGUIToCfg()
     cfg.general["workArea"] = ui->edBasePath->text().toStdString();
     switch (ui->btngrpUserWA->checkedId()) {
     case Auto:
-        cfg.general["userAreaType"] = "auto";
+        cfg.general["userAreaType"] = UserAreaName[UA_AUTO];
         cfg.general["userArea"]     = ui->edBasePath->text().toStdString() + "/data/user";
         break;
     case LocalFolder:
-        cfg.general["userAreaType"] = "local";
+        cfg.general["userAreaType"] = UserAreaName[UA_LOCAL];
         cfg.general["userArea"]     = ui->nedUserReprocArea->text().toStdString();
         break;
     case VOSpaceFolder:
-        cfg.general["userAreaType"] = "vospace";
+        cfg.general["userAreaType"] = UserAreaName[UA_VOSPACE];
         cfg.general["userArea"]     = ui->edVOSpaceFolder->text().toStdString();
         break;
     default:
