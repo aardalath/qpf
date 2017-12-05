@@ -182,6 +182,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         QString grp = q.value(0).toString();
         if (prevGrp != grp) {
             parent = new QStandardItem(grp);
+            parent->setFlags(parent->flags() & ~Qt::ItemIsSelectable);
             row.clear();
             row << parent;
             for (int i = 1; i < fldCount - skippedColumns; ++i) { row << 0; }

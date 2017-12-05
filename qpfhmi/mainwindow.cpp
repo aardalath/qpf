@@ -1606,7 +1606,7 @@ void MainWindow::localarchViewUpdate()
 }
 
 //----------------------------------------------------------------------
-// SLOT: updateLocalArchModel
+// SLOT: resizeLocalArch
 // Updates the local archive model on demand
 //----------------------------------------------------------------------
 void MainWindow::resizeLocalArch()
@@ -1660,6 +1660,16 @@ void MainWindow::setAutomaticExpandLocalArchModel(bool b)
 void MainWindow::setAutomaticResizeLocalArchModel(bool b)
 {
     resizeProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setMultiselectProducts
+// Toggles multiselection for Local Archive panel
+//----------------------------------------------------------------------
+void MainWindow::setMultiselectProducts(bool b)
+{
+    ui->treevwArchive->setSelectionMode(b ? QAbstractItemView::MultiSelection :
+                                      QAbstractItemView::SingleSelection);
 }
 
 //----------------------------------------------------------------------
@@ -1801,21 +1811,25 @@ void MainWindow::reprocessProduct()
                "next release on.\n\n"), QMessageBox::Close);
     */
     QPoint p = acReprocess->property("clickedItem").toPoint();
-    QModelIndex m = ui->treevwArchive->indexAt(p);
-    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
-    QUrl archUrl(url);
-    QString fileName = archUrl.path();
-    std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+    //QModelIndex m = ui->treevwArchive->indexAt(p);
 
     QStringList inProds;
-    inProds << fileName;
-
+    QModelIndexList list = ui->treevwArchive->selectionModel()->selectedIndexes();
+    foreach (QModelIndex m, list) {
+        if (m.column() == NumOfURLCol) {
+            QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+            QUrl archUrl(url);
+            QString fileName = archUrl.path();
+            std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+            inProds << fileName;
+        }
+    }
+    
     std::string userWAType = cfg.general.userAreaType();
-    DlgReproc::OutputsLocation out = ((userWAType == "auto") ?
-                                      DlgReproc::DefUserArea :
-                                      ((userWAType == "local") ?
-                                       DlgReproc::CfgLocalDir :
-                                       DlgReproc::CfgVOSpace));
+    DlgReproc::OutputsLocation out =
+        ((userWAType == UserAreaName[UA_AUTO]) ?
+         DlgReproc::DefUserArea : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                   DlgReproc::CfgLocalDir : DlgReproc::CfgVOSpace));
     int flags = (cfg.flags.intermediateProducts() ?
                  DlgReproc::GenIntermProd : DlgReproc::NullFlags);
 
@@ -1830,12 +1844,20 @@ void MainWindow::reprocessProduct()
     
     FileNameSpec fns;
     ProductMetadata md;
-    fns.parseFileName(fileName.toStdString(), md);
-    md["urlSpace"] = ReprocessingSpace;
+    foreach (QString fileName, inProds) {
+        fns.parseFileName(fileName.toStdString(), md);
+        md["urlSpace"]       = ReprocessingSpace;
+        md["procTargetType"] = (((out == DlgReproc::CfgLocalDir) ||
+                                 (out == DlgReproc::LocalDir)) ?
+                                UA_LOCAL : (((out == DlgReproc::CfgVOSpace) ||
+                                             (out == DlgReproc::VOSpaceFolder)) ?
+                                            UA_VOSPACE : UA_AUTO)); 
+        md["procTarget"]     = outLocation.toStdString();
 
-    URLHandler urlh;
-    urlh.setProduct(md);
-    md = urlh.fromFolder2Inbox();
+        URLHandler urlh;
+        urlh.setProduct(md);
+        md = urlh.fromFolder2Inbox();
+    }
 }
 
 //----------------------------------------------------------------------

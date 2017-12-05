@@ -122,6 +122,7 @@ public slots:
     void setAutomaticUpdateLocalArchModel(bool b);
     void setAutomaticExpandLocalArchModel(bool b);
     void setAutomaticResizeLocalArchModel(bool b);
+    void setMultiselectProducts(bool b);
     void setProductsFilter(QString qry, QStringList hdr);
     void restartProductsFilter();
 
