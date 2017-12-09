@@ -933,7 +933,7 @@ void ConfigTool::transferCfgToGUI()
     ui->nedOutbox->setText(C(cfg.storage.gateway));
 
     std::string userWAType = cfg.general.userAreaType();
-    if (userWAType == UserAreaName[UA_AUTO]) {
+    if (userWAType == UserAreaName[UA_USER]) {
         ui->btngrpUserWA->button(Auto)->setChecked(true);
     } else if (userWAType == UserAreaName[UA_LOCAL]) {
         ui->btngrpUserWA->button(LocalFolder)->setChecked(true);
@@ -1033,7 +1033,7 @@ bool ConfigTool::transferGUIToCfg()
     cfg.general["workArea"] = ui->edBasePath->text().toStdString();
     switch (ui->btngrpUserWA->checkedId()) {
     case Auto:
-        cfg.general["userAreaType"] = UserAreaName[UA_AUTO];
+        cfg.general["userAreaType"] = UserAreaName[UA_USER];
         cfg.general["userArea"]     = ui->edBasePath->text().toStdString() + "/data/user";
         break;
     case LocalFolder:

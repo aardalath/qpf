@@ -218,6 +218,26 @@ void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId sub
 }
 
 //----------------------------------------------------------------------
+// Method: sendReprocCmd
+// Send a reprocessing request command to the EventMng
+//----------------------------------------------------------------------
+void HMIProxy::sendReprocCmd()
+{
+    Message<MsgBodyCMD> msg;
+    MsgBodyCMD body;
+    msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                 compName, "*",
+                 "", "", "");
+
+    // Create message and send
+    body["cmd"]         = CmdReproc;
+
+    msg.buildBody(body);
+    send(ChnlHMICmd, msg.str()); 
+    TraceMsg("Sending message: " + msg.str());
+}
+
+//----------------------------------------------------------------------
 // Method: sendNewConfig
 // Send a processing handling command to an agent
 //----------------------------------------------------------------------

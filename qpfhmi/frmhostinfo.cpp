@@ -74,7 +74,8 @@ void FrmHostInfo::update(ProcessingHostInfo & ph)
     int k = 0;
     for (auto & a : ph.agInfo) {
         QPF::FrmAgentStatus * panel = panels.at(k);
-        panel->updateInfo(a.name, a.taskStatus);
+        panel->updateInfo(QString::fromStdString(a.name), QString("CONTAINER"),
+                         a.taskStatus);
         a.taskStatus.sum();
         ++k;
     }
@@ -111,7 +112,7 @@ void FrmHostInfo::update(SwarmInfo & sw)
             .arg(l.runProc).arg(l.totalProc).arg(l.lastPid);
 
     ui->lblHostName->setText(QString("%1").arg(QString::fromStdString(sw.name)));
-    ui->lblTaskAgentMode->setText(QString("CONTAINER"));
+    ui->lblTaskAgentMode->setText(QString("SWARM"));
     ui->lblLoadAvgs->setText(load);
     ui->lblCPULoad->setText(cpu);
     ui->lblInfo->setText(QString("%1\n%2").arg(arch).arg(proc));
@@ -135,7 +136,8 @@ void FrmHostInfo::update(SwarmInfo & sw)
         initialization = false;
     }
     QPF::FrmAgentStatus * panel = panels.at(0);
-    panel->updateInfo(sw.name, sw.taskStatus);
+    panel->updateInfo(QString::fromStdString(sw.name), QString("SWARM"),
+                     sw.taskStatus);
     sw.taskStatus.sum();
 }
 

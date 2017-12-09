@@ -90,14 +90,20 @@ const std::string LocalArchSpace("LOCAL_ARCHIVE");
 const std::string GatewaySpace("GATEWAY");
 const std::string ProcessingSpace("PROCESSING");
 const std::string ReprocessingSpace("REPROCESSING");
+const std::string ReprocessingUserArea("USER_AREA");
+const std::string ReprocessingLocalFolder("LOCAL_FOLDER");
+const std::string ReprocessingVOSpace("VOSPACE");
 
-const std::set<std::string> URLSpaces
-      { ExternalSpace,
+const std::set<std::string> URLSpaces { ExternalSpace,
         UserSpace,
         InboxSpace,
         LocalArchSpace,
         GatewaySpace,
-        ProcessingSpace };
+        ProcessingSpace,
+        ReprocessingSpace,
+        ReprocessingUserArea,
+        ReprocessingLocalFolder,
+        ReprocessingVOSpace };
 
 //============================================================
 // Group: JSON based macros and classes
@@ -248,7 +254,7 @@ enum AgentMode { CONTAINER, SERVICE };
 
 #define TLISTOF_USER_AREA_TYPES \
     T(NOMINAL),                              \
-    T(AUTO),                                 \
+    T(USER),                                 \
     T(LOCAL),                                \
     T(VOSPACE)
 
@@ -261,7 +267,7 @@ const std::string UserAreaName[] = { TLISTOF_USER_AREA_TYPES };
 #undef T
 
 const std::map<std::string, UserAreaId> UserAreaIdx = { {UserAreaName[UA_NOMINAL], UA_NOMINAL},
-                                                        {UserAreaName[UA_AUTO],    UA_AUTO},
+                                                        {UserAreaName[UA_USER],    UA_USER},
                                                         {UserAreaName[UA_LOCAL],   UA_LOCAL},
                                                         {UserAreaName[UA_VOSPACE], UA_VOSPACE} };
 

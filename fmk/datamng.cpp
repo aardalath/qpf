@@ -193,6 +193,8 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
+    TRC("TaskStatus = " + TaskStatusName[(TaskStatus)(taskInfo.taskStatus())]);
+    
     try {
         // Check that connection with the DB is possible
         dbHdl->openConnection();
@@ -223,7 +225,11 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
         // Move products to local archive
         for (auto & m : taskInfo.outputs.products) {
             urlh.setProduct(m);
-            m = urlh.fromGateway2LocalArch();
+            if (m.procTargetType() == UA_NOMINAL) {
+                m = urlh.fromGateway2LocalArch();
+            } else {
+                m = urlh.fromGateway2FinalDestination();
+            }
         }
 
         InfoMsg("Saving outputs...");
@@ -270,10 +276,12 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
         FileNameSpec fs;
 
         for (auto & m : prodList.products) {
-            std::string sgnt = m.signature();
+            std::string sgnt  = m.signature();
+            std::string ptype = m.productType();
             m.dump();
-            TraceMsg("Checking signature " + sgnt + " and version " + ver);
-            if (dbHdl->checkSignature(sgnt, ver)) {
+            TraceMsg("Checking signature " + sgnt + 
+                     ", product type " + ptype + " and version " + ver);
+            if (dbHdl->checkSignature(sgnt, ptype, ver)) {
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion();
                 std::string newVer  = fs.incrMinorVersion(origVer);
@@ -281,8 +289,10 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
                 std::string url(m.url());
                 std::string oldFile(str::mid(url,7,1000));
 
-                WarnMsg("Found in database:" + sgnt + " [" + ver +
-                        "], changing " + origVer + " with " + newVer);
+                std::string s("Found in database:" + sgnt + " [" + ver +
+                              "], changing " + origVer + " with " + newVer);
+                WarnMsg(s);
+                CreateSysAlert(Log::WARNING, Alert::Warning, s);
 
                 std::vector<std::string> svec {m.url(), m.baseName(), m.productId(), m.baseName(), sgnt };
                 for (auto & s: svec) { str::replaceAll(s, origVer, newVer); }
@@ -291,6 +301,7 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
                 m["url"]            = svec.at(i++);
                 m["baseName"]       = svec.at(i++);
                 m["productId"]      = svec.at(i++);
+                i++;
                 m["signature"]      = svec.at(i++);
 
                 m["productVersion"] = newVer;

@@ -105,13 +105,30 @@ using std::chrono::system_clock;
 //   - FatalMsg(s)  - Macro to call logMsg for FATAL msgs
 //------------------------------------------------------------
 
+#    define _NOOP()
+#    define _DEFER(x) x _NOOP()
+
+#    define _LOGandALERT(t, v, s) do {                                  \
+        Alert *a = new Alert(Alert::System, v, Alert::General,          \
+                             std::string(_DEFER(__FILE__)) + ":" +      \
+                             std::to_string(_DEFER(__LINE__)), "", 0);  \
+        Alert::Messages msgs;                                           \
+        msgs.push_back(compName + ": " + s);                            \
+        a->setMessages(msgs);                                            \
+        Log::log(compName, t, s);                                       \
+    } while(0)
+//        raise(*a, Alert::System);             \
+
 #    define LogMsg(l,s)  Log::log(compName, l, s)
 #    define TraceMsg(s)  Log::log(compName, Log::TRACE,   s)
 #    define DbgMsg(s)    Log::log(compName, Log::DEBUG,   s)
 #    define InfoMsg(s)   Log::log(compName, Log::INFO,    s)
-#    define WarnMsg(s)   Log::log(compName, Log::WARNING, s)
-#    define ErrMsg(s)    Log::log(compName, Log::ERROR,   s)
-#    define FatalMsg(s)  Log::log(compName, Log::FATAL,   s)
+#    define WarnMsg(s)   Log::log(compName, Log::WARNING, s) 
+#    define ErrMsg(s)    Log::log(compName, Log::ERROR,   s) 
+#    define FatalMsg(s)  Log::log(compName, Log::FATAL,   s) 
+/* #    define WarnMsg(s)   _LOGandALERT(Log::WARNING, Alert::Warning, s) */
+/* #    define ErrMsg(s)    _LOGandALERT(Log::ERROR,   Alert::Error, s) */
+/* #    define FatalMsg(s)  _LOGandALERT(Log::FATAL,   Alert::Fatal, s) */
 
 #endif // LogMsg
 
@@ -125,6 +142,16 @@ using std::chrono::system_clock;
 #define RaiseSysAlert(a)  raise(a, Alert::System)
 #define RaiseDiagAlert(a) raise(a, Alert::Diagnostics)
 #define RaiseAlert(a)     raise(a)
+
+#define CreateSysAlert(t, v, s) do {                                    \
+        Alert *a = new Alert(Alert::System, v, Alert::General,          \
+                             std::string(_DEFER(__FILE__)) + ":" +      \
+                             std::to_string(_DEFER(__LINE__)), "", 0);  \
+        Alert::Messages msgs;                                           \
+        msgs.push_back(compName + ": " + s);                            \
+        a->setMessages(msgs);                                            \
+        raise(*a, Alert::System);                                       \
+    } while(0)
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF

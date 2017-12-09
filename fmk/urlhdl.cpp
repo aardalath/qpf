@@ -48,6 +48,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/sendfile.h>
+#include <cerrno>
+#include <cstring>
 
 #include <libgen.h>
 
@@ -351,6 +353,56 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
     // Change url in processing task
     product["url"]      = newUrl;
     product["urlSpace"] = LocalArchSpace;
+
+    return product;
+}
+
+//----------------------------------------------------------------------
+// Method: fromGateway2FinalDestination
+//----------------------------------------------------------------------
+ProductMetadata & URLHandler::fromGateway2FinalDestination()
+{
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == GatewaySpace);
+
+    // Set new location and url
+    std::string file(str::mid(productUrl,7,1000));
+    std::string newFile(file);
+    std::string newUrl(productUrl);
+
+    std::string section("/out");
+   
+    std::string vospth("/tmp/vospace");
+    
+    if (product.procTargetType() == UA_VOSPACE) {
+        // VOSpace transactions still not implemented, so use instead a
+        // local folder named /tmp/vospace
+        if (mkdir(vospth.c_str(), Config::PATHMode) != 0) {
+            std::cerr << "mkdir " + vospth + ": " + std::strerror(errno) << '\n';
+            return product;
+        }
+        product["procTarget"] = vospth;
+    }
+    str::replaceAll(newFile,
+                    cfg.storage.gateway + section,
+                    vospth);
+    str::replaceAll(newUrl,
+                    cfg.storage.gateway + section,
+                    vospth);
+
+    // Set (hard) link
+    (void)relocate(file, newFile, MOVE);
+
+    // Change url in processing task
+    product["url"]      = newUrl;
+    product["urlSpace"] = (product.procTargetType() == UA_USER ?
+                           ReprocessingUserArea :
+                           (product.procTargetType() == UA_LOCAL ?
+                            ReprocessingLocalFolder :
+                            ReprocessingVOSpace));
 
     return product;
 }

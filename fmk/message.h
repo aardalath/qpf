@@ -187,7 +187,8 @@ typedef std::string CmdDescriptor;
         T(PING),                                     \
         T(STATES),                                   \
         T(PROCHDL),                                  \
-        T(CONFIG), 
+        T(CONFIG),                                   \
+        T(REPROC), 
 
 #define T(x) CMD_ ## x
 enum CmdId { TLISTOF_CMD_IDS };
@@ -204,6 +205,7 @@ const CmdDescriptor CmdPing     (CmdName[CMD_PING]);
 const CmdDescriptor CmdStates   (CmdName[CMD_STATES]);
 const CmdDescriptor CmdProcHdl  (CmdName[CMD_PROCHDL]);
 const CmdDescriptor CmdConfig   (CmdName[CMD_CONFIG]);
+const CmdDescriptor CmdReproc   (CmdName[CMD_REPROC]);
 
 //-- Processing Handling constants ------------
 
@@ -219,7 +221,7 @@ typedef std::string SubcmdDescriptor;
 
 #define TLISTOF_PROCHDL_SUBCMD_IDS                  \
     T(PAUSE), T(RESUME), T(CANCEL),                 \
-        T(SUSPEND), T(STOP), T(REACTIVATE)
+    T(SUSPEND), T(STOP), T(REACTIVATE)
 
 #define T(x) PROC_HDL_ ## x
 enum SubcmdId { TLISTOF_PROCHDL_SUBCMD_IDS };

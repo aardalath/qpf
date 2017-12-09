@@ -45,7 +45,7 @@ SET default_with_oids = false;
 -- Name: alerts; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
 CREATE TYPE alert_group     AS ENUM ('System', 'Diagnostics');
 CREATE TYPE alert_severity  AS ENUM ('Warning', 'Error', 'Fatal');
-CREATE TYPE alert_type      AS ENUM ('Resource', 'OutOfRange', 'Diagnostic', 'Comms');
+CREATE TYPE alert_type      AS ENUM ('General', 'Resource', 'OutOfRange', 'Diagnostic', 'Comms');
 CREATE TYPE alert_vartype   AS ENUM ('INT', 'FLOAT', 'DOUBLE');
 CREATE TYPE alert_varvalue  AS (i integer, f float, d double precision);
 CREATE TYPE alert_variable  AS (

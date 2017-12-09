@@ -1803,13 +1803,7 @@ void MainWindow::openWith()
 void MainWindow::reprocessProduct()
 {
     static const int NumOfURLCol = 10;
-    /*
-    QMessageBox::information(this, tr("Reprocess product"),
-            tr("The reprocessing of an Euclid data product is not yet "
-               "supported in the current release of the " APP_LONG_NAME ".\n\n"
-               "It is foreseen that this feature will be available from "
-               "next release on.\n\n"), QMessageBox::Close);
-    */
+
     QPoint p = acReprocess->property("clickedItem").toPoint();
     //QModelIndex m = ui->treevwArchive->indexAt(p);
 
@@ -1825,9 +1819,9 @@ void MainWindow::reprocessProduct()
         }
     }
     
-    std::string userWAType = cfg.general.userAreaType();
+    std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
     DlgReproc::OutputsLocation out =
-        ((userWAType == UserAreaName[UA_AUTO]) ?
+        ((userWAType == UserAreaName[UA_USER]) ?
          DlgReproc::DefUserArea : ((userWAType == UserAreaName[UA_LOCAL]) ?
                                    DlgReproc::CfgLocalDir : DlgReproc::CfgVOSpace));
     int flags = (cfg.flags.intermediateProducts() ?
@@ -1840,7 +1834,8 @@ void MainWindow::reprocessProduct()
     QString outLocation;
     dlg.getFields(inProds, out, outLocation, flags);
 
-    std::cerr << out << " : " << flags << '\n';
+    std::cerr << userWAType << ' ' << out << " : " << flags
+              << " - " << outLocation.toStdString() << '\n';
     
     FileNameSpec fns;
     ProductMetadata md;
@@ -1851,7 +1846,7 @@ void MainWindow::reprocessProduct()
                                  (out == DlgReproc::LocalDir)) ?
                                 UA_LOCAL : (((out == DlgReproc::CfgVOSpace) ||
                                              (out == DlgReproc::VOSpaceFolder)) ?
-                                            UA_VOSPACE : UA_AUTO)); 
+                                            UA_VOSPACE : UA_USER)); 
         md["procTarget"]     = outLocation.toStdString();
 
         URLHandler urlh;
@@ -3050,26 +3045,6 @@ void MainWindow::updateAgentsMonitPanel()
         }
         numOfRows = currentNumOfRows;
     }
-
-    // 3. Update view
-/*
-    for (auto & kv : taskAgentsInfo) {
-        TaskAgentInfo * taInfo = kv.second;
-        TaskAgentInfo & taInfoRef = *taInfo;
-        FrmAgentStatus * panel = 0;
-        std::map<std::string, FrmAgentStatus*>::iterator it = taskAgentsInfoPanel.find(kv.first);
-        if (it == taskAgentsInfoPanel.end()) {
-            panel = new FrmAgentStatus(0);
-            taskAgentsInfoPanel[kv.first] = panel;
-            vlyFrmAgents->removeItem(spacerFrmAgents);
-            vlyFrmAgents->addWidget(panel);
-            vlyFrmAgents->addSpacerItem(spacerFrmAgents);
-        } else {
-            panel = it->second;
-        }
-        // panel->updateInfo(taInfoRef);
-    }
-*/
 }
 
 //----------------------------------------------------------------------

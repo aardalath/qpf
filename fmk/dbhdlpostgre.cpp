@@ -701,13 +701,15 @@ int DBHdlPostgreSQL::getVersionCounter(std::string & procName)
 // Method: checkSignature
 // Check if a product with the same signature exists in the archive
 //----------------------------------------------------------------------
-bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)
+bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ptype, 
+                                     std::string & ver)
 {
     bool result = true;
 
     std::string cmd("SELECT product_version FROM products_info "
                     "WHERE signature LIKE " + str::quoted(sgnt + "%") +
-                    " AND (NOW() - registration_time) > INTERVAL '10 sec')"
+                    " AND product_type = " + str::quoted(ptype) +
+                    " AND ((NOW() - registration_time) > INTERVAL '10 sec')"
                     " ORDER BY id "
                     "DESC LIMIT 1;");
 

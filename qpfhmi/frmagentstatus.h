@@ -57,14 +57,25 @@ class FrmAgentStatus : public QFrame
 {
     Q_OBJECT
 
+    typedef float percent;
+    
 public:
     explicit FrmAgentStatus(QWidget *parent = 0);
     ~FrmAgentStatus();
 
-    void updateInfo(std::string name, TaskStatusSpectra & d);
+    void updateInfo(QString name, QString mode, TaskStatusSpectra & d);
 
 private:
+    void paintArcSection(QRectF & rect, QPainter & painter,
+                         const QColor & color,
+                         percent start, percent end);
+
     Ui::FrmAgentStatus *ui;
+
+    static const int HalfCircle;
+    static const float HalfCircleWidth;
+    static QPen pen;
+    static QVector<QColor> colors;
 };
 
 }

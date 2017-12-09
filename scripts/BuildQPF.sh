@@ -54,6 +54,8 @@ REMOVE="no"
 HMI="yes"
 RECREATEDB="no"
 
+CHGTODIR=""
+
 WORK_AREA="${HOME}"
 QPF_WA_TGTDIR="${WORK_AREA}/qpf"
 PSQL_HOST="localhost"
@@ -240,7 +242,7 @@ install_contrib () {
 ############################################################
 
 ## Parse command line
-while getopts :hcinrbB:D:pw:H:P:I:v OPT; do
+while getopts :hcinrbB:C:D:pw:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -249,6 +251,7 @@ while getopts :hcinrbB:D:pw:H:P:I:v OPT; do
         r|+r) REMOVE="yes" ;;
         b|+b) RECREATEDB="yes" ;;
         B|+B) BUILD_FLAGS="${BUILD_FLAGS} -D $OPTARG" ;;
+        C|+C) CHGTODIR="$OPTARG" ;;
         D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
         w|+w) WORK_AREA="$OPTARG" ;;

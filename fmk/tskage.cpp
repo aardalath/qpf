@@ -484,6 +484,9 @@ void TskAge::sendTaskReport(std::string contId)
     addInfo["TaskName"] = task.taskName();
     addInfo["Agent"]    = compName;
     addInfo["Proc"]     = task.taskPath();
+    addInfo["Inputs"]   = task.inputs.str();
+    TRC("INPUTS: " + task.inputs.str());
+    
     taskData["Info"] = addInfo;
     
     // Place all taskdata information into task structure
@@ -595,11 +598,15 @@ void TskAge::transferOutputProducts(TaskInfo & task)
     TraceMsg("outFiles has " + std::to_string(outFiles.size()) + " elements");
     task.outputs.products.clear();
 
+    ProductMetadata imd = task.inputs.products.at(0);
+    
     FileNameSpec fs;
     for (unsigned int i = 0; i < outFiles.size(); ++i) {
         ProductMetadata m;
         if (fs.parseFileName(outFiles.at(i), m, ProcessingSpace, task.taskPath())) {
             // Place output product at external (output) shared area
+            m["procTargetType"] = imd["procTargetType"];
+            m["procTarget"]     = imd["procTarget"];
             urlh.setProduct(m);
             m = urlh.fromProcessing2Gateway();
         } else {

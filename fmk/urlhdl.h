@@ -132,6 +132,11 @@ public:
     ProductMetadata & fromGateway2LocalArch();
 
     //----------------------------------------------------------------------
+    // Method: fromGateway2FinalDestination
+    //----------------------------------------------------------------------
+    ProductMetadata & fromGateway2FinalDestination();
+    
+    //----------------------------------------------------------------------
     // Method: relocate
     //----------------------------------------------------------------------
     int relocate(std::string & sFrom, std::string & sTo,

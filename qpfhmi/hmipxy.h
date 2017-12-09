@@ -108,6 +108,12 @@ public:
     void sendNewConfig();
     
     //----------------------------------------------------------------------
+    // Method: sendReprocCmd
+    // Send a reprocessing request command to the EventMng
+    //----------------------------------------------------------------------
+    void sendReprocCmd();
+
+    //----------------------------------------------------------------------
     // Method: sendCmd
     // Send a command message to a target (or a set of them)
     //----------------------------------------------------------------------

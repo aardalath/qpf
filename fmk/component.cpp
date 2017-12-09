@@ -606,7 +606,7 @@ void Component::raise(Alert a, Alert::Group grp)
 
         db->runCmd(ss.str());
     } catch (RuntimeException & e) {
-        ErrMsg(e.what());
+        ErrMsg(std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " + e.what());
         DBG(e.what());
         return;
     }

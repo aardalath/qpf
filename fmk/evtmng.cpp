@@ -109,7 +109,7 @@ void EvtMng::runEachIteration()
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
 
-        TraceMsg("New DirWatchEvent: " + e.path + "/" + e.name
+        TRC("New DirWatchEvent: " + e.path + "/" + e.name
                  + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
         // Process only files
@@ -242,7 +242,9 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
                      "", "", "");
         body["ans"] = "OK";
         
-    } else if (cmd == CmdQuit) { // Session id. request
+    } else if (cmd == CmdReproc) { // Reprocessing products request
+
+    } else if (cmd == CmdQuit) { // Quit request
 
         requestQuit = true;
         return;

@@ -244,7 +244,8 @@ public:
     // Method: checkSignature
     // Check if a product with the same signature exists in the archive
     //----------------------------------------------------------------------
-    virtual bool checkSignature(std::string & sgnt, std::string & ver);
+    virtual bool checkSignature(std::string & sgnt, std::string & ptype, 
+                                std::string & ver);
 
 private:
 
