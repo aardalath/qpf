@@ -1836,7 +1836,8 @@ void MainWindow::reprocessProduct()
 
     std::cerr << userWAType << ' ' << out << " : " << flags
               << " - " << outLocation.toStdString() << '\n';
-    
+
+    ProductList reprocProducts;
     FileNameSpec fns;
     ProductMetadata md;
     foreach (QString fileName, inProds) {
@@ -1848,11 +1849,15 @@ void MainWindow::reprocessProduct()
                                              (out == DlgReproc::VOSpaceFolder)) ?
                                             UA_VOSPACE : UA_USER)); 
         md["procTarget"]     = outLocation.toStdString();
-
-        URLHandler urlh;
-        urlh.setProduct(md);
-        md = urlh.fromFolder2Inbox();
+        reprocProducts.products.push_back(md);
     }
+
+    std::cerr << md.urlSpace() << ' '
+              << md.procTargetType() << ' '
+              << md.procTarget() << ' '
+              << '\n';
+
+    hmiNode->sendReprocCmd(reprocProducts);
 }
 
 //----------------------------------------------------------------------

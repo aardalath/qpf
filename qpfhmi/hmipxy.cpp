@@ -46,6 +46,7 @@
 #include "message.h"
 #include "str.h"
 #include "hostinfo.h"
+#include "filenamespec.h"
 
 #include "config.h"
 
@@ -221,8 +222,18 @@ void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId sub
 // Method: sendReprocCmd
 // Send a reprocessing request command to the EventMng
 //----------------------------------------------------------------------
-void HMIProxy::sendReprocCmd()
+void HMIProxy::sendReprocCmd(ProductList & reprocList)
 {
+    // Build product list to be sent in message
+    
+    json prodList;
+    int i(0);
+    for (auto & m: reprocList.products) {
+        prodList[i] = m.val();
+        ++i;
+    }
+
+    // Build message
     Message<MsgBodyCMD> msg;
     MsgBodyCMD body;
     msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
@@ -231,7 +242,8 @@ void HMIProxy::sendReprocCmd()
 
     // Create message and send
     body["cmd"]         = CmdReproc;
-
+    body["products"]    = prodList;
+    
     msg.buildBody(body);
     send(ChnlHMICmd, msg.str()); 
     TraceMsg("Sending message: " + msg.str());
