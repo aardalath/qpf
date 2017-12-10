@@ -48,14 +48,6 @@
 
 using Configuration::cfg;
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -78,7 +70,8 @@ EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)
 void EvtMng::fromRunningToOperational()
 {
     requestQuit = false;
-
+    hmiActive = false;
+    
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(Config::PATHBase + "/data/inbox");
     InfoMsg("DirW2tcher installed at " + Config::PATHBase + "/data/inbox");
@@ -124,53 +117,27 @@ void EvtMng::runEachIteration()
                 continue;
             }
 
-            Message<MsgBodyINDATA> msg;
-            msg.buildHdr(ChnlInData, MsgInData, CHNLS_IF_VERSION,
-                         compName, "*",
-                         "", "", "");
-
-            MsgBodyINDATA body;
-            body["products"][0] = m.val();
-            msg.buildBody(body);
-
-            this->send(ChnlInData, msg.str());
+            {
+                std::lock_guard<std::mutex> lock(mtxInData);
+                m["urlSpace"] = InboxSpace;
+                inboxProducts.products.push_back(m);
+            }
         }
     }
 
     bool sendInit = ((iteration + 1) == 100);
-    bool sendPing = ((iteration % 200) == 0);
-    bool sendQuit = requestQuit; //(iteration > 1000) || requestQuit;
-
-    if (sendInit || sendPing || sendQuit) {
+    if (sendInit) {
         Message<MsgBodyCMD> msg;
-
-        if (sendPing) {
-            msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
-                         compName, "*",
-                         "", "", "");
-        } else {
-            msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
-                         compName, "*",
-                         "", "", "");
-        }
-
+        msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
+                     compName, "*",
+                     "", "", "");
         MsgBodyCMD body;
         body["iteration"] = std::to_string(iteration);
-
-        if (sendInit) {
-            body["cmd"] = CmdInit;
-            body["sessionId"] = cfg.sessionId;
-        } else if (sendPing) {
-            body["cmd"] = CmdPing;
-        } else if (sendQuit) {
-            body["cmd"] = CmdQuit;
-        }
+        body["cmd"] = CmdInit;
+        body["sessionId"] = cfg.sessionId;
 
         msg.buildBody(body);
-
-        this->send(sendPing ? ChnlEvtMng : ChnlCmd, msg.str());
-
-        if (sendQuit) { transitTo(RUNNING); }
+        this->send(ChnlCmd, msg.str());
     }
 }
 
@@ -179,6 +146,8 @@ void EvtMng::runEachIteration()
 //----------------------------------------------------------------------
 void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    hmiActive = true;
+    
     Message<MsgBodyCMD> msg(m);
     MsgBodyCMD body;
     std::string cmd = msg.body["cmd"].asString();
@@ -244,6 +213,12 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         
     } else if (cmd == CmdReproc) { // Reprocessing products request
 
+        ProductList prodList(msg.body["products"]);
+        TRC("Received CmdReproc with " +
+            std::to_string(prodList.products.size()) + " products");
+        std::lock_guard<std::mutex> lock(mtxReproc);
+        reprocProducts.products = std::move(prodList.products);
+
     } else if (cmd == CmdQuit) { // Quit request
 
         requestQuit = true;
@@ -256,4 +231,92 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     this->send(ChnlHMICmd, msg.str());
 }
 
-//}
+//----------------------------------------------------------------------
+// Method: getInData
+// Store in argument variables the INDATA products
+//----------------------------------------------------------------------
+bool EvtMng::getInData(ProductList & inData, std::string & space)
+{
+    bool retVal = inboxProducts.products.size() > 0;
+    if (retVal) {
+        std::lock_guard<std::mutex> lock(mtxInData);
+        inData.products = std::move(inboxProducts.products);
+        space = inData.products.at(0).urlSpace();
+    }
+    return (retVal);
+}
+
+//----------------------------------------------------------------------
+// Method: getReprocData
+// Store in argument variables the REPROCDATA products
+//----------------------------------------------------------------------
+bool EvtMng::getReprocData(ProductList & reprocData)
+{
+    bool retVal = reprocProducts.products.size() > 0;
+    if (retVal) {
+        std::lock_guard<std::mutex> lock(mtxReproc);
+        reprocData.products = std::move(reprocProducts.products);
+    }
+    return (retVal);
+}
+
+//----------------------------------------------------------------------
+// Method: isHMIActive
+//----------------------------------------------------------------------
+bool EvtMng::isHMIActive()
+{
+    return hmiActive;
+}
+
+//----------------------------------------------------------------------
+// Method: isQuitRequested
+//----------------------------------------------------------------------
+bool EvtMng::isQuitRequested()
+{
+    return requestQuit;
+}
+
+//----------------------------------------------------------------------
+// Method: isQuitRequested
+//----------------------------------------------------------------------
+void EvtMng::quit()
+{
+    // Send QUIT messages
+    Message<MsgBodyCMD> msg;
+    msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
+                 compName, "*",
+                 "", "", "");
+
+    MsgBodyCMD body;
+    body["iteration"] = std::to_string(iteration);
+    body["cmd"] = CmdQuit;
+
+    msg.buildBody(body);
+    this->send(ChnlCmd, msg.str());
+
+    // Transit to RUNNING (no way back)
+    transitTo(RUNNING); 
+}
+
+//----------------------------------------------------------------------
+// Method: sendProcFmkInfoUpdate
+// Send an update on the ProcessingFrameworkInfo structure
+//----------------------------------------------------------------------
+void EvtMng::sendProcFmkInfoUpdate(json & fmkInfoValue)
+{
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
+    // Prepare message and send it
+    Message<MsgBodyTSK> msg;
+    MsgBodyTSK body;
+    body["info"] = fmkInfoValue;
+    msg.buildBody(body);
+
+    // Set message header
+    msg.buildHdr(ChnlFmkMon, MsgFmkMon, CHNLS_IF_VERSION,
+                 compName, "HMIProxy", "", "", "");
+
+    // Send msg
+    this->send(ChnlFmkMon, msg.str());        
+}
+

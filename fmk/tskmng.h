@@ -71,14 +71,6 @@
 #include "hostinfo.h"
 #include "procinfo.h"
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //==========================================================================
 // Class: TaskManager
 //==========================================================================
@@ -101,6 +93,24 @@ public:
     //----------------------------------------------------------------------
     virtual void runEachIteration();
 
+    //----------------------------------------------------------------------
+    // Method: scheduleTask
+    // Schedule task for later provision to the requesting agents
+    //----------------------------------------------------------------------
+    void scheduleTask(TaskInfo & task);
+    
+    //----------------------------------------------------------------------
+    // Method: getTskMsgUpdate
+    // Provide an update on the Task Report information
+    //----------------------------------------------------------------------
+    bool getTskRepUpdate(json & tskRepData);
+
+    //----------------------------------------------------------------------
+    // Method: getProcFmkInfoUpdate
+    // Provide an update on the ProcessingFrameworkInfo structure
+    //----------------------------------------------------------------------
+    void getProcFmkInfoUpdate(json & fmkInfoValue);
+    
 protected:
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational
@@ -108,11 +118,6 @@ protected:
     void fromRunningToOperational();
 
 protected:
-    //----------------------------------------------------------------------
-    // Method: processTskSchedMsg
-    //----------------------------------------------------------------------
-    void processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m);
-
     //----------------------------------------------------------------------
     // Method: processTskRqstMsg
     //----------------------------------------------------------------------
@@ -148,18 +153,6 @@ private:
     void consolidateMonitInfo(MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: armProcFmkInfoMsgTimer
-    // Arm new timer for sending ProcessingFrameworkInfo updates
-    //----------------------------------------------------------------------
-    void armProcFmkInfoMsgTimer();
-
-    //----------------------------------------------------------------------
-    // Method: armTskRepMsgTimer
-    // Arm new timer for sending Task Report messages
-    //----------------------------------------------------------------------
-    void armTskRepMsgTimer();
-
-    //----------------------------------------------------------------------
     // Method: convertTaskStatusToSpectra
     // Convert set of status for an agent to a spectra tuple
     //----------------------------------------------------------------------
@@ -171,18 +164,6 @@ private:
     bool sendTaskAgMsg(MessageString & m,
                        std::string agName);
 
-    //----------------------------------------------------------------------
-    // Method: sendProcFmkInfoUpdate
-    // Send an update on the ProcessingFrameworkInfo structure
-    //----------------------------------------------------------------------
-    void sendProcFmkInfoUpdate();
-    
-    //----------------------------------------------------------------------
-    // Method: sendTskRepMsgUpdate
-    // Send an update on the Task Report information
-    //----------------------------------------------------------------------
-    void sendTskRepMsgUpdate();
-
 private:
     typedef std::pair<std::string, TaskStatus>  TaskStatusPerAgent;
     std::vector<std::string>         agents;
@@ -192,6 +173,8 @@ private:
     std::list<TaskInfo> containerTasks;
 
     typedef std::map<std::string, TaskInfo>  RuleTagInputs;
+
+    std::vector<std::string> rqstAgents;
 
     std::map<std::string, TaskStatus> taskRegistry;
 
@@ -212,7 +195,5 @@ private:
     bool sendingTskRegInfo;
     std::map<std::string, std::string> tskRegMsgs;
 };
-
-//}
 
 #endif // TSKMNG_H

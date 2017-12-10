@@ -23,6 +23,7 @@ set (libfmk_hdr
   dbhdlpostgre.h
   except.h
   datamng.h
+  master.h
   evtmng.h
   logmng.h
   tskage.h
@@ -45,6 +46,7 @@ set (libfmk_src
   filenamespec.cpp
   component.cpp
   dbhdlpostgre.cpp
+  master.cpp
   datamng.cpp
   evtmng.cpp
   logmng.cpp

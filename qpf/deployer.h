@@ -64,6 +64,7 @@
 // Topic: Project headers
 //   none
 //------------------------------------------------------------
+#include "master.h"
 #include "evtmng.h"
 #include "datamng.h"
 #include "logmng.h"
@@ -207,10 +208,8 @@ private:
 private:
     struct MasterNodeElements {
         EvtMng  * evtMng;
-        DataMng * datMng;
-        LogMng  * logMng;
-        TskOrc  * tskOrc;
         TskMng  * tskMng;
+        Master  * master;
     };
 
     typedef MasterNodeElements * MasterNodeElementsPtr;

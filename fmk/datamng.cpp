@@ -66,14 +66,6 @@
 
 using Configuration::cfg;
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -91,59 +83,22 @@ DataMng::DataMng(std::string name, std::string addr, Synchronizer * s)
 }
 
 //----------------------------------------------------------------------
-// Method: processInDataMsg
+// Method: storeTskRegData
 //----------------------------------------------------------------------
-void DataMng::processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m)
+void DataMng::storeTskRegData(json & tskRepData)
 {
-    Message<MsgBodyINDATA> msg(m);
-    MsgBodyINDATA & body = msg.body;
-    ProductList prodList(body["products"]);
+    for (Json::ValueIterator itr = tskRepData.begin();
+         itr != tskRepData.end(); ++itr) {
 
-    // Synthetic INDATA messages, that means reading products from folder
-    DBG("Transfer files to local archive");
-    URLHandler urlh;
-    for (auto & m : prodList.products) {
-        urlh.setProduct(m);
-        m = urlh.fromInbox2LocalArch();
-    }
-
-    // Save to DB
-    DBG("Store products in DB");
-    saveProductsToDB(prodList);
-    DBG("Processing of DB done.");
-}
-
-//----------------------------------------------------------------------
-// Method: processTskSchedMsg
-//----------------------------------------------------------------------
-void DataMng::processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString & m)
-{
-    // Save task to DB
-    saveTaskToDB(m, true);
-}
-
-//----------------------------------------------------------------------
-// Method: processTskRegMsg
-//----------------------------------------------------------------------
-void DataMng::processTskRegMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-
-    json & multiBody = body["info"];
-
-    for (Json::ValueIterator itr = multiBody.begin();
-         itr != multiBody.end(); ++itr) {
-
-	TaskInfo task(*itr);
-
-	std::string taskName  = task.taskName();
-	TaskStatus taskStatus = TaskStatus(task.taskStatus());
-
-	TraceMsg("DataMng: Processing TaskReport: " + taskName
-		 + " has status " + TaskStatusName[taskStatus]);
-
-	saveTaskToDB(task);
+        TaskInfo task(*itr);
+        
+        std::string taskName  = task.taskName();
+        TaskStatus taskStatus = TaskStatus(task.taskStatus());
+        
+        TraceMsg("DataMng: Processing TaskReport: " + taskName
+                 + " has status " + TaskStatusName[taskStatus]);
+        
+        saveTaskToDB(task);
     }
 }
 
@@ -486,4 +441,20 @@ bool DataMng::getProductLatest(std::string prodType,
     return retVal;
 }
 
-//}
+
+
+//----------------------------------------------------------------------
+// Method: processInDataMsg
+//----------------------------------------------------------------------
+void DataMng::txInDataToLocalArch(ProductList & inData)
+{
+    // Transfer to local archive
+    URLHandler urlh;
+    for (auto & m : inData.products) {
+        urlh.setProduct(m);
+        m = urlh.fromInbox2LocalArch();
+    }
+
+    // Save to DB
+    saveProductsToDB(inData);
+}

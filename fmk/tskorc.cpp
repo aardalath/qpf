@@ -55,14 +55,6 @@
 
 using Configuration::cfg;
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -147,46 +139,6 @@ void TskOrc::fromRunningToOperational()
 
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
-}
-
-//----------------------------------------------------------------------
-// Method: runEachIteration
-//----------------------------------------------------------------------
-void TskOrc::runEachIteration()
-{
-}
-
-//----------------------------------------------------------------------
-// Method: processInDataMsg
-//----------------------------------------------------------------------
-void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    Message<MsgBodyINDATA> msg(m);
-    MsgBodyINDATA & body = msg.body;
-
-    // Synthetic INDATA messages, that means reading products from folder
-    URLHandler urlh;
-    for (auto & md : msg.body.products) {
-        urlh.setProduct(md);
-        md = urlh.fromInbox2LocalArch(false);
-        // Append product to catalogue
-        std::string prodType = md.productType();
-        catalogue.products[prodType] = md;
-
-        // Check the product type as input for any rule
-        RuleInputs ruleInputs;
-        if (checkRulesForProductType(prodType, ruleInputs)) {
-            for (auto & kv : ruleInputs) {
-                DbgMsg("Product type " + prodType + " fires rule: " +
-                        orcMaps.ruleDesc[kv.first]);
-                for (auto & itInp : kv.second.products) {
-                    DbgMsg("Input: " + itInp.productId());
-                }
-                // Generate and send processing task to TskMng
-                sendTaskSchedMsg(kv.first, kv.second);
-            }
-        }
-    }
 }
 
 //----------------------------------------------------------------------
@@ -321,17 +273,46 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
     return atLeastOneRuleFired;
 }
 
-//----------------------------------------------------------------------
-// Method: sendTaskSchedMsg
-// Send a TaskProcessingMsg to the Task Manager, requesting the
-// execution of a rule
-//----------------------------------------------------------------------
-bool TskOrc::sendTaskSchedMsg(Rule * rule,
-                              ProductList & inputs)
-{
-    // Define and set task object
-    TaskInfo task;
 
+
+//----------------------------------------------------------------------
+// Method: createTasks
+// Create tasks if any of the products is firing an orchestration rule,
+// and return the tasks created
+//----------------------------------------------------------------------
+void TskOrc::createTasks(ProductList & inData, std::vector<TaskInfo> & tasks)
+{
+    // Synthetic INDATA messages, that means reading products from folder
+    for (auto & md : inData.products) {
+        // Append product to catalogue
+        std::string prodType = md.productType();
+        catalogue.products[prodType] = md;
+
+        // Check the product type as input for any rule
+        RuleInputs ruleInputs;
+        if (checkRulesForProductType(prodType, ruleInputs)) {
+            for (auto & kv : ruleInputs) {
+                DbgMsg("Product type " + prodType + " fires rule: " +
+                        orcMaps.ruleDesc[kv.first]);
+                for (auto & itInp : kv.second.products) {
+                    DbgMsg("Input: " + itInp.productId());
+                }
+
+                // Generate task and store in output vector
+                TaskInfo task;
+                createTask(kv.first, kv.second, task);
+                tasks.push_back(task);
+            }
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: createTask
+// Create a task for a given rule and input products
+//----------------------------------------------------------------------
+void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
+{
     DateTime epoch = timeTag();
     UUID uuid;
     uuid.generate_random();
@@ -363,19 +344,4 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
         task["outputs"][i] = m.val();
         ++i;
     }
-
-    // Create message and send
-    Message<MsgBodyTSK> msg;
-    msg.buildHdr(ChnlTskSched, ChnlTskSched, CHNLS_IF_VERSION,
-                 compName, "*",
-                 "", "", "");
-
-    MsgBodyTSK body;
-    body["info"] = task.val();
-    body["tag"]  = rule->name;
-    msg.buildBody(body);
-
-    this->send(ChnlTskSched, msg.str());
-    TRC("Sending: " + msg.str());
-    return true;
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    evtmng.h
+ * File:    master.h
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.Component
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef EVTMNG_H
-#define EVTMNG_H
+#ifndef MASTER_H
+#define MASTER_H
 
 //============================================================
 // Group: External Dependencies
@@ -48,7 +48,6 @@
 //------------------------------------------------------------
 // Topic: System headers
 //------------------------------------------------------------
-#include <mutex>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -57,26 +56,34 @@
 //------------------------------------------------------------
 // Topic: Project headers
 //   . component.h
-//   - dwatcher.h
 //------------------------------------------------------------
-#include "component.h"
-#include "dwatcher.h"
+#include "evtmng.h"
+#include "datamng.h"
+#include "logmng.h"
+#include "tskorc.h"
+#include "tskmng.h"
+#include "tskage.h"
 
 //==========================================================================
-// Class: EventManager
+// Class: Master
 //==========================================================================
-class EvtMng : public Component {
+class Master : public Component {
 
 public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(const char * name, const char * addr = 0, Synchronizer * s = 0);
+    Master(const char * name, const char * addr = 0, Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
+    Master(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
+
+    //----------------------------------------------------------------------
+    // Method: init
+    //----------------------------------------------------------------------
+    void init();
 
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational
@@ -89,62 +96,30 @@ public:
     virtual void fromOperationalToRunning();
 
     //----------------------------------------------------------------------
+    // Method: setEvtMng
+    //----------------------------------------------------------------------
+    void setEvtMng(EvtMng * obj);
+    
+    //----------------------------------------------------------------------
+    // Method: setTskMng
+    //----------------------------------------------------------------------
+    void setTskMng(TskMng * obj);
+    
+    //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
     virtual void runEachIteration();
 
-public:
-    //----------------------------------------------------------------------
-    // Method: runEachIteration
-    //----------------------------------------------------------------------
-    bool getInData(ProductList & inData, std::string & space);
-
-    //----------------------------------------------------------------------
-    // Method: getReprocData
-    // Store in argument variables the REPROCDATA products
-    //----------------------------------------------------------------------
-    bool getReprocData(ProductList & reprocData);
-    
-    //----------------------------------------------------------------------
-    // Method: isHMIActive
-    //----------------------------------------------------------------------
-    bool isHMIActive();
-    
-    //----------------------------------------------------------------------
-    // Method: isQuitRequested
-    //----------------------------------------------------------------------
-    bool isQuitRequested();
-    
-    //----------------------------------------------------------------------
-    // Method: isQuitRequested
-    //----------------------------------------------------------------------
-    void quit();
-
-    //----------------------------------------------------------------------
-    // Method: sendProcFmkInfoUpdate
-    // Send an update on the ProcessingFrameworkInfo structure
-    //----------------------------------------------------------------------
-    void sendProcFmkInfoUpdate(json & fmkInfoValue);
-
-protected:
-    //----------------------------------------------------------------------
-    // Method: processHMICmdMsg
-    //----------------------------------------------------------------------
-    virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-
 private:
-    DirWatcher * dw;
+    EvtMng  * evtMng;
+    DataMng * datMng;
+    LogMng  * logMng;
+    TskOrc  * tskOrc;
+    TskMng  * tskMng;
 
-    ProductList inboxProducts;
-    ProductList reprocProducts;
-
-    std::mutex mtxInData;
-    std::mutex mtxReproc;
-    std::mutex mtxHostInfo;
-
-    std::map<std::string, json> elements;
-
+    std::vector<Component*> subComponents;
+    
     bool requestQuit;
-    bool hmiActive;
 };
+
 #endif

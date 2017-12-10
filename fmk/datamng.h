@@ -61,14 +61,6 @@
 //------------------------------------------------------------
 #include "component.h"
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //==========================================================================
 // Class: DataManager
 //==========================================================================
@@ -98,21 +90,22 @@ public:
     bool getProductLatest(std::string prodType,
                           Json::Value & prodMetadata);
 
-protected:
+public:
     //----------------------------------------------------------------------
     // Method: processInDataMsg
     //----------------------------------------------------------------------
-    virtual void processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m);
+    void txInDataToLocalArch(ProductList & inData);
 
     //----------------------------------------------------------------------
-    // Method: processTskSchedMsg
+    // Method: storeTskRegData
     //----------------------------------------------------------------------
-    virtual void processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString & m);
+    void storeTskRegData(json & tskRepData);
 
     //----------------------------------------------------------------------
-    // Method: processTskRegMsg
+    // Method: saveTaskToDB
+    // Save the information on generated output products to the archive
     //----------------------------------------------------------------------
-    virtual void processTskRegMsg(ScalabilityProtocolRole* c, MessageString & m);
+    void saveTaskToDB(TaskInfo & taskInfo, bool initialStore = false);
 
 protected:
 
@@ -135,12 +128,6 @@ protected:
     // Save the information on generated output products to the archive
     //----------------------------------------------------------------------
     void saveTaskToDB(MessageString & msg, bool initialStore = false);
-
-    //----------------------------------------------------------------------
-    // Method: saveTaskToDB
-    // Save the information on generated output products to the archive
-    //----------------------------------------------------------------------
-    void saveTaskToDB(TaskInfo & taskInfo, bool initialStore = false);
 
     //----------------------------------------------------------------------
     // Method: sanitizeProductVersions
@@ -166,7 +153,5 @@ protected:
 private:
     std::string dbFileName;
 };
-
-//}
 
 #endif  /* DATAMNG_H */

@@ -68,14 +68,6 @@ using Configuration::cfg;
 
 #define DEFAULT_INITIAL_PORT   50000
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 Deployer * deployerCatcher;
 
 //----------------------------------------------------------------------
@@ -530,7 +522,7 @@ void Deployer::createElementsNetwork()
 
         // CHANNEL CMD - PUBSUB
         // - Publisher: EvtMng
-        // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
+        // - Subscribers: TskAge*
         chnl     = ChnlCmd;
         TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
@@ -538,19 +530,6 @@ void Deployer::createElementsNetwork()
         for (auto & a : ag) {
             if (a != 0) {
                 a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-            }
-        }
-
-        // CHANNEL EVTMNG Related - SURVEY
-        // - Surveyor: EvtMng
-        // - Respondent: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
-        chnl     = ChnlEvtMng;
-        TRC("### Connections for channel " << chnl);
-        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
-        connAddr = bindAddr;
-        for (auto & a : ag) {
-            if (a != 0) {
-                a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
             }
         }
 
@@ -581,9 +560,6 @@ void Deployer::createElementsNetwork()
     // a. Create master node elements
     //-----------------------------------------------------------------
     m.evtMng = new EvtMng  ("EvtMng", masterAddress, &synchro);
-    m.datMng = new DataMng ("DatMng", masterAddress, &synchro);
-    m.logMng = new LogMng  ("LogMng", masterAddress, &synchro);
-    m.tskOrc = new TskOrc  ("TskOrc", masterAddress, &synchro);
     m.tskMng = new TskMng  ("TskMng", masterAddress, &synchro);
 
     //-----------------------------------------------------------------
@@ -592,33 +568,15 @@ void Deployer::createElementsNetwork()
 
     // CHANNEL CMD - PUBSUB
     // - Publisher: EvtMng
-    // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
+    // - Subscribers: TskAge*
     chnl     = ChnlCmd;
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
     m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     connAddr = bindAddr;
-    std::vector<CommNode*> cs1({m.datMng, m.logMng, m.tskOrc, m.tskMng});
-    cs1.insert(cs1.end(), ag.begin(), ag.end());
-    for (auto & c : cs1) {
+    for (auto & c : ag) {
         if (c != 0) {
             c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-        }
-    }
-
-    // CHANNEL EVTMNG Related - SURVEY
-    // - Surveyor: EvtMng
-    // - Respondent: DataMng LogMng TskOrc TskMng TskAge*
-    chnl     = ChnlEvtMng;
-    TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
-    m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
-    connAddr = bindAddr;
-    std::vector<CommNode*> cs2({m.datMng, m.logMng, m.tskOrc, m.tskMng});
-    cs2.insert(cs2.end(), ag.begin(), ag.end());
-    for (auto & c : cs2) {
-        if (c != 0) {
-            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
         }
     }
 
@@ -628,30 +586,6 @@ void Deployer::createElementsNetwork()
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortHMICmd);
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
-
-    // CHANNEL INDATA -  PUBSUB
-    // - Publisher: EvtMng
-    // - Subscriber: DataMng TskOrc
-    chnl     = ChnlInData;
-    TRC("### Connections for channel " << chnl);
-    bindAddr = "inproc://" + chnl;
-    connAddr = bindAddr;
-    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-    }
-
-    // CHANNEL TASK-SCHEDULING - PUBSUB
-    // - Publisher: TskOrc
-    // - Subscriber: DataMng TskMng
-    chnl     = ChnlTskSched;
-    TRC("### Connections for channel " << chnl);
-    bindAddr = "inproc://" + chnl;
-    connAddr = bindAddr;
-    m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-    }
 
     // CHANNEL TASK-PROCESSING - REQREP
     // - Out/In: TskAge*/TskMng
@@ -673,26 +607,20 @@ void Deployer::createElementsNetwork()
         ++k;
     }
 
-    // CHANNEL TASK-REGISTRATION - PIPELINE
-    // - Requester: TskMng
-    // - Replier: DataMng
-    chnl     = ChnlTskReg;
-    TRC("### Connections for channel " << chnl);
-    bindAddr = "ipc:///tmp/" + chnl + ".ipc";
-    connAddr = bindAddr;
-    m.tskMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
-    m.datMng->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
-
     // CHANNEL FRAMEWORK MONITORING - PIPELINE
-    // - Requester: TskMng
+    // - Requester: EvtMng
     // - Replier: QPFHMI
     chnl     = ChnlFmkMon;
     TRC("### Connections for channel " << chnl);
     bindAddr = "ipc:///tmp/" + chnl + ".ipc";
     connAddr = bindAddr;
-    m.tskMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
+    m.evtMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
     // PULL end is created by HMIProxy
 
+    //=== FINALLY, CREATE MASTER COMPONENT ============================
+    
+    m.master = new Master("Master", masterAddress, &synchro);
+    m.master->setEvtMng(m.evtMng);
+    m.master->setTskMng(m.tskMng);
+    m.master->init();
 }
-
-//}

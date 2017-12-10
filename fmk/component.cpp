@@ -55,14 +55,6 @@ using Configuration::cfg;
 //#include <unistd.h>
 //#include <time.h>
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 const int HEART_BEAT_STEP_SIZE = 250;
 
 #include <csignal>
@@ -105,20 +97,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     iteration = 0;
     stepSize  = HEART_BEAT_STEP_SIZE;
 
-    // Every component must respond to MONIT_RQST messages (at least the
-    // state might be requested)
-    //canProcessMessage(MSG_MONIT_RQST_IDX);
-
-    /*
-    isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
-    isRemote     = (!ConfigurationInfo::data().isMaster);
-    session      = ConfigurationInfo::data().session;
-    */
-    // Define log output
-    //Log::setLogBaseDir(Config::PATHBase + "/log");
-    
-    //Log::setMinLogLevel((Log::LogLevel)(minLvl));
-
+    // Define log system
     Log::defineLogSystem(compName);
 
     // Define valid state transitions
@@ -141,8 +120,6 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
 void Component::addConnection(ChannelDescriptor & chnl,
                               ScalabilityProtocolRole * conct)
 {
-    //TRC(">>> Connection object is 0x" << conct);
-    //TRC(">>> Creating connection: " + chnl + " - " + conct->getName() + "/" + conct->getAddress());
     conct->setName(compName);
     connections[chnl] = conct;
 }
@@ -653,4 +630,3 @@ void Component::writeMsgToFile(SendOrRecv sor,
     fclose(fHdl);
 }
 
-//}

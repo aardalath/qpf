@@ -53,14 +53,6 @@
 
 using Configuration::cfg;
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 const int FMK_INFO_TIMER = 5000;
 const int TSK_REP_TIMER  = 3000;
 
@@ -153,33 +145,6 @@ void TskMng::runEachIteration()
 }
 
 //----------------------------------------------------------------------
-// Method: processTskSchedMsg
-//----------------------------------------------------------------------
-void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    // Define ans set task objecte
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"]);
-
-    // Store task in specific container
-    if (task.taskSet() == "CONTAINER") {
-        containerTasks.push_back(task);
-    } else if (task.taskSet() == "SERVICE") {
-        serviceTasks.push_back(task);
-    } else {
-        WarnMsg("Task not identified neither for Container nor Services: " + task.taskSet());
-        RaiseSysAlert(Alert(Alert::System,
-                            Alert::Warning,
-                            Alert::Comms,
-                            std::string(__FILE__ ":" Stringify(__LINE__)),
-                            "Task not identified neither for Container nor Services: "
-                            + task.taskSet(),
-                            0));
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processTskRqstMsg
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
@@ -217,6 +182,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
         DBG("Task message resent to " + agName);
         return;
     }
+
     
     // Select task to send
     TraceMsg("Pool of tasks has size of " + std::to_string(containerTasks.size()));
@@ -246,8 +212,6 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     containerTaskStatusPerAgent[std::make_pair(agName, TASK_SCHEDULED)]++;
     
     DBG("Task " + taskName + "sent to " + agName);
-    
-    if (!sendingTskRegInfo) { armTskRepMsgTimer(); }       
 }
 
 //----------------------------------------------------------------------
@@ -319,33 +283,6 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Place new information in general structure
     consolidateMonitInfo(m);
-
-    // If sending updates is not yet activated, activate it
-    if (!sendingPeriodicFmkInfo) {
-        sendingPeriodicFmkInfo = true;
-        armProcFmkInfoMsgTimer();
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: armTskRepMsgTimer
-// Arm new timer for sending Task Report messages
-//----------------------------------------------------------------------
-void TskMng::armTskRepMsgTimer()
-{
-    std::unique_ptr<Timer> tskRepSender(new Timer(TSK_REP_TIMER, true,
-                                                  &TskMng::sendTskRepMsgUpdate, this));
-    sendingTskRegInfo = true;
-}
-
-//----------------------------------------------------------------------
-// Method: armProcFmkInfoMsgTimer
-// Arm new timer for sending ProcessingFrameworkInfo updates
-//----------------------------------------------------------------------
-void TskMng::armProcFmkInfoMsgTimer()
-{
-    std::unique_ptr<Timer> fmkSender(new Timer(FMK_INFO_TIMER, true,
-                                               &TskMng::sendProcFmkInfoUpdate, this));
 }
 
 //----------------------------------------------------------------------
@@ -437,29 +374,16 @@ void TskMng::consolidateMonitInfo(MessageString & m)
 }
 
 //----------------------------------------------------------------------
-// Method: sendTaskAgMsg
-// Send a TaskProcessingMsg to the Task Manager, requesting the
-// execution of a rule
+// Method: getTskRepUpdate
+// Provide an update on the Task Report information
 //----------------------------------------------------------------------
-bool TskMng::sendTaskAgMsg(MessageString & m,
-                           std::string agName)
-{
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: sendTskRepMsgUpdate
-// Send an update on the Task Report information
-//----------------------------------------------------------------------
-void TskMng::sendTskRepMsgUpdate()
+bool TskMng::getTskRepUpdate(json & tskRepData)
 {
     std::unique_lock<std::mutex> ulck(mtxTskRegMsg);
-
-    if (! tskRegMsgs.empty()) {
+    bool dataAvailable = ! tskRegMsgs.empty();
+    if (dataAvailable) {
 
         // Prepare message and send it
-        Message<MsgBodyTSK> msg;
-        MsgBodyTSK body;
         int maxSize = MAX_MESSAGE_SIZE - 400; // header must be added
 
         std::string multiMsg;
@@ -471,48 +395,43 @@ void TskMng::sendTskRepMsgUpdate()
         }
         multiMsg.pop_back();
 
-        JValue tskRegValue("{" + multiMsg + "}");
-        body["info"] = tskRegValue.val();
-        msg.buildBody(body);
-
-        // Set message header
-        msg.buildHdr(ChnlTskReg, MsgTskReg, CHNLS_IF_VERSION,
-                     compName, "DatMng", "", "", "");
-
-        // Send msg
-        this->send(ChnlTskReg, msg.str());    
+        tskRepData = JValue("{" + multiMsg + "}").val();
     }
     
-    // Arm new timer
-    armTskRepMsgTimer();
+    return dataAvailable;
 }
 
 //----------------------------------------------------------------------
-// Method: sendProcFmkInfoUpdate
-// Send an update on the ProcessingFrameworkInfo structure
+// Method: getProcFmkInfoUpdate
+// Provide an update on the ProcessingFrameworkInfo structure
 //----------------------------------------------------------------------
-void TskMng::sendProcFmkInfoUpdate()
+void TskMng::getProcFmkInfoUpdate(json & fmkInfoValue)
 {
     std::unique_lock<std::mutex> ulck(mtxHostInfo);
+    fmkInfoValue = JValue( Config::procFmkInfo->toJsonStr() ).val();
+}
 
-    // Prepare message and send it
-    Message<MsgBodyTSK> msg;
-    MsgBodyTSK body;
-
-    std::string s = Config::procFmkInfo->toJsonStr();
-    JValue fmkInfoValue(s);
-    body["info"] = fmkInfoValue.val();
-    msg.buildBody(body);
-
-    // Set message header
-    msg.buildHdr(ChnlFmkMon, MsgFmkMon, CHNLS_IF_VERSION,
-                 compName, "HMIProxy", "", "", "");
-
-    // Send msg
-    this->send(ChnlFmkMon, msg.str());    
-    
-    // Arm new timer
-    if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
+//----------------------------------------------------------------------
+// Method: scheduleTask
+// Schedule task for later provision to the requesting agents
+//----------------------------------------------------------------------
+void TskMng::scheduleTask(TaskInfo & task)
+{
+    // Store task in specific container
+    if (task.taskSet() == "CONTAINER") {
+        containerTasks.push_back(task);
+    } else if (task.taskSet() == "SERVICE") {
+        serviceTasks.push_back(task);
+    } else {
+        WarnMsg("Task not identified neither for Container nor Services: " + task.taskSet());
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Task not identified neither for Container nor Services: "
+                            + task.taskSet(),
+                            0));
+    }
 }
 
 

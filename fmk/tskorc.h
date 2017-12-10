@@ -61,14 +61,6 @@
 //------------------------------------------------------------
 #include "component.h"
 
-////////////////////////////////////////////////////////////////////////////
-// Namespace: QPF
-// -----------------------
-//
-// Library namespace
-////////////////////////////////////////////////////////////////////////////
-//namespace QPF {
-
 //==========================================================================
 // Class: TskOrc
 //==========================================================================
@@ -120,41 +112,30 @@ public:
     //----------------------------------------------------------------------
     // Method: defineOrchestrationParams
     //----------------------------------------------------------------------
-    virtual void runEachIteration();
-
-    //----------------------------------------------------------------------
-    // Method: defineOrchestrationParams
-    //----------------------------------------------------------------------
     void defineOrchestrationParams();
 
+    //----------------------------------------------------------------------
+    // Method: createTasks
+    //----------------------------------------------------------------------
+    void createTasks(ProductList & inData, std::vector<TaskInfo> & tasks);
+    
+    //----------------------------------------------------------------------
+    // Method: createTask
+    //----------------------------------------------------------------------
+    void createTask(Rule * rule, ProductList & inputs, TaskInfo & task);
+    
 protected:
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational
     //----------------------------------------------------------------------
     void fromRunningToOperational();
 
-protected:
-    //----------------------------------------------------------------------
-    // Method: processInDataMsg
-    //----------------------------------------------------------------------
-    void processInDataMsg(ScalabilityProtocolRole* c, MessageString & m);
-
 private:
     //----------------------------------------------------------------------
     // Method: checkRulesForProductType
-    // Check if any of the rules that involve productType as input can
-    // be fired
     //----------------------------------------------------------------------
     bool checkRulesForProductType(std::string prodType,
                                   RuleInputs & ruleInputs);
-
-    //----------------------------------------------------------------------
-    // Method: sendTaskSchedMsg
-    // Send a TaskProcessingMsg to the Task Manager, requesting the
-    // execution of a rule
-    //----------------------------------------------------------------------
-    bool sendTaskSchedMsg(Rule * rule,
-                          ProductList & inputs);
 
 private:
     OrchestrationParameters  orcParams;
@@ -162,7 +143,5 @@ private:
 
     ProductCollection        catalogue;
 };
-
-//}
 
 #endif  /* TSKORC_H */
