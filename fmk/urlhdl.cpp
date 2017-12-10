@@ -214,7 +214,8 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
     productUrlSpace = product.urlSpace();
 
     assert(str::mid(productUrl,0,8) == "file:///");
-    assert(productUrlSpace == LocalArchSpace);
+    assert((productUrlSpace == LocalArchSpace)  ||
+           (productUrlSpace == ReprocessingSpace));
 
     // Set new location and url
     std::string file(str::mid(productUrl,7,1000));
@@ -374,36 +375,56 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     std::string newUrl(productUrl);
 
     std::string section("/out");
-   
-    std::string vospth("/tmp/vospace");
+
+    UserAreaId tgtType = UserAreaId(product.procTargetType());
+    std::string tgtFolder(cfg.storage.archive + section);
     
-    if (product.procTargetType() == UA_VOSPACE) {
-        // VOSpace transactions still not implemented, so use instead a
-        // local folder named /tmp/vospace
-        if (mkdir(vospth.c_str(), Config::PATHMode) != 0) {
-            std::cerr << "mkdir " + vospth + ": " + std::strerror(errno) << '\n';
+    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+
+        tgtFolder = product.procTarget();
+
+    } else if (tgtType == UA_VOSPACE) {
+
+        tgtFolder = "/tmp/vospace";    
+        tgtType = UA_LOCAL;
+
+    } else {
+        
+        std::cerr << "Proc.target " + UserAreaName[tgtType] +
+            " should not be used here\n";
+        return product;
+
+    }
+
+    // Ensure local folder exists
+    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+        if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
+            (errno != EEXIST)) {
+            std::cerr << "mkdir " + tgtFolder + ": " +
+                std::strerror(errno) << '\n';
             return product;
         }
-        product["procTarget"] = vospth;
     }
+    
+    std::cerr << "Must move " + newFile + " from " +
+        cfg.storage.gateway + section + " to " +
+        tgtFolder + '\n';
+    
     str::replaceAll(newFile,
                     cfg.storage.gateway + section,
-                    vospth);
+                    tgtFolder);
     str::replaceAll(newUrl,
                     cfg.storage.gateway + section,
-                    vospth);
+                    tgtFolder);
 
-    // Set (hard) link
     (void)relocate(file, newFile, MOVE);
 
     // Change url in processing task
     product["url"]      = newUrl;
-    product["urlSpace"] = (product.procTargetType() == UA_USER ?
-                           ReprocessingUserArea :
-                           (product.procTargetType() == UA_LOCAL ?
-                            ReprocessingLocalFolder :
+    product["urlSpace"] = (tgtType == UA_USER ? ReprocessingUserArea :
+                           (tgtType == UA_LOCAL ? ReprocessingLocalFolder :
                             ReprocessingVOSpace));
-
+    
     return product;
 }
 
@@ -451,6 +472,13 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
         TRC("MOVE: Moving file from " << sFrom << " to " << sTo);
+        if ((retVal != 0) && (errno = EXDEV)) {
+            // Error due to move between different logical devices
+            // Try copy & remove
+            if ((retVal = copyfile(sFrom, sTo)) == 0) {
+                (void)unlink(sFrom.c_str());
+            }
+        }
         break;
     case COPY:
         retVal = copyfile(sFrom, sTo);
