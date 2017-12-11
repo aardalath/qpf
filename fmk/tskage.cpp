@@ -493,8 +493,9 @@ void TskAge::sendTaskReport(std::string contId)
     // Place all taskdata information into task structure
     task["taskData"] = taskData;
 
-    if (taskStatus == TASK_FINISHED) {
+    if ((taskStatus == TASK_FINISHED) || (taskStatus == TASK_FAILED)) {
         transferOutputProducts(task);
+        taskHasEnded = true;
     }
 
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,

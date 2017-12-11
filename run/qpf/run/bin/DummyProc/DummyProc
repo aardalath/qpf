@@ -49,6 +49,14 @@ else
     output=/dev/stdout
 fi
 
+theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
+echo "$theDate:INFO:process:Start processing . . ." > $log
+
+touch $output
+chown -R --reference=./${SCRIPT_NAME} .
+
+bname=$(basename $files)
+
 for i in $files ; do
     filename=$(basename "$output")
     extension="${filename##*.}"
@@ -380,15 +388,9 @@ EOF
         date
     fi
     sleep 4
-done > $output
-
-bname=$(basename $files)
-sed -i -e "s#EUC_LE1_NIR-85109-2-W_20200707T144425Z_01\.03\.fits#$bname#g" $output
-#cat $output > $log
+done | sed -e "s#EUC_LE1_NIR-85109-2-W_20200707T144425Z_01\.03\.fits#$bname#g" >> $output
 
 (
-theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
-echo "$theDate:INFO:process:Start processing . . ."
 k=0
 while [ $k -lt 101 ]; do
     theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
@@ -401,7 +403,7 @@ while [ $k -lt 101 ]; do
 done
 theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
 echo "$theDate:INFO:process:Processing ended."
-) > $log
+) >> $log
 
 chown -R --reference=./${SCRIPT_NAME} .
 

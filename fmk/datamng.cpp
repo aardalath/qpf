@@ -167,7 +167,7 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
     dbHdl->closeConnection();
 
     // In case the task has finished, save output products metadata
-    if (taskInfo.taskStatus() == TASK_FINISHED) {
+    if ((taskInfo.taskStatus() == TASK_FINISHED) || (taskInfo.taskStatus() == TASK_FAILED)) {
 
         DBG("TASK FINISHED : Storing outputs into local archive...");
 
