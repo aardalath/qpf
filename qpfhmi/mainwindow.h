@@ -162,6 +162,7 @@ private slots:
     void openWith();
     void showArchiveTableContextMenu(const QPoint & p);
     void openLocalArchiveElement(QModelIndex idx);
+    void openLocalArchiveFullPath(QString fullPath);
 
     void showAlertsContextMenu(const QPoint & p);
     void showAlertInfo(QTableView * tblvw, DBTableModel * model);

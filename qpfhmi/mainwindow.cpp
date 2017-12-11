@@ -1971,8 +1971,15 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     } else if (url.left(8) == "https://") {
         // TODO Download file to temporary folder, and set url to temporary file
     }
+    openLocalArchiveFullPath(url);
+}
 
-    QFileInfo fs(url);
+//----------------------------------------------------------------------
+// SLOT: openLocalArchiveFullPath
+//----------------------------------------------------------------------
+void MainWindow::openLocalArchiveFullPath(QString fullPath)
+{
+    QFileInfo fs(fullPath);
     QString tabName = fs.fileName();
     QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
     if (existingWdg != 0) {
@@ -2952,7 +2959,8 @@ void MainWindow::jumpToAlertSource(const QModelIndex & idx)
 
     QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
     if (existingWdg == 0) {
-        return;
+        openLocalArchiveFullPath(QString::fromStdString(cfg.storage.archive + "/out/") + file);
+        existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
     }
     
     int tabIdx = ui->tabMainWgd->indexOf(existingWdg);
