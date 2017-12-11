@@ -481,10 +481,11 @@ void TskAge::sendTaskReport(std::string contId)
 
     // Include additional info
     json addInfo;
-    addInfo["TaskName"] = task.taskName();
-    addInfo["Agent"]    = compName;
-    addInfo["Proc"]     = task.taskPath();
-    addInfo["Inputs"]   = task.inputs.str();
+    addInfo["TaskName"]  = task.taskName();
+    addInfo["Agent"]     = compName;
+    addInfo["Proc"]      = task.taskPath();
+    addInfo["Inputs"]    = task.inputs.str();
+    addInfo["MainInput"] = task.inputs.products.at(0).productId();
     TRC("INPUTS: " + task.inputs.str());
     
     taskData["Info"] = addInfo;

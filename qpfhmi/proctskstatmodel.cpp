@@ -48,7 +48,8 @@ ProcTaskStatusModel::ProcTaskStatusModel()
                 "id as ID, "
                 "t.task_data#>>'{State,StartedAt}' AS start, "
                 "t.task_data#>>'{State,FinishedAt}' AS finish, "
-                "t.task_data#>>'{Info,TaskName}' AS name, "
+                //"t.task_data#>>'{Info,TaskName}' AS name, "
+                "t.task_data#>>'{Info,MainInput}' AS name, "
                 "t.task_data#>>'{Info,Agent}' AS agent, "
                 "t.task_path AS proc, "
                 "tt.status_desc AS status, "
@@ -57,14 +58,15 @@ ProcTaskStatusModel::ProcTaskStatusModel()
                 "t.task_data AS task_data "
                 "FROM tasks_info t "
                 "INNER JOIN task_status tt "
-                "      ON t.task_data#>>'{State,TaskStatus}' = tt.task_status_id::text "
+                //"      ON t.task_data#>>'{State,TaskStatus}' = tt.task_status_id::text "
+                "      ON t.task_status_id = tt.task_status_id "
                 "ORDER BY id;");
 
 //    defineQuery("SELECT * FROM tasks_info t "
 //                "ORDER BY id;");
 
     defineHeaders({"ID", "Started at", "Finished at",
-                "Task Name", "Agent", "Proc.Element",
+                "Main Input Product", "Agent", "Proc.Element",
                 "Status", "Progress", "Exit Code", "Task Info"});
 
 

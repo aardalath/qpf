@@ -239,8 +239,8 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
     std::string taskPath = task.taskPath();
     Json::StyledWriter writer;
     std::string taskData("{}");
-    if (!task.taskData().empty()) {
-        taskData = writer.write(task.taskData());
+    if (task["taskData"] != nullJson) {
+        taskData = writer.write(task["taskData"]);
     }
 
     ss.str("");

@@ -326,6 +326,8 @@ void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
     task["taskSession"]  = cfg.sessionId;
     task["params"]       = nullJson;
 
+    std::string productId;
+    
     URLHandler urlh;
     int i = 0;
     for (auto & m : inputs.products) {
@@ -333,6 +335,7 @@ void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
         ProductMetadata & mg = urlh.fromLocalArch2Gateway();
         task.inputs.products.push_back(mg);
         task["inputs"][i] = mg.val();
+        if (i == 0) { productId = m.productId(); }
         ++i;
     }
 
@@ -344,4 +347,17 @@ void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
         task["outputs"][i] = m.val();
         ++i;
     }
+
+    // Include additional info
+    json addInfo;
+    addInfo["TaskName"]  = task.taskName();
+    addInfo["Agent"]     = "<not-set>";
+    addInfo["Proc"]      = task.taskPath();
+    addInfo["Inputs"]    = task.inputs.str();
+    addInfo["MainInput"] = productId;
+
+    json taskData;
+    taskData["Info"] = addInfo;
+    
+    task["taskData"] = taskData;
 }
