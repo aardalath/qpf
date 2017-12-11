@@ -137,6 +137,13 @@ public:
     ProductMetadata & fromGateway2FinalDestination();
     
     //----------------------------------------------------------------------
+    // Method: sendToVOSpace
+    //----------------------------------------------------------------------
+    void sendToVOSpace(std::string user, std::string pwd,
+                       std::string vosURL, std::string folder,
+                       std::string oFile);
+    
+    //----------------------------------------------------------------------
     // Method: relocate
     //----------------------------------------------------------------------
     int relocate(std::string & sFrom, std::string & sTo,

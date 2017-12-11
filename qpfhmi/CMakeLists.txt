@@ -31,7 +31,6 @@ set (qpfGuiLib_src
   dlgreproc.cpp
   anasession.cpp
   exporthdl.cpp
-  voshdl.cpp
   conthostedit.cpp
   swarmedit.cpp
   ruleedit.cpp
@@ -77,7 +76,6 @@ set (qpfGuiLib_hdr
   dlgreproc.h
   anasession.h
   exporthdl.h
-  voshdl.h
   conthostedit.h
   swarmedit.h
   ruleedit.h

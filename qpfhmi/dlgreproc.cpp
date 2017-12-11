@@ -107,7 +107,7 @@ void DlgReproc::getFields(QStringList & inProds, OutputsLocation & out,
         outDir = ui->edCfgLocal->text();
         break;  
     case CfgVOSpace:
-        outDir = ui->edCfgVOSpace->text();
+        outDir = ""; //ui->edCfgVOSpace->text();
         break;   
     case LocalDir:
         outDir = ui->edLocal->text();

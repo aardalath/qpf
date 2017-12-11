@@ -75,13 +75,14 @@ target_include_directories (fmk PUBLIC .
   ${UUID_ROOT_DIR}
   ${FILEHDL_ROOT_DIR}
   ${FMK_ROOT_DIR}
+  ${VOS_ROOT_DIR}
   ${NNMSGINCDIR}
   ${PCRE2INCDIR}
   ${PSQLINCDIR}
   ${UUIDINCDIR}
   ${MONGOOSEDIR})
 target_link_libraries (fmk
-  json filehdl infix str log tools uuidxx nncomm
+  json filehdl infix str log tools uuidxx nncomm vos
   nanomsg mongoose
   ${PCRE2LIB} ${PSQLLIB}
   uuid pthread)

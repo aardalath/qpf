@@ -57,6 +57,7 @@ add_subdirectory (log)
 add_subdirectory (str)
 add_subdirectory (tools)
 add_subdirectory (uuid)
+add_subdirectory (vos)
 add_subdirectory (fmk)
 add_subdirectory (qpf)
 

@@ -55,6 +55,7 @@
 
 #include "str.h"
 #include "config.h"
+#include "voshdl.h"
 
 #include "dbg.h"
 
@@ -385,8 +386,17 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
 
     } else if (tgtType == UA_VOSPACE) {
 
-        tgtFolder = "/tmp/vospace";    
-        tgtType = UA_LOCAL;
+        tgtFolder = product.procTarget();    
+
+        sendToVOSpace(cfg.connectivity.vospace.user(),
+                      cfg.connectivity.vospace.pwd(),
+                      cfg.connectivity.vospace.url(),
+                      ((tgtFolder.empty()) ?
+                       cfg.connectivity.vospace.folder() :
+                       tgtFolder),
+                      file);
+        (void)unlink(file.c_str());
+        return product;
 
     } else {
         
@@ -426,6 +436,20 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
                             ReprocessingVOSpace));
     
     return product;
+}
+
+//----------------------------------------------------------------------
+// Method: sendToVOSpace
+//----------------------------------------------------------------------
+void URLHandler::sendToVOSpace(std::string user, std::string pwd,
+                               std::string vosURL, std::string folder,
+                               std::string oFile)
+{
+    VOSpaceHandler vos(vosURL);
+    vos.setAuth(user, pwd);
+    if (!vos.uploadFile(folder, oFile)) {
+        std::cerr << "ERROR! Cannot upload " << oFile << "\n";
+    }
 }
 
 //----------------------------------------------------------------------

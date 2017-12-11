@@ -15,7 +15,10 @@ set (libtools_hdr
   propdef.h
   alert.h
   dwatcher.h
+  filetools.h
   metadatareader.h
+  rwc.h
+  scopeexit.h
   sm.h
   timer.h
   tools.h
@@ -24,10 +27,14 @@ set (libtools_hdr
 set (libtools_src
   alert.cpp
   dwatcher.cpp
+  filetools.cpp
+  rwc.cpp
   sm.cpp
   timer.cpp
   tools.cpp
 )
+
+find_package(CURL REQUIRED)
 
 add_library(tools SHARED ${libtools_src})
 target_include_directories (tools PUBLIC .

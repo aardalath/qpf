@@ -74,6 +74,7 @@ set (STR_ROOT_DIR     ${PWD}/str)
 set (UUID_ROOT_DIR    ${PWD}/uuid)
 set (FILEHDL_ROOT_DIR ${PWD}/filehdl)
 set (FMK_ROOT_DIR     ${PWD}/fmk)
+set (VOS_ROOT_DIR     ${PWD}/vos)
 
 set (MONGOOSEDIR      ${PWD}/mongoose)
 
@@ -93,4 +94,5 @@ link_directories (
   ${INFIX_ROOT_DIR}
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
+  ${VOS_ROOT_DIR}
 )
