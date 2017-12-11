@@ -77,6 +77,14 @@
       <number>6</number>
      </property>
      <widget class="QWidget" name="qpf">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>852</width>
+        <height>592</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Euclid QLA Processing Framework - Configuration Tool</string>
       </attribute>
@@ -177,7 +185,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <property name="font">
@@ -878,7 +886,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -1266,7 +1274,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -1619,7 +1627,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -1851,7 +1859,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -2028,7 +2036,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -2243,7 +2251,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -2499,21 +2507,42 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_23">
              <item>
-              <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,4">
+              <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,4">
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_27">
+                 <property name="text">
+                  <string>Working directory</string>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_13">
                  <property name="text">
-                  <string>IPython executable</string>
+                  <string>IPython command line</string>
                  </property>
                 </widget>
                </item>
                <item row="0" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_24" stretch="1,0">
                  <item>
-                  <widget class="QLineEdit" name="edIPythonExe"/>
+                  <widget class="QLineEdit" name="edIPythonCmd"/>
                  </item>
                  <item>
-                  <widget class="QToolButton" name="tbtnIPythonExe">
+                  <widget class="QToolButton" name="tbtnIPythonCmd">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_43" stretch="1,0">
+                 <item>
+                  <widget class="QLineEdit" name="edIPythonPath"/>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="tbtnIPythonWorkdir">
                    <property name="text">
                     <string>...</string>
                    </property>
@@ -2550,7 +2579,7 @@
         <x>0</x>
         <y>0</y>
         <width>852</width>
-        <height>594</height>
+        <height>592</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -3302,10 +3331,10 @@ number indicating the percentage of progress of the task.files the </string>
    </hints>
   </connection>
   <connection>
-   <sender>tbtnIPythonExe</sender>
+   <sender>tbtnIPythonCmd</sender>
    <signal>clicked()</signal>
    <receiver>ConfigTool</receiver>
-   <slot>selectIPythonExec()</slot>
+   <slot>selectIPythonCmd()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>915</x>
@@ -3314,6 +3343,22 @@ number indicating the percentage of progress of the task.files the </string>
     <hint type="destinationlabel">
      <x>961</x>
      <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbtnIPythonWorkdir</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigTool</receiver>
+   <slot>selectIPythonWorkingDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>816</x>
+     <y>716</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>484</y>
     </hint>
    </hints>
   </connection>
@@ -3365,7 +3410,8 @@ number indicating the percentage of progress of the task.files the </string>
   <slot>editRule(QModelIndex)</slot>
   <slot>selectUserDefAreaPath()</slot>
   <slot>defineUserWA(int)</slot>
-  <slot>selectIPythonExec()</slot>
+  <slot>selectIPythonCmd()</slot>
+  <slot>selectIPythonWorkingDir()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="btngrpUserWA"/>

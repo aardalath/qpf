@@ -157,7 +157,8 @@ public slots:
     void setWorkingPaths(QString newPath);
     void selectUserDefAreaPath();
     void defineUserWA(int btn);
-    void selectIPythonExec();
+    void selectIPythonCmd();
+    void selectIPythonWorkingDir();
     
 private slots:
     void addHost();

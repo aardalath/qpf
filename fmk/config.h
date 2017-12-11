@@ -192,6 +192,21 @@ public:
 };
 
 //==========================================================================
+// Class: CfgGrpIPython
+//==========================================================================
+class CfgGrpIPython : public JRecord {
+public:
+    CfgGrpIPython() {}
+    CfgGrpIPython(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(cmd);
+        DUMPJSTR(path);
+    }
+    JSTR(cmd);
+    JSTR(path);
+};
+
+//==========================================================================
 // Class: CfgGrpConnectivity
 //==========================================================================
 class CfgGrpConnectivity : public JRecord {
@@ -200,15 +215,16 @@ public:
     CfgGrpConnectivity(json v) : JRecord(v) {
         SET_GRP(CfgGrpVOSpace, vospace);
         SET_GRP(CfgGrpJupyter, jupyter);
+        SET_GRP(CfgGrpIPython, ipython);
     }
     virtual void dump() {
         vospace.dump();
         jupyter.dump();
-        DUMPJSTR(ipython);
+        ipython.dump();
     }
     GRP(CfgGrpVOSpace, vospace);
     GRP(CfgGrpJupyter, jupyter);
-    JSTR(ipython);
+    GRP(CfgGrpIPython, ipython);
 };
 
 //==========================================================================

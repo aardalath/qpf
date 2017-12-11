@@ -419,10 +419,10 @@ void ConfigTool::defineUserWA(int btn)
 }
 
 //----------------------------------------------------------------------
-// Slot: selectIPythonExec
+// Slot: selectIPythonCmd
 // Select executable in local host corresponding to IPython binary
 //----------------------------------------------------------------------
-void ConfigTool::selectIPythonExec()
+void ConfigTool::selectIPythonCmd()
 {
     QString fileName;
     fileName = QFileDialog::getOpenFileName(this,
@@ -430,7 +430,23 @@ void ConfigTool::selectIPythonExec()
                                             fileName);
     QFileInfo fs(fileName);
     if (fs.exists()) {
-        ui->edIPythonExe->setText(fileName);
+        ui->edIPythonCmd->setText(fileName);
+    }
+}    
+
+//----------------------------------------------------------------------
+// Slot: selectIPythonWorkingDir
+// Select executable in local host corresponding to IPython binary
+//----------------------------------------------------------------------
+void ConfigTool::selectIPythonWorkingDir()
+{
+    QString pathName;
+
+    pathName = QFileDialog::getExistingDirectory(this,
+                                                 tr("Select IPython working directory"));
+    QFileInfo fs(pathName);
+    if (fs.exists()) {
+        ui->edIPythonPath->setText(pathName);
     }
 }    
 
@@ -1009,7 +1025,8 @@ void ConfigTool::transferCfgToGUI()
     ui->edJupyterLabURL->setText(C(cfg.connectivity.jupyter.url()));
 
     // IPython
-    ui->edIPythonExe->setText(C(cfg.connectivity.ipython()));
+    ui->edIPythonCmd->setText(C(cfg.connectivity.ipython.cmd()));
+    ui->edIPythonPath->setText(C(cfg.connectivity.ipython.path()));
     
     // 8. FLAGS
     transferFlagsFromCfgToGUI();
@@ -1163,7 +1180,8 @@ bool ConfigTool::transferGUIToCfg()
     cfg.connectivity.jupyter["url"]    = ui->edJupyterLabURL->text().toStdString();
 
     // IPython
-    cfg.connectivity["ipython"] = ui->edIPythonExe->text().toStdString();
+    cfg.connectivity.ipython["cmd"] = ui->edIPythonCmd->text().toStdString();
+    cfg.connectivity.ipython["path"] = ui->edIPythonPath->text().toStdString();
 
     // 8. FLAGS
     transferFlagsFromGUIToCfg();
