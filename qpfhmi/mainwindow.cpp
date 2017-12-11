@@ -209,6 +209,9 @@ MainWindow::MainWindow(QString url, QString sessionName,
     
     //== Set log file watchers ========================================
     setLogWatch();
+
+    // Finally, deactivate some elements
+    ui->tabMainWgd->removeTab(1);    
 }
 
 //----------------------------------------------------------------------
@@ -260,9 +263,9 @@ void MainWindow::manualSetupUI()
     QTabBar * tb = ui->tabMainWgd->tabBar();
     tb->setTabIcon(0, QIcon(":/img/logs.png"));
     tb->setTabIcon(1, QIcon(":/img/messages.png"));
-    tb->setTabIcon(2, QIcon(":/img/monit.png"));
-    tb->setTabIcon(3, QIcon(":/img/storage2.png"));
-    tb->setTabIcon(4, QIcon(":/img/alerts.png"));
+    tb->setTabIcon(1, QIcon(":/img/monit.png"));
+    tb->setTabIcon(2, QIcon(":/img/storage2.png"));
+    tb->setTabIcon(3, QIcon(":/img/alerts.png"));
 
     connect(ui->tabMainWgd, SIGNAL(currentChanged(int)),
             this, SLOT(selectRowInNav(int)));
@@ -284,7 +287,7 @@ void MainWindow::manualSetupUI()
     ui->tabMainWgd->setCornerWidget(tbtnTabsList, Qt::TopLeftCorner);
 
     const QList<QString> fixedItemNames {"Log Information",
-                                         "Messages",
+                                         //"Messages",
                                          "Monitoring",
                                          "Local Archive",
                                          "Processing Alerts"};
