@@ -34,10 +34,11 @@ set (libtools_src
   tools.cpp
 )
 
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
 
 add_library(tools SHARED ${libtools_src})
 target_include_directories (tools PUBLIC .
+  ${CURLINCDIR}
   ${STR_ROOT_DIR}
   ${JSON_ROOT_DIR}
   ${TOOLS_ROOT_DIR})

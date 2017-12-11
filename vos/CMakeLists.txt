@@ -17,11 +17,13 @@ set (vosLib_hdr
 set (vosLib_src
   voshdl.cpp)
 
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
 
 add_library (vos SHARED ${vosLib_src})
 set_target_properties (vos PROPERTIES LINKER_LANGUAGE CXX)
-include_directories(. ../tools ${CURL_INCLUDE_DIR})
+#include_directories(. ../tools ${CURL_INCLUDE_DIR})
+include_directories(. ../tools ${CURLINCDIR})
+link_directories (${CURLLIBDIR})
 target_include_directories (vos PUBLIC . ../tools)
 target_link_libraries(vos curl tools)
 install (TARGETS vos
