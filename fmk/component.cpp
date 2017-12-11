@@ -566,10 +566,10 @@ void Component::raise(Alert a, Alert::Group grp)
     // Check that connection with the DB is possible
     try {
         db->openConnection();
-
+        
         std::stringstream ss;
         ss << "INSERT INTO alerts "
-           << "(alert_id, creation, grp, sev, typ, origin, msgs";
+           << "(alert_id, creation, grp, sev, typ, origin, msgs, file";
         if (a.getVar() != 0) { ss << ", var"; }
         ss << ") VALUES ( nextval('alerts_alert_id_seq'), "
            << str::quoted(a.timeStampString()) << ", "
@@ -577,7 +577,8 @@ void Component::raise(Alert a, Alert::Group grp)
            << str::quoted(Alert::SeverityName[a.getSeverity()]) << ", "
            << str::quoted(Alert::TypeName[a.getType()]) << ", "
            << str::quoted(a.getOrigin()) << ", "
-           << str::quoted(a.allMessages());
+           << str::quoted(a.allMessages()) << ", "
+           << str::quoted(str::getBaseName(a.getFile()));
         if (a.getVar() != 0) { ss << ", " << a.varAsTuple(); }
         ss << ");";
 

@@ -24,6 +24,7 @@
 #include <QJsonObject>
 #include <QIcon>
 #include <QFont>
+#include <iostream>
 
 QJsonModel::QJsonModel(QObject *parent) :
     QAbstractItemModel(parent)
@@ -172,4 +173,43 @@ int QJsonModel::columnCount(const QModelIndex &parent) const
 void QJsonModel::setIcon(const QJsonValue::Type &type, const QIcon &icon)
 {
     mTypeIcons.insert(type,icon);
+}
+
+QModelIndex QJsonModel::find(QAbstractItemModel * model, QString content,
+                             QModelIndex startNode = QModelIndex())
+{
+    QModelIndex finalIdx = QModelIndex();
+    
+    for (int r = 0; r < model->rowCount(startNode); ++r) {
+        QModelIndex idx = model->index(r, 0, startNode);
+        QVariant value = idx.data();
+        
+        // Compare content
+        if (value.toString() == content) { return model->index(idx.row(),
+                                                             idx.column(),
+                                                             startNode); }
+        
+        if (model->hasChildren(idx)) {
+            finalIdx = find(model, content, idx);
+            if (finalIdx != QModelIndex()) { return model->index(finalIdx.row(),
+                                                               finalIdx.column(),
+                                                               startNode); }
+        }
+    }
+    
+    return finalIdx;
+}
+
+bool QJsonModel::findSequence(QAbstractItemModel * model, QStringList & seq,
+                              QList<QModelIndex> & idxs)
+{
+    QModelIndex idx = QModelIndex();
+    
+    foreach (QString s, seq) {
+        idx = find(model, s, idx);
+        if (idx == QModelIndex()) { return false; }
+        idxs.append(idx);
+    }
+
+    return true;
 }

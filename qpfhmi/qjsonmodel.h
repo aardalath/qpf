@@ -46,6 +46,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QIcon>
+#include <QList>
+
 class QJsonModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -61,16 +63,15 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     void setIcon(const QJsonValue::Type& type, const QIcon& icon);
-
-
+    QModelIndex find(QAbstractItemModel * model, QString content, QModelIndex startNode);
+    bool findSequence(QAbstractItemModel * model, QStringList & seq,
+                      QList<QModelIndex> & idxs);
 
 private:
     QJsonTreeItem * mRootItem;
     QJsonDocument mDocument;
     QStringList mHeaders;
     QHash<QJsonValue::Type, QIcon> mTypeIcons;
-
-
 };
 
 #endif // QJSONMODEL_H

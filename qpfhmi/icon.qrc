@@ -1,12 +1,15 @@
 <RCC>
-    <qresource prefix="/">
-        <file>img/alerts.png</file>
-        <file>img/logs.png</file>
-        <file>img/monit.png</file>
-        <file>img/storage2.png</file>
-        <file>img/messages.png</file>
-        <file>img/EuclidQPF.png</file>
-        <file>img/QPF.png</file>
-        <file>img/filter.png</file>
-    </qresource>
+  <qresource prefix="/">
+    <file>img/xml.png</file>
+    <file>img/json.png</file>
+    <file>img/txt.png</file>
+    <file>img/alerts.png</file>
+    <file>img/logs.png</file>
+    <file>img/monit.png</file>
+    <file>img/storage2.png</file>
+    <file>img/messages.png</file>
+    <file>img/EuclidQPF.png</file>
+    <file>img/QPF.png</file>
+    <file>img/filter.png</file>
+  </qresource>
 </RCC>

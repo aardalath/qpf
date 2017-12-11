@@ -167,7 +167,8 @@ private slots:
     void showAlertInfo(QTableView * tblvw, DBTableModel * model);
     void showSysAlertInfo();
     void showProcAlertInfo();
-
+    void jumpToAlertSource(const QModelIndex & idx);
+    
     void sortTaskViewByColumn(int c);
     void showTaskMonitContextMenu(const QPoint & p);
 

@@ -132,6 +132,7 @@ public:
     Property(Alert, Origin, origin, Origin);
     Property(Alert, Messages, messages, Messages);
     Property(Alert, VariableHdl, var, Var);
+    Property(Alert, std::string, file, File);
 
 public:
 

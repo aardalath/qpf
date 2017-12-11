@@ -46,6 +46,7 @@ ProcAlertModel::ProcAlertModel()
 {
     defineQuery("SELECT "
                 "a.alert_id AS ID, "
+                "a.file as file, "
                 "a.creation AS created, "
                 "a.sev AS severity, "
                 "a.typ AS type, "
@@ -54,7 +55,7 @@ ProcAlertModel::ProcAlertModel()
                 "FROM alerts a "
                 "WHERE a.grp = 'Diagnostics' "
                 "ORDER BY a.alert_id;");
-    defineHeaders({"ID", "Created", "Severity",
+    defineHeaders({"ID", "File", "Created", "Severity",
                 "Type", "Origin", "Add.Info"});
 
     refresh();
@@ -66,11 +67,12 @@ Alert ProcAlertModel::getAlertAt(QModelIndex idx)
     Alert::Messages msgs;
     foreach (QString m, listOfMsgs) { msgs.push_back(m.toStdString()); }
     Alert a(Alert::now(),
-            Alert::System,
-            Alert::SeverityIdx[index(idx.row(), 2).data().toString().toStdString()],
-            Alert::TypeIdx[index(idx.row(), 3).data().toString().toStdString()],
-            index(idx.row(), 4).data().toString().toStdString(),
+            Alert::Diagnostics,
+            Alert::SeverityIdx[index(idx.row(), 3).data().toString().toStdString()],
+            Alert::TypeIdx[index(idx.row(), 4).data().toString().toStdString()],
+            index(idx.row(), 5).data().toString().toStdString(),
             msgs);
+    a.setFile(index(idx.row(), 1).data().toString().toStdString());
     return a;
 }
 

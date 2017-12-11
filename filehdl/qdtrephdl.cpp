@@ -153,6 +153,7 @@ void QDTReportHandler::checkDiagnostic(Json::Value::iterator it,
                                   "",
                                   0);
         alert->setMessages(msgs);
+        alert->setFile(fileName);
         issues.push_back(alert);
     }
 }

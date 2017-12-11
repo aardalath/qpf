@@ -1963,13 +1963,6 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
     QModelIndex nameIdx = model->index(row, NumOfNameCol, idx.parent());
     QModelIndex urlIdx  = model->index(row, NumOfURLCol, idx.parent());
 
-    QString tabName = nameIdx.data().toString().trimmed();
-    QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
-    if (existingWdg != 0) {
-        ui->tabMainWgd->setCurrentIndex(ui->tabMainWgd->indexOf(existingWdg));
-        return;
-    }
-
     QString url = urlIdx.data().toString().trimmed();
     if (url.left(7) == "file://") {
         url.remove(0, 7);
@@ -1979,8 +1972,16 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         // TODO Download file to temporary folder, and set url to temporary file
     }
 
-    QWidget * editor = 0;
     QFileInfo fs(url);
+    QString tabName = fs.fileName();
+    QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
+    if (existingWdg != 0) {
+        ui->tabMainWgd->setCurrentIndex(ui->tabMainWgd->indexOf(existingWdg));
+        return;
+    }
+
+    QString iconRscName;
+    QWidget * editor = 0;
     TMsg((fs.absoluteFilePath() + fs.suffix()).toStdString());
     if (fs.suffix() == "xml") {
         QFile file(fs.absoluteFilePath());
@@ -1996,6 +1997,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         ed->setPlainText(content);
         ed->setReadOnly(true);
         editor = ed;
+        iconRscName = ":/img/xml.png";
     } else if (fs.suffix() == "json") {
         QJsonModel * model = new QJsonModel;
         QTreeView * view = new QTreeView;
@@ -2009,6 +2011,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
         attachJsonPopUpMenu(view);
         editor = view;
+        iconRscName = ":/img/json.png";
     } else if (fs.suffix() == "fits") {
         QJsonModel * model = new QJsonModel;
         QTreeView * view = new QTreeView;
@@ -2034,6 +2037,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         model->setIcon(QJsonValue::Object, QIcon(":/img/brick.png"));
         attachJsonPopUpMenu(view);
         editor = view;
+        iconRscName = ":/img/brick.png";
     } else if (fs.suffix() == "log") {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -2046,6 +2050,7 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         ed->setPlainText(content);
         ed->setReadOnly(true);
         editor = ed;
+        iconRscName = ":/img/txt.png";
     } else {
         QFile file(fs.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -2058,14 +2063,16 @@ void MainWindow::openLocalArchiveElement(QModelIndex idx)
         ed->setPlainText(content);
         ed->setReadOnly(true);
         editor = ed;
+        iconRscName = ":/img/bullet_blue.png";
     }
 
     // Ensure these tabs are closable (and only these)
+    editor->setObjectName(tabName);
     int tabIdx = ui->tabMainWgd->addTab(editor, tabName);
+    ui->tabMainWgd->setTabIcon(tabIdx, QIcon(iconRscName));
     ui->lstwdgNav->addItem(tabName);
 
     ui->tabMainWgd->setTabsClosable(true);
-    editor->setObjectName(tabName);
     for (int i = 0; i < 5; ++i) {
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->hide();
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->resize(0, 0);
@@ -2452,7 +2459,6 @@ void MainWindow::showWorkDir()
 
     QString localDir = QString::fromStdString(v["Mounts"][2]["Source"].asString());
 
-    std::cerr << "LocalDir: " << localDir.toStdString() << "\n";
     QFileInfo fs(localDir);
     if (fs.exists()) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(localDir));
@@ -2833,6 +2839,9 @@ void MainWindow::initAlertsTables()
     connect(ui->tblvwSysAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showAlertsContextMenu(const QPoint &)));
 
+    connect(ui->tblvwAlerts, SIGNAL(doubleClicked(const QModelIndex &)),
+            this, SLOT(jumpToAlertSource(const QModelIndex &)));
+    
     ui->tblvwAlerts->setSortingEnabled(true);
     ui->tblvwSysAlerts->setSortingEnabled(true);
 
@@ -2919,6 +2928,55 @@ void MainWindow::showSysAlertInfo()
 void MainWindow::showProcAlertInfo()
 {
     showAlertInfo(ui->tblvwAlerts, procAlertModel);
+}
+
+//----------------------------------------------------------------------
+// Method: showProcAlertInfo
+// Show dialog with system alert information
+//----------------------------------------------------------------------
+void MainWindow::jumpToAlertSource(const QModelIndex & idx)
+{
+    Alert alert = procAlertModel->getAlertAt(idx);
+    QString origin = QString::fromStdString(alert.getOrigin());
+    QStringList seq = origin.split('.');
+    QString a = seq.takeFirst();
+    QString b = seq.takeFirst();
+    QString c = seq.takeFirst();
+    seq.prepend(a + "." + b + "." + c);
+    QString last = seq.takeLast();
+    seq << "diagnostics" << last;
+
+    QString file = QString::fromStdString(alert.getFile());
+    QFileInfo fs(file);
+    QString tabName = fs.fileName();
+
+    QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
+    if (existingWdg == 0) {
+        return;
+    }
+    
+    int tabIdx = ui->tabMainWgd->indexOf(existingWdg);
+    QTreeView * wdg = (QTreeView*)(ui->tabMainWgd->widget(tabIdx));
+    QJsonModel * mdl = (QJsonModel *)(wdg->model());
+    QList<QModelIndex> idxs;
+
+    std::function<void(const QModelIndex &x)> lExpand = [&](const QModelIndex &x) {
+        int chldCount = x.model()->rowCount(x);
+        for (int i = 0; i < chldCount; i++) { lExpand(x.child(i, 0)); }
+        if (! wdg->isExpanded(x)) { wdg->expand(x); }
+    };
+    
+    QModelIndex k;
+    if (mdl->findSequence(mdl, seq, idxs)) {
+        foreach (const QModelIndex & i, idxs) {
+            k = mdl->index(i.row(), i.column(), k);
+            wdg->expand(k);
+        }
+    }
+    lExpand(k);
+    wdg->setCurrentIndex(k);
+    
+    ui->tabMainWgd->setCurrentIndex(tabIdx);
 }
 
 //======================================================================

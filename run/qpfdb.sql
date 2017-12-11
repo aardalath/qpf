@@ -71,6 +71,7 @@ CREATE TABLE alerts (
     typ        alert_type,
     origin     text,
     msgs       text,
+    file       text,
     var        alert_variable
 );
 

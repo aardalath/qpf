@@ -30,6 +30,8 @@ first=$(basename $1)
 theObsId=$(dd if=/dev/random bs=4 count=1 2>/dev/null|sum 2>&1|cut -d" " -f1)
 theDate=$(date +"%Y%m%dT%H%M%S")
 
+files=""
+
 if [ "$first" == "dummy.cfg" ]; then
     files=$(echo in/*)
     if [ "$files" == 'in/*' ]; then
@@ -380,6 +382,8 @@ EOF
     sleep 4
 done > $output
 
+bname=$(basename $files)
+sed -i -e "s#EUC_LE1_NIR-85109-2-W_20200707T144425Z_01\.03\.fits#$bname#g" $output
 #cat $output > $log
 
 (

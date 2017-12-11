@@ -354,7 +354,7 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
                    obsId + "-" + expos + "-" + m.obsMode() + "_" +
                    m.productVersion());
 
-    m["signature"] = (obsId + "-" + m.obsMode() + "-" + expos);
+    m["signature"] = (obsId + "-" + expos + "-" + m.obsMode());
     //TRC("Final: " << m.productType() << " / " << m.signature());
 }
 
