@@ -273,9 +273,9 @@ void MainWindow::manualSetupUI()
     QTabBar * tb = ui->tabMainWgd->tabBar();
     tb->setTabIcon(0, QIcon(":/img/logs.png"));
     tb->setTabIcon(1, QIcon(":/img/messages.png"));
-    tb->setTabIcon(1, QIcon(":/img/monit.png"));
-    tb->setTabIcon(2, QIcon(":/img/storage2.png"));
-    tb->setTabIcon(3, QIcon(":/img/alerts.png"));
+    tb->setTabIcon(2, QIcon(":/img/monit.png"));
+    tb->setTabIcon(3, QIcon(":/img/storage2.png"));
+    tb->setTabIcon(4, QIcon(":/img/alerts.png"));
 
     connect(ui->tabMainWgd, SIGNAL(currentChanged(int)),
             this, SLOT(selectRowInNav(int)));
@@ -297,7 +297,7 @@ void MainWindow::manualSetupUI()
     ui->tabMainWgd->setCornerWidget(tbtnTabsList, Qt::TopLeftCorner);
 
     const QList<QString> fixedItemNames {"Log Information",
-                                         //"Messages",
+                                       //"Messages",
                                          "Monitoring",
                                          "Local Archive",
                                          "Processing Alerts"};
@@ -1827,13 +1827,13 @@ void MainWindow::openLocalArchiveFullPath(QString fullPath)
     ui->lstwdgNav->addItem(tabName);
 
     ui->tabMainWgd->setTabsClosable(true);
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 4; ++i) {
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->hide();
         ui->tabMainWgd->tabBar()->tabButton(i, QTabBar::RightSide)->resize(0, 0);
     }
     QWidget * tabbtn = ui->tabMainWgd->tabBar()->tabButton(tabIdx, QTabBar::RightSide);
     QRect g = tabbtn->geometry();
-    tabbtn->resize(6, 6);
+    tabbtn->resize(7, 7);
     tabbtn->move(g.x() + 14, g.y() + 2);
 }
 
