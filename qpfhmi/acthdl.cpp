@@ -53,12 +53,6 @@ namespace QPF {
 ActionHandler::ActionHandler(QWidget *parent) 
 {
     mw = qobject_cast<MainWindow*>(parent);
-    
-    createActions();
-    createMenus();
-    createToolBars();
-    createStatusBar();
-    updateMenus();
 }
 
 //----------------------------------------------------------------------

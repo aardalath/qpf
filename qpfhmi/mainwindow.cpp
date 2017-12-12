@@ -1145,6 +1145,19 @@ void MainWindow::updateSystemView()
     static bool resSysAlert = false;
     static bool resAlert = false;
 
+    static const int LogTab = 0;
+    static const int MsgsTab = -1;
+    static const int TasksTab = 1;
+    static const int LocalArchTab = 2;
+    static const int ProcAlertsTab = 3;
+    
+    static const int ProcTasksTab = 0;
+    static const int AgentsTab = 1;
+    static const int SysAlertsTab = 2;
+
+    static const int MsgContentCol = 5;
+    static const int TaskDataCol = 9;
+
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
@@ -1157,40 +1170,77 @@ void MainWindow::updateSystemView()
     }
 
     if (isViewsUpdateActive) {
-        //== 1. Processing tasks
-        procTaskStatusModel->setFullUpdate(true);
-        procTaskStatusModel->refresh();
-        if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
-            ui->tblvwTaskMonit->resizeColumnsToContents();
-            resTask = true;
-        }
-        const int TaskDataCol = 9;
-        ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
         
-        //== 2. System Alerts
-        sysAlertModel->refresh();
-        if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
-            ui->tblvwSysAlerts->resizeColumnsToContents();
-            resSysAlert = true;
-        }
+        int idx = ui->tabMainWgd->currentIndex();
+        int idx2 = ui->tabWidget->currentIndex();
         
-        //== 3. Diagnostics Alerts
-        procAlertModel->refresh();
-        if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
-            ui->tblvwAlerts->resizeColumnsToContents();
-            resAlert = true;
-        }
-        
-        //== 4. Local Archive
-        localarchViewUpdate();
-        
-        //== 5. Transmissions
-        txModel->refresh();
-        const int MsgContentCol = 5;
-        ui->tblvwTx->setColumnHidden(MsgContentCol, true);
+        switch (idx) {
+            
+        case LogTab:
+            
+            break;
 
-        // 6. Agents Monit. Panel
-        updateAgentsMonitPanel();
+        case MsgsTab:
+            
+            //== 5. Transmissions
+            txModel->refresh();
+            ui->tblvwTx->setColumnHidden(MsgContentCol, true);
+            break;
+
+        case TasksTab:
+            
+            switch (idx2) {
+            case ProcTasksTab:
+                //== 1. Processing tasks
+                procTaskStatusModel->setFullUpdate(true);
+                procTaskStatusModel->refresh();
+                if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
+                    ui->tblvwTaskMonit->resizeColumnsToContents();
+                    resTask = true;
+                }
+                ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
+                break;
+                
+            case AgentsTab:
+                // 6. Agents Monit. Panel
+                updateAgentsMonitPanel();
+                break;
+                
+            case SysAlertsTab:
+                //== 2. System Alerts
+                sysAlertModel->refresh();
+                if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
+                    ui->tblvwSysAlerts->resizeColumnsToContents();
+                    resSysAlert = true;
+                }
+                break;
+                
+            default:
+                break;            
+            }
+            break;
+            
+        case LocalArchTab:
+            
+            //== 4. Local Archive
+            localarchViewUpdate();
+            break;
+
+        case ProcAlertsTab:
+            
+            //== 3. Diagnostics Alerts
+            procAlertModel->refresh();
+            if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
+                ui->tblvwAlerts->resizeColumnsToContents();
+                resAlert = true;
+            }
+            break;
+            
+        default:
+            break;
+
+        }
+        
     }
 }
 
