@@ -80,6 +80,7 @@
 #include <QPoint>
 #include <QObject>
 #include <QTextStream>
+#include <QProcess>
 
 #include "acthdl.h"
 
@@ -1551,6 +1552,62 @@ void MainWindow::reprocessProduct()
 //----------------------------------------------------------------------
 void MainWindow::analyzeProduct()
 {
+    static const int NumOfURLCol = 10;
+
+    // Create product list
+
+    QAction * caller = qobject_cast<QAction*>(sender());
+
+    QPoint p = caller->property("clickedItem").toPoint();
+
+    QModelIndexList list = ui->treevwArchive->selectionModel()->selectedIndexes();
+    ProductList analyzeProducts;
+    FileNameSpec fns;
+    ProductMetadata md;
+
+    foreach (QModelIndex m, list) {
+        if (m.column() == NumOfURLCol) {
+            QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+            fns.parseFileName(QUrl(url).path().toStdString(), md);
+            md["urlSpace"]       = LocalArchSpace;
+            md["procTargetType"] = UA_LOCAL; 
+            md["procTarget"]     = cfg.connectivity.ipython.path();
+            analyzeProducts.products.push_back(md);
+        }
+    }
+
+    QString acName = caller->objectName();
+    if (acName == "AnalyzeWithIPython") {
+        
+        // Link products to IPython working directory
+        URLHandler urlh;
+        for (auto & m : analyzeProducts.products) {
+            urlh.setProduct(m);
+            m = urlh.fromLocalArch2ExportLocation();
+        }
+
+        // Launch IPython session
+        QProcess ipythonProcess;
+        QString program = "xterm";
+        QStringList arguments;
+        arguments << "-e"
+                  << QString::fromStdString(cfg.connectivity.ipython.cmd())
+                  << "-i" << "-c"
+                  << QString::fromStdString("'%cd " + cfg.connectivity.ipython.path() + "'");
+        ipythonProcess.startDetached(program, arguments);       
+        // ipythonProcess.waitForFinished();
+        // QByteArray result = ipythonProcess.readAllStandardOutput();
+        // const QString ipythonOutput(result);
+        
+    } else if (acName == "AnalyzeWithJupyter") {
+
+        //TO DO: Send products to Jupyter remote host and open browser
+
+    } else {
+
+        //ERROR
+
+    }
 }
 
 //----------------------------------------------------------------------

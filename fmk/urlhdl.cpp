@@ -486,21 +486,16 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
     if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
         if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
             (errno != EEXIST)) {
-            std::cerr << "mkdir " + tgtFolder + ": " +
-                std::strerror(errno) << '\n';
             return product;
         }
     }
     
-    std::cerr << "Must move " + newFile + " from archive to " +
-        tgtFolder + '\n';
-
     for (auto & section: {"/out", "/in"}) {
         str::replaceAll(newFile,
-                        cfg.storage.gateway + section,
+                        cfg.storage.archive + section,
                         tgtFolder);
         str::replaceAll(newUrl,
-                        cfg.storage.gateway + section,
+                        cfg.storage.archive + section,
                         tgtFolder);
     }
 

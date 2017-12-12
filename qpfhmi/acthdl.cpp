@@ -467,9 +467,11 @@ void ActionHandler::createLocalArchiveViewActions()
     connect(acReprocess, SIGNAL(triggered()), mw, SLOT(reprocessProduct()));
 
     acAnalyzeIPython = new QAction("Analyze within IPython", mw->ui->treevwArchive);
+    acAnalyzeIPython->setObjectName("AnalyzeWithIPython");
     connect(acAnalyzeIPython, SIGNAL(triggered()), mw, SLOT(analyzeProduct()));
 
     acAnalyzeJupyter = new QAction("Analyze within Jupyter Lab", mw->ui->treevwArchive);
+    acAnalyzeJupyter->setObjectName("AnalyzeWithJupyter");
     connect(acAnalyzeJupyter, SIGNAL(triggered()), mw, SLOT(analyzeProduct()));
 
     acExport = new QAction("Export the selected product(s) ...", mw->ui->treevwArchive);
