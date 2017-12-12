@@ -74,6 +74,15 @@ DlgReproc::~DlgReproc()
     delete ui;
 }
 
+void DlgReproc::setLabels(QString aTitle, QString desc, QString aHeading,
+                          bool showAddOpt)
+{
+    this->setWindowTitle(aTitle);
+    ui->lblDesc->setText(desc);
+    ui->grpboxOptions->setTitle(aHeading);
+    ui->frmAdditionalOpts->setVisible(showAddOpt);
+}
+        
 void DlgReproc::setFields(QStringList inProds, OutputsLocation out,
                           int flags)
     

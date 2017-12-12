@@ -439,6 +439,83 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
 }
 
 //----------------------------------------------------------------------
+// Method: fromLocalArch2ExportLocation
+//----------------------------------------------------------------------
+ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
+{
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == LocalArchSpace);
+
+    // Set new location and url
+    std::string file(str::mid(productUrl,7,1000));
+    std::string newFile(file);
+    std::string newUrl(productUrl);
+
+    UserAreaId tgtType = UserAreaId(product.procTargetType());
+    std::string tgtFolder; //(cfg.storage.archive + section);
+    
+    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+
+        tgtFolder = product.procTarget();
+
+    } else if (tgtType == UA_VOSPACE) {
+
+        tgtFolder = product.procTarget();    
+
+        sendToVOSpace(cfg.connectivity.vospace.user(),
+                      cfg.connectivity.vospace.pwd(),
+                      cfg.connectivity.vospace.url(),
+                      ((tgtFolder.empty()) ?
+                       cfg.connectivity.vospace.folder() :
+                       tgtFolder),
+                      file);
+        return product;
+
+    } else {
+        
+        std::cerr << "Proc.target " + UserAreaName[tgtType] +
+            " should not be used here\n";
+        return product;
+
+    }
+
+    // Ensure local folder exists
+    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+        if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
+            (errno != EEXIST)) {
+            std::cerr << "mkdir " + tgtFolder + ": " +
+                std::strerror(errno) << '\n';
+            return product;
+        }
+    }
+    
+    std::cerr << "Must move " + newFile + " from archive to " +
+        tgtFolder + '\n';
+
+    for (auto & section: {"/out", "/in"}) {
+        str::replaceAll(newFile,
+                        cfg.storage.gateway + section,
+                        tgtFolder);
+        str::replaceAll(newUrl,
+                        cfg.storage.gateway + section,
+                        tgtFolder);
+    }
+
+    (void)relocate(file, newFile, COPY);
+
+    // Change url in processing task
+    product["url"]      = newUrl;
+    product["urlSpace"] = (tgtType == UA_USER ? ReprocessingUserArea :
+                           (tgtType == UA_LOCAL ? ReprocessingLocalFolder :
+                            ReprocessingVOSpace));
+    
+    return product;
+}
+
+//----------------------------------------------------------------------
 // Method: sendToVOSpace
 //----------------------------------------------------------------------
 void URLHandler::sendToVOSpace(std::string user, std::string pwd,

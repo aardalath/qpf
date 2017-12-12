@@ -137,10 +137,10 @@ private:
 
     QAction *acAnalyzeIPython;
     QAction *acAnalyzeJupyter;
-    QAction *acExportLocal;
-    QAction *acExportRemote;
-    QAction *acExportVOSpace;
-    QAction *acExportVOSpaceOther;
+    QAction *acExport;
+    /* QAction *acExportRemote; */
+    /* QAction *acExportVOSpace; */
+    /* QAction *acExportVOSpaceOther; */
 
     QAction *acNavig;
     QAction *acClose;

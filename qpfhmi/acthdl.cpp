@@ -472,9 +472,9 @@ void ActionHandler::createLocalArchiveViewActions()
     acAnalyzeJupyter = new QAction("Analyze within Jupyter Lab", mw->ui->treevwArchive);
     connect(acAnalyzeJupyter, SIGNAL(triggered()), mw, SLOT(analyzeProduct()));
 
-    acExportLocal = new QAction("Export to a local folder", mw->ui->treevwArchive);
-    connect(acExportLocal, SIGNAL(triggered()), mw, SLOT(exportProduct()));
-
+    acExport = new QAction("Export the selected product(s) ...", mw->ui->treevwArchive);
+    connect(acExport, SIGNAL(triggered()), mw, SLOT(exportProduct()));
+    /*
     acExportRemote = new QAction("Export to a remote folder", mw->ui->treevwArchive);
     connect(acExportRemote, SIGNAL(triggered()), mw, SLOT(exportProduct()));
 
@@ -483,6 +483,7 @@ void ActionHandler::createLocalArchiveViewActions()
 
     acExportVOSpaceOther = new QAction("Export to another VOSpace folder", mw->ui->treevwArchive);
     connect(acExportVOSpaceOther, SIGNAL(triggered()), mw, SLOT(exportProduct()));
+    */
 
 }
 
@@ -533,12 +534,14 @@ void ActionHandler::showArchiveTableContextMenu(const QPoint & p)
         cmAnalyze->addAction(acAnalyzeIPython);
         cmAnalyze->addAction(acAnalyzeJupyter);
 
+        menu.addAction(acExport);
+        /*
         QMenu * cmExport = menu.addMenu("Export ...");
-        cmExport->addAction(acExportLocal);
+        cmExport->addAction(acExport);
         cmExport->addAction(acExportRemote);
         cmExport->addAction(acExportVOSpace);
         cmExport->addAction(acExportVOSpaceOther);
-
+        */
         mw->isViewsUpdateActive = false;
         menu.exec(mw->ui->treevwArchive->mapToGlobal(p));
         mw->isViewsUpdateActive = true;

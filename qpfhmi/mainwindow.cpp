@@ -1558,6 +1558,69 @@ void MainWindow::analyzeProduct()
 //----------------------------------------------------------------------
 void MainWindow::exportProduct()
 {
+    static const int NumOfURLCol = 10;
+
+    QPoint p = actHdl->getAcReprocess()->property("clickedItem").toPoint();
+    //QModelIndex m = ui->treevwArchive->indexAt(p);
+
+    QStringList inProds;
+    QModelIndexList list = ui->treevwArchive->selectionModel()->selectedIndexes();
+    foreach (QModelIndex m, list) {
+        if (m.column() == NumOfURLCol) {
+            QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+            QUrl archUrl(url);
+            QString fileName = archUrl.path();
+            std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+            inProds << fileName;
+        }
+    }
+    
+    std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
+    DlgReproc::OutputsLocation out =
+        ((userWAType == UserAreaName[UA_USER]) ?
+         DlgReproc::DefUserArea : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                   DlgReproc::CfgLocalDir : DlgReproc::CfgVOSpace));
+    int flags = (cfg.flags.intermediateProducts() ?
+                 DlgReproc::GenIntermProd : DlgReproc::NullFlags);
+
+    DlgReproc dlg;
+    dlg.setLabels("Export products", "The following products will be exported",
+                  "Export products to:", false);
+    dlg.setFields(inProds, out, flags);
+    if (!dlg.exec()) { return; }
+
+    QString outLocation;
+    dlg.getFields(inProds, out, outLocation, flags);
+
+    std::cerr << userWAType << ' ' << out << " : " << flags
+              << " - " << outLocation.toStdString() << '\n';
+
+    ProductList exportProducts;
+    FileNameSpec fns;
+    ProductMetadata md;
+    foreach (QString fileName, inProds) {
+        fns.parseFileName(fileName.toStdString(), md);
+        md["urlSpace"]       = LocalArchSpace;
+        md["procTargetType"] = (((out == DlgReproc::CfgLocalDir) ||
+                                 (out == DlgReproc::LocalDir)) ?
+                                UA_LOCAL : (((out == DlgReproc::CfgVOSpace) ||
+                                             (out == DlgReproc::VOSpaceFolder)) ?
+                                            UA_VOSPACE : UA_USER)); 
+        md["procTarget"]     = outLocation.toStdString();
+        exportProducts.products.push_back(md);
+    }
+
+    std::cerr << md.urlSpace() << ' '
+              << md.procTargetType() << ' '
+              << md.procTarget() << ' '
+              << '\n';
+
+    // Copy products to export location
+    URLHandler urlh;
+    for (auto & m : exportProducts.products) {
+        urlh.setProduct(m);
+        m = urlh.fromLocalArch2ExportLocation();
+    }
 }
 
 //----------------------------------------------------------------------

@@ -76,6 +76,8 @@ public:
     };
         
 public:
+    void setLabels(QString aTitle, QString desc, QString aHeading,
+                   bool showAddOpt);
     void setFields(QStringList inProds, OutputsLocation out,
                    int flags);
     void getFields(QStringList & inProds, OutputsLocation & out,

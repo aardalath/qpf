@@ -137,6 +137,11 @@ public:
     ProductMetadata & fromGateway2FinalDestination();
     
     //----------------------------------------------------------------------
+    // Method: fromLocalArch2ExportLocation
+    //----------------------------------------------------------------------
+    ProductMetadata & fromLocalArch2ExportLocation();
+    
+    //----------------------------------------------------------------------
     // Method: sendToVOSpace
     //----------------------------------------------------------------------
     void sendToVOSpace(std::string user, std::string pwd,

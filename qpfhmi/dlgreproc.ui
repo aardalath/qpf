@@ -7,15 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>630</width>
-    <height>454</height>
+    <height>458</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Swarm Definition Editor</string>
+   <string>Products Reprocessing</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="lblDesc">
      <property name="text">
       <string>The products selected below will be reprocessed.</string>
      </property>
@@ -25,7 +25,7 @@
     <widget class="QListWidget" name="lstInputProducts"/>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grpboxOptions">
      <property name="title">
       <string>Reprocessing options:</string>
      </property>
@@ -151,37 +151,61 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="chkGenIntermProd">
-        <property name="text">
-         <string>Generate intermediate products</string>
+       <widget class="QFrame" name="frmAdditionalOpts">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkIPython">
-        <property name="text">
-         <string>Open IPython session</string>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-        <attribute name="buttonGroup">
-         <string notr="true">btngrpAnalyzeSession</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkJupLab">
-        <property name="text">
-         <string>Open Jupyter Lab session</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">btngrpAnalyzeSession</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkBrowserVOSpace">
-        <property name="text">
-         <string>Open browser with VOSpace session</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="chkGenIntermProd">
+           <property name="text">
+            <string>Generate intermediate products</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkIPython">
+           <property name="text">
+            <string>Open IPython session</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btngrpAnalyzeSession</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkJupLab">
+           <property name="text">
+            <string>Open Jupyter Lab session</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btngrpAnalyzeSession</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkBrowserVOSpace">
+           <property name="text">
+            <string>Open browser with VOSpace session</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -273,7 +297,7 @@
   <slot>selectProdTypes()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="btngrpOutputsLocation"/>
   <buttongroup name="btngrpAnalyzeSession"/>
+  <buttongroup name="btngrpOutputsLocation"/>
  </buttongroups>
 </ui>
