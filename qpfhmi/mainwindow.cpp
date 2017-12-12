@@ -81,6 +81,8 @@
 #include <QObject>
 #include <QTextStream>
 
+#include "acthdl.h"
+
 #include "logwatcher.h"
 #include "progbardlg.h"
 #include "txitemdlg.h"
@@ -238,20 +240,27 @@ void MainWindow::setAppInfo(QString name, QString rev, QString bld)
 //----------------------------------------------------------------------
 void MainWindow::manualSetupUI()
 {
+    actHdl = new ActionHandler(this);
+
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     connect(ui->mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
-            this, SLOT(updateMenus()));
+            actHdl, SLOT(updateMenus()));
+
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)),
             this, SLOT(setActiveSubWindow(QWidget*)));
 
-    createActions();
-    createMenus();
-    createToolBars();
-    createStatusBar();
-    updateMenus();
+    actHdl->createActions();
+    actHdl->createMenus();
+    actHdl->createToolBars();
+    actHdl->createStatusBar();
+    
+    actHdl->updateMenus();
 
+    actHdl->getAcQuit()->setShortcuts(QKeySequence::Close);
+    actHdl->getAcQuitAll()->setShortcuts(QKeySequence::Quit);
+    
     // Read settings and set title
     readSettings();
     setWindowTitle(tr("QLA Processing Framework"));
@@ -270,15 +279,15 @@ void MainWindow::manualSetupUI()
     connect(ui->tabMainWgd, SIGNAL(currentChanged(int)),
             this, SLOT(selectRowInNav(int)));
     connect(ui->tabMainWgd, SIGNAL(tabCloseRequested(int)),
-            this, SLOT(closeTab(int)));
+            actHdl, SLOT(closeTab(int)));
 
     ui->tabMainWgd->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tabMainWgd, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showTabsContextMenu(const QPoint &)));
+            actHdl, SLOT(showTabsContextMenu(const QPoint &)));
 
     ui->lstwdgNav->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->lstwdgNav, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showTabsContextMenu(const QPoint &)));
+            actHdl, SLOT(showTabsContextMenu(const QPoint &)));
 
     QToolButton * tbtnTabsList = new QToolButton(ui->tabMainWgd);
     tbtnTabsList->setArrowType(Qt::DownArrow);
@@ -509,74 +518,6 @@ void MainWindow::about()
 }
 
 //----------------------------------------------------------------------
-// Method: updateMenus
-// Reads configuration file
-//----------------------------------------------------------------------
-void MainWindow::updateMenus()
-{
-    bool hasTextView = (activeTextView() != 0);
-
-    acSaveAs->setEnabled(hasTextView);
-#ifndef QT_NO_CLIPBOARD
-    acPaste->setEnabled(hasTextView);
-#endif
-    acClose->setEnabled(hasTextView);
-    acCloseAll->setEnabled(hasTextView);
-    acTile->setEnabled(hasTextView);
-    acCascade->setEnabled(hasTextView);
-    acNext->setEnabled(hasTextView);
-    acPrevious->setEnabled(hasTextView);
-    acSeparator->setVisible(hasTextView);
-
-#ifndef QT_NO_CLIPBOARD
-    bool hasSelection = (activeTextView() &&
-                         activeTextView()->getTextEditor()->textCursor().hasSelection());
-    acCut->setEnabled(hasSelection);
-    acCopy->setEnabled(hasSelection);
-#endif
-}
-
-//----------------------------------------------------------------------
-// Method: updateWindowMenu
-// Updates the Window menu according to the current set of logs displayed
-//----------------------------------------------------------------------
-void MainWindow::updateWindowMenu()
-{
-    windowMenu->clear();
-    windowMenu->addAction(acNavig);
-    windowMenu->addSeparator();
-    windowMenu->addAction(acClose);
-    windowMenu->addAction(acCloseAll);
-    windowMenu->addSeparator();
-    windowMenu->addAction(acTile);
-    windowMenu->addAction(acCascade);
-    windowMenu->addSeparator();
-    windowMenu->addAction(acNext);
-    windowMenu->addAction(acPrevious);
-    windowMenu->addAction(acSeparator);
-
-    QList<QMdiSubWindow *> windows = ui->mdiArea->subWindowList();
-    acSeparator->setVisible(!windows.isEmpty());
-
-    for (int i = 0; i < windows.size(); ++i) {
-        TextView *child = qobject_cast<TextView *>(windows.at(i)->widget());
-
-        QString text;
-        if (i < 9) {
-            text = tr("&%1 %2").arg(i + 1).arg(child->logName());
-        } else {
-            text = tr("%1 %2").arg(i + 1).arg(child->logName());
-        }
-        QAction *action  = windowMenu->addAction(text);
-        action->setCheckable(true);
-        action ->setChecked(child == activeTextView());
-        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
-        windowMapper->setMapping(action, windows.at(i));
-    }
-
-}
-
-//----------------------------------------------------------------------
 // Method: createTextView
 // Create new subwindow
 //----------------------------------------------------------------------
@@ -586,234 +527,12 @@ TextView *MainWindow::createTextView()
     ui->mdiArea->addSubWindow(child);
 
 #ifndef QT_NO_CLIPBOARD
-    connect(child, SIGNAL(copyAvailable(bool)), acCut, SLOT(setEnabled(bool)));
-    connect(child, SIGNAL(copyAvailable(bool)), acCopy, SLOT(setEnabled(bool)));
+    actHdl->activateClipboardFor(child);
 #endif
 
     return child;
 }
-
-//----------------------------------------------------------------------
-// Method: createActions
-// Create actions to be included in mainwindow menus
-//----------------------------------------------------------------------
-void MainWindow::createActions()
-{
-    // File menu
-    acSaveAs = new QAction(tr("Save &As..."), this);
-    acSaveAs->setShortcuts(QKeySequence::SaveAs);
-    acSaveAs->setStatusTip(tr("Save the document under a new name"));
-    connect(acSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
-
-    acProcessPath = new QAction(tr("Pr&ocess products in folder..."), this);
-    acProcessPath->setShortcuts(QKeySequence::Open);
-    acProcessPath->setStatusTip(tr("Specify a user selected folder and process all products inside"));
-    connect(acProcessPath, SIGNAL(triggered()), this, SLOT(processPath()));
-
-//    acRestart = new QAction(tr("&Restart"), this);
-//    //acRestart->setShortcuts(QKeySequence::Quit);
-//    acRestart->setStatusTip(tr("Restart the application"));
-//    connect(acRestart, SIGNAL(triggered()), this, SLOT(restart()));
-
-    acQuit = new QAction(tr("Close HMI"), this);
-    acQuit->setShortcuts(QKeySequence::Close);
-    acQuit->setStatusTip(tr("Quit the QPF HMI application"));
-    connect(acQuit, SIGNAL(triggered()), this, SLOT(quitApp()));
-
-    acQuitAll = new QAction(tr("Quit all"), this);
-    acQuitAll->setShortcuts(QKeySequence::Quit);
-    acQuitAll->setStatusTip(tr("Quit the QLA Processing Framework"));
-    connect(acQuitAll, SIGNAL(triggered()), this, SLOT(quitAllQPF()));
-
-    // Edit menu
-#ifndef QT_NO_CLIPBOARD
-    acCut = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
-    acCut->setShortcuts(QKeySequence::Cut);
-    acCut->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
-    connect(acCut, SIGNAL(triggered()), this, SLOT(cut()));
-
-    acCopy = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
-    acCopy->setShortcuts(QKeySequence::Copy);
-    acCopy->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
-    connect(acCopy, SIGNAL(triggered()), this, SLOT(copy()));
-
-    acPaste = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
-    acPaste->setShortcuts(QKeySequence::Paste);
-    acPaste->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
-    connect(acPaste, SIGNAL(triggered()), this, SLOT(paste()));
-#endif
-
-    // Tools menu
-    acConfigTool = new QAction(tr("&Configuration Tool ..."), this);
-    acConfigTool->setStatusTip(tr("Open Configuration Tool with current configuration"));
-    connect(acConfigTool, SIGNAL(triggered()), this, SLOT(showConfigTool()));
-
-    acBrowseDB = new QAction(tr("&Browse System DB ..."), this);
-    acBrowseDB->setStatusTip(tr("Open System Database Browser"));
-    connect(acBrowseDB, SIGNAL(triggered()), this, SLOT(showDBBrowser()));
-
-    acExtTools = new QAction(tr("&Define External Tools ..."), this);
-    acExtTools->setStatusTip(tr("Define external tools to open data products"));
-    connect(acExtTools, SIGNAL(triggered()), this, SLOT(showExtToolsDef()));
-
-    acVerbosity = new QAction(tr("&Define Verbosity Level ..."), this);
-    acVerbosity->setStatusTip(tr("Define verbosity level to be used in this session"));
-    connect(acVerbosity, SIGNAL(triggered()), this, SLOT(showVerbLevel()));
-
-    acExecTestRun = new QAction(tr("&Execute test run ..."), this);
-    acExecTestRun->setStatusTip(tr("Execute a test run processing on dummy data"));
-    //connect(acExecTestRun, SIGNAL(triggered()), this, SLOT(execTestRun()));
-
-    // Window menu
-    acNavig = new QAction(tr("Show &navigator panel"), this);
-    acNavig->setStatusTip(tr("Shows or hides the navigator panel"));
-    acNavig->setCheckable(true);
-    connect(acNavig, SIGNAL(toggled(bool)),
-            ui->dockNavigator, SLOT(setVisible(bool)));
-    connect(ui->dockNavigator, SIGNAL(visibilityChanged(bool)),
-            acNavig, SLOT(setChecked(bool)));
-    ui->dockNavigator->setVisible(false);
-
-    acClose = new QAction(tr("Cl&ose"), this);
-    acClose->setStatusTip(tr("Close the active window"));
-    connect(acClose, SIGNAL(triggered()),
-            ui->mdiArea, SLOT(closeActiveSubWindow()));
-
-    acCloseAll = new QAction(tr("Close &All"), this);
-    acCloseAll->setStatusTip(tr("Close all the windows"));
-    connect(acCloseAll, SIGNAL(triggered()),
-            ui->mdiArea, SLOT(closeAllSubWindows()));
-
-    acTile = new QAction(tr("&Tile"), this);
-    acTile->setStatusTip(tr("Tile the windows"));
-    connect(acTile, SIGNAL(triggered()), ui->mdiArea, SLOT(tileSubWindows()));
-
-    acCascade = new QAction(tr("&Cascade"), this);
-    acCascade->setStatusTip(tr("Cascade the windows"));
-    connect(acCascade, SIGNAL(triggered()), ui->mdiArea, SLOT(cascadeSubWindows()));
-
-    acNext = new QAction(tr("Ne&xt"), this);
-    acNext->setShortcuts(QKeySequence::NextChild);
-    acNext->setStatusTip(tr("Move the focus to the next window"));
-    connect(acNext, SIGNAL(triggered()),
-            ui->mdiArea, SLOT(activateNextSubWindow()));
-
-    acPrevious = new QAction(tr("Pre&vious"), this);
-    acPrevious->setShortcuts(QKeySequence::PreviousChild);
-    acPrevious->setStatusTip(tr("Move the focus to the previous "
-                                 "window"));
-    connect(acPrevious, SIGNAL(triggered()),
-            ui->mdiArea, SLOT(activatePreviousSubWindow()));
-
-    acSeparator = new QAction(this);
-    acSeparator->setSeparator(true);
-
-    // Help menu
-    acAbout = new QAction(tr("&About"), this);
-    acAbout->setStatusTip(tr("Show the application's About box"));
-    connect(acAbout, SIGNAL(triggered()), this, SLOT(about()));
-
-    acAboutQt = new QAction(tr("About &Qt"), this);
-    acAboutQt->setStatusTip(tr("Show the Qt library's About box"));
-    connect(acAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
-    // Tab-related actions
-    acTabClose = new QAction(tr("&Close"), this);
-    acTabClose->setStatusTip(tr("Close this tab"));
-    connect(acTabClose, SIGNAL(triggered()), this, SLOT(closeTabAction()));
-
-    acTabCloseAll = new QAction(tr("Close all"), this);
-    acTabCloseAll->setStatusTip(tr("Close all tabs"));
-    connect(acTabCloseAll, SIGNAL(triggered()), this, SLOT(closeAllTabAction()));
-
-    acTabCloseOther = new QAction(tr("Close &other"), this);
-    acTabCloseOther->setStatusTip(tr("Close all other tabs"));
-    connect(acTabCloseOther, SIGNAL(triggered()), this, SLOT(closeOtherTabAction()));
-
-}
-
-//----------------------------------------------------------------------
-// Method: createMenus
-// Create mainwindow menus
-//----------------------------------------------------------------------
-void MainWindow::createMenus()
-{
-    // File menu
-    fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(acProcessPath);
-    fileMenu->addSeparator();
-//    fileMenu->addAction(acSaveAs);
-//    fileMenu->addSeparator();
-//    fileMenu->addAction(acRestart);
-//    fileMenu->addSeparator();
-//    QAction *action = fileMenu->addAction(tr("Switch layout direction"));
-//    connect(action, SIGNAL(triggered()), this, SLOT(switchLayoutDirection()));
-    fileMenu->addAction(acQuit);
-    fileMenu->addAction(acQuitAll);
-
-    // Edit menu
-    editMenu = menuBar()->addMenu(tr("&Edit"));
-#ifndef QT_NO_CLIPBOARD
-    editMenu->addAction(acCut);
-    editMenu->addAction(acCopy);
-    editMenu->addAction(acPaste);
-#endif
-
-    // Tools menu
-    toolsMenu = menuBar()->addMenu(tr("&Tools"));
-    toolsMenu->addAction(acConfigTool);
-    toolsMenu->addAction(acBrowseDB);
-    toolsMenu->addAction(acExtTools);
-    // toolsMenu->addSeparator();
-    // sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
-    // sessionInfoMenu->addAction(acVerbosity);
-    toolsMenu->addAction(acVerbosity);
-
-    //toolsMenu->addSeparator();
-    //toolsMenu->addAction(acExecTestRun);
-
-    // Window menu
-    windowMenu = menuBar()->addMenu(tr("&Window"));
-    updateWindowMenu();
-    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
-
-    menuBar()->addSeparator();
-
-    // Help menu
-    helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(acAbout);
-    helpMenu->addAction(acAboutQt);
-}
-
-//----------------------------------------------------------------------
-// Method: closeEvent
-// Reads configuration file
-//----------------------------------------------------------------------
-void MainWindow::createToolBars()
-{
-//    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(acQuit);
-
-//#ifndef QT_NO_CLIPBOARD
-//    editToolBar = addToolBar(tr("Edit"));
-//    editToolBar->addAction(acCut);
-//    editToolBar->addAction(acCopy);2000
-//    editToolBar->addAction(acPaste);
-//#endif
-}
-
-//----------------------------------------------------------------------
-// Method: createStatusBar
-// Shows final Ready message in status bar
-//----------------------------------------------------------------------
-void MainWindow::createStatusBar()
-{
-    statusBar()->showMessage(tr("Ready"));
-}
-
+ 
 //----------------------------------------------------------------------
 // Method: readSettings
 // Read settings from system
@@ -1227,7 +946,7 @@ void MainWindow::addPathToLogWatch(QString & logDir)
         connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
 
-    updateWindowMenu();
+    actHdl->updateWindowMenu();
 }
 
 //----------------------------------------------------------------------
@@ -1428,7 +1147,7 @@ void MainWindow::updateSystemView()
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
-    acQuitAll->setEnabled(isThereActiveCores);
+    actHdl->getAcQuitAll()->setEnabled(isThereActiveCores);
 
     //-- 0b. If received sessionId from master, add files to watch
     if (!newPathToWatch.isEmpty()) {
@@ -1508,43 +1227,7 @@ void MainWindow::removeRowInNav(int row)
 //----------------------------------------------------------------------
 void MainWindow::initLocalArchiveView()
 {
-    // Create pop-up menu with user defined tools
-    ui->treevwArchive->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->treevwArchive->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->treevwArchive, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showArchiveTableContextMenu(const QPoint &)));
-
-    connect(ui->treevwArchive, SIGNAL(doubleClicked(QModelIndex)),
-            this, SLOT(openLocalArchiveElement(QModelIndex)));
-
-    acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
-
-    acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
-    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openLocation()));
-
-    acDefault = new QAction("System Default", ui->treevwArchive);
-    connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
-
-    acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
-    connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
-
-    acAnalyzeIPython = new QAction("Analyze within IPython", ui->treevwArchive);
-    connect(acAnalyzeIPython, SIGNAL(triggered()), this, SLOT(analyzeProduct()));
-
-    acAnalyzeJupyter = new QAction("Analyze within Jupyter Lab", ui->treevwArchive);
-    connect(acAnalyzeJupyter, SIGNAL(triggered()), this, SLOT(analyzeProduct()));
-
-    acExportLocal = new QAction("Export to a local folder", ui->treevwArchive);
-    connect(acExportLocal, SIGNAL(triggered()), this, SLOT(exportProduct()));
-
-    acExportRemote = new QAction("Export to a remote folder", ui->treevwArchive);
-    connect(acExportRemote, SIGNAL(triggered()), this, SLOT(exportProduct()));
-
-    acExportVOSpace = new QAction("Export to configured VOSpace folder", ui->treevwArchive);
-    connect(acExportVOSpace, SIGNAL(triggered()), this, SLOT(exportProduct()));
-
-    acExportVOSpaceOther = new QAction("Export to another VOSpace folder", ui->treevwArchive);
-    connect(acExportVOSpaceOther, SIGNAL(triggered()), this, SLOT(exportProduct()));
+    actHdl->createLocalArchiveViewActions();
 
     // Filter initialisation
     FieldSet products;
@@ -1587,13 +1270,13 @@ void MainWindow::initLocalArchiveView()
 //----------------------------------------------------------------------
 void MainWindow::setUToolTasks()
 {
-    acUserTools.clear();
+    actHdl->getAcUserTools().clear();
     foreach (QString key, userDefTools.keys()) {
         const QUserDefTool & udt = userDefTools.value(key);
         QAction * ac = new QAction(key, ui->treevwArchive);
         ac->setStatusTip(udt.desc);
         connect(ac, SIGNAL(triggered()), this, SLOT(openWith()));
-        acUserTools[key] = ac;
+        actHdl->getAcUserTools()[key] = ac;
     }
 }
 
@@ -1626,7 +1309,7 @@ void MainWindow::resizeLocalArch()
 void MainWindow::updateLocalArchModel()
 {
     // Update context menus depending on config flags
-    acReprocess->setEnabled(cfg.flags.allowReprocessing());
+    actHdl->getAcReprocess()->setEnabled(cfg.flags.allowReprocessing());
     
     // Update view
     productsModel->refresh();
@@ -1807,7 +1490,7 @@ void MainWindow::reprocessProduct()
 {
     static const int NumOfURLCol = 10;
 
-    QPoint p = acReprocess->property("clickedItem").toPoint();
+    QPoint p = actHdl->getAcReprocess()->property("clickedItem").toPoint();
     //QModelIndex m = ui->treevwArchive->indexAt(p);
 
     QStringList inProds;
@@ -1875,65 +1558,6 @@ void MainWindow::analyzeProduct()
 //----------------------------------------------------------------------
 void MainWindow::exportProduct()
 {
-}
-
-//----------------------------------------------------------------------
-// SLOT: showArchiveTableContextMenu
-//----------------------------------------------------------------------
-void MainWindow::showArchiveTableContextMenu(const QPoint & p)
-{
-    static const int NumOfProdTypeCol = 1;
-
-    if (isProductsCustomFilterActive) { return; }
-
-    QModelIndex m = ui->treevwArchive->indexAt(p);
-    //if (m.parent() == QModelIndex()) { return; }
-
-    QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
-    if (!m2.data().isValid()) { return; }
-    QString productType = m2.data().toString();
-
-    QList<QAction *> actions;
-    if (m.isValid()) {
-        foreach (QString key, userDefTools.keys()) {
-            const QUserDefTool & udt = userDefTools.value(key);
-            if (udt.prod_types.contains(productType) || true) {
-                QAction * ac = acUserTools[key];
-                actions.append(ac);
-            }
-        }
-        acArchiveOpenExt->addAction(acDefault);
-        acArchiveOpenExt->addSeparator();
-        acArchiveOpenExt->addActions(actions);
-
-        QMenu menu(this);
-        menu.addAction(acArchiveShow);
-        menu.addSeparator();
-        menu.addMenu(acArchiveOpenExt);
-
-        if ((m.parent().isValid()) && ((productType.left(4) == "LE1_") ||
-                                       (productType.left(4) == "SIM_") ||
-                                       (productType.left(4) == "SOC_"))) {
-            acReprocess->setEnabled(cfg.flags.allowReprocessing());
-            menu.addSeparator();
-            menu.addAction(acReprocess);
-            acReprocess->setProperty("clickedItem", p);
-        }
-
-        QMenu * cmAnalyze = menu.addMenu("Analyze ...");
-        cmAnalyze->addAction(acAnalyzeIPython);
-        cmAnalyze->addAction(acAnalyzeJupyter);
-
-        QMenu * cmExport = menu.addMenu("Export ...");
-        cmExport->addAction(acExportLocal);
-        cmExport->addAction(acExportRemote);
-        cmExport->addAction(acExportVOSpace);
-        cmExport->addAction(acExportVOSpaceOther);
-
-        isViewsUpdateActive = false;
-        menu.exec(ui->treevwArchive->mapToGlobal(p));
-        isViewsUpdateActive = true;
-    }
 }
 
 //----------------------------------------------------------------------
@@ -2094,85 +1718,6 @@ void MainWindow::openLocalArchiveFullPath(QString fullPath)
 }
 
 //----------------------------------------------------------------------
-// SLOT: closeTab
-//----------------------------------------------------------------------
-void MainWindow::closeTab(int n)
-{
-    removeRowInNav(n);
-    delete ui->tabMainWgd->widget(n);
-}
-
-//----------------------------------------------------------------------
-// SLOT: showTabsContextMenu
-// Shows closing menu for all the main tabs in the window
-//----------------------------------------------------------------------
-void MainWindow::showTabsContextMenu(const QPoint & p)
-{
-    QWidget * w = qobject_cast<QWidget *>(sender());
-    isMenuForTabWidget = (w == (QWidget*)(ui->tabMainWgd));
-    menuPt = p;
-
-    QMenu menu(w);
-    menu.addAction(acTabClose);
-    menu.addAction(acTabCloseAll);
-    menu.addAction(acTabCloseOther);
-
-    isViewsUpdateActive = false;
-    menu.exec(w->mapToGlobal(p));
-    isViewsUpdateActive = true;
-}
-
-//----------------------------------------------------------------------
-// SLOT: closeTabAction
-// Close the selected tab
-//----------------------------------------------------------------------
-void MainWindow::closeTabAction()
-{
-    static const int NumOfFixedTabs = 5;
-    int nTab;
-    if (isMenuForTabWidget) {
-        nTab = ui->tabMainWgd->tabBar()->tabAt(menuPt);
-    } else {
-        nTab = ui->lstwdgNav->currentRow();
-    }
-    if (nTab >= NumOfFixedTabs) {
-        closeTab(nTab);
-    }
-}
-
-//----------------------------------------------------------------------
-// SLOT: closeAllTabAction
-// Close all tabs
-//----------------------------------------------------------------------
-void MainWindow::closeAllTabAction()
-{
-    static const int NumOfFixedTabs = 5;
-    for (int i = ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        closeTab(i);
-    }
-}
-
-//----------------------------------------------------------------------
-// SLOT: closeOtherTabAction
-// Close all but the selected tab
-//----------------------------------------------------------------------
-void MainWindow::closeOtherTabAction()
-{
-    static const int NumOfFixedTabs = 5;
-    int nTab;
-    if (isMenuForTabWidget) {
-        nTab = ui->tabMainWgd->tabBar()->tabAt(menuPt);
-    } else {
-        nTab = ui->lstwdgNav->currentRow();
-    }
-    for (int i = ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        if (i != nTab) {
-            closeTab(i);
-        }
-    }
-}
-
-//----------------------------------------------------------------------
 // SLOT: showTabsListMenu
 // Shows list of tabs, in order to select one to move focus on to
 //----------------------------------------------------------------------
@@ -2213,50 +1758,7 @@ void MainWindow::attachJsonPopUpMenu(QWidget * w)
     w->setContextMenuPolicy(Qt::CustomContextMenu);
     //w->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(w, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showJsonContextMenu(const QPoint &)));
-}
-
-//----------------------------------------------------------------------
-// SLOT: showJsonContextMenu
-//----------------------------------------------------------------------
-void MainWindow::showJsonContextMenu(const QPoint & p)
-{
-    QAbstractItemView * w = qobject_cast<QAbstractItemView *>(sender());
-
-    QModelIndex m = w->indexAt(p);
-    //if (m.parent() == QModelIndex()) { return; }
-
-    if (w->indexAt(p).isValid()) {
-        QAction * acExp   = new QAction(tr("Expand"), w);
-        QAction * acExpS  = new QAction(tr("Expand subtree"), w);
-        QAction * acExpA  = new QAction(tr("Expand all"), w);
-
-        QAction * acColl  = new QAction(tr("Collapse"), w);
-        QAction * acCollS = new QAction(tr("Collapse subtree"), w);
-        QAction * acCollA = new QAction(tr("Collapse all"), w);
-
-        connect(acExp,   SIGNAL(triggered()), this, SLOT(jsontreeExpand()));
-        connect(acExpS,  SIGNAL(triggered()), this, SLOT(jsontreeExpandSubtree()));
-        connect(acExpA,  SIGNAL(triggered()), this, SLOT(jsontreeExpandAll()));
-
-        connect(acColl,  SIGNAL(triggered()), this, SLOT(jsontreeCollapse()));
-        connect(acCollS, SIGNAL(triggered()), this, SLOT(jsontreeCollapseSubtree()));
-        connect(acCollA, SIGNAL(triggered()), this, SLOT(jsontreeCollapseAll()));
-
-        QMenu menu(w);
-        menu.addAction(acExp);
-        menu.addAction(acExpS);
-        menu.addAction(acExpA);
-        menu.addSeparator();
-        menu.addAction(acColl);
-        menu.addAction(acCollS);
-        menu.addAction(acCollA);
-        pointOfAction = p;
-
-        isViewsUpdateActive = false;
-        menu.exec(w->mapToGlobal(p));
-        isViewsUpdateActive = true;
-    }
+            actHdl, SLOT(showJsonContextMenu(const QPoint &)));
 }
 
 //----------------------------------------------------------------------
@@ -2283,15 +1785,6 @@ void MainWindow::jsontreeExpandSubtree()
     foreach (QModelIndex i, indices) {
         w->expand(i);
     }
-    /*
-    QModelIndex i;
-    int k = idx.row();
-    while (idx.child(k, 0).isValid()) {
-        k++;
-        DMsg("Expanding at row k = " + k);
-        w->expand(idx.child(k, 0));
-    }
-    */
 }
 
 //----------------------------------------------------------------------
@@ -2362,44 +1855,10 @@ void MainWindow::initTasksMonitView()
 {
     static ProgressBarDelegate * progressBarDisplay = new ProgressBarDelegate(this, 7);
 
-    ui->tblvwTaskMonit->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    acWorkDir         = new QAction(tr("Open task working directory..."), ui->tblvwTaskMonit);
-    acShowTaskInfo    = new QAction(tr("Display task information"),       ui->tblvwTaskMonit);
-    //acStopTask       = new QAction(tr("Stop"),                           ui->tblvwTaskMonit);
-    //acRestartTask    = new QAction(tr("Restart"),                        ui->tblvwTaskMonit);
-
-    acTaskPause       = new QAction(tr("Pause Task"),                     ui->tblvwTaskMonit);
-    acTaskResume      = new QAction(tr("Resume Task"),                    ui->tblvwTaskMonit);
-    acTaskCancel      = new QAction(tr("Cancel Task"),                    ui->tblvwTaskMonit);
-
-    // acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),       ui->tblvwTaskMonit);
-    // acAgentStop       = new QAction(tr("Stop Agent Processing"),          ui->tblvwTaskMonit);
-    // acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),    ui->tblvwTaskMonit);
-
-    acHostSuspend     = new QAction(tr("Suspend Host Processing"),        ui->tblvwTaskMonit);
-    acHostStop        = new QAction(tr("Stop Host Processing"),           ui->tblvwTaskMonit);
-    acHostReactivate  = new QAction(tr("Reactivate Host Processing"),     ui->tblvwTaskMonit);
-
-    connect(acWorkDir,          SIGNAL(triggered()), this, SLOT(showWorkDir()));
-    connect(acShowTaskInfo,     SIGNAL(triggered()), this, SLOT(displayTaskInfo()));
-    //connect(acStopTask,     SIGNAL(triggered()), this, SLOT(stopTask()));
-    //connect(acRestartTask,  SIGNAL(triggered()), this, SLOT(restartTask()));
-
-    connect(acTaskPause,       SIGNAL(triggered()), this, SLOT(doTaskPause()));
-    connect(acTaskResume,      SIGNAL(triggered()), this, SLOT(doTaskResume()));
-    connect(acTaskCancel,      SIGNAL(triggered()), this, SLOT(doTaskCancel()));
-
-    // connect(acAgentSuspend,    SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
-    // connect(acAgentStop,       SIGNAL(triggered()), this, SLOT(doAgentStop()));
-    // connect(acAgentReactivate, SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
-
-    connect(acHostSuspend,     SIGNAL(triggered()), this, SLOT(doHostSuspend()));
-    connect(acHostStop,        SIGNAL(triggered()), this, SLOT(doHostStop()));
-    connect(acHostReactivate,  SIGNAL(triggered()), this, SLOT(doHostReactivate()));
-
+    actHdl->createTasksMonitViewActions();
+    
     connect(ui->tblvwTaskMonit, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showTaskMonitContextMenu(const QPoint &)));
+            actHdl, SLOT(showTaskMonitContextMenu(const QPoint &)));
 
     connect(ui->tblvwTaskMonit->horizontalHeader(), SIGNAL(sectionClicked(int)),
             this, SLOT(sortTaskViewByColumn(int)));
@@ -2415,42 +1874,6 @@ void MainWindow::initTasksMonitView()
 void MainWindow::sortTaskViewByColumn(int c)
 {
     ui->tblvwTaskMonit->sortByColumn(c);
-}
-
-//----------------------------------------------------------------------
-// SLOT: showTaskMonitContextMenu
-//----------------------------------------------------------------------
-void MainWindow::showTaskMonitContextMenu(const QPoint & p)
-{
-    if (ui->tblvwTaskMonit->indexAt(p).isValid()) {
-        QMenu cm;
-        
-        cm.addAction(acWorkDir);
-        cm.addAction(acShowTaskInfo);
-        //cm.addAction(acRestartTask);
-        //cm.addAction(acStopTask);
-        
-        cm.addSeparator();
-        
-        QMenu * cmTask = cm.addMenu("Task control ...");
-        cmTask->addAction(acTaskPause);
-        cmTask->addAction(acTaskResume);
-        cmTask->addAction(acTaskCancel);
-        
-        // QMenu * cmAgent = cm.addMenu("Agent processing ...");
-        // cmAgent->addAction(acAgentSuspend);
-        // cmAgent->addAction(acAgentStop);
-        // cmAgent->addAction(acAgentReactivate);
-
-        QMenu * cmHost = cm.addMenu("Host processing ...");
-        cmHost->addAction(acHostSuspend);
-        cmHost->addAction(acHostStop);
-        cmHost->addAction(acHostReactivate);
-        
-        isViewsUpdateActive = false;
-        cm.exec(ui->tblvwTaskMonit->mapToGlobal(p));
-        isViewsUpdateActive = true;
-    }
 }
 
 //----------------------------------------------------------------------
@@ -2836,19 +2259,8 @@ void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)
 //----------------------------------------------------------------------
 void MainWindow::initAlertsTables()
 {
-    ui->tblvwAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->tblvwSysAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    acShowAlert = new QAction(tr("Show alert information"), this);
-    acAckAlert = new QAction(tr("Acknowledge alert"), this);
-    //    connect(acShowAlert,     SIGNAL(triggered()), this, SLOT(showAlertInfo()));
-    // connect(acAckAlert,     SIGNAL(triggered()), this, SLOT(alertAck()));
-
-    connect(ui->tblvwAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showAlertsContextMenu(const QPoint &)));
-    connect(ui->tblvwSysAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showAlertsContextMenu(const QPoint &)));
-
+    actHdl->createAlertsTablesActions();
+    
     connect(ui->tblvwAlerts, SIGNAL(doubleClicked(const QModelIndex &)),
             this, SLOT(jumpToAlertSource(const QModelIndex &)));
     
@@ -2884,31 +2296,6 @@ void MainWindow::initAlertsTables()
 }
 
 //----------------------------------------------------------------------
-// SLOT: showAlertsContextMenu
-//----------------------------------------------------------------------
-void MainWindow::showAlertsContextMenu(const QPoint & p)
-{
-    if (isAlertsCustomFilterActive) { return; }
-
-    QList<QAction *> actions;
-    QTableView * tblvw = qobject_cast<QTableView*>(sender());
-    if (tblvw->indexAt(p).isValid()) {
-        actions.append(acShowAlert);
-        //actions.append(acAckAlert);
-        if (tblvw == ui->tblvwSysAlerts) {
-            connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showSysAlertInfo()));
-        } else {
-            connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showProcAlertInfo()));
-        }
-    }
-    if (actions.count() > 0) {
-        isViewsUpdateActive = false;
-        QMenu::exec(actions, tblvw->mapToGlobal(p));
-        isViewsUpdateActive = true;
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: showAlertInfo
 // Show dialog with alert information
 //----------------------------------------------------------------------
@@ -2919,7 +2306,7 @@ void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)
     DlgAlert dlg;
     dlg.setAlert(alert);
     dlg.exec();
-    disconnect(acShowAlert);
+    disconnect(actHdl->getAcShowAlert());
 }
 
 //----------------------------------------------------------------------
@@ -2999,14 +2386,7 @@ void MainWindow::jumpToAlertSource(const QModelIndex & idx)
 //----------------------------------------------------------------------
 void MainWindow::initTxView()
 {
-    ui->tblvwTx->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    acShowMsgInfo = new QAction(tr("Display message content"), ui->tblvwTx);
-
-    connect(acShowMsgInfo, SIGNAL(triggered()), this, SLOT(displayTxInfo()));
-
-    connect(ui->tblvwTx, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showTxContextMenu(const QPoint &)));
+    actHdl->createTxViewActions();
 
     connect(ui->tblvwTx->horizontalHeader(), SIGNAL(sectionClicked(int)),
             this, SLOT(sortTxViewByColumn(int)));
@@ -3022,23 +2402,6 @@ void MainWindow::initTxView()
 void MainWindow::sortTxViewByColumn(int c)
 {
     ui->tblvwTx->sortByColumn(c);
-}
-
-//----------------------------------------------------------------------
-// SLOT: showTxContextMenu
-//----------------------------------------------------------------------
-void MainWindow::showTxContextMenu(const QPoint & p)
-{
-    QList<QAction *> actions;
-    if (ui->tblvwTx->indexAt(p).isValid()) {
-        actions.append(acShowMsgInfo);
-
-    }
-    if (actions.count() > 0) {
-        isViewsUpdateActive = false;
-        QMenu::exec(actions, ui->tblvwTx->mapToGlobal(p));
-        isViewsUpdateActive = true;
-    }
 }
 
 //----------------------------------------------------------------------

@@ -42,7 +42,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMainWindow>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QTreeWidget>
@@ -77,10 +76,13 @@ namespace Ui {
 namespace QPF {
 
 class LogWatcher;
+class ActionHandler;
 
 class MainWindow : public QMainWindow, StateMachine
 {
     Q_OBJECT
+
+    friend class ActionHandler;
 
     // Valid Manager states
     static const int ERROR;
@@ -112,7 +114,7 @@ protected:
 
 public slots:
     void setAppInfo(QString name, QString rev, QString bld);
-    void updateMenus();
+
     void showConfigTool();
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
@@ -143,8 +145,6 @@ private slots:
     void selectRowInNav(int row);
     void removeRowInNav(int row);
 
-    void updateWindowMenu();
-
     void reprocessProduct();
     void analyzeProduct();
     void exportProduct();
@@ -160,18 +160,15 @@ private slots:
     void openWithDefault();
     void openLocation();
     void openWith();
-    void showArchiveTableContextMenu(const QPoint & p);
     void openLocalArchiveElement(QModelIndex idx);
     void openLocalArchiveFullPath(QString fullPath);
 
-    void showAlertsContextMenu(const QPoint & p);
     void showAlertInfo(QTableView * tblvw, DBTableModel * model);
     void showSysAlertInfo();
     void showProcAlertInfo();
     void jumpToAlertSource(const QModelIndex & idx);
     
     void sortTaskViewByColumn(int c);
-    void showTaskMonitContextMenu(const QPoint & p);
 
     void showWorkDir();
     void displayTaskInfo();
@@ -195,15 +192,10 @@ private slots:
     void dumpToTree(const Json::Value & v, QTreeWidgetItem * t);
 
     void sortTxViewByColumn(int c);
-    void showTxContextMenu(const QPoint & p);
     void displayTxInfo();
 
-    void showJsonContextMenu(const QPoint & p);
-
-    void showTabsContextMenu(const QPoint & p);
     void showTabsListMenu();
     void selectTabFromList();
-    void closeTab(int n);
 
     void jsontreeExpand();
     void jsontreeExpandSubtree();
@@ -212,17 +204,9 @@ private slots:
     void jsontreeCollapseSubtree();
     void jsontreeCollapseAll();
 
-    void closeTabAction();
-    void closeAllTabAction();
-    void closeOtherTabAction();
-
 private:
     void readConfig(QString dbUrl);
     TextView *createTextView();
-    void createActions();
-    void createMenus();
-    void createToolBars();
-    void createStatusBar();
     void readSettings();
     void writeSettings();
     QVariant getFromSettings(QString name);
@@ -280,62 +264,6 @@ private:
     bool expandProductsModel;
     bool resizeProductsModel;
 
-    QMenu *fileMenu;
-    QMenu *editMenu;
-    QMenu *windowMenu;
-    QMenu *toolsMenu;
-    QMenu *sessionInfoMenu;
-    QMenu *helpMenu;
-    QToolBar *fileToolBar;
-    QToolBar *editToolBar;
-
-    QAction *acProcessPath;
-    QAction *acSaveAs;
-
-    //QAction *acStopTask;
-    //QAction *acRestartTask;
-
-    QAction *acRestart;
-    QAction *acQuit;
-    QAction *acQuitAll;
-#ifndef QT_NO_CLIPBOARD
-    QAction *acCut;
-    QAction *acCopy;
-    QAction *acPaste;
-#endif
-
-    QAction *acConfigTool;
-    QAction *acBrowseDB;
-    QAction *acExtTools;
-    QAction *acVerbosity;
-    QAction *acExecTestRun;
-
-    QAction *acDefault;
-    QAction *acReprocess;
-
-    QAction *acAnalyzeIPython;
-    QAction *acAnalyzeJupyter;
-    QAction *acExportLocal;
-    QAction *acExportRemote;
-    QAction *acExportVOSpace;
-    QAction *acExportVOSpaceOther;
-
-    QAction *acNavig;
-    QAction *acClose;
-    QAction *acCloseAll;
-    QAction *acTile;
-    QAction *acCascade;
-    QAction *acNext;
-    QAction *acPrevious;
-    QAction *acSeparator;
-    QAction *acAbout;
-    QAction *acAboutQt;
-
-    bool isMenuForTabWidget;
-    QPoint menuPt;
-    QAction * acTabClose;
-    QAction * acTabCloseAll;
-    QAction * acTabCloseOther;
 
     QVector<LogWatcher*> nodeLogs;
     QStringList nodeNames;
@@ -348,34 +276,6 @@ private:
     QTimer * taskMonitTimer;
 
     QString inboxDirName;
-
-    QAction * acWorkDir;
-    QAction * acShowTaskInfo;
-
-    QAction * acRestartTask;
-    QAction * acStopTask;
-
-    QAction * acTaskPause;
-    QAction * acTaskResume;
-    QAction * acTaskCancel;
-
-    QAction * acAgentSuspend;
-    QAction * acAgentStop;
-    QAction * acAgentReactivate;
-
-    QAction * acHostSuspend;
-    QAction * acHostStop;
-    QAction * acHostReactivate;
-
-    QAction * acShowMsgInfo;
-
-    QAction * acShowAlert;
-    QAction * acAckAlert;
-
-    QAction * acArchiveShow;
-    QMenu *   acArchiveOpenExt;
-    QList<QAction *> acArchiveOpenExtTools;
-    QMap<QString, QAction *> acUserTools;
 
     QVBoxLayout * vlyFrmAgents;
     QSpacerItem * spacerFrmAgents;
@@ -407,10 +307,12 @@ private:
 
     bool isProductsCustomFilterActive;
     bool isAlertsCustomFilterActive;
+    bool isMenuForTabWidget;
+    bool isViewsUpdateActive;
 
     QString newPathToWatch;
 
-    bool isViewsUpdateActive;
+    ActionHandler * actHdl;
 };
 
 }

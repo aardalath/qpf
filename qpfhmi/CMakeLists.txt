@@ -18,6 +18,7 @@ find_package (Qt5Xml)
 #find_package (Qt5WebKitWidgets)
 
 set (qpfGuiLib_src
+  acthdl.cpp
   browser.cpp
   configtool.cpp
   connectionwidget.cpp
@@ -63,6 +64,7 @@ set (qpfGuiLib_src
   xmlsyntaxhighlight.cpp)
 
 set (qpfGuiLib_hdr
+  acthdl.h
   browser.h
   configtool.h
   connectionwidget.h
