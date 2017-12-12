@@ -8,7 +8,7 @@
 --
 -- Author:   J C Gonzalez
 --
--- Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+-- Copyright (C) 2015-2018 Euclid SOC Team @ ESAC
 -- ----------------------------------------------------------------------
 -- Notes:
 -- . Dumped from database version 9.6.0
@@ -342,6 +342,25 @@ CREATE TABLE task_status (
 );
 
 ALTER TABLE task_status OWNER TO eucops;
+
+-- ======================================================================
+-- TABLE: task_status_spectra
+-- ======================================================================
+
+-- ----------------------------------------------------------------------
+-- Name: task_status_spectra; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
+CREATE TABLE task_status_spectra (
+    agent_id character varying(64),
+    running  integer,
+    waiting  integer,
+    paused   integer,
+    stopped  integer,
+    failed   integer,
+    finished integer,
+    total    integer
+);
+
+ALTER TABLE task_status_spectra OWNER TO eucops;
 
 -- ======================================================================
 -- TABLE: tasks_info

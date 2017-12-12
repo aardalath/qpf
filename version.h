@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.version
  *
- * Version:  1.2
+ * Version: 2.0
  *
- * Date:    2017/03/20
+ * Date:    2018/01/20
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2018 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -50,10 +50,10 @@
 #define APP_NAME         "QPF"
 
 //! Application release number
-#define APP_RELEASE      "2.0beta"
+#define APP_RELEASE      "2.0rc1"
 
 //! Application release date
-#define APP_DATE         "OCT 2017"
+#define APP_DATE         "FEB 2018"
 
 //! Application developer company
 #define APP_COMPANY      "Euclid SOC Team"
@@ -77,6 +77,6 @@
 #define APP_CREATED_BY   APP_COMPANY
 
 //! Copyright Notice
-#define APP_COPYRIGHT    "(C) 2015-2017 Euclid SOC Team"
+#define APP_COPYRIGHT    "(C) 2015-2018 Euclid SOC Team"
 
 #endif /* VERSION_H */

@@ -10,7 +10,7 @@
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2018 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -353,7 +353,7 @@ const std::string WebComposer::Style = std::string
      "      }\n"
      "    </style>\n");
 const std::string WebComposer::FootMsg = std::string
-    ("<hr><div id=\"footer\">Copyright 2015-2017 The Euclid SOC Team @ ESAC<br>\n"
+    ("<hr><div id=\"footer\">Copyright 2015-2018 The Euclid SOC Team @ ESAC<br>\n"
      "<center><a href=\"https://www.cosmos.esa.int/web/euclid/euclid-at-esac\" "
      "title=\"The Euclid QLA Processing Framework\" "
      "target=\"_blank\">The Euclid QLA Processing Framework</a><br>\n"

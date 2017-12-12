@@ -2,7 +2,7 @@
 **
 ** Author:   J C Gonzalez
  *
- * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2018 Euclid SOC Team @ ESAC
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of the demonstration applications of the Qt Toolkit.

@@ -5,7 +5,7 @@
         "cfgVersion": "1.0",
         "lastAccess": "20171117T121212",
         "workArea": "/home/eucops/qpf",
-        "userAreaType": "auto",
+        "userAreaType": "user",
         "userArea": "",
         "logLevel": "INFO"
     },
@@ -46,7 +46,10 @@
             "pwd": "eu314clid",
             "url": "http://eucproc03.n1vs.lan:8001"
         },
-        "ipython": "/usr/bin/ipython"
+        "ipython": {
+            "cmd": "/usr/bin/ipython",
+            "path": "/home/eucops/Work/ipython"
+        }
     },
     "products": {
         "productTypes": [

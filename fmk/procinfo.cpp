@@ -10,7 +10,7 @@
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015-2017 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015-2018 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information

@@ -2,7 +2,7 @@
 # Log - Simple Logging library
 #======================================================================
 # Library project file
-# Author: J C Gonzalez - 2015-2017
+# Author: J C Gonzalez - 2015-2018
 #======================================================================
 include (../common.cmake)
 
