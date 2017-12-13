@@ -465,16 +465,42 @@ void DataMng::txInDataToLocalArch(ProductList & inData)
 //----------------------------------------------------------------------
 void DataMng::storeProcFmkInfoUpdate(json & fmkInfoValue)
 {
-    int running, scheduled, paused, stopped, failed, finished, total;
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
     std::string agName;
-    
-    json nfo = fmkInfoValue["hostsInfo"];
-    forjson (hi, nfo) {
-        std::string key = hi.key().asString();
-        json ph = *hi;
-        forjson (ai, ph["agentsInfo"]) {
-            agName = ai.key().asString();
-            json ts = (*ai)["counts"];
+    int running, scheduled, paused, stopped, failed, finished, total;
+
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+
+        json nfo = fmkInfoValue["hostsInfo"];
+        forjson (hi, nfo) {
+            std::string key = hi.key().asString();
+            json ph = *hi;
+            forjson (ai, ph["agentsInfo"]) {
+                agName = ai.key().asString();
+                json ts = (*ai)["counts"];
+                running    = ts["running"].asInt();
+                scheduled  = ts["scheduled"].asInt();
+                paused     = ts["paused"].asInt();
+                stopped    = ts["stopped"].asInt();
+                failed     = ts["failed"].asInt();
+                finished   = ts["finished"].asInt();
+                total      = ts["total"].asInt();
+                dbHdl->saveAgentTaskStatusSpectra(agName,
+                                                 running, scheduled, paused,
+                                                 stopped, failed,   finished,
+                                                 total);
+            }
+        }
+        
+        nfo = fmkInfoValue["swarmInfo"];
+        forjson (sw, nfo) {
+            std::string key = sw.key().asString();
+            json ph = *sw;
+            agName = ph["name"].asString();
+            json ts = ph["counts"];
             running    = ts["running"].asInt();
             scheduled  = ts["scheduled"].asInt();
             paused     = ts["paused"].asInt();
@@ -482,34 +508,18 @@ void DataMng::storeProcFmkInfoUpdate(json & fmkInfoValue)
             failed     = ts["failed"].asInt();
             finished   = ts["finished"].asInt();
             total      = ts["total"].asInt();
-            std::cerr << agName << ": "
-                      << ' ' << running
-                      << ' ' << scheduled
-                      << ' ' << paused
-                      << ' ' << stopped
-                      << ' ' << failed
-                      << ' ' << finished
-                      << ' ' << total << '\n';
+                dbHdl->saveAgentTaskStatusSpectra(agName,
+                                                 running, scheduled, paused,
+                                                 stopped, failed,   finished,
+                                                 total);
         }
+        
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
     }
 
-    nfo = fmkInfoValue["swarmInfo"];
-    agName = nfo["name"].asString();
-    json ts = fmkInfoValue["swarmInfo"]["counts"];
-    running    = ts["running"].asInt();
-    scheduled  = ts["scheduled"].asInt();
-    paused     = ts["paused"].asInt();
-    stopped    = ts["stopped"].asInt();
-    failed     = ts["failed"].asInt();
-    finished   = ts["finished"].asInt();
-    total      = ts["total"].asInt();
-    std::cerr << agName << ": "
-              << ' ' << running
-              << ' ' << scheduled
-              << ' ' << paused
-              << ' ' << stopped
-              << ' ' << failed
-              << ' ' << finished
-              << ' ' << total << '\n';
-}
+    // Close connection
+    dbHdl->closeConnection();
 
+
+}

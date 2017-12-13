@@ -247,7 +247,17 @@ public:
     virtual bool checkSignature(std::string & sgnt, std::string & ptype, 
                                 std::string & ver);
 
-private:
+    //----------------------------------------------------------------------
+    // Method: saveAgentTaskStatusSpectra
+    // Save the Task Status Spectra for a given agent
+    //----------------------------------------------------------------------
+    virtual bool saveAgentTaskStatusSpectra(std::string agName,
+                                            int running, int scheduled,
+                                            int paused, int stopped,
+                                            int failed, int finished,
+                                            int total);
+        
+ private:
 
     //----------------------------------------------------------------------
     // Method: eqKeyValue
