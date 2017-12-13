@@ -107,6 +107,12 @@ public:
     //----------------------------------------------------------------------
     void saveTaskToDB(TaskInfo & taskInfo, bool initialStore = false);
 
+    //----------------------------------------------------------------------
+    // Method: storeProcFmkInfoUpdate
+    // Store task status spectra into DB
+    //----------------------------------------------------------------------
+    void storeProcFmkInfoUpdate(json & fmkInfoValue);
+    
 protected:
 
     //----------------------------------------------------------------------

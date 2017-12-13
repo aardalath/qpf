@@ -441,8 +441,6 @@ bool DataMng::getProductLatest(std::string prodType,
     return retVal;
 }
 
-
-
 //----------------------------------------------------------------------
 // Method: processInDataMsg
 //----------------------------------------------------------------------
@@ -458,3 +456,60 @@ void DataMng::txInDataToLocalArch(ProductList & inData)
     // Save to DB
     saveProductsToDB(inData);
 }
+
+#define forjson(i, m) for (Json::Value::iterator (i) = (m).begin(); \
+                           (i) != (m).end() ; ++(i))
+//----------------------------------------------------------------------
+// Method: storeProcFmkInfoUpdate
+// Store task status spectra into DB
+//----------------------------------------------------------------------
+void DataMng::storeProcFmkInfoUpdate(json & fmkInfoValue)
+{
+    int running, scheduled, paused, stopped, failed, finished, total;
+    std::string agName;
+    
+    json nfo = fmkInfoValue["hostsInfo"];
+    forjson (hi, nfo) {
+        std::string key = hi.key().asString();
+        json ph = *hi;
+        forjson (ai, ph["agentsInfo"]) {
+            agName = ai.key().asString();
+            json ts = (*ai)["counts"];
+            running    = ts["running"].asInt();
+            scheduled  = ts["scheduled"].asInt();
+            paused     = ts["paused"].asInt();
+            stopped    = ts["stopped"].asInt();
+            failed     = ts["failed"].asInt();
+            finished   = ts["finished"].asInt();
+            total      = ts["total"].asInt();
+            std::cerr << agName << ": "
+                      << ' ' << running
+                      << ' ' << scheduled
+                      << ' ' << paused
+                      << ' ' << stopped
+                      << ' ' << failed
+                      << ' ' << finished
+                      << ' ' << total << '\n';
+        }
+    }
+
+    nfo = fmkInfoValue["swarmInfo"];
+    agName = nfo["name"].asString();
+    json ts = fmkInfoValue["swarmInfo"]["counts"];
+    running    = ts["running"].asInt();
+    scheduled  = ts["scheduled"].asInt();
+    paused     = ts["paused"].asInt();
+    stopped    = ts["stopped"].asInt();
+    failed     = ts["failed"].asInt();
+    finished   = ts["finished"].asInt();
+    total      = ts["total"].asInt();
+    std::cerr << agName << ": "
+              << ' ' << running
+              << ' ' << scheduled
+              << ' ' << paused
+              << ' ' << stopped
+              << ' ' << failed
+              << ' ' << finished
+              << ' ' << total << '\n';
+}
+

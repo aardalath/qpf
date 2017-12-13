@@ -564,7 +564,7 @@ void Config::generateProcFmkInfoStructure()
         agHost.push_back(ip);
 
         SwarmInfo * sw = new SwarmInfo;
-        sw->name       = ip;
+        sw->name       = sAgName;
         sw->scale      = swrm.scale();
         sw->hostInfo   = hi;
         sw->taskStatus = TaskStatusSpectra();
