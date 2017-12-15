@@ -133,7 +133,14 @@ public:
         PageProdProc,
         PageOrchestration,
         PageExtTools,
+        PageConnectivity,
         PageFlags,
+    };
+
+    enum UserWAIndex {
+        Auto,
+        LocalFolder,
+        VOSpaceFolder,
     };
 
     void prepare(MapOfUserDefTools & userTools, QStringList pts);
@@ -148,13 +155,18 @@ public slots:
     void closeDoNothing();
     void selectBasePath();
     void setWorkingPaths(QString newPath);
-
+    void selectUserDefAreaPath();
+    void defineUserWA(int btn);
+    void selectIPythonExec();
+    
 private slots:
     void addHost();
     void removeHost();
+    void editHost(QModelIndex idx);
 
     void addSwarm();
     void removeSwarm();
+    void editSwarm(QModelIndex idx);
 
     void addProduct();
     void removeProduct();
@@ -164,6 +176,7 @@ private slots:
 
     void addRule();
     void removeRule();
+    void editRule(QModelIndex idx);
 
     void removeFromTable(QAbstractItemView * vw, QString item);
 
@@ -178,7 +191,7 @@ private slots:
 
 private:
     void transferCfgToGUI();
-    void transferGUIToCfg();
+    bool transferGUIToCfg();
 
     ModelView * createListModelView(QAbstractItemView * v,
                                     QStringList & dlist,
