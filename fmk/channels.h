@@ -15,12 +15,13 @@
         T(HMICMD),                              \
         T(INDATA),                              \
         T(TSKSCHED),                            \
-        T(TSKPROC),                             \
-        T(TSKRQST),                             \
-        T(TSKREP),                              \
         T(TSKREG),                              \
+        T(TSKRQST),                             \
+        T(TSKPROC),                             \
+        T(TSKREP),                              \
+        T(FMKMON),                              \
         T(HOSTMON),                             \
-        T(FMKMON),                              
+        T(UNKNOWN)
 
 #define T(x) TX_ID_ ## x
 enum TxId { TLISTOF_TX_IDS };
@@ -48,10 +49,10 @@ enum Message_Tag {
     Tag_ChnlInData   = 0b0000000000001000,
     Tag_ChnlTskSched = 0b0000000000010000,
     Tag_ChnlTskReg   = 0b0000000000100000,
-    Tag_ChnlFmkMon   = 0b0000000001000000,
-    Tag_MsgTskRqst   = 0b0000000010000000,
-    Tag_MsgTskProc   = 0b0000000100000000,
-    Tag_MsgTskRep    = 0b0000001000000000,
+    Tag_MsgTskRqst   = 0b0000000001000000,
+    Tag_MsgTskProc   = 0b0000000010000000,
+    Tag_MsgTskRep    = 0b0000000100000000,
+    Tag_ChnlFmkMon   = 0b0000001000000000,
     Tag_MsgHostMon   = 0b0000010000000000,
     Tag_UNKNOWN      = 0b1000000000000000,
 };    
