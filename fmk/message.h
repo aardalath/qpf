@@ -181,13 +181,13 @@ typedef std::string CmdDescriptor;
 #undef T
 
 #define TLISTOF_CMD_IDS                              \
-    T(INIT),                                         \
+        T(INIT),                                     \
         T(SESSION),                                  \
         T(QUIT),                                     \
         T(PING),                                     \
         T(STATES),                                   \
-        T(PROCHDL),                                   \
-        T(MSGMASK)
+        T(PROCHDL),                                  \
+        T(CONFIG), 
 
 #define T(x) CMD_ ## x
 enum CmdId { TLISTOF_CMD_IDS };
@@ -203,7 +203,7 @@ const CmdDescriptor CmdQuit     (CmdName[CMD_QUIT]);
 const CmdDescriptor CmdPing     (CmdName[CMD_PING]);
 const CmdDescriptor CmdStates   (CmdName[CMD_STATES]);
 const CmdDescriptor CmdProcHdl  (CmdName[CMD_PROCHDL]);
-const CmdDescriptor CmdMsgMask  (CmdName[CMD_MSGMASK]);
+const CmdDescriptor CmdConfig   (CmdName[CMD_CONFIG]);
 
 //-- Processing Handling constants ------------
 
