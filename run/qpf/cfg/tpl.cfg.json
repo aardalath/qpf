@@ -1,9 +1,13 @@
-g{
+{
     "general": {
         "appName": "QPF",
         "appVersion": "2.0",
-        "lastAccess": "20170901T121212",
-        "workArea": "/home/eucops/qpf"
+        "cfgVersion": "1.0",
+        "lastAccess": "20171117T121212",
+        "workArea": "/home/eucops/qpf",
+        "userAreaType": "auto",
+        "userArea": "",
+        "logLevel": "INFO"
     },
     "network" : {
         "masterNode" : "@THIS_HOST_IP@",
@@ -12,7 +16,15 @@ g{
             "@THIS_HOST_IP@": 5
         },
         "swarms": {
-         }
+            "QDT": {
+                "serviceNodes": [ "192.168.89.141" ],
+                "scale": 4,
+                "name": "helloworld",
+                "image": "alpine",
+                "exec": "ping",
+                "args": [ "docker.com" ]
+            }
+        }
     },
     "db": {
         "host": "127.0.0.1",
@@ -21,8 +33,23 @@ g{
         "user": "eucops",
         "pwd": ""
     },
+    "connectivity": {
+        "vospace": {
+            "url": "https://vospace.esac.esa.int/vospace",
+            "user": "vosuser",
+            "pwd": "vospassword",
+            "folder": "qla"
+        },
+        "jupyter": {
+            "host": "eucproc03.n1vs.lan",
+            "user": "eucops",
+            "pwd": "eu314clid",
+            "url": "http://eucproc03.n1vs.lan:8001"
+        },
+        "ipython": "/usr/bin/ipython"
+    },
     "products": {
-        "product_types": [
+        "productTypes": [
             "SOC_VIS",
             "SOC_NIR",
             "SOC_SIR",
@@ -70,7 +97,7 @@ g{
             "QLA_HK_LOG",
             "QLA_HK_ARCH",
             "UNKNOWN_TYPE"],
-        "parsingRegex": "@filenamespec.tpl",
+        "parsingRegEx": "@filenamespec.tpl",
         "parsingAssign": "%M=%1;%F=%2;%P=%3;%S=%2+_+%3;%D=%4;%f=%4;%v=%5",
         "productIdTpl": "%M_%F_%P_%f_%v",
         "extensions": {
@@ -82,90 +109,105 @@ g{
     "orchestration": {
         "rules": [
             {
+                "name": "DummyProc_QLAISMVIS",
                 "inputs": "SIM_VIS",
                 "outputs": "QLA_SIM_VIS,QLA_SIM_VIS_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_QLASIMNIR",
                 "inputs": "SIM_NIR",
                 "outputs": "QLA_SIM_NIR,QLA_SIM_NIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_QLASIMSIR",
                 "inputs": "SIM_SIR",
                 "outputs": "QLA_SIM_SIR,QLA_SIM_SIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_QLAVIS",
                 "inputs": "LE1_VIS",
                 "outputs": "QLA_LE1_VIS,QLA_LE1_VIS_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_QLANIR",
                 "inputs": "LE1_NIR",
                 "outputs": "QLA_LE1_NIR,QLA_LE1_NIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_QLASIR",
                 "inputs": "LE1_SIR",
                 "outputs": "QLA_LE1_SIR,QLA_LE1_SIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "Archive_Ingestor_QLAVIS",
                 "inputs": "QLA_LE1_VIS,QLA_LE1_VIS_LOG",
                 "outputs": "QLA_LE1_VIS_ARCH",
                 "processing": "Archive_Ingestor",
                 "condition": "(QLA_LE1_VIS.date==QLA_LE1_VIS_LOG.date) & (QLA_LE1_VIS.time==QLA_LE1_VIS_LOG.time)"
             },
             {
+                "name": "Archive_Ingestor_QLANIR",
                 "inputs": "QLA_LE1_NIR,QLA_LE1_NIR_LOG",
                 "outputs": "QLA_LE1_NIR_ARCH",
                 "processing": "Archive_Ingestor",
                 "condition": "(QLA_LE1_NIR.date==QLA_LE1_NIR_LOG.date) & (QLA_LE1_NIR.time==QLA_LE1_NIR_LOG.time)"
             },
             {
+                "name": "Archive_Ingestor_QLASIR",
                 "inputs": "QLA_LE1_SIR,QLA_LE1_SIR_LOG",
                 "outputs": "QLA_LE1_SIR_ARCH",
                 "processing": "Archive_Ingestor",
                 "condition": "(QLA_LE1_SIR.date==QLA_LE1_SIR_LOG.date) & (QLA_LE1_SIR.time==QLA_LE1_SIR_LOG.time)"
             },
             {
+                "name": "DummyProc_LE1VIS",
                 "inputs": "SOC_VIS",
                 "outputs": "LE1_VIS,LE1_VIS_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_LE1NIR",
                 "inputs": "SOC_NIR",
                 "outputs": "LE1_NIR,LE1_NIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "DummyProc_LE1SIR",
                 "inputs": "SOC_SIR",
                 "outputs": "LE1_SIR,LE1_SIR_LOG",
                 "processing": "DummyProc",
                 "condition": "1"
             },
             {
+                "name": "Archive_Ingestor_LE1VIS",
                 "inputs": "LE1_VIS,LE1_VIS_LOG",
                 "outputs": "LE1_VIS_ARCH",
                 "processing": "Archive_Ingestor",
                 "condition": "1"
             },
             {
+                "name": "Archive_Ingestor_LE1NIR",
                 "inputs": "LE1_NIR,LE1_NIR_LOG",
                 "outputs": "LE1_NIR_ARCH",
                 "processing": "Archive_Ingestor",
                 "condition": "1"
             },
             {
+                "name": "Archive_Ingestor_LE1SIR",
                 "inputs": "LE1_SIR,LE1_SIR_LOG",
                 "outputs": "LE1_SIR_ARCH",
                 "processing": "Archive_Ingestor",
@@ -174,65 +216,64 @@ g{
         ],
         "processors": {
             "DummyProc": "DummyProc",
-            "DummyProc": "DummyProc",
             "Archive_Ingestor": "Archive_Ingestor"
         }
     },
-    "userdeftools": [
+    "userDefTools": [
         {
             "name": "DS9",
             "description": "DS9",
             "arguments": "%F",
             "executable": "/usr/bin/ds9",
-            "product_types": "SOC_VIS,SOC_NIR,SOC_SIR,HK"
+            "productTypes": "SOC_VIS,SOC_NIR,SOC_SIR,HK"
         },
         {
             "name": "Firefox",
             "description": "Firefox",
             "arguments": "%F",
             "executable": "/usr/bin/firefox",
-            "product_types": "VIS_INFO,NIR_INFO,SIR_INFO"
+            "productTypes": "VIS_INFO,NIR_INFO,SIR_INFO"
         },
         {
             "name": "GEdit",
             "description": "Gnome Editor",
             "arguments": "%F",
             "executable": "/usr/bin/gedit",
-            "product_types": "QLA_LE1_VIS_LOG,QLA_LE1_VIS_ARCH,QLA_LE1_NIR_LOG,QLA_LE1_NIR_ARCH,QLA_LE1_SIR_LOG,QLA_LE1_SIR_ARCH"
+            "productTypes": "QLA_LE1_VIS_LOG,QLA_LE1_VIS_ARCH,QLA_LE1_NIR_LOG,QLA_LE1_NIR_ARCH,QLA_LE1_SIR_LOG,QLA_LE1_SIR_ARCH"
         },
         {
             "name": "Geany",
             "description": "Geany editor",
             "arguments": "%F",
             "executable": "/usr/bin/geany",
-            "product_types": "QLA_LE1_VIS,QLA_LE1_VIS_META,QLA_LE1_NIR,QLA_LE1_NIR_META,QLA_LE1_SIR,QLA_LE1_SIR_META,HK_QLA"
+            "productTypes": "QLA_LE1_VIS,QLA_LE1_VIS_META,QLA_LE1_NIR,QLA_LE1_NIR_META,QLA_LE1_SIR,QLA_LE1_SIR_META,HK_QLA"
         },
         {
             "name": "XMessage",
             "description": "XMessage tiny tool",
             "arguments": "%F",
             "executable": "/usr/bin/xmessage",
-            "product_types": "UNKNOWN_TYPE"
+            "productTypes": "UNKNOWN_TYPE"
         }
     ],
     "flags": {
+        "writeMsgsToDisk": false,
         "msgsToDisk": [
+            "HMICMD",
+            "EVTMNG",
             "INDATA",
-            "MONITINFO",
-            "TASKPROC",
-            "TASKRES",
-            "START",
-            "CMD" ],
-        "msgsToDb": [
-            "INDATA",
-            "DATARQST",
-            "DATAINFO",
-            "MONITRQST",
-            "CMD" ],
+            "TSKSCHED",
+            "TSKREG",
+            "TSKRQST",
+            "TSKPROC",
+            "TSKREP",
+            "HOSTMON"
+        ],
         "notifyMsgArrival": true,
         "groupTaskAgentLogs": false,
         "allowReprocessing": true,
         "intermediateProducts": false,
-        "sendOutputsToMainArchive": false
+        "sendOutputsToMainArchive": false,
+        "progressString": ":PROGRESS:"
     }
 }
