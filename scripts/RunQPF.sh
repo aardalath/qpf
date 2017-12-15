@@ -52,12 +52,17 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -d ] [ -H ] [ -c <cfg> ] [ -I <ipAddr> ] [ -s <session> ]"
-    say "Usage: ${SCRIPT_NAME} $opts"
+    SCRIPT_NAME=$0
+    local opts2="[ -h ] [ -d ] [ -v ] [ -H ]"
+    local opts1="[ -h ] [ -d ] [ -v ] [ -c <cfg> ] [ -I <ipAddr> ] [ -s <session> ]"
+    say "Usage:   ${SCRIPT_NAME} $opts1"
+    say "         ${SCRIPT_NAME} $opts2"
     say "where:"
     say "  -h             Show this usage message"
     say "  -d             Debug session"
+    say "  -v             Increases verbosity (can be used more than once)"
     say "  -H             HMI"
+    say "  -C             HMI - Show Configuration Tool"
     say "  -c <cfg>       Use config. file <cfg>"
     say "  -s <session>   Re-use existing session tag/folder"
     say "  -I <ipAddr>    Use this IP address for master"
@@ -90,8 +95,10 @@ LAST_SESSION=$(basename $(ls -1dt ${QPF_SESSIONS_DIR}/20*|head -1))
 
 THIS_HOST=$(uname -a|cut -d" " -f2)
 
+VERBOSITY=""
+
 ## Parse command line
-while getopts :hHdc:s:I: OPT; do
+while getopts :hHCdc:s:I:v OPT; do
     case $OPT in
         h|+h) 
 	    usage 
@@ -99,6 +106,12 @@ while getopts :hHdc:s:I: OPT; do
         H|+H) 
 	    QPFEXE=${QPFHMI} 
 	    CFG_FILE="-c ${DB_CONNECTION}"
+	    SESSION="-s ${LAST_SESSION}"
+	    THIS_HOST=localhost
+        ;;
+        C|+C) 
+	    QPFEXE=${QPFHMI} 
+	    CFG_FILE="-C -c ${DB_CONNECTION}"
 	    SESSION="-s ${LAST_SESSION}"
 	    THIS_HOST=localhost
 	    ;;
@@ -114,6 +127,9 @@ while getopts :hHdc:s:I: OPT; do
         I|+I) 
 	    IPADDR="-I $OPTARG"
 	    ;;
+        v|+v) 
+	    VERBOSITY="$VERBOSITY -v"
+	    ;;
         *)    usage ; exit 2
     esac
 done
@@ -123,7 +139,8 @@ OPTIND=1
 ## Run
 greetings
 
-HOSTNAME=${THIS_HOST} ${DBG} ${QPFEXE} ${CFG_FILE} ${SESSION} ${IPADDR} 2>&1  | tee ${LOG_FILE}
+ALL_OPTS="${CFG_FILE} ${SESSION} ${IPADDR} ${VERBOSITY}"
+HOSTNAME=${THIS_HOST} ${DBG} ${QPFEXE} ${ALL_OPTS} 2>&1 | tee ${LOG_FILE}
 
 if [ $? -ne 0 ]; then
     die "Exiting..."
