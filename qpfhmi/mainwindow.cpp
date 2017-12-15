@@ -94,6 +94,7 @@
 #include "qjsonmodel.h"
 #include "xmlsyntaxhighlight.h"
 #include "dlgalert.h"
+#include "dlgreproc.h"
 
 #include "reqrep.h"
 #include "pubsub.h"
@@ -130,8 +131,8 @@ const std::string MainWindow::INITIALISED_StateName("INITIALISED");
 const std::string MainWindow::RUNNING_StateName("RUNNING");
 const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
 
-    void fwdCommandFromHMIPxy(void* context, std::string cmd, std::string arg) {
-        static_cast<MainWindow*>(context)->commandFromHMIPxy(cmd, arg);
+void fwdCommandFromHMIPxy(void* context, std::string cmd, std::string arg) {
+    static_cast<MainWindow*>(context)->commandFromHMIPxy(cmd, arg);
 }
 
 
@@ -763,10 +764,10 @@ void MainWindow::createMenus()
     toolsMenu->addAction(acConfigTool);
     toolsMenu->addAction(acBrowseDB);
     toolsMenu->addAction(acExtTools);
-    toolsMenu->addSeparator();
-
-    sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
-    sessionInfoMenu->addAction(acVerbosity);
+    // toolsMenu->addSeparator();
+    // sessionInfoMenu = toolsMenu->addMenu(tr("&Session Information"));
+    // sessionInfoMenu->addAction(acVerbosity);
+    toolsMenu->addAction(acVerbosity);
 
     //toolsMenu->addSeparator();
     //toolsMenu->addAction(acExecTestRun);
@@ -930,13 +931,16 @@ void MainWindow::setActiveSubWindow(QWidget *window)
 //----------------------------------------------------------------------
 void MainWindow::showConfigTool()
 {
-    static ConfigTool cfgTool;
+    static ConfigTool cfgTool(this);
 
     cfgTool.prepare(userDefTools, userDefProdTypes);
     if (cfgTool.exec()) {
-        DMsg("Updating user tools!");
+        TRC("Updating user tools!");
         cfgTool.getExtTools(userDefTools);
-        hmiNode->sendNewCfgInfo();
+        if (hmiNode != 0) {
+            hmiNode->sendNewConfig();
+            TRC("Sending new configuration to all the nodes");
+        }
     }
 }
 
@@ -1174,28 +1178,36 @@ void MainWindow::setLogWatch()
 //----------------------------------------------------------------------
 void MainWindow::addPathToLogWatch(QString & logDir)
 {
+    // Create list of log file names and window names (file basenames)
     QStringList logExtFilter("*.log");
-
     QStringList logFiles;
     logFiles << QDir(logDir).entryList(logExtFilter);
-
-    // Create MDI window with the log file viewer
+    QStringList wndNames;
+    QStringList logFileNames;
     foreach (QString logBaseName, logFiles) {
         QString logFileName(logDir + "/" + logBaseName);
-        QString bseName(QFileInfo(logFileName).baseName());
-      
-        // check that the window for this log does not exist
-        QList<QMdiSubWindow *> sws = ui->mdiArea->subWindowList();
-        bool doesExist = false;
-        foreach (QMdiSubWindow * subw, sws) {
-            TextView * tv = qobject_cast<TextView *>(subw->widget());
+        logFileNames << logFileName;
+        wndNames     << QFileInfo(logFileName).baseName();
+    }
+
+    // Clean up, removing those that match existing subwindows
+    foreach (QMdiSubWindow * subw, ui->mdiArea->subWindowList()) {
+        TextView * tv = qobject_cast<TextView *>(subw->widget());
+        for (int i = logFileNames.size() - 1; i >= 0; --i) {
+            const QString & bseName = wndNames.at(i);
             if (tv->logName() == bseName) {
-                doesExist = true;
-                break;
+                logFileNames.removeAt(i);
+                wndNames.removeAt(i);
+                continue;
             }
         }
-        if (doesExist) { continue; }
-
+    }
+    
+    // Create MDI window with the log file viewer
+    for (int i = 0; i < logFileNames.size(); ++i) {
+        const QString & logFileName = logFileNames.at(i);
+        const QString & bseName     = wndNames.at(i);
+      
         activeNodes << bseName;
 
         TextView * pltxted = new TextView;
@@ -1206,10 +1218,13 @@ void MainWindow::addPathToLogWatch(QString & logDir)
         nodeLogs.append(newLog);
         QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
         subw->setWindowFlags(Qt::CustomizeWindowHint |
-                             Qt::WindowTitleHint |
-                             Qt::WindowMinMaxButtonsHint);
+                            Qt::WindowTitleHint |
+                            Qt::WindowMinMaxButtonsHint);
+        subw->show();
         connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
+
+    updateWindowMenu();
 }
 
 //----------------------------------------------------------------------
@@ -1510,6 +1525,24 @@ void MainWindow::initLocalArchiveView()
     acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
     connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
 
+    acAnalyzeIPython = new QAction("Analyze within IPython", ui->treevwArchive);
+    connect(acAnalyzeIPython, SIGNAL(triggered()), this, SLOT(analyzeProduct()));
+
+    acAnalyzeJupyter = new QAction("Analyze within Jupyter Lab", ui->treevwArchive);
+    connect(acAnalyzeJupyter, SIGNAL(triggered()), this, SLOT(analyzeProduct()));
+
+    acExportLocal = new QAction("Export to a local folder", ui->treevwArchive);
+    connect(acExportLocal, SIGNAL(triggered()), this, SLOT(exportProduct()));
+
+    acExportRemote = new QAction("Export to a remote folder", ui->treevwArchive);
+    connect(acExportRemote, SIGNAL(triggered()), this, SLOT(exportProduct()));
+
+    acExportVOSpace = new QAction("Export to configured VOSpace folder", ui->treevwArchive);
+    connect(acExportVOSpace, SIGNAL(triggered()), this, SLOT(exportProduct()));
+
+    acExportVOSpaceOther = new QAction("Export to another VOSpace folder", ui->treevwArchive);
+    connect(acExportVOSpaceOther, SIGNAL(triggered()), this, SLOT(exportProduct()));
+
     // Filter initialisation
     FieldSet products;
     Field fld("product_id"          , STRING); products[fld.name] = fld;
@@ -1589,6 +1622,10 @@ void MainWindow::resizeLocalArch()
 //----------------------------------------------------------------------
 void MainWindow::updateLocalArchModel()
 {
+    // Update context menus depending on config flags
+    acReprocess->setEnabled(cfg.flags.allowReprocessing());
+    
+    // Update view
     productsModel->refresh();
     if (expandProductsModel) {
         ui->treevwArchive->expandAll();
@@ -1770,6 +1807,27 @@ void MainWindow::reprocessProduct()
     QString fileName = archUrl.path();
     std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
 
+    QStringList inProds;
+    inProds << fileName;
+
+    std::string userWAType = cfg.general.userAreaType();
+    DlgReproc::OutputsLocation out = ((userWAType == "auto") ?
+                                      DlgReproc::DefUserArea :
+                                      ((userWAType == "local") ?
+                                       DlgReproc::CfgLocalDir :
+                                       DlgReproc::CfgVOSpace));
+    int flags = (cfg.flags.intermediateProducts() ?
+                 DlgReproc::GenIntermProd : DlgReproc::NullFlags);
+
+    DlgReproc dlg;
+    dlg.setFields(inProds, out, flags);
+    if (!dlg.exec()) { return; }
+
+    QString outLocation;
+    dlg.getFields(inProds, out, outLocation, flags);
+
+    std::cerr << out << " : " << flags << '\n';
+    
     FileNameSpec fns;
     ProductMetadata md;
     fns.parseFileName(fileName.toStdString(), md);
@@ -1778,6 +1836,20 @@ void MainWindow::reprocessProduct()
     URLHandler urlh;
     urlh.setProduct(md);
     md = urlh.fromFolder2Inbox();
+}
+
+//----------------------------------------------------------------------
+// SLOT: analyzeProduct
+//----------------------------------------------------------------------
+void MainWindow::analyzeProduct()
+{
+}
+
+//----------------------------------------------------------------------
+// SLOT: exportProduct
+//----------------------------------------------------------------------
+void MainWindow::exportProduct()
+{
 }
 
 //----------------------------------------------------------------------
@@ -1823,10 +1895,19 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
             acReprocess->setProperty("clickedItem", p);
         }
 
+        QMenu * cmAnalyze = menu.addMenu("Analyze ...");
+        cmAnalyze->addAction(acAnalyzeIPython);
+        cmAnalyze->addAction(acAnalyzeJupyter);
+
+        QMenu * cmExport = menu.addMenu("Export ...");
+        cmExport->addAction(acExportLocal);
+        cmExport->addAction(acExportRemote);
+        cmExport->addAction(acExportVOSpace);
+        cmExport->addAction(acExportVOSpaceOther);
+
         isViewsUpdateActive = false;
         menu.exec(ui->treevwArchive->mapToGlobal(p));
         isViewsUpdateActive = true;
-        //QMenu::exec(actions, ui->treevwArchive->mapToGlobal(p));
     }
 }
 
@@ -2253,9 +2334,9 @@ void MainWindow::initTasksMonitView()
     acTaskResume      = new QAction(tr("Resume Task"),                    ui->tblvwTaskMonit);
     acTaskCancel      = new QAction(tr("Cancel Task"),                    ui->tblvwTaskMonit);
 
-    acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),       ui->tblvwTaskMonit);
-    acAgentStop       = new QAction(tr("Stop Agent Processing"),          ui->tblvwTaskMonit);
-    acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),    ui->tblvwTaskMonit);
+    // acAgentSuspend    = new QAction(tr("Suspend Agent Processing"),       ui->tblvwTaskMonit);
+    // acAgentStop       = new QAction(tr("Stop Agent Processing"),          ui->tblvwTaskMonit);
+    // acAgentReactivate = new QAction(tr("Reactivate Agent Processing"),    ui->tblvwTaskMonit);
 
     acHostSuspend     = new QAction(tr("Suspend Host Processing"),        ui->tblvwTaskMonit);
     acHostStop        = new QAction(tr("Stop Host Processing"),           ui->tblvwTaskMonit);
@@ -2270,9 +2351,9 @@ void MainWindow::initTasksMonitView()
     connect(acTaskResume,      SIGNAL(triggered()), this, SLOT(doTaskResume()));
     connect(acTaskCancel,      SIGNAL(triggered()), this, SLOT(doTaskCancel()));
 
-    connect(acAgentSuspend,    SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
-    connect(acAgentStop,       SIGNAL(triggered()), this, SLOT(doAgentStop()));
-    connect(acAgentReactivate, SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
+    // connect(acAgentSuspend,    SIGNAL(triggered()), this, SLOT(doAgentSuspend()));
+    // connect(acAgentStop,       SIGNAL(triggered()), this, SLOT(doAgentStop()));
+    // connect(acAgentReactivate, SIGNAL(triggered()), this, SLOT(doAgentReactivate()));
 
     connect(acHostSuspend,     SIGNAL(triggered()), this, SLOT(doHostSuspend()));
     connect(acHostStop,        SIGNAL(triggered()), this, SLOT(doHostStop()));
@@ -2317,10 +2398,10 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
         cmTask->addAction(acTaskResume);
         cmTask->addAction(acTaskCancel);
         
-        QMenu * cmAgent = cm.addMenu("Agent processing ...");
-        cmAgent->addAction(acAgentSuspend);
-        cmAgent->addAction(acAgentStop);
-        cmAgent->addAction(acAgentReactivate);
+        // QMenu * cmAgent = cm.addMenu("Agent processing ...");
+        // cmAgent->addAction(acAgentSuspend);
+        // cmAgent->addAction(acAgentStop);
+        // cmAgent->addAction(acAgentReactivate);
 
         QMenu * cmHost = cm.addMenu("Host processing ...");
         cmHost->addAction(acHostSuspend);
@@ -3139,6 +3220,7 @@ void MainWindow::commandFromHMIPxy(std::string command, std::string arg)
         newPathToWatch = QString::fromStdString(Log::getLogBaseDir());
         newPathToWatch.replace(QString::fromStdString(cfg.sessionId),
                                QString::fromStdString(arg));
+        TRC("Now checking =====> " + newPathToWatch.toStdString());
     }
 }
 
