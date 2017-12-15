@@ -43,6 +43,8 @@
 
 #include "config.h"
 
+#include "channels.h"
+
 #include "dbg.h"
 #include "str.h"
 #include "tools.h"
@@ -115,7 +117,7 @@ void Config::init(std::string fName)
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
         DbgMsg(DBUser + ":" + DBPwd + "@" + DBHost + ":" + DBPort + "/" + DBName);
-
+        
         DbgMsg("Configuration is retrieved from db: " + fName);
         readConfigFromDB();
         isActualFile = false;
@@ -164,10 +166,13 @@ void Config::fillData()
     SET_GRP(CfgGrpGeneral,          general);
     SET_GRP(CfgGrpNetwork,          network);
     SET_GRP(CfgGrpDB,               db);
+    SET_GRP(CfgGrpConnectivity,     connectivity);
     SET_GRP(CfgGrpProducts,         products);
     SET_GRP(CfgGrpOrchestration,    orchestration);
     SET_GRP(CfgGrpUserDefToolsList, userDefTools);
     SET_GRP(CfgGrpFlags,            flags);
+
+    Log::setMinLogLevel(general.logLevel());
 
     DBHost = db.host();
     DBPort = db.port();
@@ -195,7 +200,6 @@ void Config::setLastAccess(std::string last)
 //----------------------------------------------------------------------
 void Config::setConfigFile(std::string fName)
 {
-
     char actualpath [PATH_MAX+1];
     char * ptr;
     ptr = realpath(fName.c_str(), actualpath);
@@ -216,6 +220,7 @@ void Config::readConfigFromFile()
     buffer << cfgFile.rdbuf();
     TraceMsg("CONFIG FROM FILE:\n" + buffer.str());
     fromStr(buffer.str());
+    fillData();
 }
 
 //----------------------------------------------------------------------
@@ -250,6 +255,7 @@ void Config::readConfigFromDB()
         unsigned int lastConfig = config.size() - 1;
         dateCreated = config.at(lastConfig).at(0);
         std::string configData(config.at(lastConfig).at(1));
+        TRC("Retrieving from DB config:\n" + config.at(lastConfig).at(1));
         cfg.fromStr(configData);
         cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
@@ -262,7 +268,7 @@ void Config::readConfigFromDB()
                  "Unexpected error accessing "
                  "database for retrieval of system configuration");
         return;
-    }
+    }    
     
     // Modificar fecha de último accesso
     std::string now = timeTag();
@@ -395,7 +401,28 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
+    static std::map<Message_Tag, std::string> msgTags = {
+        {Tag_ChnlCmd,      "CMD"},    
+        {Tag_ChnlEvtMng,   "EVTMNG"}, 
+        {Tag_ChnlHMICmd,   "HMICMD"}, 
+        {Tag_ChnlInData,   "INDATA"}, 
+        {Tag_ChnlTskSched, "TSKSCHED"},
+        {Tag_ChnlTskReg,   "TSKREG"}, 
+        {Tag_MsgTskRqst,   "TSKRQST"},
+        {Tag_MsgTskProc,   "TSKPROC"},
+        {Tag_MsgTskRep,    "TSKREP"}, 
+        {Tag_ChnlFmkMon,   "FMKMON"}, 
+        {Tag_MsgHostMon,   "HOSTMON"}};
+
     fillData();
+
+    if (std::string(CONFIG_VERSION) != cfg.general.cfgVersion()) {
+        FatalMsg("Configuration version (" +
+                 cfg.general.cfgVersion() +
+                 ") not compatible with the one supported (" +
+                 std::string(CONFIG_VERSION) +
+                 ") by this release.\n");
+    }
     
     PATHBase    = general.workArea();
 
@@ -422,6 +449,36 @@ void Config::processConfig()
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
+
+    writeMsgsMask = 0;
+    for (auto & kv : msgTags) {
+        for (const json & msgType : flags["msgsToDisk"]) {
+            if (msgType.asString() == kv.second) {
+                writeMsgsMask |= static_cast<int>(kv.first);
+                break;
+            }
+        }
+    }
+
+    writeMsgsToDisk = flags.writeMsgsToDisk();
+}
+
+//----------------------------------------------------------------------
+// Method: consolidate
+// Injects changes in the components of the cfg structure into the value
+//----------------------------------------------------------------------
+void Config::consolidate()
+{
+    value["general"]       = general.val();
+    value["network"]       = network.val();
+    value["db"]            = db.val();
+    value["connectivity"]  = connectivity.val();
+    value["connectivity"]["vospace"] = connectivity.vospace.val();
+    value["connectivity"]["jupyter"] = connectivity.jupyter.val();
+    value["products"]      = products.val();
+    value["orchestration"] = orchestration.val();
+    value["userDefTools"]  = userDefTools.val();
+    value["flags"]         = flags.val();
 }
 
 //----------------------------------------------------------------------
