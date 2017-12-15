@@ -1,0 +1,500 @@
+  310  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  311  ll
+  312  find .
+  313  ls -l
+  314  find www/output/
+  315  less out.loh 
+  316  tail out.loh 
+  317  less out.loh 
+  318  tail -2 out.loh 
+  319  rm out.loh 
+  320  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  321  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  322  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  323  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  324  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  325  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  326  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  327  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  328  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  329  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver2.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  330  cp webserver2.py webserver3.py
+  331  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  332  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  333  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  334  pylint webserver3.py 
+  335  docker run -t -i -p 8080:8080 -v $(pwd):/ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  336  find . -ls
+  337  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  338  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output qpf-debian:a bash #python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  339  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  340  pylint webserver3.py 
+  341  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a su jcgonzalez /bin/sh -c id #python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  342  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a /bin/sh -c id #python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  343  id
+  344  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws -u 502:20 qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  345  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws -u 502:20 qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  346  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws -u 502:20 qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  347  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  348  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  349  docker run -t -i -p 8080:8080 -v $(pwd):/ws -v $(pwd)/www/output:/ws/www/output -w /ws qpf-debian:a /bin/bash #python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  350  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  351  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:a /bin/bash #python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  352  mkdir output
+  353  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  354  ls
+  355  find out
+  356  find output/
+  357  find output/ -ls
+  358  find output/ -ls
+  359  cd output
+  360  ls
+  361  cd ..
+  362  ll www/input/EUC_LE1_VIS-W-12002-3_20201218T053049.0Z.fits 
+  363  ls -l www/input/EUC_LE1_VIS-W-12002-3_20201218T053049.0Z.fits 
+  364  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  365  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  366  rm -rf output/
+  367  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  368  rm www/input/EUC_LE1_VI
+  369  find .
+  370  rm www/output/*
+  371  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  372  rm www/*put/*
+  373  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  374  rm www/*put/*
+  375  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  376  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  377  docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh
+  378  find www
+  379  rm www/input/*
+  380  rm www/output/*
+  381  cd www/input
+  382  for i in 1234{0,1,2,3,4,5,6,7,8,9}; do ln ~/EUC_SIM_VIS-W-00458-1-ROE1-CCD1_20160311T164645.0Z.fits EUC_LE1_VIS-W-${i}-1-ROE1-CCD1_20160311T164645.0Z.fits; done
+  383  ll
+  384  ls -l
+  385  cd ../../
+  386  echo 'docker run -t -i -p 8080:8080 -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www | tee out.loh' > run-server.sh
+  387  vi run-server.sh 
+  388  chmod 755 run-server.sh 
+  389  ./run-server.sh 
+  390  ./run-server.sh 
+  391  ./run-server.sh 
+  392  rm www/{in,out}put/*
+  393  cd www/input/
+  394  for i in 1234{0,1,2,3,4,5,6,7,8,9}; do ln ~/EUC_SIM_VIS-W-00458-1-ROE1-CCD1_20160311T164645.0Z.fits EUC_LE1_VIS-W-${i}-1-ROE1-CCD1_20160311T164645.0Z.fits; done
+  395  ll
+  396  ls -l
+  397   ../..
+  398  cd ../../
+  399  ./run-server.sh 
+  400  ./run-server.sh 
+  401  ls www/output/
+  402  less www/output/
+  403  ls -l www/output/
+  404  less www/output/EUC_QLA_LE1-VIS-LOG-W-12341-1-ROE1-CCD1_20160311T164645.0Z.log
+  405  ./run-server.sh 
+  406  ls -l www/input/
+  407  cd www/input/
+  408  rm *
+  409  for i in 1234{0,1,2,3,4,5,6,7,8,9}; do ln ~/ws/qpf-data/EUC_LE1_VIS-12353-1-W-DarkHigh_20240520T063212.0Z.fits EUC_LE1_VIS-${i}-1-W-DarkHigh_20240520T063212.0Z.fits ; done
+  410  ls -l
+  411  cd ../../
+  412  ./run-server.sh 
+  413  mkdir www/processed
+  414  ./run-server.sh 
+  415  ./run-server.sh 
+  416  find www
+  417  rm www/output/*
+  418  find www
+  419  ./run-server.sh 
+  420  ./run-server.sh 
+  421  ./run-server.sh 
+  422  find www
+  423  mv www/processed/* www/input/
+  424  rm www/output/*
+  425  ./run-server.sh 
+  426  find www
+  427  less www/output/EUC_QLA_LE1-VIS-LOG-12340-1-W-DarkHigh_20240520T063212.0Z.log
+  428  less www/output/EUC_QLA_LE1-VIS-12348-1-W-DarkHigh_20240520T063212.0Z.json
+  429  rm www/output/EUC_QLA_LE1-VIS-*
+  430  mv www/processed/* www/input/
+  431  cat run-server.sh 
+  432  ./run-server.sh 
+  433  vi run-server.sh 
+  434  ./run-server.sh 
+  435  cat run-server.sh 
+  436  docker run -t -i     --expose=8080     -v $(pwd):/ws     -w /ws/www     qpf-debian:a     python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www     | tee out.loh
+  437  docker network create jcnet
+  438  docker run -t -i --net jcnet -v $(pwd):/ws -w /ws/www qpf-debian:a python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  439  docker run -t -i --net jcnet -v $(pwd):/ws -w /ws/www qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  440  docker run -t -i --net jcnet -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  441  docker run -dP --net jcnet -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  442  docker rm qpfservder
+  443  docker rm qpfserder
+  444  docker rm qpfserver
+  445  docker run -dP --net jcnet -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  446  docker kill qpfserver
+  447  docker run -dP -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  448  docker rm qpfserver
+  449  docker run -dP -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  450  docker kill qpfserver
+  451  docker rm qpfserver
+  452  docker run -d -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  453  docker kill qpfserver
+  454  docker rm qpfserver
+  455  docker run -d -v $(pwd):/ws -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  456  docker kill qpfserver
+  457  docker rm qpfserver
+  458  docker run -d -v $(pwd):/ws --net jcnet -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  459  cat out.loh 
+  460  docker kill qpfserver
+  461  docker rm qpfserver
+  462  docker run -it -v $(pwd):/ws --net jcnet -w /ws/www --name qpfserver qpf-debian:b bash #python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  463  docker network delete jcnet
+  464  docker network prune
+  465  docker network create --driver bridge jcnet
+  466  docker run -it -v $(pwd):/ws --net=jcnet -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  467  docker kill qpfserver
+  468  docker rm qpfserver
+  469  docker run -it -v $(pwd):/ws --net=jcnet -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  470  docker run -it -v $(pwd):/ws --net=jcnet -w /ws/www --name qpfserver qpf-debian:b python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  471  docker kill qpfserver
+  472  docker rm qpfserver
+  473  docker run -it -v $(pwd):/ws --net=jcnet -w /ws/www --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  474  docker run -it -v $(pwd):/ws --net=jcnet -w /ws/www --rm --name qpfserver qpf-debian:b bash #python /ws/webserver3.py -H 127.0.0.1 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  475  docker run -it -v $(pwd):/ws -w /ws/www --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  476  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  477  rm www/output/*
+  478  mv www/processed/EUC_LE1_VIS-1234* www/input/
+  479  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  480  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  481  rm www/output/* && mv www/processed/* www/input/
+  482  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  483  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  484  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  485  rm www/output/* && mv www/processed/* www/input/
+  486  find www
+  487  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  488  find www
+  489  find www -ls
+  490  rm www/output/* && mv www/processed/* www/input/
+  491  cd www/input
+  492  for i in 123{0,1,2,3,5}{0,1,2,3,4,5,6,7,8,9}; do ln ~/ws/qpf-data/EUC_LE1_VIS-12353-1-W-DarkHigh_20240520T063212.0Z.fits EUC_LE1_VIS-${i}-1-W-DarkHigh_20240520T063212.0Z.fits ; done
+  493  ll
+  494  ls -l
+  495  ls -s
+  496  cd ../../
+  497  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  498  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 0.0.0.0 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  499  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --net my-network --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 10.0.9.127 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  500  docker run -it -v $(pwd):/ws -w /ws/www -p 8080:8080 --rm --name qpfserver qpf-debian:b python /ws/webserver3.py -H 10.0.9.127 -p 8080 -l debug --no-dirlist -r /ws/www  | tee out.loh
+  501  cd ws/QPF/processors/WA/bin/QDT-srv/
+  502  docker service create --net host --rm --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://127.0.0.1:8080
+  503  docker service create --network host --rm --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://127.0.0.1:8080
+  504  docker service create --network host --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://127.0.0.1:8080
+  505  docker service ps
+  506  docker service ps qdtsrv
+  507  docker service ps qdtsrv
+  508  docker service ps qdtsrv
+  509  docker service ps qdtsrv
+  510  docker service ps qdtsrv
+  511  docker service ps qdtsrv
+  512  docker service ps qdtsrv
+  513  docker service ps qdtsrv
+  514  docker service ps qdtsrv
+  515  docker service ps qdtsrv
+  516  docker service ps qdtsrv
+  517  docker service rm qdtsrv
+  518  docker service create --network host --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://0.0.0.0:8080
+  519  docker service ps qdtsrv
+  520  docker service rm qdtsrv
+  521  docker service create --network host --name qdtsrv --replicas 2 --subnet 127.0.0.0/24 qpf-debian:b python QDTsrv.py -s http://127.0.0.1:8080
+  522  docker network inspect
+  523  docker network ps
+  524  docker network ls
+  525  docker network rm my-network
+  526  docker network rm jcnet
+  527  docker network create --driver overlay --subnet 127.0.0.0/24 jcnet
+  528  docker service create --network jcnet --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://127.0.0.1:8080
+  529  docker service ps qdtsrv
+  530  docker service ps qdtsrv
+  531  docker service ps qdtsrv
+  532  docker service ps qdtsrv
+  533  docker service ps qdtsrv
+  534  docker service ps qdtsrv
+  535  docker service ps qdtsrv
+  536  docker service ps qdtsrv
+  537  docker service ps qdtsrv
+  538  docker service rm qdtsrv
+  539  docker network rm jcnet
+  540  docker service ps
+  541  docker service ls
+  542  ls -ltr
+  543  rm QDTsrv_20171019-*
+  544  ls
+  545  find .
+  546  rm -rf tasks/QDTsrv_20171019-*
+  547  ls -ltr
+  548  cd ..
+  549  ls
+  550  cd ..
+  551  ls
+  552  cd ..
+  553  ls
+  554  cd ..
+  555  ls
+  556  mv processors/ qpf-processors
+  557  cd qpf-processors/
+  558  find .
+  559  mkdir data
+  560  mv WA/bin/EUC_SOC_VIS-W-83114-4_20200707T144425Z.fits data/
+  561  history
+  562  git init
+  563  git add --all
+  564  find .
+  565  find . -name "*.pyc"
+  566  find . -name "*.pyc" -exec git rm {} \;
+  567  find . -name "*.pyc" -exec git rm -f {} \;
+  568  git commmit -m "Initial commit"
+  569  git commit -m "Initial commit"
+  570  git remote add origin https://jc_gonzalez@bitbucket.org/jc_gonzalez/qpf-processors.git
+  571  git push -u origin master
+  572  ifconfig|grep inet
+  573  docker network create --driver overlay --subnet 10.66.180.0/24 eucnet
+  574  docker service create --network eucnet --name qdtsrv --replicas 2 qpf-debian:b python QDTsrv.py -s http://10.66.180.106:8080
+  575  docker service ls
+  576  docker service ps qdtsrv
+  577  docker service ps qdtsrv
+  578  docker service ps qdtsrv
+  579  docker service ps qdtsrv
+  580  docker service rm qdtsrv
+  581  docker service create --network eucnet --name qdtsrv --replicas 2 qpf-debian:b ping 10.66.180.106 #python QDTsrv.py -s http://10.66.180.106:8080
+  582  docker service ps qdtsrv
+  583  docker service ps qdtsrv
+  584  docker service ps qdtsrv
+  585  docker service ps qdtsrv
+  586  docker service ps qdtsrv
+  587  docker service ps qdtsrv
+  588  docker service ps qdtsrv
+  589  docker service ps qdtsrv
+  590  docker service ps qdtsrv
+  591  docker service ps qdtsrv
+  592  docker service ps qdtsrv
+  593  docker service ps qdtsrv
+  594  docker service ps qdtsrv
+  595  docker service ps qdtsrv
+  596  docker service ps qdtsrv
+  597  docker service ps qdtsrv
+  598  docker service ps qdtsrv
+  599  docker service ps qdtsrv
+  600  docker service rm qdtsrv
+  601  docker service create --network eucnet --name qdtsrv --replicas 2 -p 8080:8080 qpf-debian:b python QDTsrv.py -s http://10.66.180.106:8080
+  602  docker service ps qdtsrv
+  603  docker service ps qdtsrv
+  604  docker service ps qdtsrv
+  605  docker service ps qdtsrv
+  606  docker service ps qdtsrv
+  607  docker service ps qdtsrv
+  608  docker service ps qdtsrv
+  609  docker service ps qdtsrv
+  610  docker service rm qdtsrv
+  611  docker service create --network eucnet --name qdtsrv --replicas 2 -p 8080:8080 qpf-debian:b python QDTsrv.py -s http://10.66.180.106:8080
+  612  docker service ps qdtsrv
+  613  docker service ps qdtsrv
+  614  docker service ps qdtsrv
+  615  docker service ps qdtsrv
+  616  docker service ps qdtsrv
+  617  docker service ps qdtsrv
+  618  docker service ps qdtsrv
+  619  docker service ps qdtsrv
+  620  docker service ps qdtsrv
+  621  docker service ps qdtsrv
+  622  docker service ps qdtsrv
+  623  docker service ps qdtsrv
+  624  docker service ps qdtsrv
+  625  docker service ps qdtsrv
+  626  docker service ps qdtsrv
+  627  docker service ps qdtsrv
+  628  docker service rm qdtsrv
+  629  docker run -it qpf-debian:b bash
+  630  curl http://10.69.180.30:8080
+  631  curl http://10.69.180.30:8080/info
+  632  curl http://10.69.180.30:8080/get_task
+  633  curl http://10.69.180.30:8080/get_task
+  634  curl http://10.69.180.30:8080/end_task?task_id=QDTsrv_20171020-085327
+  635  curl http://10.69.180.30:8080/get_task
+  636  curl http://10.69.180.30:8080/end_task?task_id=QDTsrv_20171020-085520
+  637  docker image ls
+  638  docker run -it centos bash
+  639  docker run -it -p 8080:8080 centos bash
+  640* docker network 
+  641  docker run -it --net ingress centos bash
+  642  docker service create --network ingress --name qdtsrv --replicas 4 centos curl http://10.69.180.30:8080/get_task
+  643  docker service qdtsrv ls
+  644  docker service qdtsrv ps
+  645  docker service ps qdtsrv 
+  646  docker service ps qdtsrv 
+  647  docker service ps qdtsrv 
+  648  docker service ps qdtsrv 
+  649  docker service ps qdtsrv 
+  650  docker service ps qdtsrv 
+  651  docker service ps qdtsrv 
+  652  docker service ps qdtsrv 
+  653  docker service rm qdtsrv
+  654  docker service create --network ingress --name qdtsrv --replicas 4 centos curl http://10.69.180.30:8080/get_task
+  655  docker service ps qdtsrv 
+  656  docker service rm qdtsrv
+  657  docker network create --driver overlay --subnet 10.69.180.0/24 eucnet
+  658  docker network rm eucnet
+  659  docker network create --driver overlay --subnet 10.69.180.0/24 eucnet
+  660  docker service create --network eucnet --name qdtsrv --replicas 4 centos curl http://10.69.180.30:8080/get_task
+  661  docker service ps qdtsrv
+  662  docker service ps qdtsrv
+  663  docker service ps qdtsrv
+  664  docker service ps qdtsrv
+  665  docker service ps qdtsrv
+  666  docker service ps qdtsrv
+  667  docker service ps qdtsrv
+  668  docker service ps qdtsrv
+  669  docker service ps qdtsrv
+  670  docker service ps qdtsrv
+  671  docker service ps qdtsrv
+  672  docker service ps qdtsrv
+  673  docker network rm eucnet
+  674  docker service rm qdtsrv
+  675  docker network rm eucnet
+  676  history
+  677  docker service rm qdtsrv
+  678  docker network create --driver overlay eucnet
+  679  docker service create --network eucnet --add-host external:10.69.180.30 --name qdtsrv --replicas 4 centos curl http://external:8080/get_task
+  680  docker run -it centos bash
+  681  docker commit --help
+  682  docker commit --help 16968844955a centos:test1
+  683  docker commit 16968844955a centos:test1
+  684  docker ps a
+  685  docker ps -a
+  686  docker rm $(docker ps -aq)
+  687  docker ps -a
+  688  docker service create --network eucnet --name qdtsrv --replicas 4 centos:test1 curl http://external:8080/get_task
+  689  docker service rm qdtsrv
+  690  docker service create --network eucnet --name qdtsrv --replicas 4 centos:test1 curl http://10.69.180.30:8080/get_task
+  691  docker service ps qdtsrv
+  692  docker service ps qdtsrv
+  693  docker service ps qdtsrv
+  694  docker service ps qdtsrv
+  695  docker service rm qdtsrv
+  696  docker service create --network eucnet --name qdtsrv --replicas 6 centos:test1 curl http://10.69.180.30:8080/get_task
+  697  docker service ps qdtsrv
+  698  docker service ps qdtsrv
+  699  docker service ps qdtsrv
+  700  docker service ps qdtsrv
+  701  docker service ps qdtsrv
+  702  docker service ps qdtsrv
+  703  docker service ps qdtsrv
+  704  docker service ps qdtsrv
+  705  docker service ps qdtsrv
+  706  docker service ps qdtsrv
+  707  docker service ps qdtsrv
+  708  docker service ps qdtsrv
+  709  docker service ps qdtsrv
+  710  docker service ps qdtsrv
+  711  docker service ps qdtsrv
+  712  docker service ps qdtsrv
+  713  docker service ps qdtsrv
+  714  docker service ps qdtsrv
+  715  docker inspect ibbq8pi0bi2y
+  716  docker service inspect ibbq8pi0bi2y
+  717  docker service inspect qdtsrv.6
+  718  docker service inspect 
+  719  docker service inspect qdtsrv
+  720  docker service inspect
+  721  docker service inspect --help
+  722  docker service ps qdtsrv
+  723  docker service ps qdtsrv
+  724  docker service ps qdtsrv
+  725  docker service ps qdtsrv
+  726  docker service ps qdtsrv
+  727  docker service ps qdtsrv
+  728  docker service ps qdtsrv
+  729  docker service rm qdtsrv
+  730  docker service create --network eucnet --name qdtsrv --replicas 2 -p 8080:8080 centos:test1 -v $(pwd):/ws -w /ws python QDTsrv.py -s http://10.66.180.106:8080
+  731  docker service ps qdtsrv
+  732  docker service ps qdtsrv
+  733  docker service ps qdtsrv
+  734  docker service ps qdtsrv
+  735  docker service ps qdtsrv
+  736  docker service ps qdtsrv -w180
+  737  docker service ps qdtsrv
+  738  docker inspect rrk5omz48uvk
+  739  docker service rm qdtsrv
+  740  docker run -it qpf-debian:b bash
+  741  docker commit 32e69d392d21 qpf-debian:c
+  742  docker service create --network eucnet --name qdtsrv --replicas 5 -p 8080:8080 qpf-debian:c python QDTsrv.py -s http://10.66.180.106:8080
+  743  docker service ps qdtsrv
+  744  docker service ps qdtsrv
+  745  docker service ps qdtsrv
+  746  docker service ps qdtsrv
+  747  docker inspect rrkk4a882pnkwm8
+  748  docker inspect mm03jqqoeot3
+  749  docker service rm qdtsrv
+  750  docker run -it qpf-debian:b bash
+  751  docker commit 70f2e3cd3de0 qpf-debian:c
+  752  docker service create --network eucnet --name qdtsrv --replicas 5 -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:c python QDTsrv.py -s http://10.69.180.30:8080
+  753  docker service create --network eucnet --name qdtsrv --replicas 5 -p 8080:8080 qpf-debian:c python QDTsrv.py -s http://10.69.180.30:8080
+  754  docker service ps qdtsrv
+  755  docker service ps qdtsrv
+  756  docker service ps qdtsrv
+  757  docker service ps qdtsrv
+  758  docker service ps qdtsrv
+  759  docker service ps qdtsrv
+  760  docker service ps qdtsrv
+  761  docker service rm qdtsrv
+  762  docker run -it qpf-debian:c bash -p 8080:8080 -v $(pwd):/ws -w /ws
+  763  docker run -it qpf-debian:c -p 8080:8080 -v $(pwd):/ws -w /ws bash
+  764  docker run -it -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:c bash
+  765  docker run -it -p 8080:8080 --net eucnet -v $(pwd):/ws -w /ws qpf-debian:c bash
+  766  docker run -it -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:c bash
+  767  docker commit c84b3c7389ea qpf-debian:c
+  768  docker run -it -p 8080:8080 -v $(pwd):/ws -w /ws qpf-debian:c bash
+  769  docker run -it -p 8080:8080 qpf-debian:c bash
+  770  docker run -it -p 8080:8080 -v $(pwd):/ws -w /ws/WA/bin/QDT-srv qpf-debian:c bash
+  771  docker commit d342ab382682 qpf-debian:c
+  772  docker run -it -p 8080:8080 -v $(pwd):/ws -w /ws/WA/bin/QDT-srv qpf-debian:c bash
+  773  docker service rm qdtsrv
+  774  docker service create --network eucnet --name qdtsrv --replicas 5 -p 8080:8080 qpf-debian:c python QDTsrv.py -s http://10.69.180.30:8080
+  775  docker service ps adtsrv
+  776  docker service ps qdtsrv
+  777  docker service ps qdtsrv
+  778  docker service ps qdtsrv
+  779  docker service ps qdtsrv
+  780  docker service ps qdtsrv
+  781  docker service ps qdtsrv
+  782  docker service ps qdtsrv
+  783  docker service ps qdtsrv
+  784  docker service ps qdtsrv
+  785  docker service ps qdtsrv
+  786  docker service ps qdtsrv
+  787  docker service ps qdtsrv
+  788  docker service ps qdtsrv
+  789  docker service ps qdtsrv
+  790  docker service ps qdtsrv
+  791  docker service ps qdtsrv
+  792  docker service ps qdtsrv
+  793  docker service rm qdtsrv
+  794  docker run -it --rm --name qdtsrv -p 8080:8080 qpf-debian:c python QDTsrv.py -s http://10.69.180.30:8080
+  795  docker run -it --rm --name qdtsrv -p 8080:8080 qpf-debian:c bash #python QDTsrv.py -s http://10.69.180.30:8080
+  796  docker run -it --rm --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv qpf-debian:b bash #python QDTsrv.py -s http://10.69.180.30:8080
+  797  docker run -it --rm --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host 10.69.180.30:eucdck1 qpf-debian:c bash #python QDTsrv.py -s http://10.69.180.30:8080
+  798  docker create service --net eucdck --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host 10.69.180.30:eucdck1 qpf-debian:c bash #python QDTsrv.py -s http://10.69.180.30:8080
+  799  docker service create --net eucdck --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host 10.69.180.30:eucdck1 qpf-debian:b curl http://10.69.180.30:8080 #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  800  docker service create --network eucdck --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host 10.69.180.30:eucdck1 qpf-debian:b curl http://10.69.180.30:8080 #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  801  docker service create --network eucdck --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host eucdck1:10.69.180.30 qpf-debian:b curl http://10.69.180.30:8080 #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  802  docker service create --network eucnet --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host eucdck1:10.69.180.30 qpf-debian:b curl http://10.69.180.30:8080 #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  803  docker service rm qdtsrv
+  804  docker service create --replicas 5 --network eucnet --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host eucdck1:10.69.180.30 qpf-debian:b curl http://10.69.180.30:8080/get_task #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  805  docker service ps qdtsrv
+  806  docker service rm qdtsrv
+  807  docker service create --replicas 5 --network eucnet --name qdtsrv -p 8080:8080 --entrypoint /ws/WA/bin/QDT-srv --host eucdck1:10.69.180.30 qpf-debian:c curl http://10.69.180.30:8080/get_task #bash #python QDTsrv.py -s http://10.69.180.30:8080
+  808  docker service rm qdtsrv
+  809  history > dck-history.1

@@ -1,0 +1,11 @@
+{
+  "input": "in/*.fits",
+  "output": "",
+  "log": "",
+  "steps": 30,
+  "add": 10,
+  "processor": "DummyProcessor",
+  "script": "DummyProcessor.py",
+  "args": "--steps {steps} --add {add}",
+  "container": true
+}
