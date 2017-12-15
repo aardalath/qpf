@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgReproc</class>
+ <widget class="QDialog" name="DlgReproc">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>630</width>
+    <height>454</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Swarm Definition Editor</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>The products selected below will be reprocessed.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListWidget" name="lstInputProducts"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Reprocessing options:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Final generated outputs location:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="3" column="1">
+         <widget class="QRadioButton" name="rbtnLocal">
+          <property name="text">
+           <string>Local directory</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">btngrpOutputsLocation</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QRadioButton" name="rbtnVOSpace">
+          <property name="text">
+           <string>Another VOSpace folder</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">btngrpOutputsLocation</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QRadioButton" name="rbtnCfgLocal">
+          <property name="text">
+           <string>Configured local directory</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">btngrpOutputsLocation</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="edCfgLocal">
+          <property name="styleSheet">
+           <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLineEdit" name="edVOSpace"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="QRadioButton" name="rbtnCfgVOSpace">
+          <property name="text">
+           <string>Configured VOSpace user area</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">btngrpOutputsLocation</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="edDefaultUserArea">
+          <property name="styleSheet">
+           <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="edCfgVOSpace">
+          <property name="styleSheet">
+           <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLineEdit" name="edLocal"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QRadioButton" name="rbtnDefaultUserArea">
+          <property name="text">
+           <string>Default user area</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">btngrpOutputsLocation</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QToolButton" name="tbtnLocal">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkGenIntermProd">
+        <property name="text">
+         <string>Generate intermediate products</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkIPython">
+        <property name="text">
+         <string>Open IPython session</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">btngrpAnalyzeSession</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkJupLab">
+        <property name="text">
+         <string>Open Jupyter Lab session</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">btngrpAnalyzeSession</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkBrowserVOSpace">
+        <property name="text">
+         <string>Open browser with VOSpace session</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnOK">
+       <property name="text">
+        <string>&amp;OK</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnOK</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgReproc</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>387</x>
+     <y>183</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgReproc</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>619</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>278</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>showHelp()</slot>
+  <slot>selectApp()</slot>
+  <slot>selectProdTypes()</slot>
+ </slots>
+ <buttongroups>
+  <buttongroup name="btngrpOutputsLocation"/>
+  <buttongroup name="btngrpAnalyzeSession"/>
+ </buttongroups>
+</ui>
