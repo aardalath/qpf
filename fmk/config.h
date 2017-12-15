@@ -61,6 +61,8 @@
 
 #define DEFAULT_INITIAL_PORT   50000
 
+#define CONFIG_VERSION  "1.0"
+
 //==========================================================================
 // Class: CfgGrpGeneral
 //==========================================================================
@@ -71,13 +73,21 @@ public:
     virtual void dump() {
         DUMPJSTR(appName);
         DUMPJSTR(appVersion);
+        DUMPJSTR(cfgVersion);
         DUMPJSTR(lastAccess);
         DUMPJSTR(workArea);
+        DUMPJSTR(userAreaType);
+        DUMPJSTR(userArea);
+        DUMPJSTR(logLevel);
     }
     JSTR(appName);
     JSTR(appVersion);
+    JSTR(cfgVersion);
     JSTR(lastAccess);
     JSTR(workArea);
+    JSTR(userAreaType);
+    JSTR(userArea);
+    JSTR(logLevel);
 };
 
 //==========================================================================
@@ -141,6 +151,64 @@ public:
     JSTR(name);
     JSTR(user);
     JSTR(pwd);
+};
+
+//==========================================================================
+// Class: CfgGrpVOSpace
+//==========================================================================
+class CfgGrpVOSpace : public JRecord {
+public:
+    CfgGrpVOSpace() {}
+    CfgGrpVOSpace(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(url);
+        DUMPJSTR(user);
+        DUMPJSTR(pwd);
+        DUMPJSTR(folder);
+    }
+    JSTR(url);
+    JSTR(user);
+    JSTR(pwd);
+    JSTR(folder);
+};
+
+//==========================================================================
+// Class: CfgGrpJupyter
+//==========================================================================
+class CfgGrpJupyter : public JRecord {
+public:
+    CfgGrpJupyter() {}
+    CfgGrpJupyter(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(host);
+        DUMPJSTR(user);
+        DUMPJSTR(pwd);
+        DUMPJSTR(url);
+    }
+    JSTR(host);
+    JSTR(user);
+    JSTR(pwd);
+    JSTR(url);
+};
+
+//==========================================================================
+// Class: CfgGrpConnectivity
+//==========================================================================
+class CfgGrpConnectivity : public JRecord {
+public:
+    CfgGrpConnectivity() {}
+    CfgGrpConnectivity(json v) : JRecord(v) {
+        SET_GRP(CfgGrpVOSpace, vospace);
+        SET_GRP(CfgGrpJupyter, jupyter);
+    }
+    virtual void dump() {
+        vospace.dump();
+        jupyter.dump();
+        DUMPJSTR(ipython);
+    }
+    GRP(CfgGrpVOSpace, vospace);
+    GRP(CfgGrpJupyter, jupyter);
+    JSTR(ipython);
 };
 
 //==========================================================================
@@ -235,7 +303,7 @@ public:
     CfgGrpFlags() {}
     CfgGrpFlags(json v) : JRecord(v) {}
     virtual void dump() {
-        DUMPJSTR(writeMsgsToDisk);
+        DUMPJBOOL(writeMsgsToDisk);
         DUMPJSTRVEC(msgsToDisk);
         DUMPJBOOL(notifyMsgArrival);
         DUMPJBOOL(groupTaskAgentLogs);
@@ -244,7 +312,7 @@ public:
         DUMPJBOOL(sendOutputsToMainArchive);
         DUMPJSTR(progressString);
     }
-    JSTR(writeMsgsToDisk);
+    JBOOL(writeMsgsToDisk);
     JSTRVEC(msgsToDisk);
     JBOOL(notifyMsgArrival);
     JBOOL(groupTaskAgentLogs);
@@ -260,14 +328,11 @@ public:
 class Config : public JRecord {
 public:
     static Config & _();
-/*
-    Config(std::string fName = std::string());
-    Config(const char * fName = 0);
-    Config(json v);
-*/
+
     GRP(CfgGrpGeneral,          general);
     GRP(CfgGrpNetwork,          network);
     GRP(CfgGrpDB,               db);
+    GRP(CfgGrpConnectivity,     connectivity);
     GRP(CfgGrpProducts,         products);
     GRP(CfgGrpOrchestration,    orchestration);
     GRP(CfgGrpUserDefToolsList, userDefTools);
@@ -293,6 +358,7 @@ public:
         general.dump();
         network.dump();
         db.dump();
+        connectivity.dump();
         products.dump();
         orchestration.dump();
         userDefTools.dump();
@@ -326,6 +392,18 @@ public:
     //----------------------------------------------------------------------
     void generateProcFmkInfoStructure();
 
+    //----------------------------------------------------------------------
+    // Method: processConfig
+    // Convert data in cfg (Json) to cfgInfo structure
+    //----------------------------------------------------------------------
+    void processConfig();
+
+    //----------------------------------------------------------------------
+    // Method: consolidate
+    // Injects changes in the components of the cfg structure into the value
+    //----------------------------------------------------------------------
+    void consolidate();
+
 private:
 
     //----------------------------------------------------------------------
@@ -351,12 +429,6 @@ private:
     // Store the configuration into the DB
     //----------------------------------------------------------------------
     void saveConfigToDB();
-
-    //----------------------------------------------------------------------
-    // Method: processConfig
-    // Convert data in cfg (Json) to cfgInfo structure
-    //----------------------------------------------------------------------
-    void processConfig();
 
     //----------------------------------------------------------------------
     // Method: getRegExFromCfg
@@ -385,7 +457,10 @@ public:
     bool                  weAreOnMaster;
 
     int                   startingPort;
-
+    
+    int                   writeMsgsMask;
+    bool                  writeMsgsToDisk;
+    
     std::vector<std::string> agentNames;
     std::vector<std::string> agHost;
     std::vector<int>         agPortTsk;
