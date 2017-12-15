@@ -197,6 +197,13 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         }
         body["states"] = states;
 
+        json logs;
+        for (auto & kv : logFolders) {
+            TraceMsg(kv.first + " => " + kv.second);
+            logs[kv.first] = kv.second;
+        }
+        body["logs"] = logs;
+
     } else if (cmd == CmdSession) { // Session id. request
 
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
@@ -205,6 +212,21 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         body["cmd"] = CmdSession;
         body["sessionId"] = cfg.sessionId;
 
+    } else if (cmd == CmdConfig) { // Embedded is message to TskAgents
+
+        // Send relay message
+        Message<MsgBodyCMD> relayMsg(m);
+        relayMsg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
+                          compName, "*",
+                          "", "", "");
+        this->send(ChnlCmd, relayMsg.str());
+                    
+        // Build HMICmd answer
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "HMIProxy",
+                     "", "", "");
+        body["ans"] = "OK";
+        
     } else if (cmd == CmdProcHdl) { // Embedded is message to TskAgents
 
         // Send relay message
