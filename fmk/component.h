@@ -337,8 +337,7 @@ protected:
     int iteration;
     int stepSize;
 
-    int  writeMsgsMask;
-    bool writeMsgsToDisk;
+    std::map<std::string, std::string> logFolders;
 };
 
 #endif
