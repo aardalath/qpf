@@ -350,7 +350,6 @@ if [ "${INSTALL}" == "yes" ]; then
 
     cd "${BUILD_PATH}"
     make install
-    ln -sf ${WORK_AREA}/qpf/bin/qpfcore ${WORK_AREA}/qpf/bin/qpf
     if [ "${HMI}" == "yes" ]; then
         ln -sf ${WORK_AREA}/qpf/bin/qpfgui ${WORK_AREA}/qpf/bin/qpfhmi
     fi
