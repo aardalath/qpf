@@ -399,6 +399,8 @@ theDate=$(date +"%Y-%m-%d %H:%M:%S.000")
 echo "$theDate:INFO:process:Processing ended."
 ) > $log
 
+chown -R --reference=./${SCRIPT_NAME} .
+
 exit 0
 
 ##----------------------------------------------------------------------------

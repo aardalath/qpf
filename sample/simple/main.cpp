@@ -143,10 +143,10 @@ void createElementsNetwork(MasterNodeElements & m,
             ++h;
         }
 
-        // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+        // CHANNEL TASK-REGISTRATION - PUBSUB
         // - Publisher: TskMng
         // - Subscriber: DataMng EvtMng QPFHMI
-        chnl     = ChnlTskRepDist;
+        chnl     = ChnlTskReg;
         bindAddr = "inproc://" + chnl;
         connAddr = bindAddr;
         m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
