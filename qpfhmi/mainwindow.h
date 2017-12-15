@@ -113,6 +113,7 @@ protected:
 public slots:
     void setAppInfo(QString name, QString rev, QString bld);
     void updateMenus();
+    void showConfigTool();
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
@@ -144,12 +145,13 @@ private slots:
     void updateWindowMenu();
 
     void reprocessProduct();
+    void analyzeProduct();
+    void exportProduct();
 
     void processPendingEvents();
 
     void transitToOperational();
 
-    void showConfigTool();
     void showDBBrowser();
     void showExtToolsDef();
     void showVerbLevel();
@@ -307,6 +309,13 @@ private:
 
     QAction *acDefault;
     QAction *acReprocess;
+
+    QAction *acAnalyzeIPython;
+    QAction *acAnalyzeJupyter;
+    QAction *acExportLocal;
+    QAction *acExportRemote;
+    QAction *acExportVOSpace;
+    QAction *acExportVOSpaceOther;
 
     QAction *acNavig;
     QAction *acClose;
