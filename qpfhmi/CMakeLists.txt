@@ -28,6 +28,13 @@ set (qpfGuiLib_src
   dlgalert.cpp
   dlgdataing.cpp
   dlgshowtaskinfo.cpp
+  dlgreproc.cpp
+  anasession.cpp
+  exporthdl.cpp
+  voshdl.cpp
+  conthostedit.cpp
+  swarmedit.cpp
+  ruleedit.cpp
   exttooledit.cpp
   exttoolsdef.cpp
   frm_filter.cpp
@@ -38,6 +45,7 @@ set (qpfGuiLib_src
   logframe.cpp
   logwatcher.cpp
   mainwindow.cpp
+  multitextview.cpp
   procfmkmonit.cpp
   procalertmodel.cpp
   proctskstatmodel.cpp
@@ -66,6 +74,13 @@ set (qpfGuiLib_hdr
   dlgalert.h
   dlgdataing.h
   dlgshowtaskinfo.h
+  dlgreproc.h
+  anasession.h
+  exporthdl.h
+  voshdl.h
+  conthostedit.h
+  swarmedit.h
+  ruleedit.h
   exttooledit.h
   exttoolsdef.h
   filters.h
@@ -79,6 +94,7 @@ set (qpfGuiLib_hdr
   logframe.h
   logwatcher.h
   mainwindow.h
+  multitextview.h
   procfmkmonit.h
   procalertmodel.h
   proctskstatmodel.h
@@ -100,12 +116,17 @@ set (qpfGuiLib_ui
   mainwindow.ui
   dlgdataing.ui
   dlgshowtaskinfo.ui
+  dlgreproc.ui
   configtool.ui
   browserwidget.ui
   dbbrowser.ui
   dlgalert.ui
+  conthostedit.ui
+  swarmedit.ui
+  ruleedit.ui
   exttooledit.ui
   exttoolsdef.ui
+  multitextview.ui
   frm_filterset.ui
   frm_filter.ui
   frmagentstatus.ui
