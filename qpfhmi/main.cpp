@@ -83,6 +83,7 @@ void usage(int code)
          << DEFAULT_INITIAL_PORT << ").\n\n"
          "\t-I masterIPaddress  Set the host IP address (by default the program takes\n"
          "\t                    this information from the system).\n"
+         "\t-C                  Shows the Configuration Tool.\n\n"
          "\t-v                  Increases verbosity (default:silent operation).\n\n"
          "\t-h                  Shows this help message.\n");
 
@@ -151,14 +152,18 @@ int main(int argc, char *argv[])
     QString sessionStr("");
     QString masterIpAddress("");
     int initialPort(DEFAULT_INITIAL_PORT);
-
+    bool showConfigTool = false;
+    
     int exitCode = EXIT_FAILURE;
 
     int opt;
-    while ((opt = getopt(argc, argv, "hvp:c:s:I:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvCp:c:s:I:")) != -1) {
         switch (opt) {
         case 'v':
             Dbg::verbosityLevel++;
+            break;
+        case 'C':
+            showConfigTool = true;
             break;
         case 'c':
             configStr = QString(optarg);
@@ -185,20 +190,26 @@ int main(int argc, char *argv[])
     QSplashScreen splash(pixmap);
     splash.show();
     ctrlMsg(splash);
-
     sayHello();
+    
     ctrlMsg(splash);
-
     QPF::MainWindow w(configStr, sessionStr, masterIpAddress, initialPort);
+
     ctrlMsg(splash);
     w.setAppInfo(APP_NAME " - " APP_LONG_NAME,
                  "V" APP_RELEASE " " APP_DATE, BUILD_ID);
 
     ctrlMsg(splash);
+
+    if (showConfigTool) {
+        splash.finish(&w);
+        w.showConfigTool();
+        return EXIT_SUCCESS;
+    }
+    
     w.show();
-
+        
     ctrlMsg(splash);
-
     splash.finish(&w);
 
     return a.exec();
