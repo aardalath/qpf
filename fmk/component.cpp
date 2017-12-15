@@ -99,8 +99,6 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     compAddress = addr;
     synchro     = s;
 
-    writeMsgsToDisk = true;
-
     // register signal SIGINT and signal handler  
     signal(SIGABRT, signalHandler);  
 
@@ -258,8 +256,8 @@ void Component::processIncommingMessages()
                                     0));
             }
 
-            if (writeMsgsToDisk &&
-                (static_cast<int>(incommMsgTag) & writeMsgsMask != 0)) {
+            if (cfg.writeMsgsToDisk &&
+                ((static_cast<int>(incommMsgTag) & cfg.writeMsgsMask) != 0)) {
                 writeMsgToFile(Recv, chnl, m);
             }
         }
@@ -322,7 +320,6 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(m);
-        if (writeMsgsToDisk) { writeMsgToFile(Recv, chnl, m); }
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
         RaiseSysAlert(Alert(Alert::System,
@@ -436,6 +433,13 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
             cfg.synchronizeSessionId(sessId);
         }
 
+    } else if (cmd == CmdConfig) { // This should be any component
+
+        std::string newConfigString = msg.body["config"].asString();
+        cfg.fromStr(newConfigString);
+        cfg.processConfig();        
+        TraceMsg("New configuration applied");
+
     } else if (cmd == CmdProcHdl) {
 
         processSubcmdMsg(m);
@@ -468,23 +472,20 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
         msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
                      compName, msg.header.source(),
                      "", "", "");
-        body["cmd"]   = CmdStates;
-        body["state"] = getStateName(getState());
+        body["cmd"]     = CmdStates;
+        body["state"]   = getStateName(getState());
+        body["host"]    = compAddress;
+        body["logs"]    = Config::PATHLog;
+            
         msg.buildBody(body);
         this->send(ChnlEvtMng, msg.str());
 
     } else if (cmd == CmdStates) { // This should be EvtMng
 
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
+        logFolders[msg.body["host"].asString()] = msg.body["logs"].asString();
+       
         TraceMsg(compName + " received from " + msg.header.source() + " from " + compName);
-
-    } else if (cmd == CmdMsgMask) { // This should be any component
-
-        writeMsgsToDisk = msg.body["write_to_disk"].asBool(); 
-        writeMsgsMask   = msg.body["mask"].asInt();
-        TraceMsg("Message writing to disk " +
-                 std::string(writeMsgsToDisk ? "ACTIVATED" : "DEACTIVATED") +
-                 " (mask = " + std::to_string(writeMsgsMask) + ")");
 
     } else {
 
@@ -647,38 +648,6 @@ void Component::writeMsgToFile(SendOrRecv sor,
     FILE * fHdl = fopen(fileName, "w");
     fprintf(fHdl, m.c_str());
     fclose(fHdl);
-}
-
-//----------------------------------------------------------------------
-// Method: setWriteMsgsToDisk
-//----------------------------------------------------------------------
-void Component::setWriteMsgsToDisk(bool b)
-{
-    writeMsgsToDisk = b;
-}
-
-//----------------------------------------------------------------------
-// Method: getWriteMsgsToDisk
-//----------------------------------------------------------------------
-bool Component::getWriteMsgsToDisk()
-{
-    return writeMsgsToDisk;
-}
-
-//----------------------------------------------------------------------
-// Method: setWriteMsgsMask
-//----------------------------------------------------------------------
-void Component::setWriteMsgsMask(int msk)
-{
-    writeMsgsMask = msk;
-}
-
-//----------------------------------------------------------------------
-// Method: getWriteMsgsMask
-//----------------------------------------------------------------------
-int Component::getWriteMsgsMask()
-{
-    return writeMsgsMask;
 }
 
 //}
