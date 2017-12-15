@@ -73,6 +73,13 @@ static const Log::LogLevel DefaultMinimumLogLevel = Log::INFO;
 
 Log::LogLevel Log::minimumLogLevel = DefaultMinimumLogLevel;
 
+const std::string Log::LogLevelName[] = {"TRACE",
+                                         "DEBUG", 
+                                         "INFO",  
+                                         "WARNING",
+                                         "ERROR", 
+                                         "FATAL"};
+
 bool Log::consoleOutput = false;
 bool Log::quietExit     = false;
 bool Log::isInitialised = false;
@@ -333,6 +340,23 @@ std::string Log::getLogBaseDir()
 void Log::setMinLogLevel(Log::LogLevel lvl)
 {
     Log::minimumLogLevel = lvl;
+}
+
+//----------------------------------------------------------------------
+// Static Method: setMinLogLevel
+// Sets the value of the minimum log level
+//
+// Parameters:
+//   lvl - (I) Minimum log level to be used (string)
+//----------------------------------------------------------------------
+void Log::setMinLogLevel(std::string lvlStr)
+{
+    for (int lvl = (int)(Log::TRACE); lvl <= (int)(Log::FATAL); lvl++) {
+        if (Log::LogLevelName[lvl] == lvlStr) {
+            Log::minimumLogLevel = (Log::LogLevel)(lvl);
+            return;
+        }
+    }
 }
 
 //----------------------------------------------------------------------
