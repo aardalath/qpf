@@ -127,6 +127,7 @@ public:
         F = FATAL,
     };
 
+    static const std::string LogLevelName[];
     static const std::string System;
 
     //----------------------------------------------------------------------
@@ -231,6 +232,15 @@ public:
     //----------------------------------------------------------------------
     static void setMinLogLevel(LogLevel lvl);
 
+    //----------------------------------------------------------------------
+    // Static Method: setMinLogLevel
+    // Sets the value of the minimum log level
+    //
+    // Parameters:
+    //   lvl - (I) Minimum log level to be used (string)
+    //----------------------------------------------------------------------
+    static void setMinLogLevel(std::string lvlStr);
+    
     //----------------------------------------------------------------------
     // Static Method: getMinLogLevel
     // Returns the value of the minimum log level
