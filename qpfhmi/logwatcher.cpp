@@ -57,7 +57,7 @@ LogWatcher::LogWatcher(TextView * txtVw, int lines)
 }
 
 LogWatcher::~LogWatcher()
-{
+{ 
   foreach (QString s, fsWatcher->directories()) {
       unlink(s.toStdString().c_str());
   }
@@ -80,7 +80,7 @@ void LogWatcher::updateLogView(const QString & path)
 {
   QFile f(path);
   if (!f.open(QIODevice::ReadOnly)) { return; }
-
+  
   qint64 newBytes = f.size() - bytesRead;
   f.seek(bytesRead);
   QByteArray c;
