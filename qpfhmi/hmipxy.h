@@ -102,6 +102,12 @@ public:
     void sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId subCmd);
     
     //----------------------------------------------------------------------
+    // Method: sendNewConfig
+    // Send a processing handling command to an agent
+    //----------------------------------------------------------------------
+    void sendNewConfig();
+    
+    //----------------------------------------------------------------------
     // Method: sendCmd
     // Send a command message to a target (or a set of them)
     //----------------------------------------------------------------------
