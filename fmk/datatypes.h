@@ -149,6 +149,7 @@ typedef Json::Value  json;
 #define JRECORD(e) JRecord e () { return JRecord(value[ #e ]); }
 
 #define SET_GRP(c,e) e = c ( v[ #e ] );
+#define SET_GRP2(c,e,f) e.f = c ( v[ #e ][ #f ] );
 #define GRP(c,e) c e;
 
 #define DUMPJSTR(e)  std::cerr << #e << ": " << value[ #e ].asString() << std::endl;
@@ -202,10 +203,15 @@ public:
     JValue(std::string s) { fromStr(s); }
     JValue operator()(std::string key) { return JValue(value[key]); }
     json & operator[](std::string key) { return value[key]; }
-    std::string str() {
+    std::string str(bool styled = false) {
         if (value.isObject() || value.isArray()) {
-            Json::FastWriter w;
-            return w.write(value);
+            if (! styled) {
+                Json::FastWriter w;
+                return w.write(value);
+            } else {
+                Json::StyledWriter w;
+                return w.write(value);
+            }
         } else {
             return value.asString();
         }
