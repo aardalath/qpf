@@ -117,7 +117,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     // Define log output
     //Log::setLogBaseDir(Config::PATHBase + "/log");
     
-    Log::setMinLogLevel((Log::LogLevel)(minLvl));
+    //Log::setMinLogLevel((Log::LogLevel)(minLvl));
 
     Log::defineLogSystem(compName);
 
