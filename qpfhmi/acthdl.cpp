@@ -466,6 +466,7 @@ void ActionHandler::createLocalArchiveViewActions()
 
     acAnalyzeJupyter = new QAction("Analyze within Jupyter Lab", mw->ui->treevwArchive);
     acAnalyzeJupyter->setObjectName("AnalyzeWithJupyter");
+    acAnalyzeJupyter->setEnabled(false);
     connect(acAnalyzeJupyter, SIGNAL(triggered()), mw, SLOT(analyzeProduct()));
 
     acExport = new QAction("Export the selected product(s) ...", mw->ui->treevwArchive);
@@ -508,6 +509,7 @@ void ActionHandler::showArchiveTableContextMenu(const QPoint & p)
                 actions.append(ac);
             }
         }
+        acArchiveOpenExt->clear();
         acArchiveOpenExt->addAction(acDefault);
         acArchiveOpenExt->addSeparator();
         acArchiveOpenExt->addActions(actions);
@@ -516,10 +518,10 @@ void ActionHandler::showArchiveTableContextMenu(const QPoint & p)
         menu.addAction(acArchiveShow);
         menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
-
+        
         if ((m.parent().isValid()) && ((productType.left(4) == "LE1_") ||
-                                       (productType.left(4) == "SIM_") ||
-                                       (productType.left(4) == "SOC_"))) {
+                                      (productType.left(4) == "SIM_") ||
+                                      (productType.left(4) == "SOC_"))) {
             acReprocess->setEnabled(cfg.flags.allowReprocessing());
             menu.addSeparator();
             menu.addAction(acReprocess);

@@ -133,6 +133,7 @@ ALTER SEQUENCE qpfstates_qpfstate_id_seq OWNED BY qpfstates.qpfstate_id;
 -- Name: configuration; Type: TABLE; Schema: public; Owner: eucops; Tablespace:
 CREATE TABLE configuration (
     created timestamp without time zone NOT NULL,
+    filename character varying(256),
     cfg json,
     last_accessed timestamp without time zone
 );

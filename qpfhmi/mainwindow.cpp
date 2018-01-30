@@ -660,6 +660,7 @@ void MainWindow::showConfigTool()
     if (cfgTool.exec()) {
         TRC("Updating user tools!");
         cfgTool.getExtTools(userDefTools);
+        setUToolTasks();
         if (hmiNode != 0) {
             hmiNode->sendNewConfig();
             TRC("Sending new configuration to all the nodes");
@@ -688,8 +689,8 @@ void MainWindow::showExtToolsDef()
     dlg.initialize(userDefTools, userDefProdTypes);
     if (dlg.exec()) {
         dlg.getTools(userDefTools);
-
         storeQUTools2Cfg(userDefTools);
+        setUToolTasks();
     }
 }
 
@@ -1282,19 +1283,19 @@ void MainWindow::initLocalArchiveView()
 
     // Filter initialisation
     FieldSet products;
-    Field fld("product_id"          , STRING); products[fld.name] = fld;
-    fld = Field("product_type"      , STRING); products[fld.name] = fld;
-    fld = Field("product_version"   , STRING); products[fld.name] = fld;
-    fld = Field("signature"         , STRING); products[fld.name] = fld;
-    fld = Field("instrument_id"     , NUMBER); products[fld.name] = fld;
-    fld = Field("product_size"      , STRING); products[fld.name] = fld;
-    fld = Field("product_status_id" , NUMBER); products[fld.name] = fld;
-    fld = Field("creator_id"        , NUMBER); products[fld.name] = fld;
-    fld = Field("obsmode_id"        , NUMBER); products[fld.name] = fld;
+    Field fld("product_id"          , STRING);   products[fld.name] = fld;
+    fld = Field("product_type"      , STRING);   products[fld.name] = fld;
+    fld = Field("product_version"   , STRING);   products[fld.name] = fld;
+    fld = Field("signature"         , STRING);   products[fld.name] = fld;
+    fld = Field("instrument_id"     , NUMBER);   products[fld.name] = fld;
+    fld = Field("product_size"      , STRING);   products[fld.name] = fld;
+    fld = Field("product_status_id" , NUMBER);   products[fld.name] = fld;
+    fld = Field("creator_id"        , NUMBER);   products[fld.name] = fld;
+    fld = Field("obsmode_id"        , NUMBER);   products[fld.name] = fld;
     fld = Field("start_time"        , DATETIME); products[fld.name] = fld;
     fld = Field("end_time"          , DATETIME); products[fld.name] = fld;
     fld = Field("registration_time" , DATETIME); products[fld.name] = fld;
-    fld = Field("url"               , STRING); products[fld.name] = fld;
+    fld = Field("url"               , STRING);   products[fld.name] = fld;
 
     QStringList flds {"product_id", "product_type", "product_version", "signature",
                       "instrument_id", "product_size", "product_status_id", "creator_id",

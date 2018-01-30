@@ -82,7 +82,7 @@ ProductsModel::ProductsModel()
                 "    p.registration_time as RegTime,  "
                 "    p.url as URL "
                 "FROM products_info p  "
-                "ORDER BY concat(p.obs_id, '.', p.product_type, '.',  "
+                "ORDER BY concat(p.obs_id, '.', p.instrument_id, '.',  "
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
     defineHeaders({//"Signature",

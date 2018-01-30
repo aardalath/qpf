@@ -259,6 +259,7 @@ void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
         ui->tblwdgUserDefTools->setItem(row, 3, new QTableWidgetItem(udt.args));
         ui->tblwdgUserDefTools->setItem(row, 4, new QTableWidgetItem(udt.prod_types.join(QString("|"))));
         ++row;
+        std::cerr << row << ": " << udt.name.toStdString() << '\n';
     }
     userDefTools = userTools;
     origDefTools = userTools;
@@ -274,6 +275,13 @@ void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)
 void ConfigTool::getExtTools(MapOfUserDefTools & userTools)
 {
     userTools = userDefTools;
+    userTools.detach();
+    int row = 0;
+    foreach (QString key, userTools.keys()) {
+        const QUserDefTool & udt = userTools.value(key);
+        ++row;
+        std::cerr << row << ": " << udt.name.toStdString() << '\n';
+    }
 }
 
 //----------------------------------------------------------------------
@@ -321,7 +329,7 @@ void ConfigTool::saveAsFilename(QString & fName)
     if (! fName.isEmpty()) {
         if (!transferGUIToCfg()) { return; }
         QFile file( fName );
-        if (file.open(QIODevice::ReadWrite)) {
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
             QTextStream stream(&file);
             stream << QS(cfg.str(true)) << endl;
         }
@@ -1164,6 +1172,26 @@ bool ConfigTool::transferGUIToCfg()
     }
     
     // 6. USER DEFINED TOOLS
+
+    json uts;
+
+    QMap<QString, QUserDefTool>::const_iterator it  = userDefTools.constBegin();
+    auto end = userDefTools.constEnd();
+    int i = 0;
+    while (it != end) {
+        const QUserDefTool & t = it.value();
+
+        uts[i]["name"]         = t.name.toStdString();
+        uts[i]["description"]  = t.desc.toStdString();
+        uts[i]["executable"]   = t.exe.toStdString();
+        uts[i]["arguments"]    = t.args.toStdString();
+        uts[i]["productTypes"] = t.prod_types.join(",").toStdString();
+
+        ++it;
+        ++i;
+    }
+
+    cfg.userDefTools.fromStr(JValue(uts).str());
 
     // 7. CONNECTIVITY
 

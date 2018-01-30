@@ -184,7 +184,6 @@ void Master::runEachIteration()
         json fmkInfoValue;
         tskMng->getProcFmkInfoUpdate(fmkInfoValue);
         evtMng->sendProcFmkInfoUpdate(fmkInfoValue);
-        datMng->storeProcFmkInfoUpdate(fmkInfoValue);
     }   
 }
 

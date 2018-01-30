@@ -732,57 +732,5 @@ bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ptype,
     return result;
 }
 
-//----------------------------------------------------------------------
-// Method: saveAgentTaskStatusSpectra
-// Save the Task Status Spectra for a given agent
-//----------------------------------------------------------------------
-bool DBHdlPostgreSQL::saveAgentTaskStatusSpectra(std::string agName,
-                                                 int running, int scheduled,
-                                                 int paused, int stopped,
-                                                 int failed, int finished,
-                                                 int total)
-{
-    bool result;
-    std::string cmd("SELECT total from task_status_spectra "
-                    "WHERE agent_id=" + str::quoted(agName) + ";");
-
-    try { result = runCmd(cmd); } catch(...) { throw; }
-
-    if (PQntuples(res) > 0) {
-        // Update
-        cmd = "UPDATE task_status_spectra "
-            "SET (running, waiting, paused, stopped, failed, finished, total) = "
-            " (" +
-            std::to_string(running) + ", " + 
-            std::to_string(scheduled) + ", " + 
-            std::to_string(paused) + ", " + 
-            std::to_string(stopped) + ", " + 
-            std::to_string(failed) + ", " + 
-            std::to_string(finished) + ", " + 
-            std::to_string(total) + " ) "
-            "WHERE agent_id=" + str::quoted(agName) + ";";            
-    } else {
-        // Insert
-        cmd = "INSERT INTO task_status_spectra "
-            "(agent_id, running, waiting, paused, stopped, failed, finished, total) "
-            " VALUES (" +
-            str::quoted(agName) + ", " +
-            std::to_string(running) + ", " + 
-            std::to_string(scheduled) + ", " + 
-            std::to_string(paused) + ", " + 
-            std::to_string(stopped) + ", " + 
-            std::to_string(failed) + ", " + 
-            std::to_string(finished) + ", " + 
-            std::to_string(total) + " );";                  
-    }
-
-    try { result = runCmd(cmd); } catch(...) { throw; }
-
-    PQclear(res);
-
-    return true;
-}
-
-
 
 //}

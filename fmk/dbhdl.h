@@ -269,17 +269,7 @@ public:
     virtual bool checkSignature(std::string & sgnt, std::string & ptype, 
                                 std::string & ver)=0;
 
-    //----------------------------------------------------------------------
-    // Method: saveAgentTaskStatusSpectra
-    // Save the Task Status Spectra for a given agent
-    //----------------------------------------------------------------------
-    virtual bool saveAgentTaskStatusSpectra(std::string agName,
-                                            int running, int scheduled,
-                                            int paused, int stopped,
-                                            int failed, int finished,
-                                            int total)=0;
-
- protected:
+protected:
     bool connectionParamsSet;
 
 };
