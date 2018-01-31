@@ -1,0 +1,12 @@
+{
+  "input": "in/*.fits",
+  "output": "{input:SOC_VIS=>LE1_VIS,in/=>out/}",
+  "log": "{output:LE1_VIS=>LE1_VIS-LOG,out/=>log/,fits=>log}",
+  "input_dir": "in",
+  "steps": 30,
+  "add": 10,
+  "processor": "LE1_VIS_Processor",
+  "script": "driver.py",
+  "args": "--input {input_dir} --output {output} --log {log} --steps {steps} --add {add}",
+  "container": true
+}
