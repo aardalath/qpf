@@ -468,6 +468,17 @@ class process
     }
 
     /**
+     * Sets the process to read from the standard output of another
+     * process.
+     */
+    std::string cmd_line()
+    {
+        std::string cmd;
+        for (auto s : args_) { cmd += s + " "; }
+        return cmd;
+    }
+
+    /**
      * Executes the process.
      */
     void exec()

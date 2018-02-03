@@ -500,6 +500,7 @@ public:
 
     static std::string    PATHBase;
     static std::string    PATHData;
+    static std::string    PATHProcs;
     static std::string    PATHRun;
     static std::string    PATHBin;
     static std::string    PATHSession;

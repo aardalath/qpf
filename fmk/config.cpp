@@ -427,6 +427,8 @@ void Config::processConfig()
     
     PATHBase    = general.workArea();
 
+    PATHProcs   = PATHBase + "/bin";
+
     PATHData    = PATHBase + "/data";
 
     PATHRun     = PATHBase + "/run";
@@ -605,6 +607,7 @@ std::string Config::PATHBase;
 std::string Config::PATHData;
 std::string Config::PATHWww;
 std::string Config::PATHRun;
+std::string Config::PATHProcs;
 std::string Config::PATHBin;
 std::string Config::PATHSession;
 std::string Config::PATHLog;

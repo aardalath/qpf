@@ -98,6 +98,8 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     cnt.add_argument(exe);
     for (auto & a : args) { cnt.add_argument(a); }
 
+    std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
+    
     cnt.exec();
     cnt.wait();
 
@@ -114,17 +116,22 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 bool ContainerMng::createContainer(std::string proc, std::string workDir,
                                    std::string & containerId)
 {
-    std::string RunProcessorScript(Config::PATHBin + "/RunProcessor.sh");
+    std::string RunProcessorApp("python");
+    std::string RunProcessorScript(Config::PATHBin + "/RunProcessor.py");
 
-    std::string cfgFileArg(workDir + "/dummy.cfg");
+    std::string cfgFileArg(workDir + "/" + proc + ".cfg");
     std::string dockerIdFile(workDir + "/docker.id");
 
-    std::ofstream ofs;
-    ofs.open(cfgFileArg, std::ofstream::out);
-    ofs << getuid() << '\n';
-    ofs.close();
+    //std::ofstream ofs;
+    //ofs.open(cfgFileArg, std::ofstream::out);
+    //ofs << getuid() << '\n';
+    //ofs.close();
 
-    procxx::process cnt(RunProcessorScript, proc, cfgFileArg);
+    procxx::process cnt(RunProcessorApp, RunProcessorScript,
+                        "-t", workDir, "-c", cfgFileArg);
+
+    std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
+
     cnt.exec();
     cnt.wait();
 

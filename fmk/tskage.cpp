@@ -316,8 +316,12 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     //----  * * * LAUNCH TASK * * *
     std::string contId;
-    
-    if (dckMng->createContainer(task.taskPath(), exchangeDir, contId)) {
+    std::string procName(task.taskPath());
+    std::string sourceProcCfgFile = Config::PATHProcs + "/" + procName + "/sample.cfg.json";
+    std::string targetProcCfgFile = exchangeDir + "/" + procName + ".cfg";
+    urlh.copyfile(sourceProcCfgFile, targetProcCfgFile);
+    TRC("Copying " + sourceProcCfgFile + " to " + targetProcCfgFile);
+    if (dckMng->createContainer(procName, exchangeDir, contId)) {
         InfoMsg("Running task " + task.taskName() +
                 " (" + task.taskPath() + ") within container " + contId);
         origMsgString = m;
@@ -706,12 +710,13 @@ void TskAge::updateProgress()
             if (progressTagPos != std::string::npos) {
                 size_t porcEndsAt = line.find_first_of("%");
                 if (porcEndsAt != std::string::npos) {
-                    size_t porcBeginsAt = line.find_last_of(" ");
+                    std::string untilPerc = line.substr(0, porcEndsAt);
+                    size_t porcBeginsAt = untilPerc.find_last_of(" ");
                     if (porcBeginsAt != std::string::npos) {
                         std::string percentage =
                             line.substr(porcBeginsAt + 1,
                                         porcEndsAt - porcBeginsAt);
-                        progress = std::stod(percentage);
+                        progress = (int)floor(std::stof(percentage));
                     }
                 }
             }

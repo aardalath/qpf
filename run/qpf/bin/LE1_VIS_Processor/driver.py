@@ -57,9 +57,9 @@ def main():
         step += 1
         progress += deltaProgress
         if writeLog:
-            fh.write("Done step {0} of {1} [P] {2:.1f}% . . .\n".format(step, numSteps, progress))
+            fh.write("Done step {0} of {1} - Processing executed: {2:.1f}%\n".format(step, numSteps, progress))
         else:
-            print "Done step {0} of {1} [P] {2:.1f}% . . .".format(step, numSteps, progress)
+            print "Done step {0} of {1} - Processing executed: {2:.1f}%".format(step, numSteps, progress)
 
         # At some point, number of steps could change
         if random.randint(0, 1000) < 50:

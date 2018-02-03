@@ -1,7 +1,7 @@
 {
   "input": "in/*.fits",
   "output": "{input:SOC_NIR=>LE1_NIR,in/=>out/}",
-  "log": "{output:LE1_NIR=>LE1_NIR-LOG,out/=>log/,fits=>log}",
+  "log": "{output:out/=>log/,fits=>log}",
   "input_dir": "in",
   "steps": 30,
   "add": 10,

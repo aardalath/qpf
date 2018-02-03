@@ -85,7 +85,7 @@ def main():
         progress += deltaProgress
 
         logger.info("Processing step {0} of {1}.".format(step, numSteps))
-        logger.info("Processing executed: {0:.2f}% . . .".format(progress))
+        logger.info("Processing executed: {0:.2f}%".format(progress))
 
         # At some point, number of steps could change
         if random.randint(0, 1000) < 50:

@@ -3,7 +3,7 @@
   "input_dir": "in",
   "output": "{input:fits=>json,in/=>out/,LE1_VIS=>QLA_LE1-VIS}",
   "log": "{output:json=>log,out/=>log/,-VIS=>-VIS-LOG}",
-  "processor": "QDT_fake",
+  "processor": "QLA_VIS_Processor",
   "script": "driver.py",
   "args": "--input {input_dir} --result {output} --log {log}",
   "container": true
