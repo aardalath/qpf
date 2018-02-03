@@ -62,7 +62,7 @@
 #define APP_DOMAIN       "jcg"
 
 //! application developer division
-#define APP_DIVISION     ""
+#define APP_DIVISION     "SCI-O"
 
 //! Application long name
 #define APP_LONG_NAME    "QLA Processing Framework"
