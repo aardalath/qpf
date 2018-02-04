@@ -1,15 +1,13 @@
 #==============================================================================
-# VERSION:        1.2
+# VERSION:        2.0
 # DESCRIPTION:    Create container with its dependencies for the execution of QDT
 # AUTHOR:         J. C. Gonzalez <JCGonzalez@sciops.esa.int>
 # COMMENTS:
 #   This file describes how to build a container for the execution of the
-#   QLA Diagnostic Tools.  The tools are not embeded in the container, but
-#   they are rather installed in the host and mapped to internal container
-#   paths when the container is executed.
+#   QLA Diagnostic Tools, as a service, to be used within a Docker Swarm.
 # USAGE:
 #   # Build QDT image (for now the image name:tag is always qpf-debian:a)
-#   docker build -t qpf-debian:a .
+#   docker build -t qla-srv-debian:a .
 #
 #   # Run interactive
 #   docker run -i -t --priviledged=true \
@@ -21,19 +19,15 @@
 #==============================================================================
 
 # Base Docker image
-FROM debian
+FROM qdtsrv-vis_nisp-debian:baseext
 MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
 
-LABEL esa.euclid.soc.qla.content="QDT required packages" \
-      esa.euclid.soc.qla.version="1.2-RC2" \
-      esa.euclid.soc.qla.release-date="2017-05-18"
-      
-# see update.sh for why all "apt-get install"s have to stay as one long line
-RUN apt-get update && \
-    apt-get install -y python2.7 \
-                       python-scipy \
-                       python-astropy \
-                       python-zmq \ 
-                    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
-    
+LABEL esa.euclid.soc.qla.content="QDT caller as service" \
+      esa.euclid.soc.qla.version="2.0" \
+      esa.euclid.soc.qla.release-date="2018-02-06"
+
+# install QDT caller
+COPY QDT.src.tgz /tmp/
+RUN mkdir -p /qlabin && tar xvzfC /tmp/QDT.src.tgz /qlabin && rm -f /tmp/QDT.src.tgz
+WORKDIR /qlabin
+ENTRYPOINT ["python","./QDTsrv.py"]

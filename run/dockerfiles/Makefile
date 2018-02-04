@@ -1,9 +1,9 @@
 ##############################################################################
 # File       : Makefile
 # Domain     : QPF.run.dockerfiles
-# Version    : 1.2
-# Date       : 2016/12/18
-# Copyright (C) 2015-2017  J C Gonzalez
+# Version    : 2.0
+# Date       : 2018/02/06
+# Copyright (C) 2015-2018  J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Generates docker images from Dockerfiles
 # Created by : J C Gonzalez
@@ -11,7 +11,7 @@
 # History    : See <Changelog>
 ###############################################################################
 
-SUBDIRS = QLA LE1sim 
+SUBDIRS = QDT LE1sim QDTsrv
 
 .PHONY: subdirs clean $(SUBDIRS)
 
@@ -26,7 +26,7 @@ clean:
 	-for d in $(SUBDIRS); do ($(MAKE) -C $$d clean ); done
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	-cd $@ && bash ./createimgs.sh
 
 all: subdirs
 

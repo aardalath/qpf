@@ -21,7 +21,7 @@
 #==============================================================================
 
 # Base Docker image
-FROM qla-srv-debian:base
+FROM qdtsrv-vis_nisp-debian:base
 MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
 
 LABEL esa.euclid.soc.qla.content="QDT srv required packages" \

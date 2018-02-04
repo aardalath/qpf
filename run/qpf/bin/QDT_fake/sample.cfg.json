@@ -5,6 +5,6 @@
   "log": "{output:json=>log,out/=>log/}",
   "processor": "QDT_fake",
   "script": "driver.py",
-  "args": "--input {input_dir} --result {output} --log {log}",
+  "args": "--input {input_dir} --result_file {output} --log_file {log}",
   "container": true
 }
