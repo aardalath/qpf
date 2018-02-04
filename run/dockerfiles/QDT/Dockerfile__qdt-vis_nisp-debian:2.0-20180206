@@ -33,7 +33,12 @@ RUN apt-get update && \
     apt-get install -y python2.7 \
                        python-scipy \
                        python-astropy \
-                       python-zmq \ 
+                       python-zmq \
+                       python-matplotlib \
+                       python-tk \
                     --no-install-recommends && \
+    apt-get install -y sextractor \
+                    --no-install-recommends && \
+    ln -sf /usr/bin/sextractor /usr/bin/sex && \
     rm -rf /var/lib/apt/lists/*
     

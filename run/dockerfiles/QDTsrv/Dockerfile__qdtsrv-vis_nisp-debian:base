@@ -34,5 +34,10 @@ RUN apt-get update && \
                        python-scipy \
                        python-astropy \
                        python-zmq \
+                       python-matplotlib \
+                       python-tk \
                     --no-install-recommends && \
+    apt-get install -y sextractor \
+                    --no-install-recommends && \
+    ln -sf /usr/bin/sextractor /usr/bin/sex && \
     rm -rf /var/lib/apt/lists/*
