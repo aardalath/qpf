@@ -4,7 +4,7 @@
   "log": "{output:out/=>log/,fits=>log}",
   "steps": 30,
   "add": 10,
-  "image": "qdt-vis_nisp-debian:2.0-20180206",
+  "image": "qdt-vis_nisp-debian:latest",
   "processor": "DummyProcessor",
   "script": "DummyProcessor.py",
   "args": "--steps {steps} --add {add} --results {output} --log {log}",
