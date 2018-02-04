@@ -78,7 +78,7 @@ class Processor(object):
     QPFRunToolsPath = QPFWorkArea + "/run/bin"
     QPFProcsPath = QPFWorkArea + "/bin"
 
-    QPFDckImageDefault = "qpf-debian:a"
+    QPFDckImageDefault = "debian"
     QPFDckImageRunPath = "/qpf/run"
     QPFDckImageProcPath = "/qlabin"
 
@@ -224,7 +224,7 @@ class Processor(object):
             self.mapping += " -v {}:{}".format(mval[0], mval[1])
 
         self.dck_opts = "{} -w={} --privileged=true".format(dck_opts, self.task_dir_img)
-        self.dck_image = Processor.QPFDckImageDefault
+        self.dck_image = self.cfg["image"] #Processor.QPFDckImageDefault
 
     def run(self, arguments=None, additional="", container=None):
         '''

@@ -3,6 +3,7 @@
   "input_dir": "in",
   "output": "{input:fits=>json,in/=>out/,LE1_VIS=>QLA_LE1-VIS,LE1_NIR=>QLA_LE1-NIR,LE1_SIR=>QLA_LE1-SIR}",
   "log": "{output:json=>log,out/=>log/}",
+  "image": "qdtsrv-vis_nisp-debian:2.0-20180206",
   "processor": "QDT-srv",
   "script": "driver.py",
   "args": "--input {input_dir} --result {output} --log {log}",
