@@ -98,8 +98,6 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     cnt.add_argument(exe);
     for (auto & a : args) { cnt.add_argument(a); }
 
-    std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
-    
     cnt.exec();
     cnt.wait();
 
@@ -130,7 +128,7 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
     procxx::process cnt(RunProcessorApp, RunProcessorScript,
                         "-t", workDir, "-c", cfgFileArg);
 
-    std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
+    //std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
 
     cnt.exec();
     cnt.wait();
