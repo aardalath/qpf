@@ -3,7 +3,7 @@
 # Domain     : QPF.scripts
 # Version    : 1.0
 # Date       : 2016/04/01
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Install Docker and create base container
 # Created by : J C Gonzalez

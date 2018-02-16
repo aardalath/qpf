@@ -46,7 +46,7 @@ from __future__ import print_function
 
 
 __author__    = 'J C Gonzalez <JCGonzalez@sciops.esa.int>'
-__copyright__ = 'Copyright (C) 2015-2017 Euclid SOC Team'
+__copyright__ = 'Copyright (C) 2015-2018 Euclid SOC Team'
 __license__   = 'LGPL'
 __vcs_id__    = '$Id$'
 __version__   = '0.1.0' #Versioning: http://www.python.org/dev/peps/pep-0386/

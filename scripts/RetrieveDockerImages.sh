@@ -4,7 +4,7 @@
 # Domain     : QPF.scripts
 # Version    : 2.0
 # Date       : 2018/02/16
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Retrieve Docker Images from Nexus Repository
 # Created by : J C Gonzalez

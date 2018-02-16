@@ -4,7 +4,7 @@
 # Domain     : QPF.tests.filenamespec
 # Version    : 2.0
 # Date       : 2017/07/14
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Test execution and performance of FileNameSpec class
 # Created by : J C Gonzalez

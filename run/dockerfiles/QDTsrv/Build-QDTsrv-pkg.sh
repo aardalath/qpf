@@ -4,7 +4,7 @@
 # Domain     : QPF.run.dockerfiles
 # Version    : 2.0
 # Date       : 2017/10/23
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Create package for Dockerfile, in order to build image for QDT
 #              service invocation

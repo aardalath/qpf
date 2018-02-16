@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.Component
  *
- * Version:  1.2
+ * Version:  2.0
  *
  * Date:    2016/06/21
  *

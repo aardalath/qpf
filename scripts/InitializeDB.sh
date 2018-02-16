@@ -4,7 +4,7 @@
 # Domain     : QPF.scripts
 # Version    : 1.0
 # Date       : 2017/09/08
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Drops and recreate qpfdb database
 # Created by : J C Gonzalez

@@ -4,7 +4,7 @@
 # Domain     : QPF.scripts
 # Version    : 2.0
 # Date       : 2017/09/08
-# Copyright (C) 2015-2017 J C Gonzalez
+# Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
 # Purpose    : Compile and Install QPF binaries in target platform
 # Created by : J C Gonzalez

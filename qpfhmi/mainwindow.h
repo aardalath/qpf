@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.qpfgui.mainwindow
  *
- * Version:  1.2
+ * Version:  2.0
  *
  * Date:    2016-11-03
  *

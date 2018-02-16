@@ -4,7 +4,7 @@
  *
  * Domain:  QPF.libQPF.JsonFileHandler
  *
- * Version:  1.2
+ * Version:  2.0
  *
  * Date:    2017/04/01
  *
