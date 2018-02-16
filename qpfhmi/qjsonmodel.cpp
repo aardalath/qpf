@@ -204,12 +204,10 @@ bool QJsonModel::findSequence(QAbstractItemModel * model, QStringList & seq,
                               QList<QModelIndex> & idxs)
 {
     QModelIndex idx = QModelIndex();
-    
     foreach (QString s, seq) {
         idx = find(model, s, idx);
         if (idx == QModelIndex()) { return false; }
         idxs.append(idx);
     }
-
-    return true;
+    return idxs.count() > 0;
 }
