@@ -189,7 +189,7 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui(new Ui::ConfigTool)
 {
     ui->setupUi(this);
-
+    ui->label_20->setPixmap(QPixmap(":img/EuclidQPF.png"));
     monitMsgFlags.append(FlagSt({ "CMD",      ui->chkCmd }));    
     monitMsgFlags.append(FlagSt({ "EVTMNG",   ui->chkEvtMngCmd })); 
     monitMsgFlags.append(FlagSt({ "HMICMD",   ui->chkHmiCmd })); 
@@ -331,7 +331,14 @@ void ConfigTool::saveAsFilename(QString & fName)
         QFile file( fName );
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
             QTextStream stream(&file);
-            stream << QS(cfg.str(true)) << endl;
+            stream << QS(cfg.sortedStr({"general",
+                            "network",
+                            "db",
+                            "connectivity",
+                            "products",
+                            "orchestration",
+                            "userDefTools",
+                            "flags"})) << endl;
         }
     }
 }
