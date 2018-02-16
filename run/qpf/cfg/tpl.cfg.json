@@ -115,42 +115,42 @@
                 "name": "DummyProc_QLAISMVIS",
                 "inputs": "SIM_VIS",
                 "outputs": "QLA_SIM_VIS,QLA_SIM_VIS_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_QLASIMNIR",
                 "inputs": "SIM_NIR",
                 "outputs": "QLA_SIM_NIR,QLA_SIM_NIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_QLASIMSIR",
                 "inputs": "SIM_SIR",
                 "outputs": "QLA_SIM_SIR,QLA_SIM_SIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_QLAVIS",
                 "inputs": "LE1_VIS",
                 "outputs": "QLA_LE1_VIS,QLA_LE1_VIS_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_QLANIR",
                 "inputs": "LE1_NIR",
                 "outputs": "QLA_LE1_NIR,QLA_LE1_NIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_QLASIR",
                 "inputs": "LE1_SIR",
                 "outputs": "QLA_LE1_SIR,QLA_LE1_SIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyQLAProcessor",
                 "condition": "1"
             },
             {
@@ -178,21 +178,21 @@
                 "name": "DummyProc_LE1VIS",
                 "inputs": "SOC_VIS",
                 "outputs": "LE1_VIS,LE1_VIS_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyLE1Processor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_LE1NIR",
                 "inputs": "SOC_NIR",
                 "outputs": "LE1_NIR,LE1_NIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyLE1Processor",
                 "condition": "1"
             },
             {
                 "name": "DummyProc_LE1SIR",
                 "inputs": "SOC_SIR",
                 "outputs": "LE1_SIR,LE1_SIR_LOG",
-                "processing": "DummyProcessor",
+                "processing": "DummyLE1Processor",
                 "condition": "1"
             },
             {
@@ -218,7 +218,8 @@
             }
         ],
         "processors": {
-            "DummyProcessor": "DummyProcessor",
+            "DummyQLAProcessor": "DummyQLAProcessor",
+            "DummyLE1Processor": "DummyLE1Processor",
             "Archive_Ingestor": "Archive_Ingestor"
         }
     },
