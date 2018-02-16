@@ -1,0 +1,12 @@
+{
+  "input": "in/*.fits",
+  "output": "{input:SOC_VIS=>LE1_VIS,SOC_NIR=>LE1_NIR,SOC_SIR=>LE1_SIR,in/=>out/}",
+  "log": "{output:out/=>log/,fits=>log}",
+  "steps": 60,
+  "add": 10,
+  "image": "qdt-vis_nisp-debian:latest",
+  "processor": "DummyLE1Processor",
+  "script": "DummyLE1Processor.py",
+  "args": "--input {input} --steps {steps} --add {add} --results {output} --log {log}",
+  "container": true
+}

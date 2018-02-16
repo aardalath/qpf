@@ -1,0 +1,12 @@
+{
+  "input": "in/*.fits",
+  "output": "{input:LE1_VIS=>QLA_LE1-VIS,SIM_VIS=>QLA_SIM-VIS,LE1_NIR=>QLA_LE1-NIR,SIM_NIR=>QLA_SIM-NIR,LE1_SIR=>QLA_LE1-SIR,SIM_SIR=>QLA_SIM-SIR,in/=>out/,fits=>json}",
+  "log": "{output:out/=>log/,json=>log}",
+  "steps": 30,
+  "add": 10,
+  "image": "qdt-vis_nisp-debian:latest",
+  "processor": "DummyQLAProcessor",
+  "script": "DummyQLAProcessor.py",
+  "args": "--steps {steps} --add {add} --results {output} --log {log}",
+  "container": true
+}

@@ -79,8 +79,9 @@ def main():
             numSteps += moreSteps
             deltaProgress = (endProgress - progress) / (numSteps - step)
 
+    resFile = os.path.basename(args.resfile)
     report = {
-        args.resfile: {
+        resFile: {
             "CCD_1-6": {
                 "Q-1": {
                     "diagnostics": {
