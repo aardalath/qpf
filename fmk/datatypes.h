@@ -204,31 +204,17 @@ typedef Json::Value  json;
 
 class JValue {
 public:
-    JValue() {}
-    JValue(json val) { value = val; }
-    JValue(std::string s) { fromStr(s); }
-    JValue operator()(std::string key) { return JValue(value[key]); }
-    json & operator[](std::string key) { return value[key]; }
-    std::string str(bool styled = false) {
-        if (value.isObject() || value.isArray()) {
-            if (! styled) {
-                Json::FastWriter w;
-                return w.write(value);
-            } else {
-                Json::StyledWriter w;
-                return w.write(value);
-            }
-        } else {
-            return value.asString();
-        }
-    }
-    void fromStr(std::string content = std::string()) {
-        Json::Reader reader;
-        reader.parse(content, value);
-    }
-    json & val() { return value; }
-    int size() { return value.size(); }
-    bool has(const char * key) { return value.isMember(key); }
+    JValue();
+    JValue(json val);
+    JValue(std::string s);
+    JValue operator()(std::string key);
+    json & operator[](std::string key);
+    std::string str(bool styled = false);
+    std::string sortedStr(std::vector<std::string> sortKeys);
+    void fromStr(std::string content = std::string());
+    json & val();
+    int size();
+    bool has(const char * key);
 protected:
     json value;
 };
