@@ -169,14 +169,12 @@ ProductMetadata & URLHandler::fromInbox2LocalArch(bool tx)
     std::string newFile(file);
     std::string newUrl(productUrl);
 
-    std::string section("/in");
-
     str::replaceAll(newFile,
                     cfg.storage.inbox,
-                    cfg.storage.archive + section);
+                    cfg.storage.archive);
     str::replaceAll(newUrl,
                     cfg.storage.inbox,
-                    cfg.storage.archive + section);
+                    cfg.storage.archive);
 
     if (product.hadNoVersion()) {
         std::string a("Z." + product.extension());
@@ -223,13 +221,11 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
     std::string newFile(file);
     std::string newUrl(productUrl);
 
-    std::string section((newUrl.find("/out/") != std::string::npos) ? "/out" : "/in");
-
     str::replaceAll(newFile,
-                    cfg.storage.archive + section,
+                    cfg.storage.archive,
                     cfg.storage.gateway + "/in");
     str::replaceAll(newUrl,
-                    cfg.storage.archive + section,
+                    cfg.storage.archive,
                     cfg.storage.gateway + "/in");
 
     // Set (hard) link
@@ -300,7 +296,6 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
     // Get extension
     std::string extension = str::mid(file,file.find_last_of('.') + 1);
     std::string subdir = (extension == "log") ? "/log" : "/out";
-
     std::string section("/out");
 
     str::replaceAll(newFile,
@@ -340,21 +335,19 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
     std::string newFile(file);
     std::string newUrl(productUrl);
 
-    std::string section("/out");
-
     str::replaceAll(newFile,
-                    cfg.storage.gateway + section,
-                    cfg.storage.archive + section);
+                    cfg.storage.gateway + "/out",
+                    cfg.storage.inbox);
     str::replaceAll(newUrl,
-                    cfg.storage.gateway + section,
-                    cfg.storage.archive + section);
+                    cfg.storage.gateway + "/out",
+                    cfg.storage.archive);
 
     // Set (hard) link
     (void)relocate(file, newFile, MOVE);
 
     // Change url in processing task
     product["url"]      = newUrl;
-    product["urlSpace"] = LocalArchSpace;
+    product["urlSpace"] = InboxSpace; //LocalArchSpace;
 
     return product;
 }
@@ -375,10 +368,8 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     std::string newFile(file);
     std::string newUrl(productUrl);
 
-    std::string section("/out");
-
     UserAreaId tgtType = UserAreaId(product.procTargetType());
-    std::string tgtFolder(cfg.storage.archive + section);
+    std::string tgtFolder(cfg.storage.archive);
     
     if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
 
@@ -417,14 +408,13 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     }
     
     std::cerr << "Must move " + newFile + " from " +
-        cfg.storage.gateway + section + " to " +
-        tgtFolder + '\n';
+        cfg.storage.gateway + "/out to " + tgtFolder + '\n';
     
     str::replaceAll(newFile,
-                    cfg.storage.gateway + section,
+                    cfg.storage.gateway + "/out",
                     tgtFolder);
     str::replaceAll(newUrl,
-                    cfg.storage.gateway + section,
+                    cfg.storage.gateway + "/out",
                     tgtFolder);
 
     (void)relocate(file, newFile, MOVE);
@@ -455,7 +445,7 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
     std::string newUrl(productUrl);
 
     UserAreaId tgtType = UserAreaId(product.procTargetType());
-    std::string tgtFolder; //(cfg.storage.archive + section);
+    std::string tgtFolder; 
     
     if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
 
@@ -490,14 +480,12 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
         }
     }
     
-    for (auto & section: {"/out", "/in"}) {
-        str::replaceAll(newFile,
-                        cfg.storage.archive + section,
-                        tgtFolder);
-        str::replaceAll(newUrl,
-                        cfg.storage.archive + section,
-                        tgtFolder);
-    }
+    str::replaceAll(newFile,
+                    cfg.storage.archive,
+                    tgtFolder);
+    str::replaceAll(newUrl,
+                    cfg.storage.archive,
+                    tgtFolder);
 
     (void)relocate(file, newFile, COPY);
 
