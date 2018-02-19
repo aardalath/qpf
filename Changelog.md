@@ -11,23 +11,46 @@ the previous version are:
 
 ### Improvements
 
-TBD
+- New messaging library Nanomsg suspended
+- New messaging schema improves speed and scalability
+- HTTP file server for Swarm services
+- New monitoring view for Task Agents
+- Improved way to define & configure data processors
+- New WWW pages to show processing status
+- Improved sorting of data products in local archive view
+- Improved task processing monitoring
+- Mongoose lib now part of source code
+- Definition of processors now include command line call with arguments
+  and Docker image
+- Docker images now pulled from Nexus Docker Repository
 
 ### New Features
 
-TBD
+- Added Pause/Resume/Cancel task, and Suspend, Cancel host processing
+- Retrieval and browsing of Processing alerts, and opening of source reports
+- List System Alerts
+- Reprocessed products can be placed in user defined area or external folders
+- Reprocessed products can be stored in VOSpace user account
+- Data products can be analyzed with IPython
 
 ### Fixed
 
-TBD
+- Progress of tasks now reflects output provided in running tasks log
+- Usage and definition of (external) User Defined Tools
+- Fixed saving of configuration from ConfigTool
 
 ### Cosmetic changes
 
-TBD
+- New, improved ConfigTool entries distribution
+- Minor updates to main HMI
+- Great improvement to ConfigTool HMI
 
 ### Removed
 
-TBD
+- Some internal messages are replaced by direct component method calls
+- Removed old 0MQ messaging library
+
+----
 
 [V1.2] / 2017-05-08
 --------------------------
@@ -59,6 +82,7 @@ First release candidate for the QPF V1.2.  The main changes with respecto to the
 
 ### Removed
 
+----
 
 [V1.1] / 2016-12-20
 --------------------------
@@ -130,6 +154,7 @@ QPF GUI:
 - Removed entire integrated version of QPF Core and QPF GUI
 - Now the Quit All commanded from the HMI is sent directly via CMD message to the EvtMng, not as a DB iCommand.
 
+----
 
 [V1.0] / 2016-04-22
 --------------------
@@ -139,7 +164,8 @@ First official release of the [QPF].
 
 ----
 
-[V1.2rc1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.2-RC1
+[V2.0rc1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V2.0-RC1
+[V1.2]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.2
 [V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
@@ -155,9 +181,9 @@ Project:     QPF
 Author:      J C Gonzalez
 Affiliation: Euclid SOC Team @ ESAC - Telespazio Vega U.K. S.L.
 Web:         http://www.cosmos.esa.int/web/euclid
-Date:        2017-05-09
+Date:        2018-02-19
 
-Copyright (C) 2015,2016,2017  Euclid SOC Team @ ESAC
+Copyright (C) 2015-2018  Euclid SOC Team @ ESAC
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 taking into account also [Semantic Versioning](http://semver.org/).
