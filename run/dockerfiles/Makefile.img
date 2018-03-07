@@ -1,0 +1,53 @@
+##############################################################################
+# File       : Makefile
+# Domain     : QPF.run.dockerfiles.QLA
+# Version    : 2.0
+# Date       : 2016/12/18
+# Copyright (C) 2015-2018  J C Gonzalez
+#_____________________________________________________________________________
+# Purpose    : Generates docker images from Dockerfiles
+# Created by : J C Gonzalez
+# Status     : Prototype
+# History    : See <Changelog>
+###############################################################################
+
+DOCKERFILE=Dockerfile
+
+# NAME OF IMAGES:
+# <component>-<scope>-<distr>[-<comment>]:<version>[-<date>][-<addInfoNoSpaces>]
+# Component: qdt|qpf|qla|le1|...
+# Scope: vis|nisp|hktm|aocs|fake|...
+# Base distribution: debian|ubuntu|lodeen|...
+# Comment: free text without spaces or dashes
+# Version: #[.#]
+# Date: YYYYMMDD
+# Add.Info: free text without spaces or dashes
+
+COMPONENT=qdt
+SCOPE=vis_nisp
+DISTR=debian
+COMMENT=
+VERSION=2.0
+DATE=20180206
+ADDINFO=
+
+IMGNAME=$(COMPONENT)-$(SCOPE)-$(DISTR)$(addprefix -,$(COMMENT))
+IMGTAG=$(VERSION)$(addprefix -,$(DATE))$(addprefix -,$(ADDINFO))
+
+IMAGE_NAME=$(IMGNAME):$(IMGTAG)
+
+.PHONY: image clean
+
+.SILENT:
+
+image:
+	-echo "The image to be created is $(IMAGE_NAME)"
+	docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
+
+clean:
+	-echo "Cleanning up image $(IMAGE_NAME). . ."
+	docker rmi -f $(IMAGE_NAME) \
+		|| echo "Cannot remove image $(IMAGE_NAME)."
+
+all: image
+

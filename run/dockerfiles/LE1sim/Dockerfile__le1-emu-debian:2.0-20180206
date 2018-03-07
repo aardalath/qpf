@@ -1,0 +1,58 @@
+#==============================================================================
+# VERSION:        2.0
+# DESCRIPTION:    Create container with its dependencies for the execution of
+#                 the fake LE1 processor
+# AUTHOR:         J. C. Gonzalez <JCGonzalez@sciops.esa.int>
+# COMMENTS:
+#   This file describes how to build a container for the execution of the
+#   fake LE1 processor.  The processor is embeded in the container.
+# USAGE:
+#   # Build QDT image (for now the image name:tag is always le1-sim-debian:a)
+#   docker build -t le1-sim-debian:a .
+#
+#   # Run interactive
+#   docker run -i -t --priviledged=true \
+#       -v {procBinPath}:/le1bin \
+#       -v {localPath}/:{imgPath} \
+#       qpf-debian:a /bin/bash {imgPath}/{procElem} 
+#
+#  Runing script {procElem} assumes the LE1 processor is in /le1bin
+#==============================================================================
+
+# Base Docker image
+FROM le1-emu-debian:base
+MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
+ENV QPF_VERSION 2.0
+
+LABEL esa.euclid.soc.qla.content="LE1 fake processor" \
+      esa.euclid.soc.qla.version="2.0" \
+      esa.euclid.soc.qla.release-date="2018-02-06"
+      
+# install LE1-fake software (placed in current directory)
+COPY le1sim.tgz /tmp/
+RUN mkdir -p /le1bin && tar xvzfC /tmp/le1sim.tgz /le1bin && rm -f /tmp/le1sim.tgz
+
+# Use gosu to move down from ROOT to other users, without the signals trap
+# problems of sudo
+# First, install gosu:
+# https://github.com/tianon/gosu/blob/master/INSTALL.md
+ENV GOSU_VERSION 1.10
+RUN apt-get update && \
+    apt-get install -y wget && \
+    set -ex; \
+    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+    gosuUrl="https://github.com/tianon/gosu/releases/download/$GOSU_VERSION"; \
+    wget -O /usr/bin/gosu "$gosuUrl/gosu-$dpkgArch"; \
+    chmod +x /usr/bin/gosu
+#    wget -O /tmp/gosu.asc "$gosuUrl/gosu-$dpkgArch.asc"; \
+#    export GNUPGHOME="$(mktemp -d)"; \
+#    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+#    gpg --batch --verify /tmp/gosu.asc /usr/bin/gosu; \
+#    rm -r "$GNUPGHOME" /tmp/gosu.asc; \
+
+# Then, create entry-point to run at container startup:
+# https://denibertovic.com/posts/handling-permissions-with-docker-volumes/
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+
