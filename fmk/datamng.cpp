@@ -177,6 +177,19 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
         TraceMsg("Will try to sanitize product versions:");
         sanitizeProductVersions(taskInfo.outputs);
 
+	// Try to process the QDT report and get the issues found
+	for (auto & m : taskInfo.outputs.products) {
+	    if ((m.procTargetType() == UA_NOMINAL) && 
+		(m.procFunc() == "QLA") && 
+		(m.fileType() == "JSON")) {
+		QDTReportHandler qdtRep(m.url().substr(7));
+		if (!qdtRep.read()) continue;
+		std::vector<Alert*> issues;
+		qdtRep.getIssues(issues);
+		for (auto & v : issues) { RaiseDiagAlert(*v); }
+	    }
+	}
+        
         // Move products to local archive
         for (auto & m : taskInfo.outputs.products) {
             urlh.setProduct(m);
@@ -187,20 +200,9 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
             }
         }
 
-        InfoMsg("Saving outputs...");
-        saveProductsToDB(taskInfo.outputs);
-
-        // Try to process the QDT report and get the issues found
-        for (auto & m : taskInfo.outputs.products) {
-            if ((m.procFunc() == "QLA") && (m.fileType() == "JSON")) {
-                QDTReportHandler qdtRep(m.url().substr(7));
-                qdtRep.read();
-                std::vector<Alert*> issues;
-                qdtRep.getIssues(issues);
-                for (auto & v : issues) { RaiseDiagAlert(*v); }
-            }
-        }
-
+	InfoMsg("Saving outputs...");
+	saveProductsToDB(taskInfo.outputs);
+	
         InfoMsg("Sending message to register outputs at Orchestrator catalogue");
 
         //Config & cfg = Config::_();

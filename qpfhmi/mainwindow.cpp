@@ -333,8 +333,15 @@ void MainWindow::manualSetupUI()
     procAlertModel = new ProcAlertModel;
     ui->tblvwAlerts->setModel(procAlertModel);
 
+    std::vector<std::string> pTypes;
+    int siz = 0;
+    for (auto & s : cfg.products.productTypes()) {
+	pTypes.push_back(s);
+	if (s.length() > siz) { siz = s.length(); } 
+    }
+
     // 4. Local Archive Products Model
-    productsModel = new ProductsModel;
+    productsModel = new ProductsModel(pTypes, siz);
     ui->treevwArchive->setModel(productsModel);
     ui->treevwArchive->setItemDelegate(new DBTreeBoldHeaderDelegate(this));
     ui->treevwArchive->setSortingEnabled(true);
@@ -2474,10 +2481,13 @@ void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)
 {
     QModelIndex idx = tblvw->currentIndex();
     Alert alert = model->getAlertAt(idx);
-    DlgAlert dlg;
-    dlg.setAlert(alert);
-    dlg.exec();
-    disconnect(actHdl->getAcShowAlert());
+
+    DlgAlert * dlg = new DlgAlert;
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setAlert(alert);
+    dlg->show();
+    dlg->raise();
+    dlg->activateWindow();
 }
 
 //----------------------------------------------------------------------
@@ -2518,9 +2528,12 @@ void MainWindow::jumpToAlertSource(const QModelIndex & idx)
     QFileInfo fs(file);
     QString tabName = fs.fileName();
 
-    seq.prepend(tabName);
+    seq.prepend(a + "." + b + "." + c + "." + d);
     seq << "diagnostics" << last;
     
+    //foreach (QString s, seq) { std::cerr << '/' << s.toStdString(); }
+    //std::cerr << '\n';
+
     QWidget * existingWdg = ui->tabMainWgd->findChild<QWidget*>(tabName);
     if (existingWdg == 0) {
         openLocalArchiveFullPath(QString::fromStdString(cfg.storage.archive + "/") + file);

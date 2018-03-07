@@ -74,9 +74,6 @@ QMap<QString, QAction *> & ActionHandler::getAcUserTools() { return acUserTools;
 //--- Accessor to acReprocess
 QAction * ActionHandler::getAcReprocess() { return acReprocess; }
 
-//--- Accessor to acShowAlert
-QAction * ActionHandler::getAcShowAlert() { return acShowAlert; }
-
 //----------------------------------------------------------------------
 // Method: updateMenus
 // Reads configuration file
@@ -697,15 +694,17 @@ void ActionHandler::createAlertsTablesActions()
     mw->ui->tblvwSysAlerts->setContextMenuPolicy(Qt::CustomContextMenu);
 
     acShowAlert = new QAction(tr("Show alert information"), this);
-    acAckAlert = new QAction(tr("Acknowledge alert"), this);
-    //    connect(acShowAlert,     SIGNAL(triggered()), mw, SLOT(showAlertInfo()));
-    // connect(acAckAlert,     SIGNAL(triggered()), mw, SLOT(alertAck()));
+    connect(acShowAlert, SIGNAL(triggered()), mw, SLOT(showProcAlertInfo()));
+    
+    acShowSysAlert = new QAction(tr("Show alert information"), this);
+    connect(acShowSysAlert, SIGNAL(triggered()), mw, SLOT(showSysAlertInfo()));
+    
+    //acAckAlert = new QAction(tr("Acknowledge alert"), this);
 
     connect(mw->ui->tblvwAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showAlertsContextMenu(const QPoint &)));
     connect(mw->ui->tblvwSysAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showAlertsContextMenu(const QPoint &)));
-
+            this, SLOT(showSysAlertsContextMenu(const QPoint &)));
 }
 
 //----------------------------------------------------------------------
@@ -717,15 +716,24 @@ void ActionHandler::showAlertsContextMenu(const QPoint & p)
 
     QList<QAction *> actions;
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
-    if (tblvw->indexAt(p).isValid()) {
-        actions.append(acShowAlert);
-        //actions.append(acAckAlert);
-        if (tblvw == mw->ui->tblvwSysAlerts) {
-            connect(acShowAlert, SIGNAL(triggered()), mw, SLOT(showSysAlertInfo()));
-        } else {
-            connect(acShowAlert, SIGNAL(triggered()), mw, SLOT(showProcAlertInfo()));
-        }
+    if (tblvw->indexAt(p).isValid()) { actions.append(acShowAlert); }
+    if (actions.count() > 0) {
+        mw->isViewsUpdateActive = false;
+        QMenu::exec(actions, tblvw->mapToGlobal(p));
+        mw->isViewsUpdateActive = true;
     }
+}
+
+//----------------------------------------------------------------------
+// SLOT: showSysAlertsContextMenu
+//----------------------------------------------------------------------
+void ActionHandler::showSysAlertsContextMenu(const QPoint & p)
+{
+    if (mw->isAlertsCustomFilterActive) { return; }
+
+    QList<QAction *> actions;
+    QTableView * tblvw = qobject_cast<QTableView*>(sender());
+    if (tblvw->indexAt(p).isValid()) { actions.append(acShowSysAlert); }
     if (actions.count() > 0) {
         mw->isViewsUpdateActive = false;
         QMenu::exec(actions, tblvw->mapToGlobal(p));

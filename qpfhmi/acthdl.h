@@ -78,7 +78,6 @@ public:
     QAction * getAcQuitAll();
     QMap<QString, QAction *> & getAcUserTools();
     QAction * getAcReprocess();
-    QAction * getAcShowAlert();
 
 public slots:
     void updateMenus();
@@ -91,6 +90,7 @@ private slots:
     void showJsonContextMenu(const QPoint&);
     void showTaskMonitContextMenu(const QPoint&);
     void showAlertsContextMenu(const QPoint&);
+    void showSysAlertsContextMenu(const QPoint &);
     void showTxContextMenu(const QPoint&);
         
     void closeTab(int n);
@@ -180,6 +180,7 @@ private:
     QAction * acShowMsgInfo;
 
     QAction * acShowAlert;
+    QAction * acShowSysAlert;
     QAction * acAckAlert;
 
     QAction * acArchiveShow;

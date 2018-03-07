@@ -2,7 +2,7 @@
 ##############################################################################
 # File       : ClearForQPF.sh - Cleans up db, data folders and old sessions
 # Domain     : QPF.scripts
-# Version    : 1.0
+# Version    : 2.0
 # Date       : 2016/12/02
 # Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________
@@ -29,8 +29,8 @@ psql -f /tmp/clean-up-qpfdb.sql qpfdb
 echo "Cleaning up data folders . . ."
 
 pths=""
-pths="$pths qpf/data/archive/in"
-pths="$pths qpf/data/archive/out"
+pths="$pths qpf/data/archive"
+pths="$pths qpf/data/gateway"
 pths="$pths qpf/data/gateway/in"
 pths="$pths qpf/data/gateway/out"
 pths="$pths qpf/data/inbox"
@@ -38,13 +38,13 @@ pths="$pths qpf/data/inbox"
 size=0
 for p in $pths ; do
     sz=$(du -ks $HOME/${p} | cut -f 1)
-    rm -rf $HOME/${p}/*
+    rm -rf $HOME/${p}/EUC*
     size=$(($size + $sz))
 done
 
 ## Remove old run folders
 echo "Removing old sessions . . ."
-sess=$(ls -d $HOME/qpf/run/201* 2>/dev/null)
+sess=$(ls -d $HOME/qpf/run/20* 2>/dev/null)
 for p in $sess ; do
     sz=$(du -ks ${p} | cut -f 1)
     rm -rf ${p}

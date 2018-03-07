@@ -49,7 +49,12 @@ class ProductsModel : public DBTreeModel {
     Q_OBJECT
 
 public:
-    explicit ProductsModel();
+    explicit ProductsModel(std::vector<std::string> & pTypes, 
+			   int siz);
+
+private:
+    std::string stringWithProductTypes;
+    int singleProdTypeLen;
 };
 
 }

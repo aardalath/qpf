@@ -1,7 +1,7 @@
 ##############################################################################
 # File       : GenerateRelease.sh - QPF Release Generation script
 # Domain     : QPF.scripts
-# Version    : 1.0
+# Version    : 2.0
 # Date       : 2016/04/01
 # Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________

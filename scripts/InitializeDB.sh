@@ -2,7 +2,7 @@
 ##############################################################################
 # File       : Initialize.sh - Drops and recreates QPF database
 # Domain     : QPF.scripts
-# Version    : 1.0
+# Version    : 2.0
 # Date       : 2017/09/08
 # Copyright (C) 2015-2018 J C Gonzalez
 #_____________________________________________________________________________

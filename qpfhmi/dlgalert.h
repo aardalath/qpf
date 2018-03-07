@@ -57,7 +57,7 @@ class DlgAlert : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgAlert(QWidget *parent = 0);
+    explicit DlgAlert(QWidget *parent = Q_NULLPTR);
     ~DlgAlert();
 
     void setAlert(Alert & alert);

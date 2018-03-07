@@ -49,6 +49,7 @@ STEP=0
 #- Options
 COMPILE="no"
 INSTALL="no"
+INSTALL_WA="no"
 FAKE="no"
 REMOVE="no"
 HMI="yes"
@@ -113,8 +114,8 @@ greetings () {
 }
 
 usage () {
-    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -D def ] [ -D def ] [ -p ]"
-    opts="$opts [ -w <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ] [ -v ]"
+    local opts="[ -h ] [ -c ] [ -i ] [ -n ] [ -r ] [ -b ] [ -w ] [ -D def ] [ -D def ] [ -p ]"
+    opts="$opts [ -W <path> ] [ -H <host> ] [ -P <port> ] [ -I <ip> ] [ -v ]"
     say "Usage: ${SCRIPT_NAME} $opts"
     say "where:"
     say "  -h         Show this usage message"
@@ -123,10 +124,11 @@ usage () {
     say "  -n         Show the actions without executing them"
     say "  -r         Clear previous build"
     say "  -b         Re-create PostsgreSQL system database"
+    say "  -w         Initializes QPF working area"
     say "  -B DEF     Define build macros"
     say "  -D DEF     Define compile macros"
     say "  -p         Processing-only node: do not compile QPF HMI"
-    say "  -w <path>  Folder to locate QPF working area (default:HOME)"
+    say "  -W <path>  Folder to locate QPF working area (default:HOME)"
     say "  -H <host>  Host where system database is located (default:${PSQL_HOST})"
     say "  -P <port>  Port to access the database (default:${PSQL_PORT})"
     say "  -I <ip>    IP address to use in the sample config. file"
@@ -242,7 +244,7 @@ install_contrib () {
 ############################################################
 
 ## Parse command line
-while getopts :hcinrbB:C:D:pw:H:P:I:v OPT; do
+while getopts :hcinrbB:C:D:pwW:H:P:I:v OPT; do
     case $OPT in
         h|+h) usage ;;
         c|+c) COMPILE="yes" ;;
@@ -250,11 +252,12 @@ while getopts :hcinrbB:C:D:pw:H:P:I:v OPT; do
         n|+n) FAKE="yes" ;;
         r|+r) REMOVE="yes" ;;
         b|+b) RECREATEDB="yes" ;;
+        w|+w) INSTALL_WA="yes" ;;
         B|+B) BUILD_FLAGS="${BUILD_FLAGS} -D $OPTARG" ;;
         C|+C) CHGTODIR="$OPTARG" ;;
         D|+D) COMP_FLAGS="${COMP_FLAGS} -D$OPTARG" ;;
         p|+p) HMI="no" ;;
-        w|+w) WORK_AREA="$OPTARG" ;;
+        W|+W) WORK_AREA="$OPTARG" ;;
         H|+H) PSQL_HOST="$OPTARG" ;;
         P|+P) PSQL_PORT="$OPTARG" ;;
         I|+I) IP="$OPTARG" ;;
@@ -332,7 +335,7 @@ if [ "${COMPILE}" == "yes" ]; then
 fi
 
 ## Setting up Work Area in /tmp
-if [ "${INSTALL}" == "yes" ]; then
+if [ "${INSTALL_WA}" == "yes" ]; then
     step "Setting up Work Area under '${WORK_AREA}'"
 
     if [ ! -d "${WORK_AREA}" ]; then
@@ -440,6 +443,22 @@ say "  - include the directory ${WORK_AREA}/qpf/lib in the LD_LIBRARY_PATH varia
 say "To do that, just execute the following commands:"
 say "  export PATH=${WORK_AREA}/qpf/bin:\$PATH"
 say "  export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH"
+if [ -f ${HOME}/env_qpf.sh ]; then
+    (cat ~/env_qpf.sh; echo ""; echo "# BuildQPF section") | \
+    awk '(NR==1),/BuildQPF section/' > /tmp/$$.sh
+    cat /tmp/$$.sh > ~/env_qpf.sh
+    cat <<EOF>> ~/env_qpf.sh
+export PATH=${WORK_AREA}/qpf/bin:\$PATH
+export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH
+EOF
+  
+    say ""
+    say "For your convenience, these commands have been saved into the file:"
+    say "  \$HOME/env_qpf.sh"
+    say "so that you can just update your environment by typing:"
+    say "  source \$HOME/env_qpf.sh"
+    say ""
+fi
 say "In order to check that the QPF HMI executable and the libraries were correctly"
 say "installed, you may run:"
 say "  $ RunQPF.sh -H "

@@ -39,11 +39,19 @@
  ******************************************************************************/
 
 #include "productsmodel.h"
-
+#include <iostream>
 namespace QPF {
 
-ProductsModel::ProductsModel()
+ProductsModel::ProductsModel(std::vector<std::string> & pTypes, 
+			     int siz)
 {
+    stringWithProductTypes = "";
+    for (auto & s: pTypes) {
+        std::string ss = s + "                                ";
+	stringWithProductTypes += ss.substr(0, siz);
+    }
+    singleProdTypeLen = siz;
+
     /*
     defineQuery("SELECT  "
                 "    concat(i.instrument, ':', p.signature) AS Signature,  "
@@ -68,7 +76,8 @@ ProductsModel::ProductsModel()
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
     */
-    defineQuery("SELECT  "
+    defineQuery(QString::fromStdString(
+		"SELECT  "
                 "    left(p.signature, 7) AS ObsId_Exp,  "
                 "    p.product_id as ID,  "
                 "    p.product_type as Type,  "
@@ -82,11 +91,15 @@ ProductsModel::ProductsModel()
                 "    p.registration_time as RegTime,  "
                 "    p.url as URL "
                 "FROM products_info p  "
-                "ORDER BY concat(p.obs_id, '.', "
-                "                CAST(position(cast(p.instrument_id as char) "
-                "                              in '  VISNIRSIR') / 3 as char), '.', "
-                "                right(concat('00000000000000000000', p.ID), 20)), "
-                "                p.registration_time;");
+                "ORDER BY concat(left(p.signature, 7), '.', "
+                "                cast(position(cast(p.instrument_id as char) "
+		"                              in ' VNS') as char), '.', "
+                "                to_char(position(p.product_type in '" + 
+		stringWithProductTypes + "') / " + 
+		std::to_string(singleProdTypeLen) + ", 'FM00MI'), '.', "
+                "                p.product_version);"
+		));
+
     defineHeaders({//"Signature",
                    "Product Id", "Type", "Version",
                    "Size", "Status", "Creator", "Obs.Mode",
