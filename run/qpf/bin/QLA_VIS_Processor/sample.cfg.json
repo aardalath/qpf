@@ -1,11 +1,11 @@
 {
   "input": "in/*.fits",
   "input_dir": "in",
-  "output": "{input:fits=>json,in/=>out/,LE1_VIS=>QLA_LE1-VIS}",
+  "output": "{input:fits=>json,in/=>out/,LE1_VIS=>QLA_LE1-VIS,SIM_VIS=>QLA_SIM-VIS}",
   "log": "{output:json=>log,out/=>log/}",
   "image": "qdt-vis_nisp-debian:latest",
   "processor": "QLA_VIS_Processor",
   "script": "driver.py",
-  "args": "--input {input_dir} --result {output} --log {log}",
+  "args": "--input_dir {input_dir} --result_file {output} --log_file {log} --verbose",
   "container": true
 }

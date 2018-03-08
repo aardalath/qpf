@@ -1,0 +1,10 @@
+{
+  "input": "in/*.fits",
+  "output": "{input:SOC_NIR=>LE1_NIR,SOC_SIR=>LE1_SIR,SOC_NISP=>LE1_NISP,in/=>out/}",
+  "log": "{output:out/=>log/,fits=>log}",
+  "image": "le1-emu-debian:latest",
+  "processor": "LE1_NISP_Processor",
+  "script": "driver.py",
+  "args": "--inputFile {input} --outputFile {output} --log {log}",
+  "container": true
+}

@@ -1,13 +1,1 @@
-{
-  "input": "in/*.fits",
-  "output": "{input:SOC_NIR=>LE1_NIR,in/=>out/}",
-  "log": "{output:out/=>log/,fits=>log}",
-  "input_dir": "in",
-  "steps": 30,
-  "add": 10,
-  "image": "le1-emu-debian:latest",
-  "processor": "LE1_NISP_Processor",
-  "script": "driver.py",
-  "args": "--input {input_dir} --output {output} --log {log} --steps {steps} --add {add}",
-  "container": true
-}
+sample-NISP-fake.cfg.json

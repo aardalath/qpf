@@ -177,7 +177,7 @@ class Processor(object):
         # 2. Processor subfolder name (folder under QPF_WA/bin/"
         self.processor = self.cfg["processor"]
         # 3. Processor entire subfolder name
-        self.proc_dir = Processor.QPFProcsPath + "/" + self.processor
+        self.proc_dir = Processor.QPFProcsPath # + "/" + self.processor
         # 4. Main script to invoke processor (something like driver.py)
         self.script = self.cfg["script"]
         self.args = self.cfg["args"]
@@ -215,15 +215,17 @@ class Processor(object):
 
         # Prepare Docker folder mapping, just in case...
         self.task_dir_img = Processor.QPFDckImageRunPath + "/" + self.task_id
-        self.proc_dir_img = Processor.QPFDckImageProcPath + "/" + self.processor
+        self.proc_dir_img = Processor.QPFDckImageProcPath #+ "/" + self.processor
 
         maps = {'task_dir': [self.task_dir, self.task_dir_img],
                 'proc_dir': [self.proc_dir, self.proc_dir_img]}
         self.mapping = ""
         for mkey, mval in maps.iteritems():
-            self.mapping += " -v {}:{}".format(mval[0], mval[1])
+            self.mapping += " -v {0}:{1}".format(mval[0], mval[1])
 
-        self.dck_opts = "{} -w={} --privileged=true".format(dck_opts, self.task_dir_img)
+        uid = os.getuid()
+        dck_opts_str = "{0} -e UID={1} -e UNAME=eucops -e WDIR={2} -w={2} --privileged=true"
+        self.dck_opts = dck_opts_str.format(dck_opts, uid, self.task_dir_img)
         self.dck_image = self.cfg["image"] #Processor.QPFDckImageDefault
 
     def run(self, arguments=None, additional="", container=None):
@@ -242,8 +244,10 @@ class Processor(object):
         #os.symlink(self.proc_dir + "/" + self.script,
         #           self.task_dir + "/" + self.script)
 
-        cmd_line = "python {0}/{1} {2} {3}".format(self.proc_dir_img, self.script,
-                                                   script_args, additional)
+        cmd_line = "python {0}/{1}/{2} {3} {4}".format(self.proc_dir_img, 
+                                                       self.processor,
+                                                       self.script,
+                                                       script_args, additional)
         if container is None:
             use_containers = self.cfg['container']
         else:

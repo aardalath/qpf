@@ -1,0 +1,11 @@
+{
+  "input": "in/*.fits",
+  "output": "{input:SOC_VIS=>LE1_VIS,in/=>out/}",
+  "log": "{output:out/=>log/,fits=>log}",
+  "output_dir": "out",
+  "image": "le1-emu-debian:latest",
+  "processor": "LE1_VIS_Processor",
+  "script": "driver.py",
+  "args": "--inputFile {input} --outputFile {output} --log {log}",
+  "container": true
+}
