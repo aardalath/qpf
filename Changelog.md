@@ -3,15 +3,15 @@ Change Log
 
 All notable changes to the [QPF] software project will be documented in this file.
 
-[V2.0rc1] / 2018-02-19
+[V2.0] / 2018-03-07
 --------------------------
 
-First release candidate for the QPF V2.0.  The main changes with respec to to
+First release candidate for the QPF V2.0.  The main changes with respect to
 the previous version are:
 
 ### Improvements
 
-- New messaging library Nanomsg suspended
+- New messaging library Nanomsg used
 - New messaging schema improves speed and scalability
 - HTTP file server for Swarm services
 - New monitoring view for Task Agents
@@ -31,7 +31,7 @@ the previous version are:
 - List System Alerts
 - Reprocessed products can be placed in user defined area or external folders
 - Reprocessed products can be stored in VOSpace user account
-- Data products can be analyzed with IPython
+- Data products can be analysed with IPython
 
 ### Fixed
 
@@ -43,7 +43,7 @@ the previous version are:
 
 - New, improved ConfigTool entries distribution
 - Minor updates to main HMI
-- Great improvement to ConfigTool HMI
+- Big improvement to ConfigTool HMI
 
 ### Removed
 
@@ -164,8 +164,8 @@ First official release of the [QPF].
 
 ----
 
-[V2.0rc1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V2.0-RC1
-[V1.2]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/branches/V1.2
+[V2.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V2.0
+[V1.2]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.2
 [V1.1]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.1
 [V1.0]: http://euclid.esac.esa.int/svn/ESA/SOC/SOC-3-DEV/SOC-3-07-QLook/QPF/tags/V1.0
 
