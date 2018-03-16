@@ -275,7 +275,7 @@ void MainWindow::manualSetupUI()
     tb->setTabIcon(1, QIcon(":/img/messages.png"));
     tb->setTabIcon(2, QIcon(":/img/monit.png"));
     tb->setTabIcon(3, QIcon(":/img/storage2.png"));
-    tb->setTabIcon(4, QIcon(":/img/alerts.png"));
+    tb->setTabIcon(4, QIcon(":/img/alerts.png"));  
 
     connect(ui->tabMainWgd, SIGNAL(currentChanged(int)),
             this, SLOT(selectRowInNav(int)));

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/img">
+    <file>img/verblevel.png</file>
     <file>img/connect.png</file>
     <file>img/plus.png</file>
     <file>img/minus.png</file>

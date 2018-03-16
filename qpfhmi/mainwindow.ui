@@ -807,7 +807,7 @@
      <x>0</x>
      <y>0</y>
      <width>1131</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
@@ -853,6 +853,7 @@
   <include location="jsontree.qrc"/>
   <include location="configtool.qrc"/>
   <include location="tx.qrc"/>
+  <include location="tb.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -139,7 +139,8 @@ set (qpfGuiLib_qrc
   configtool.qrc
   jsontree.qrc
   icon.qrc
-  tx.qrc)
+  tx.qrc
+  tb.qrc)
 
 set (qpfGuiBin_src main.cpp)
 

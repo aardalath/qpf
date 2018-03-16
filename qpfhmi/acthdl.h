@@ -109,8 +109,9 @@ private:
     QMenu *helpMenu;
 
     QToolBar *fileToolBar;
-    QToolBar *editToolBar;
-
+    QToolBar *toolsToolBar;
+    QToolBar *panelsToolBar;
+    
     QAction *acProcessPath;
     QAction *acSaveAs;
 

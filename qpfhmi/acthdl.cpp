@@ -154,7 +154,7 @@ void ActionHandler::createActions()
     acSaveAs->setStatusTip(tr("Save the document under a new name"));
     connect(acSaveAs, SIGNAL(triggered()), mw, SLOT(saveAs()));
 
-    acProcessPath = new QAction(tr("Pr&ocess products in folder..."), this);
+    acProcessPath = new QAction(QIcon(":/img/img/orchestration.png"), tr("Pr&ocess products in folder..."), this);
     acProcessPath->setShortcuts(QKeySequence::Open);
     acProcessPath->setStatusTip(tr("Specify a user selected folder and process all products inside"));
     connect(acProcessPath, SIGNAL(triggered()), mw, SLOT(processPath()));
@@ -164,31 +164,31 @@ void ActionHandler::createActions()
 //    acRestart->setStatusTip(tr("Restart the application"));
 //    connect(acRestart, SIGNAL(triggered()), mw, SLOT(restart()));
 
-    acQuit = new QAction(tr("Close HMI"), this);
+    acQuit = new QAction(QIcon(":/img/close.png"), tr("Close HMI"), this);
     //acQuit->setShortcuts(QKeySequence::Close);
     acQuit->setStatusTip(tr("Quit the QPF HMI application"));
     connect(acQuit, SIGNAL(triggered()), mw, SLOT(quitApp()));
  
-    acQuitAll = new QAction(tr("Quit all"), this);
+    acQuitAll = new QAction(QIcon(":/img/quit.png"), tr("Quit all"), this);
     //acQuitAll->setShortcuts(QKeySequence::Quit);
     acQuitAll->setStatusTip(tr("Quit the QLA Processing Framework"));
     connect(acQuitAll, SIGNAL(triggered()), mw, SLOT(quitAllQPF()));
  
     // Edit menu
 #ifndef QT_NO_CLIPBOARD
-    acCut = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+    acCut = new QAction(QIcon(":/img/cut.png"), tr("Cu&t"), this);
     acCut->setShortcuts(QKeySequence::Cut);
     acCut->setStatusTip(tr("Cut the current selection's contents to the "
                             "clipboard"));
     connect(acCut, SIGNAL(triggered()), mw, SLOT(cut()));
 
-    acCopy = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
+    acCopy = new QAction(QIcon(":/img/copy.png"), tr("&Copy"), this);
     acCopy->setShortcuts(QKeySequence::Copy);
     acCopy->setStatusTip(tr("Copy the current selection's contents to the "
                              "clipboard"));
     connect(acCopy, SIGNAL(triggered()), mw, SLOT(copy()));
 
-    acPaste = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
+    acPaste = new QAction(QIcon(":/img/paste.png"), tr("&Paste"), this);
     acPaste->setShortcuts(QKeySequence::Paste);
     acPaste->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
@@ -196,19 +196,19 @@ void ActionHandler::createActions()
 #endif
 
     // Tools menu
-    acConfigTool = new QAction(tr("&Configuration Tool ..."), this);
+    acConfigTool = new QAction(QIcon(":/img/img/general.png"), tr("&Configuration Tool ..."), this);
     acConfigTool->setStatusTip(tr("Open Configuration Tool with current configuration"));
     connect(acConfigTool, SIGNAL(triggered()), mw, SLOT(showConfigTool()));
 
-    acBrowseDB = new QAction(tr("&Browse System DB ..."), this);
+    acBrowseDB = new QAction(QIcon(":/img/img/storage.png"), tr("&Browse System DB ..."), this);
     acBrowseDB->setStatusTip(tr("Open System Database Browser"));
     connect(acBrowseDB, SIGNAL(triggered()), mw, SLOT(showDBBrowser()));
 
-    acExtTools = new QAction(tr("&Define External Tools ..."), this);
+    acExtTools = new QAction(QIcon(":/img/img/exttools.png"), tr("&Define External Tools ..."), this);
     acExtTools->setStatusTip(tr("Define external tools to open data products"));
     connect(acExtTools, SIGNAL(triggered()), mw, SLOT(showExtToolsDef()));
 
-    acVerbosity = new QAction(tr("&Define Verbosity Level ..."), this);
+    acVerbosity = new QAction(QIcon(":/img/img/verblevel.png"), tr("&Define Verbosity Level ..."), this);
     acVerbosity->setStatusTip(tr("Define verbosity level to be used in this session"));
     connect(acVerbosity, SIGNAL(triggered()), mw, SLOT(showVerbLevel()));
 
@@ -236,11 +236,11 @@ void ActionHandler::createActions()
     connect(acCloseAll, SIGNAL(triggered()),
             mw->ui->mdiArea, SLOT(closeAllSubWindows()));
 
-    acTile = new QAction(tr("&Tile"), this);
+    acTile = new QAction(QIcon(":/img/tile.png"), tr("&Tile"), this);
     acTile->setStatusTip(tr("Tile the windows"));
     connect(acTile, SIGNAL(triggered()), mw->ui->mdiArea, SLOT(tileSubWindows()));
 
-    acCascade = new QAction(tr("&Cascade"), this);
+    acCascade = new QAction(QIcon(":/img/cascade.png"), tr("&Cascade"), this);
     acCascade->setStatusTip(tr("Cascade the windows"));
     connect(acCascade, SIGNAL(triggered()), mw->ui->mdiArea, SLOT(cascadeSubWindows()));
 
@@ -343,15 +343,36 @@ void ActionHandler::createMenus()
 //----------------------------------------------------------------------
 void ActionHandler::createToolBars()
 {
-//    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(acQuit);
+    delete mw->ui->mainToolBar;
+    
+    fileToolBar = mw->addToolBar(tr("File"));
+    fileToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    fileToolBar->addAction(acProcessPath); acProcessPath->setIconText("Process folder files");
+    fileToolBar->addSeparator();
+    fileToolBar->addAction(acQuit);        acQuit->setIconText("");
+    fileToolBar->addAction(acQuitAll);     acQuitAll->setIconText("");
 
-//#ifndef QT_NO_CLIPBOARD
-//    editToolBar = addToolBar(tr("Edit"));
-//    editToolBar->addAction(acCut);
-//    editToolBar->addAction(acCopy);2000
-//    editToolBar->addAction(acPaste);
-//#endif
+    panelsToolBar = mw->addToolBar(tr("Panels"));
+    panelsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QAction * ac1 = new QAction(QIcon(":/img/logs.png"), tr("Logs"), this);    
+    //QAction * ac2 = new QAction(QIcon(":/img/messages.png"), tr("Messages"), this);
+    QAction * ac3 = new QAction(QIcon(":/img/monit.png"), tr("Tasks"), this);   
+    QAction * ac4 = new QAction(QIcon(":/img/storage2.png"), tr("L.Archive"), this);
+    QAction * ac5 = new QAction(QIcon(":/img/alerts.png"), tr("Alerts"), this);
+    for (auto & ac: {ac1, ac3, ac4, ac5}) { panelsToolBar->addAction(ac); }
+    
+    connect(ac1, &QAction::triggered, [=]() { mw->ui->tabMainWgd->setCurrentIndex(0); });
+    //connect(ac2, &QAction::triggered, [=]() { mw->ui->tabMainWgd->setCurrentIndex(1); });
+    connect(ac3, &QAction::triggered, [=]() { mw->ui->tabMainWgd->setCurrentIndex(1); });
+    connect(ac4, &QAction::triggered, [=]() { mw->ui->tabMainWgd->setCurrentIndex(2); });
+    connect(ac5, &QAction::triggered, [=]() { mw->ui->tabMainWgd->setCurrentIndex(3); });
+
+    toolsToolBar = mw->addToolBar(tr("Tools"));
+    toolsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    toolsToolBar->addAction(acConfigTool); acConfigTool->setIconText("Config.Tool"); 
+    toolsToolBar->addAction(acBrowseDB);   acBrowseDB->setIconText("DB");   
+    toolsToolBar->addAction(acExtTools);   acExtTools->setIconText("User Tools");   
+    toolsToolBar->addAction(acVerbosity);  acVerbosity->setIconText("Verbosity");
 }
 
 //----------------------------------------------------------------------
