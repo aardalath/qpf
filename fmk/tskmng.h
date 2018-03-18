@@ -89,6 +89,12 @@ public:
 
 public:
     //----------------------------------------------------------------------
+    // Method: initializeTaskStatusSpectra
+    // Initialize status per agent from initial values in DB
+    //----------------------------------------------------------------------
+    void initializeTaskStatusSpectra(TskStatTable & tssSet);
+    
+    //----------------------------------------------------------------------
     // Method: runReachIteration
     //----------------------------------------------------------------------
     virtual void runEachIteration();

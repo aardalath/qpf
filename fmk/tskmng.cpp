@@ -114,6 +114,25 @@ void TskMng::fromRunningToOperational()
 }
 
 //----------------------------------------------------------------------
+// Method: initializeTaskStatusSpectra
+// Initialize status per agent from initial values in DB
+//----------------------------------------------------------------------
+void TskMng::initializeTaskStatusSpectra(TskStatTable & tssSet)
+{
+    for (auto & row: tssSet) {
+        for (int k = TASK_SCHEDULED; k != TASK_UNKNOWN_STATE; ++k) {
+            std::string & agNme = row.first;
+            TskStatSpectra & tss = row.second;
+            TaskStatus status = TaskStatus(k);
+            int numTsks = getTskStatSpecValueFromStatus(tss, status);
+            containerTaskStatus[status] += numTsks;
+            TaskStatusPerAgent tskPair = std::make_pair(agNme, status);
+            containerTaskStatusPerAgent[tskPair] = numTsks;
+        }
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: runEachIteration
 //----------------------------------------------------------------------
 void TskMng::runEachIteration()
@@ -317,8 +336,6 @@ TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
              + std::to_string(spec.total));
 
     return spec;
-
-    // return spec;
 }
 
 //----------------------------------------------------------------------

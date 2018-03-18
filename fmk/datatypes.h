@@ -54,6 +54,7 @@
 //------------------------------------------------------------
 #include <string>
 #include <map>
+#include <vector>
 #include <set>
 
 //------------------------------------------------------------
@@ -495,6 +496,24 @@ struct TaskAgentInfo : public JRecord {
     JINT(load15min);
     JINT(uptimesecs);
 };
+
+struct TskStatSpectra {
+    TskStatSpectra(int r, int s, int p, int st, int fl, int f) :
+        running(r), scheduled(s), paused(p),
+        stopped(st), failed(fl), finished(f),
+        total(r+s+p+st+fl+f) {}
+    int    running;
+    int    scheduled;
+    int    paused;
+    int    stopped;
+    int    failed;
+    int    finished;
+    int    total;
+};
+
+typedef std::vector<std::pair<std::string, TskStatSpectra>> TskStatTable;
+
+int getTskStatSpecValueFromStatus(TskStatSpectra & tss, TaskStatus st);
 
 #define UNUSED(x) (void)(x)
 

@@ -177,18 +177,18 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
         TraceMsg("Will try to sanitize product versions:");
         sanitizeProductVersions(taskInfo.outputs);
 
-	// Try to process the QDT report and get the issues found
-	for (auto & m : taskInfo.outputs.products) {
-	    if ((m.procTargetType() == UA_NOMINAL) && 
-		(m.procFunc() == "QLA") && 
-		(m.fileType() == "JSON")) {
-		QDTReportHandler qdtRep(m.url().substr(7));
-		if (!qdtRep.read()) continue;
-		std::vector<Alert*> issues;
-		qdtRep.getIssues(issues);
-		for (auto & v : issues) { RaiseDiagAlert(*v); }
-	    }
-	}
+        // Try to process the QDT report and get the issues found
+        for (auto & m : taskInfo.outputs.products) {
+            if ((m.procTargetType() == UA_NOMINAL) && 
+                (m.procFunc() == "QLA") && 
+                (m.fileType() == "JSON")) {
+                QDTReportHandler qdtRep(m.url().substr(7));
+                if (!qdtRep.read()) continue;
+                std::vector<Alert*> issues;
+                qdtRep.getIssues(issues);
+                for (auto & v : issues) { RaiseDiagAlert(*v); }
+            }
+        }
         
         // Move products to local archive
         for (auto & m : taskInfo.outputs.products) {
@@ -199,12 +199,12 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
                 m = urlh.fromGateway2FinalDestination();
             }
         }
-
-	InfoMsg("Saving outputs...");
-	saveProductsToDB(taskInfo.outputs);
-	
+        
+        InfoMsg("Saving outputs...");
+        saveProductsToDB(taskInfo.outputs);
+        
         InfoMsg("Sending message to register outputs at Orchestrator catalogue");
-
+        
         //Config & cfg = Config::_();
         if (cfg.flags.sendOutputsToMainArchive()) {
             InfoMsg("Archiving/Registering data at DSS/EAS");
@@ -306,47 +306,42 @@ void DataMng::saveProductsToDB(ProductList & productList)
 }
 
 //----------------------------------------------------------------------
-// Method: storeProcFmkInfoData
+// Method: storeTaskStatusSpectra
 // Store task agent spectra in DB
 //----------------------------------------------------------------------
-void DataMng::storeProcFmkInfoData(json & fmkInfoValue)
+void DataMng::storeTaskStatusSpectra(json & fmkInfoValue)
 {
-    std::vector<TaskStatusSpectra> tssSet;
+    TskStatTable tssSet;
     
-#define FIELDVAL(a,n)  a["counts"][#n].asInt();
-
     for (Json::ValueIterator itr = fmkInfoValue["hostsInfo"].begin();
          itr != fmkInfoValue["hostsInfo"].end(); ++itr) {
         std::string key = itr.key().asString();
-        json & hInfo = *itr;
+        json hInfo = *itr;
         for (Json::ValueIterator ittr = hInfo["agentsInfo"].begin();
              ittr != hInfo["agentsInfo"].end(); ++ittr) {
             std::string agNme = ittr.key().asString();
-            json & ag = *ittr;
-            TaskStatusSpectra tss(FIELDVAL(ag, running),
-                                  FIELDVAL(ag, scheduled),
-                                  FIELDVAL(ag, paused),
-                                  FIELDVAL(ag, stopped),
-                                  FIELDVAL(ag, failed),
-                                  FIELDVAL(ag, finished),
-                                  FIELDVAL(ag, total));
-            tssSet.push_back(tss);
+            json ag = (*ittr)["counts"];
+            TskStatSpectra tss(ag["running"].asInt(),
+                               ag["scheduled"].asInt(),
+                               ag["paused"].asInt(),
+                               ag["stopped"].asInt(),
+                               ag["failed"].asInt(),
+                               ag["finished"].asInt());
+            tssSet.push_back(std::make_pair(agNme, tss));
         }
     }
     
     for (Json::ValueIterator itr = fmkInfoValue["swarmInfo"].begin();
          itr != fmkInfoValue["swarmInfo"].end(); ++itr) {
         std::string key = itr.key().asString();
-        std::map<std::string, SwarmInfo*>::iterator it = swarmInfo.find(key);
-        json & sw = *itr;
-        TaskStatusSpectra tss(FIELDVAL(sw, running),
-                              FIELDVAL(sw, scheduled),
-                              FIELDVAL(sw, paused),
-                              FIELDVAL(sw, stopped),
-                              FIELDVAL(sw, failed),
-                              FIELDVAL(sw, finished),
-                              FIELDVAL(sw, total));
-        tssSet.push_back(tss);
+        json sw = (*itr)["counts"];
+        TskStatSpectra tss(sw["running"].asInt(),
+                           sw["scheduled"].asInt(),
+                           sw["paused"].asInt(),
+                           sw["stopped"].asInt(),
+                           sw["failed"].asInt(),
+                           sw["finished"].asInt());
+        tssSet.push_back(std::make_pair(sw["name"].asString(), tss));
     }
     
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
@@ -355,8 +350,8 @@ void DataMng::storeProcFmkInfoData(json & fmkInfoValue)
         // Check that connection with the DB is possible
         dbHdl->openConnection();
         // Store task status spectra in DB
-        for (auto & tss : tssSet) {                   
-            dbHdl->saveTaskStatusSpectra(tss);
+        for (auto & p : tssSet) {                   
+            dbHdl->saveTaskStatusSpectra(p.first, p.second);
         }
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
@@ -365,6 +360,43 @@ void DataMng::storeProcFmkInfoData(json & fmkInfoValue)
 
     // Close connection
     dbHdl->closeConnection();
+}
+
+//----------------------------------------------------------------------
+// Method: retrieveTaskStatusSpectra
+// Retrieve task agent spectra from DB
+//----------------------------------------------------------------------
+void DataMng::retrieveTaskStatusSpectra(TskStatTable & tssSet)
+{
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    std::vector< std::vector<std::string> > table;
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        if (! dbHdl->getTable("task_status_spectra", table)) {
+            RaiseSysAlert(Alert(Alert::System,
+                                Alert::Warning,
+                                Alert::Resource,
+                                std::string(__FILE__ ":" Stringify(__LINE__)),
+                                "Cannot read status spectra table from DB",
+                                0));            
+        }
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+
+    // Place table results into task status spectra table
+    tssSet.clear();
+    for (auto & row : table) {
+        TskStatSpectra tss(std::stoi(row[1]), std::stoi(row[2]), std::stoi(row[3]),
+                           std::stoi(row[4]), std::stoi(row[5]), std::stoi(row[6]));
+        tssSet.push_back(std::make_pair(row[0], tss));
+    }
 }
 
 //----------------------------------------------------------------------

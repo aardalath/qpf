@@ -136,4 +136,17 @@ bool JValue::has(const char * key)
     return value.isMember(key); 
 }
 
+int getTskStatSpecValueFromStatus(TskStatSpectra & tss, TaskStatus st)
+{
+    switch (st) {
+    case TASK_RUNNING:   return tss.running;
+    case TASK_SCHEDULED: return tss.scheduled;
+    case TASK_PAUSED:    return tss.paused;
+    case TASK_STOPPED:   return tss.stopped;
+    case TASK_FAILED:    return tss.failed;
+    case TASK_FINISHED:  return tss.finished;
+    default:             return 0;
+    }
+}
+
 //}

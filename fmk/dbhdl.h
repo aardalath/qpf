@@ -181,7 +181,7 @@ public:
     // Method: saveTaskStatusSpectra
     // Save task status spectra for a given agent
     //----------------------------------------------------------------------
-    virtual bool saveTaskStatusSpectra(std::string & agName, TaskStatusSpectra & tss)=0;
+    virtual bool saveTaskStatusSpectra(std::string & agName, TskStatSpectra & tss)=0;
 
     //----------------------------------------------------------------------
     // Method: getICommand

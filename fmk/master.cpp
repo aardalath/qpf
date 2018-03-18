@@ -100,6 +100,11 @@ void Master::setTskMng(TskMng * obj)
 //----------------------------------------------------------------------
 void Master::fromRunningToOperational()
 {
+    // Retrieve task status spectra table
+    datMng->retrieveTaskStatusSpectra(tssSet);
+    sleep(1);
+    tskMng->initializeTaskStatusSpectra(tssSet);
+    
     // Go to OPERATIONAL
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
@@ -183,8 +188,8 @@ void Master::runEachIteration()
     if (evtMng->isHMIActive()) {
         json fmkInfoValue;
         tskMng->getProcFmkInfoUpdate(fmkInfoValue);
-        datMng->storeProcFmkInfoData(fmkInfoValue);
         evtMng->sendProcFmkInfoUpdate(fmkInfoValue);
+        datMng->storeTaskStatusSpectra(fmkInfoValue);
     }   
 }
 

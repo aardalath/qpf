@@ -118,6 +118,8 @@ private:
     TskMng  * tskMng;
 
     std::vector<Component*> subComponents;
+
+    TskStatTable tssSet;
     
     bool requestQuit;
 };
