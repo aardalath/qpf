@@ -107,6 +107,12 @@ public:
     //----------------------------------------------------------------------
     void saveTaskToDB(TaskInfo & taskInfo, bool initialStore = false);
 
+    //----------------------------------------------------------------------
+    // Method: storeProcFmkInfoData
+    // Store task agent spectra in DB
+    //----------------------------------------------------------------------
+    void storeProcFmkInfoData(json & fmkInfoValue);
+    
 protected:
 
     //----------------------------------------------------------------------

@@ -306,6 +306,16 @@ void DataMng::saveProductsToDB(ProductList & productList)
 }
 
 //----------------------------------------------------------------------
+// Method: storeProcFmkInfoData
+// Store task agent spectra in DB
+//----------------------------------------------------------------------
+void DataMng::storeProcFmkInfoData(json & fmkInfoValue)
+{
+    //std::unique_lock<std::mutex> ulck(mtxHostInfo);
+    //fmkInfoValue = JValue( Config::procFmkInfo->toJsonStr() ).val();
+}
+
+//----------------------------------------------------------------------
 // Method: archiveDSSnEAS
 // Sends the information to the area where the corresponding daemon is
 // looking for data to be sent to DSS/EAS
