@@ -231,13 +231,14 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
 #endif
         }
 
-        std::ostream_iterator<ProductType> out_it (std::cerr, ", ");
-
-        std::cerr << "requiredInputs :> ";
-        std::copy(requiredInputs.begin(), requiredInputs.end(), out_it);
-        std::cerr << "availableInputs :> ";
-        std::copy(availableInputs.begin(), availableInputs.end(), out_it);
-        std::cerr << std::endl;
+        std::string msg("requiredInputs => ");
+        for (std::set<ProductType>::iterator it = requiredInputs.begin();
+             it != requiredInputs.end(); ++it) { msg += (*it) + " "; }
+        TRC(msg);
+        msg = "availableInputs => ";
+        for (std::set<ProductType>::iterator it = availableInputs.begin();
+             it != availableInputs.end(); ++it) { msg += (*it) + " "; }
+        TRC(msg);
 
         if (availableInputs == requiredInputs) {
 #ifdef EVAL_CONDITION

@@ -391,8 +391,7 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
 
     } else {
         
-        std::cerr << "Proc.target " + UserAreaName[tgtType] +
-            " should not be used here\n";
+        TRC( "Proc.target " + UserAreaName[tgtType] + " should not be used here");
         return product;
 
     }
@@ -401,14 +400,12 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
         if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
             (errno != EEXIST)) {
-            std::cerr << "mkdir " + tgtFolder + ": " +
-                std::strerror(errno) << '\n';
+            TRC("mkdir " + tgtFolder + ": " + std::strerror(errno));
             return product;
         }
     }
     
-    std::cerr << "Must move " + newFile + " from " +
-        cfg.storage.gateway + "/out to " + tgtFolder + '\n';
+    TRC("Must move " + newFile + " from " + cfg.storage.gateway + "/out to " + tgtFolder);
     
     str::replaceAll(newFile,
                     cfg.storage.gateway + "/out",
@@ -466,8 +463,7 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
 
     } else {
         
-        std::cerr << "Proc.target " + UserAreaName[tgtType] +
-            " should not be used here\n";
+        TRC("Proc.target " + UserAreaName[tgtType] + " should not be used here");
         return product;
 
     }
@@ -508,7 +504,7 @@ void URLHandler::sendToVOSpace(std::string user, std::string pwd,
     VOSpaceHandler vos(vosURL);
     vos.setAuth(user, pwd);
     if (!vos.uploadFile(folder, oFile)) {
-        std::cerr << "ERROR! Cannot upload " << oFile << "\n";
+      TRC("ERROR! Cannot upload " << oFile);
     }
 }
 
@@ -536,9 +532,9 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
                        (tsp2.tv_nsec - tsp1.tv_nsec) / 1000000);
         }
         if (elapsed > msTimeOut) {
-            std::cerr << ("ERROR: Timeout of " + std::to_string(msTimeOut) +
-                          "ms before successful stat:\n\t" +
-                          sFrom + std::string(" => ") + sTo + "\n");
+            TRC("ERROR: Timeout of " + std::to_string(msTimeOut) +
+                          "ms before successful stat:\t" +
+                          sFrom + std::string(" => ") + sTo);
             return -1;
         }
     }

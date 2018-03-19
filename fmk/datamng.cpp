@@ -438,7 +438,7 @@ void DataMng::archiveDSSnEAS(ProductList & productList)
             exit(EXIT_FAILURE);
         case 0: {
             // We are the child
-            std::cerr << md.url << std::endl;
+            TRC(md.url);
             std::string fileName(md.url.substr(7, md.url.length()-7));
             std::string subBox;
             if      (isLE1Product(prodType)) { subBox = "data/"; }
