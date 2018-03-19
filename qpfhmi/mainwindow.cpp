@@ -267,7 +267,8 @@ void MainWindow::manualSetupUI()
     setWindowTitle(tr("QLA Processing Framework"));
     setUnifiedTitleAndToolBarOnMac(true);
     ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
-
+    ui->lblVerbosity->setText(QString::fromStdString(cfg.general.logLevel()));
+    
     //== Tab panels handling ==========================================
 
     QTabBar * tb = ui->tabMainWgd->tabBar();
@@ -366,6 +367,7 @@ void MainWindow::readConfig(QString dbUrl)
     cfg.startingPort = startingPort;
     cfg.generateProcFmkInfoStructure();
 
+    /*
     TRC(cfg.str());
     TRC(cfg.general.appName());
     TRC(cfg.network.masterNode());
@@ -375,7 +377,8 @@ void MainWindow::readConfig(QString dbUrl)
     TRC("Config::PATHBase:    " << Config::PATHBase);
     TRC("Config::PATHSession: " << Config::PATHSession);
     TRC("Config::PATHLog:     " << Config::PATHLog);
-
+    */
+    
     std::vector<std::string> runPaths {
         Config::PATHSession,
             Config::PATHLog,
@@ -410,10 +413,6 @@ void MainWindow::readConfig(QString dbUrl)
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
         for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
-            /*QString taName = QString("TskAgent_%1_%2")
-                .arg(h,2,10,QLatin1Char('0'))
-                .arg(i+1,2,10,QLatin1Char('0'));
-                std::string staName = taName.toStdString(); */
             std::string & staName = cfg.agentNames.at(j);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
@@ -427,9 +426,6 @@ void MainWindow::readConfig(QString dbUrl)
     for (auto & kv : cfg.network.swarms()) {
         CfgGrpSwarm & swrm = kv.second;
         if (swrm.serviceNodes().size() > 0) {
-            /*QString n = QString("Swarm_%1")
-                .arg(QString::fromStdString(swrm.name()));
-                std::string staName = n.toStdString();*/
             std::string & staName = cfg.agentNames.at(j);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
