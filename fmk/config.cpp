@@ -580,7 +580,7 @@ void Config::generateProcFmkInfoStructure()
         ++h;
     }
 
-    dump();
+    //dump();
 
     for (int i = 0; i < agName.size(); ++i) {
         TRC(agHost.at(i) + ": \t" + agName.at(i) + " : " + std::to_string(agPortTsk.at(i)));
