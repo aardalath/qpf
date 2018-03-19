@@ -39,6 +39,7 @@ CFG_FILE="-c ${QPFDIR}/cfg/*.json"
 DBG=""
 SESSION=""
 IPADDR=""
+MODE="Core"
 
 ###### Handy functions
 
@@ -46,7 +47,7 @@ greetings () {
     say "${_ONHDR}==============================================================================="
     say "${_ONHDR} Euclid QLA Processing Framework"
     say "${_ONHDR} Version ${VERSION}"
-    say "${_ONHDR} Run QPF HMI"
+    say "${_ONHDR} Run QPF ${MODE}"
     say "${_ONHDR}==============================================================================="
     say ""
 }
@@ -108,6 +109,7 @@ while getopts :hHCdc:s:I:v OPT; do
 	    CFG_FILE="-c ${DB_CONNECTION}"
 	    SESSION="-s ${LAST_SESSION}"
 	    THIS_HOST=localhost
+        MODE="HMI"
         ;;
         C|+C) 
 	    QPFEXE=${QPFHMI} 
