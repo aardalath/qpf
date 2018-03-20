@@ -156,6 +156,12 @@ public:
     virtual std::pair<std::string, std::string> getLatestState();
 
     //----------------------------------------------------------------------
+    // Method: saveTaskStatusSpectra
+    // Save task status spectra for a given agent
+    //----------------------------------------------------------------------
+    virtual bool saveTaskStatusSpectra(std::string & agName, TaskStatusSpectra & tss);
+
+    //----------------------------------------------------------------------
     // Method: getICommand
     // Gets a new command into the icommands table
     //----------------------------------------------------------------------

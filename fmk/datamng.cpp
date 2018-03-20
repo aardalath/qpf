@@ -311,8 +311,60 @@ void DataMng::saveProductsToDB(ProductList & productList)
 //----------------------------------------------------------------------
 void DataMng::storeProcFmkInfoData(json & fmkInfoValue)
 {
-    //std::unique_lock<std::mutex> ulck(mtxHostInfo);
-    //fmkInfoValue = JValue( Config::procFmkInfo->toJsonStr() ).val();
+    std::vector<TaskStatusSpectra> tssSet;
+    
+#define FIELDVAL(a,n)  a["counts"][#n].asInt();
+
+    for (Json::ValueIterator itr = fmkInfoValue["hostsInfo"].begin();
+         itr != fmkInfoValue["hostsInfo"].end(); ++itr) {
+        std::string key = itr.key().asString();
+        json & hInfo = *itr;
+        for (Json::ValueIterator ittr = hInfo["agentsInfo"].begin();
+             ittr != hInfo["agentsInfo"].end(); ++ittr) {
+            std::string agNme = ittr.key().asString();
+            json & ag = *ittr;
+            TaskStatusSpectra tss(FIELDVAL(ag, running),
+                                  FIELDVAL(ag, scheduled),
+                                  FIELDVAL(ag, paused),
+                                  FIELDVAL(ag, stopped),
+                                  FIELDVAL(ag, failed),
+                                  FIELDVAL(ag, finished),
+                                  FIELDVAL(ag, total));
+            tssSet.push_back(tss);
+        }
+    }
+    
+    for (Json::ValueIterator itr = fmkInfoValue["swarmInfo"].begin();
+         itr != fmkInfoValue["swarmInfo"].end(); ++itr) {
+        std::string key = itr.key().asString();
+        std::map<std::string, SwarmInfo*>::iterator it = swarmInfo.find(key);
+        json & sw = *itr;
+        TaskStatusSpectra tss(FIELDVAL(sw, running),
+                              FIELDVAL(sw, scheduled),
+                              FIELDVAL(sw, paused),
+                              FIELDVAL(sw, stopped),
+                              FIELDVAL(sw, failed),
+                              FIELDVAL(sw, finished),
+                              FIELDVAL(sw, total));
+        tssSet.push_back(tss);
+    }
+    
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store task status spectra in DB
+        for (auto & tss : tssSet) {                   
+            dbHdl->saveTaskStatusSpectra(tss);
+        }
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------

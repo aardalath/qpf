@@ -704,6 +704,12 @@ ALTER TABLE ONLY task_status
     PRIMARY KEY (task_status_id);
 
 -- ----------------------------------------------------------------------
+-- Name: task_status task_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
+ALTER TABLE ONLY task_status_spectra
+    ADD CONSTRAINT task_status_spectra_pkey 
+    PRIMARY KEY (agent_id);
+
+-- ----------------------------------------------------------------------
 -- Name: tasks_info tasks_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops
 ALTER TABLE ONLY tasks_info
     ADD CONSTRAINT tasks_info_pkey 

@@ -183,6 +183,7 @@ void Master::runEachIteration()
     if (evtMng->isHMIActive()) {
         json fmkInfoValue;
         tskMng->getProcFmkInfoUpdate(fmkInfoValue);
+        datMng->storeProcFmkInfoData(fmkInfoValue);
         evtMng->sendProcFmkInfoUpdate(fmkInfoValue);
     }   
 }
