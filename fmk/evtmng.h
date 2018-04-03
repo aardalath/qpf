@@ -144,6 +144,8 @@ private:
 
     std::map<std::string, json> elements;
 
+    std::vector<DirWatcher::DirWatchEvent> events;
+    
     bool requestQuit;
     bool hmiActive;
 };

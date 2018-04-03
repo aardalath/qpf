@@ -98,10 +98,16 @@ void EvtMng::fromOperationalToRunning()
 //----------------------------------------------------------------------
 void EvtMng::runEachIteration()
 {
+    
     // 1. Check DirWatcher events from inbox folder
-    DirWatcher::DirWatchEvent e;
-    while (dw->nextEvent(e)) {
+    DirWatcher::DirWatchEvent ev;
+    while (dw -> nextEvent(ev)) { events.push_back(ev); }
 
+    // Process all events, at most 5 per second
+    int numMaxEventsPerIter = 5;
+    int numEvents = 0;
+    while ((events.size() > 0) && (numEvents < numMaxEventsPerIter)) {
+        auto & e = events.front();
         TRC("New DirWatchEvent: " + e.path + "/" + e.name
                  + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
@@ -123,6 +129,8 @@ void EvtMng::runEachIteration()
                 inboxProducts.products.push_back(m);
             }
         }
+        events.erase(events.begin());
+        ++numEvents;
     }
 
     bool sendInit = ((iteration + 1) == 100);
