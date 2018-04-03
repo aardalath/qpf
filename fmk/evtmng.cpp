@@ -114,7 +114,9 @@ void EvtMng::runEachIteration()
         // Process only files
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
+            // Build full file name
             std::string file(e.path + "/" + e.name);
+
             // Set new content for InData Message
             FileNameSpec fs;
             ProductMetadata m;

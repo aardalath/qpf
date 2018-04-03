@@ -61,6 +61,22 @@ namespace FileTools {
     //------------------------------------------------------------
     void storeFileIntoString(std::string & iFile, std::string & s);
 
+    //----------------------------------------------------------------------
+    // Method: copyfile
+    //----------------------------------------------------------------------
+    int copyfile(std::string & sFrom, std::string & sTo);
+
+    //----------------------------------------------------------------------
+    // Method: rcopyfile
+    //----------------------------------------------------------------------
+    int rcopyfile(std::string & sFrom, std::string & sTo,
+                  std::string & remoteHost, bool toRemote);
+    
+    //----------------------------------------------------------------------
+    // Method: runlink
+    //----------------------------------------------------------------------
+    int runlink(std::string & f, std::string & remoteHost);
+
 }
 
 #endif // FILETOOLS_H

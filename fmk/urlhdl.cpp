@@ -47,7 +47,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/sendfile.h>
 #include <cerrno>
 #include <cstring>
 
@@ -58,6 +57,9 @@
 #include "voshdl.h"
 
 #include "dbg.h"
+
+#include "filetools.h"
+using namespace FileTools;
 
 #define showBacktrace()
 
@@ -566,7 +568,7 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
         break;
     case COPY_TO_REMOTE:
     case COPY_TO_MASTER:
-        retVal = rcopyfile(sFrom, sTo, method == COPY_TO_REMOTE);
+        retVal = rcopyfile(sFrom, sTo, master_address, method == COPY_TO_REMOTE);
         TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
             << "Transferring file from " << sFrom << " to " << sTo);
         break;
@@ -581,60 +583,6 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
         //showBacktrace();
     }
     return retVal;
-}
-
-//----------------------------------------------------------------------
-// Method: copyfile
-//----------------------------------------------------------------------
-int URLHandler::copyfile(std::string & sFrom, std::string & sTo)
-{
-    int source = open(sFrom.c_str(), O_RDONLY, 0);
-    int dest = open(sTo.c_str(), O_WRONLY | O_CREAT, 0644);
-
-    // struct required, rationale: function stat() exists also
-    struct stat stat_source;
-    fstat(source, &stat_source);
-
-    sendfile(dest, source, 0, stat_source.st_size);
-
-    close(source);
-    close(dest);
-
-    return 0;
-}
-
-//----------------------------------------------------------------------
-// Method: rcopyfile
-//----------------------------------------------------------------------
-int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
-                          bool toRemote)
-{
-    static std::string scp("/usr/bin/scp");
-    std::string cmd;
-    if (toRemote) {
-        cmd = scp + " " + master_address + ":" + sFrom + " " + sTo;
-    } else {
-        cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
-    }
-    TRC("CMD: " << cmd);
-    int res = system(cmd.c_str());
-    (void)(res);
-
-    return 0;
-}
-
-//----------------------------------------------------------------------
-// Method: runlink
-//----------------------------------------------------------------------
-int URLHandler::runlink(std::string & f)
-{
-    std::string cmd;
-    cmd = "ssh " + master_address + " rm " + f;
-    TRC("CMD: " << cmd);
-    int res = system(cmd.c_str());
-    (void)(res);
-
-    return 0;
 }
 
 //----------------------------------------------------------------------
