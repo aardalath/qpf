@@ -118,7 +118,10 @@ bool  DirWatcher::convertSymbolicLinks(std::string & path, std::string & name)
     std::string file(path + "/" + name);
     char srcFile[1024];
     ssize_t fnLen = readlink(file.c_str(), srcFile, 1024);
+<<<<<<< HEAD
     srcFile[fnLen] = 0;
+=======
+>>>>>>> 5da52c943452a61d86bd7bac349421a625b4b7f2
     std::string sFile(srcFile);
     int res;
     
@@ -127,6 +130,7 @@ bool  DirWatcher::convertSymbolicLinks(std::string & path, std::string & name)
         TRC("Removing " + file);
         unlink(file.c_str());
         res = link(srcFile, file.c_str());
+<<<<<<< HEAD
         TRC("Replacing with hard link to " + sFile +
             " - " + std::to_string(res) +
             ":" + std::to_string(errno));
@@ -134,6 +138,13 @@ bool  DirWatcher::convertSymbolicLinks(std::string & path, std::string & name)
     }
 
     if ((errno == EXDEV) && ConvertSymbolicLinksToCopies) {
+=======
+        TRC("Replacing with hard link to " + sFile + " - " + std::to_string(res));
+        if (res == 0) { return true; }
+    }
+
+    if ((res == EXDEV) && ConvertSymbolicLinksToCopies) {
+>>>>>>> 5da52c943452a61d86bd7bac349421a625b4b7f2
         copyfile(sFile, file);
         TRC("Making actual copy from " + sFile + " to " + file);
     }
