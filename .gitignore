@@ -1,2 +1,3 @@
 .tramp_history
 build/
+scripts/build*
