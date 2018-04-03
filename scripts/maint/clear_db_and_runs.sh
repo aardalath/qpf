@@ -21,6 +21,7 @@ delete from tasks_info where id>0;
 delete from icommands;
 delete from alerts;
 delete from qpfstates;
+delete from task_status_spectra;
 EOF
 
 psql -f /tmp/clean-up-qpfdb.sql qpfdb

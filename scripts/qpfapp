@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+##############################################################################
+# File       : RunQPF.sh - Run QPF HMI and Core
+# Domain     : QPF.scripts
+# Version    : 2.0
+# Date       : 2017/09/08
+# Copyright (C) 2015-2018 J C Gonzalez
+#_____________________________________________________________________________
+# Purpose    : Run QPF Core and HMI as a service
+# Created by : J C Gonzalez
+# Status     : Prototype
+# History    : See <Changelog>
+#------------------------------------------------------------------------------
+# This script uses 
+###############################################################################
+
+#-- This script path and name
+
+sPth="${BASH_SOURCE[0]}"; sName=$(basename "${sPth}")
+[ -h "${sPth}" ] && (while [ -h "${sPth}" ]; do sPth=$(readlink "${sPth}"); done)
+pushd . > /dev/null && cd $(dirname ${sPth}) > /dev/null
+SCRIPT_PATH=$(pwd)
+popd  > /dev/null
+
+#-- Config files
+
+INTERNAL_QPF_DIR=${HOME}/.qpf
+pidDir=$INTERNAL_QPF_DIR
+
+[ ! -d ${INTERNAL_QPF_DIR} ] && mkdir -p ${INTERNAL_QPF_DIR}
+CFG_FILE=${INTERNAL_QPF_DIR}/config
+eval $(grep QPFWA ${CFG_FILE})
+
+#-- Working area useful paths
+
+VERSION=2.0
+
+QPF=${QPFWA}/bin/qpf
+QPFHMI=${QPFWA}/bin/qpfgui
+QPF_RUN_DIR=${QPFWA}/run
+QPF_SCRIPT_DIR=${QPFWA}/scripts
+
+DAEMON_NAME=QPFCore
+
+#-- Import function scripts
+
+. ${SCRIPT_PATH}/lib/tools.sh
+. ${SCRIPT_PATH}/lib/daemon.sh
+. ${SCRIPT_PATH}/lib/cfgmng.sh
+
+#-- Script variables (miscellanea)
+
+QPFEXE=${QPF}
+DBG=""
+DBG=""
+SESSION=""
+MODE="Core"
+VERBOSITY=""
+
+LOG_FILE=$(tty)
+
+#DBUSER=eucops
+#DBPASSWD=""
+#DBHOST=127.0.0.1
+#DBPORT=5432
+#DBNAME=qpfdb
+#DB_CONNECTION="db://${DBUSER}:${DBPASSWD}@${DBHOST}:${DBPORT}/${DBNAME}"
+
+LAST_SESSION=$(basename $(ls -1dt ${QPF_RUN_DIR}/20*|head -1))
+
+THIS_HOST=$(uname -a|cut -d" " -f2)
+
+#-- Usage function
+
+usage () {
+    SCRIPT_NAME=$0
+    local opts="[ -h ] [ -d ] [ -v ] [ -c <cfg> ] [ -I <ipAddr> ] [ -s <session> ] [ -q ]"
+    say "Usage:"
+    say "     ${SCRIPT_NAME} <mode> <action> $opts"
+    say ""
+    say "where:"
+    say "  <mode> can be:"
+    say "     core - Manages the QPF Core subsystem"
+    say "     hmi  - Handles the QPF HMI"
+    say "     cfg  - Opens the HMI for the Config.Tool"
+    say "  <action> is one of the following actions:"
+    say "     start   - Start the specified subsystem"
+    say "     status  - Provides the current execution status of the subsystem"
+    say "     restart - Stops and the Starts the specified subsystem"
+    say "     stop    - Stops the execution of the "
+    say " and the following options can be used"
+    say "  -h             Show this usage message"
+    say "  -d             Debug session"
+    say "  -v             Increases verbosity (can be used more than once)"
+    say "  -H             HMI"
+    say "  -C             HMI - Show Configuration Tool"
+    say "  -c <cfg>       Use config. file <cfg>"
+    say "  -s <session>   Re-use existing session tag/folder"
+    say "  -I <ipAddr>    Use this IP address for master"
+    say "  -q             (Launcher opt.) Quiet operation"
+    say ""
+    exit 1
+}
+
+#-- Load configuration
+
+cfgload ${CFG_FILE}
+
+qpfcfg=$(cfgget cfgfile)
+ip=$(cfgget ip)
+
+QPF_CFG_FILE="-c ${qpfcfg}"
+IPADDR="-I ${ip}"
+
+#-- Parse arguments
+
+if [ "$#" -lt 2 ]; then
+    usage
+    exit 1
+fi
+
+mode="$1"
+if [ "$mode" = "help" ] || [ "$mode" = "-h" ]; then
+    usage
+    exit 0
+fi
+if [ "$mode" != "core" ] && [ "$mode" != "hmi" ] && [ "$mode" != "cfg" ]; then
+    usage
+    exit 1
+fi
+
+LOG_FILE="${pidDir}/${mode}.log"
+touch "${LOG_FILE}"
+
+shift
+
+action="$1"
+if [ "$action" = "help" ] || [ "$action" = "-h" ]; then
+    usage
+    exit 0
+fi
+
+checkIsValidAction "$action"
+if [[ $? -eq 1 ]]; then
+    usage
+    exit 1
+fi
+
+shift
+
+while getopts :hdc:s:I:vq OPT; do
+    case $OPT in
+        h|+h) 
+	        usage 
+	        ;;
+        d|+d) 
+	        DBG="gdb -ex run --args" 
+	        ;;
+        c|+c)
+            qpfcfg=$OPTARG
+	        QPF_CFG_FILE="-c $qpfcfg"
+            cfgput cfgfile $qpfcfg
+	        ;;
+        s|+s) 
+	        SESSION="-s $OPTARG" 
+	        ;;
+        I|+I) 
+            ip=$OPTARG
+	        IPADDR="-I $ip"
+            cfgput ip $ip
+	        ;;
+        v|+v) 
+	        VERBOSITY="$VERBOSITY -v"
+	        ;;
+        q|+q) 
+	        quiet=yes
+	        ;;
+        *)
+            usage
+            exit 2
+    esac
+done
+shift `expr $OPTIND - 1`
+OPTIND=1
+
+#-- Specify mode applications for interactive ones
+
+run_hmi () {
+    cmd="${QPFEXE}"
+    allOpts="${QPF_CFG_FILE} ${SESSION} ${IPADDR} ${VERBOSITY}"    
+    ${GDB} $cmd $allOpts
+    rm ${pidDir}/hmi.pid
+}
+
+run_cfg () {
+    cmd="${QPFEXE}"
+    allOpts="-C ${QPF_CFG_FILE} ${SESSION} ${IPADDR} ${VERBOSITY}"    
+    ${GDB} $cmd $allOpts
+    rm ${pidDir}/cfg.pid
+}
+
+#-- Specify what/how to run according to mode
+
+case $mode in
+    core)
+        daemonName="QPF-Core"
+        cmd="${QPFEXE}"
+        allOpts="${QPF_CFG_FILE} ${SESSION} ${IPADDR} ${VERBOSITY}"
+        #allOpts="-c 1000 10.66.180.141"
+        cfgput lastcorerun $TIMESTAMP
+        ;;
+    hmi)
+        THIS_HOST=localhost
+        QPFEXE="${QPFHMI}" 
+        #SESSION="-s ${LAST_SESSION}"
+        daemonName="QPF-HMI"
+        cmd="run_hmi"
+        cfgput lasthmirun $TIMESTAMP
+        ;;
+    cfg)
+        THIS_HOST=localhost
+        QPFEXE="${QPFHMI}" 
+        #SESSION="-s ${LAST_SESSION}"
+        daemonName="QPF-CfgTool"
+        cmd="run_cfg"
+        ;;
+esac
+
+#-- Greetings and check mandatory variables
+
+if [ -z "$quiet" ]; then
+    greetings_msg=(
+        "Euclid QLA Processing Framework"
+        "Version ${VERSION}"
+        "${daemonName}"
+    )
+    greetings "${greetings_msg[@]}"
+fi
+
+if [ -z "$quiet" ]; then
+    say "Working area seems to be located at $QPFWA"
+    [ -n "$qpfcfg" ] && say "QPF Config. file is set to ${qpfcfg}"
+fi
+
+# Check that we have a QPF config file to be used
+[ -n "$qpfcfg" ] || die "QPF Config. file not specified"
+[ -f "$qpfcfg" ] || die "QPF Config. file $qpfcfg does not exist"
+[ -n "$ip" ] || die "This host IP address not specified"
+
+export HOSTNAME=${THIS_HOST}
+
+#-- Execute action for specified mode
+
+checkDaemon "$mode" "$pidDir"
+
+case "$action" in
+  start)
+    startDaemon "$mode" "$pidDir" "$daemonName" "$cmd $allOpts"
+    ;;
+  stop)
+    stopDaemon "$mode" "$pidDir" "$daemonName"
+    ;;
+  status)
+    statusDaemon "$mode" "$pidDir" "$daemonName"
+    ;;
+  restart)
+    restartDaemon "$mode" "$pidDir" "$daemonName" "$cmd $allOpts"
+    ;;
+  *)
+  die "Error: usage $0 { start | stop | restart | status }"
+esac
+
+#-- Update qpfapp config file
+
+cfglist > "${CFG_FILE}"
+    
+exit 0

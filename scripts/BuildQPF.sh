@@ -348,6 +348,9 @@ if [ "${INSTALL_WA}" == "yes" ]; then
 
     #perform tar xzCf "'${WORK_AREA}'" "'${QPF_WA_SRCDIR}'"
     perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/
+    perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/scripts/
+    perform cp -R "'${SCRIPT_PATH}'"/lib  "'${QPF_WA_TGTDIR}'"/scripts/
+    install_scpt qpfapp
 fi
 
 ## Installing QPF executable and libraries
