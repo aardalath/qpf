@@ -52,6 +52,8 @@
 #include "srvmng.h"
 #include "filenamespec.h"
 #include "timer.h"
+#include "filetools.h"
+using namespace FileTools;
 
 #include "config.h"
 
@@ -319,7 +321,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     std::string procName(task.taskPath());
     std::string sourceProcCfgFile = Config::PATHProcs + "/" + procName + "/sample.cfg.json";
     std::string targetProcCfgFile = exchangeDir + "/" + procName + ".cfg";
-    urlh.copyfile(sourceProcCfgFile, targetProcCfgFile);
+    copyfile(sourceProcCfgFile, targetProcCfgFile);
     TRC("Copying " + sourceProcCfgFile + " to " + targetProcCfgFile);
     if (dckMng->createContainer(procName, exchangeDir, contId)) {
         InfoMsg("Running task " + task.taskName() +

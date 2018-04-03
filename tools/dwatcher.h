@@ -96,6 +96,7 @@ public:
 
 private:
     void start();
+    bool convertSymbolicLinks(std::string & path, std::string & name);
 
 private:
     int                         fd;

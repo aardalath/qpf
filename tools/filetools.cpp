@@ -44,8 +44,15 @@
 #include <cstring>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/sendfile.h>
+
 #include <iostream>
 #include <fstream>
+
+#include "dbg.h"
 
 //======================================================================
 // Namespace: FileTools
@@ -85,6 +92,61 @@ void storeFileIntoString(std::string & iFile, std::string & s)
     s.assign((const char*)(where), size);
         
     delete[] where;
+}
+
+//----------------------------------------------------------------------
+// Method: copyfile
+//----------------------------------------------------------------------
+int copyfile(std::string & sFrom, std::string & sTo)
+{
+    int source = open(sFrom.c_str(), O_RDONLY, 0);
+    int dest = open(sTo.c_str(), O_WRONLY | O_CREAT, 0644);
+
+    // struct required, rationale: function stat() exists also
+    struct stat stat_source;
+    fstat(source, &stat_source);
+
+    TRC("Local copying: " + sFrom + " => " + sTo);
+    sendfile(dest, source, 0, stat_source.st_size);
+
+    close(source);
+    close(dest);
+
+    return 0;
+}
+
+//----------------------------------------------------------------------
+// Method: rcopyfile
+//----------------------------------------------------------------------
+int rcopyfile(std::string & sFrom, std::string & sTo,
+              std::string & remoteHost, bool toRemote)
+{
+    static std::string scp("/usr/bin/scp");
+    std::string cmd;
+    if (toRemote) {
+        cmd = scp + " " + remoteHost + ":" + sFrom + " " + sTo;
+    } else {
+        cmd = scp + " " + sFrom + " " + remoteHost + ":" + sTo;
+    }
+    int res = system(cmd.c_str());
+    TRC("Remote copying: " + cmd);
+    (void)(res);
+
+    return 0;
+}
+
+//----------------------------------------------------------------------
+// Method: runlink
+//----------------------------------------------------------------------
+    int runlink(std::string & f, std::string & remoteHost)
+{
+    std::string cmd;
+    cmd = "ssh " + remoteHost + " rm " + f;
+    int res = system(cmd.c_str());
+    TRC("Remote unlinking: " + cmd);
+    (void)(res);
+
+    return 0;
 }
 
 }

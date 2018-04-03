@@ -50,6 +50,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "dbg.h"
+
+#include "filetools.h"
+using namespace FileTools;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -102,11 +107,43 @@ void DirWatcher::watch(std::string pth)
 }
 
 //----------------------------------------------------------------------
+// Method: convertSymbolicLinks
+//----------------------------------------------------------------------
+bool  DirWatcher::convertSymbolicLinks(std::string & path, std::string & name)
+{
+    static bool ConvertSymbolicLinksToHard = true;
+    static bool ConvertSymbolicLinksToCopies = true;    
+
+    // Get source file name
+    std::string file(path + "/" + name);
+    char srcFile[1024];
+    ssize_t fnLen = readlink(file.c_str(), srcFile, 1024);
+    std::string sFile(srcFile);
+    int res;
+    
+    // if convert to hard is activated, and possible, do it
+    if (ConvertSymbolicLinksToHard) {
+        TRC("Removing " + file);
+        unlink(file.c_str());
+        res = link(srcFile, file.c_str());
+        TRC("Replacing with hard link to " + sFile + " - " + std::to_string(res));
+        if (res == 0) { return true; }
+    }
+
+    if ((res == EXDEV) && ConvertSymbolicLinksToCopies) {
+        copyfile(sFile, file);
+        TRC("Making actual copy from " + sFile + " to " + file);
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: start
 //----------------------------------------------------------------------
 void DirWatcher::start()
 {
     static std::string lastTriggerEventFileName("");
+
+    static bool ConvertSymbolicLinks = true;
 
     int poll_num;
     nfds_t nfds;
@@ -168,10 +205,11 @@ void DirWatcher::start()
 
                     lastTriggerEventFileName = dwe.name;
 
+                    std::string file(dwe.path + "/" + dwe.name);
+                    
                     // Check file size
                     if (!dwe.isDir) {
                         struct stat dweStat;
-                        std::string file(dwe.path + "/" + dwe.name);
                         if (stat(file.c_str(), &dweStat) != 0) {
                             perror("stat");
                             std::cerr << file << std::endl;
@@ -179,19 +217,18 @@ void DirWatcher::start()
                         } else {
                             dwe.size = dweStat.st_size;
                         }
-                    } else {
-                        dwe.size = -1;
+                        // In case it is a symbolic link, and internally allowed,
+                        // remove symbolic link and create hard link, or copy file
+                        lstat(file.c_str(), &dweStat);
+                        if (ConvertSymbolicLinks && S_ISLNK(dweStat.st_mode)) {
+                            TRC("File " + file +" is a symlink");
+                            convertSymbolicLinks(dwe.path, dwe.name);
+                        }
+
+                        TRC("Storing event for " + file);
+                        events.push(dwe);
                     }
 
-//                    bool proceed = true;
-//                    if (events.size() > 0) {
-//                        proceed = events.back().path != dwe.path;
-//                    }
-
-//                    if (proceed) {
-                        fprintf(stderr, "Storing event for %s\n", (dwe.path + "/" + dwe.name).c_str());
-                        events.push(dwe);
-//                    }
                 }
             }
 

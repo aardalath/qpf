@@ -41,6 +41,7 @@ target_include_directories (tools PUBLIC .
   ${CURLINCDIR}
   ${STR_ROOT_DIR}
   ${JSON_ROOT_DIR}
+  ${NNCOMM_ROOT_DIR}
   ${TOOLS_ROOT_DIR})
 target_link_libraries (tools str json pthread)
 set_target_properties (tools PROPERTIES LINKER_LANGUAGE CXX)
