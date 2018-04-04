@@ -241,7 +241,6 @@ enum AgentMode { CONTAINER, SERVICE };
 
 #define TLISTOF_USER_AREA_TYPES \
     T(NOMINAL),                              \
-    T(USER),                                 \
     T(LOCAL),                                \
     T(VOSPACE)
 
@@ -254,7 +253,6 @@ const std::string UserAreaName[] = { TLISTOF_USER_AREA_TYPES };
 #undef T
 
 const std::map<std::string, UserAreaId> UserAreaIdx = { {UserAreaName[UA_NOMINAL], UA_NOMINAL},
-                                                        {UserAreaName[UA_USER],    UA_USER},
                                                         {UserAreaName[UA_LOCAL],   UA_LOCAL},
                                                         {UserAreaName[UA_VOSPACE], UA_VOSPACE} };
 

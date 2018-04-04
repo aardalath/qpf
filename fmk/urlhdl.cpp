@@ -373,14 +373,9 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     UserAreaId tgtType = UserAreaId(product.procTargetType());
     std::string tgtFolder(cfg.storage.archive);
     
-    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+    tgtFolder = product.procTarget();    
 
-        tgtFolder = product.procTarget();
-
-    } else if (tgtType == UA_VOSPACE) {
-
-        tgtFolder = product.procTarget();    
-
+    if (tgtType == UA_VOSPACE) {
         sendToVOSpace(cfg.connectivity.vospace.user(),
                       cfg.connectivity.vospace.pwd(),
                       cfg.connectivity.vospace.url(),
@@ -389,25 +384,19 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
                        tgtFolder),
                       file);
         (void)unlink(file.c_str());
+        product["urlSpace"] = ReprocessingVOSpace;
         return product;
-
-    } else {
-        
-        TRC( "Proc.target " + UserAreaName[tgtType] + " should not be used here");
-        return product;
-
     }
 
     // Ensure local folder exists
-    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
-        if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
-            (errno != EEXIST)) {
-            TRC("mkdir " + tgtFolder + ": " + std::strerror(errno));
-            return product;
-        }
+    if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
+        (errno != EEXIST)) {
+        TRC("mkdir " + tgtFolder + ": " + std::strerror(errno));
+        return product;
     }
     
-    TRC("Must move " + newFile + " from " + cfg.storage.gateway + "/out to " + tgtFolder);
+    TRC("Must move " + newFile + " from " + cfg.storage.gateway +
+        "/out to " + tgtFolder);
     
     str::replaceAll(newFile,
                     cfg.storage.gateway + "/out",
@@ -420,7 +409,7 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
 
     // Change url in processing task
     product["url"]      = newUrl;
-    product["urlSpace"] = (tgtType == UA_USER ? ReprocessingUserArea :
+    product["urlSpace"] = (tgtType == UA_NOMINAL ? InboxSpace :
                            (tgtType == UA_LOCAL ? ReprocessingLocalFolder :
                             ReprocessingVOSpace));
     
@@ -446,14 +435,9 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
     UserAreaId tgtType = UserAreaId(product.procTargetType());
     std::string tgtFolder; 
     
-    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
+    tgtFolder = product.procTarget();
 
-        tgtFolder = product.procTarget();
-
-    } else if (tgtType == UA_VOSPACE) {
-
-        tgtFolder = product.procTarget();    
-
+    if (tgtType == UA_VOSPACE) {
         sendToVOSpace(cfg.connectivity.vospace.user(),
                       cfg.connectivity.vospace.pwd(),
                       cfg.connectivity.vospace.url(),
@@ -461,21 +445,14 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
                        cfg.connectivity.vospace.folder() :
                        tgtFolder),
                       file);
+        product["urlSpace"] = ReprocessingVOSpace;
         return product;
-
-    } else {
-        
-        TRC("Proc.target " + UserAreaName[tgtType] + " should not be used here");
-        return product;
-
     }
 
     // Ensure local folder exists
-    if ((tgtType == UA_USER) || (tgtType == UA_LOCAL)) {
-        if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
-            (errno != EEXIST)) {
-            return product;
-        }
+    if ((mkdir(tgtFolder.c_str(), Config::PATHMode) != 0) &&
+        (errno != EEXIST)) {
+        return product;
     }
     
     str::replaceAll(newFile,
@@ -489,7 +466,7 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
 
     // Change url in processing task
     product["url"]      = newUrl;
-    product["urlSpace"] = (tgtType == UA_USER ? ReprocessingUserArea :
+    product["urlSpace"] = (tgtType == UA_NOMINAL ? InboxSpace :
                            (tgtType == UA_LOCAL ? ReprocessingLocalFolder :
                             ReprocessingVOSpace));
     

@@ -138,9 +138,9 @@ public:
     };
 
     enum UserWAIndex {
-        Auto,
-        LocalFolder,
-        VOSpaceFolder,
+        Nominal,
+        LocalDir,
+        VOSpace,
     };
 
     void prepare(MapOfUserDefTools & userTools, QStringList pts);

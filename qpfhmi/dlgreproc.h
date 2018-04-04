@@ -68,9 +68,7 @@ public:
     };
 
     enum OutputsLocation {
-        DefUserArea,
-        CfgLocalDir,
-        CfgVOSpace,
+        LocalArch,
         LocalDir,
         VOSpaceFolder,
     };

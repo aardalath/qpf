@@ -202,9 +202,9 @@ ConfigTool::ConfigTool(QWidget *parent) :
     monitMsgFlags.append(FlagSt({ "FMKMON",   ui->chkFmkMon })); 
     monitMsgFlags.append(FlagSt({ "HOSTMON",  ui->chkHostMon }));
                                        
-    ui->btngrpUserWA->setId(ui->rbtnUserWAAuto    , Auto);
-    ui->btngrpUserWA->setId(ui->rbtnUserWALocal   , LocalFolder);
-    ui->btngrpUserWA->setId(ui->rbtnUserWAVOSpace , VOSpaceFolder);
+    ui->btngrpUserWA->setId(ui->rbtnNominal,  Nominal);
+    ui->btngrpUserWA->setId(ui->rbtnLocalDir, LocalDir);
+    ui->btngrpUserWA->setId(ui->rbtnVOSpace,  VOSpace);
 
     connect(ui->tblwdgUserDefTools, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editTool(QModelIndex)));
     connect(ui->tblviewHosts, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editHost(QModelIndex)));
@@ -389,7 +389,7 @@ void ConfigTool::setWorkingPaths(QString newPath)
     ui->nedLocalArchiveFolder->setText(newPath + "/data/archive");
     ui->nedInbox->setText(newPath + "/data/inbox");
     ui->nedOutbox->setText(newPath + "/data/outbox");
-    ui->nedUserReprocArea->setText(newPath + "/data/user");
+    ui->nedTargetReprocDir->setText(newPath + "/data/user");
 }
 
 //----------------------------------------------------------------------
@@ -400,11 +400,11 @@ void ConfigTool::selectUserDefAreaPath()
 {
     QString pathName(QS(cfg.general.workArea()));
     pathName = QFileDialog::getExistingDirectory(this,
-                                                 tr("Select folder to be set as user-defined area"),
-                                                 pathName);
+                   tr("Select folder to be set as user-defined area"),
+                   pathName);
     QFileInfo fs(pathName);
     if (fs.exists()) {
-        ui->nedUserReprocArea->setText(pathName);
+        ui->nedTargetReprocDir->setText(pathName);
     }
 }    
 
@@ -415,17 +415,17 @@ void ConfigTool::selectUserDefAreaPath()
 void ConfigTool::defineUserWA(int btn)
 {
     switch (btn) {
-    case Auto:
+    case Nominal:
         ui->tbtnUserDefAreaPath->setEnabled(false);
-        ui->nedUserReprocArea->setReadOnly(true);
+        ui->nedTargetReprocDir->setReadOnly(true);
         break;
-    case LocalFolder:
+    case LocalDir:
         ui->tbtnUserDefAreaPath->setEnabled(true);
-        ui->nedUserReprocArea->setReadOnly(false);
+        ui->nedTargetReprocDir->setReadOnly(false);
         break;
-    case VOSpaceFolder:
+    case VOSpace:
         ui->tbtnUserDefAreaPath->setEnabled(false);
-        ui->nedUserReprocArea->setReadOnly(false);
+        ui->nedTargetReprocDir->setReadOnly(false);
         break;
     default:
         break;
@@ -964,12 +964,12 @@ void ConfigTool::transferCfgToGUI()
     ui->nedOutbox->setText(C(cfg.storage.gateway));
 
     std::string userWAType = cfg.general.userAreaType();
-    if (userWAType == UserAreaName[UA_USER]) {
-        ui->btngrpUserWA->button(Auto)->setChecked(true);
+    if (userWAType == UserAreaName[UA_NOMINAL]) {
+        ui->btngrpUserWA->button(Nominal)->setChecked(true);
     } else if (userWAType == UserAreaName[UA_LOCAL]) {
-        ui->btngrpUserWA->button(LocalFolder)->setChecked(true);
+        ui->btngrpUserWA->button(LocalDir)->setChecked(true);
     } else if (userWAType == UserAreaName[UA_VOSPACE]) {
-        ui->btngrpUserWA->button(VOSpaceFolder)->setChecked(true);
+        ui->btngrpUserWA->button(VOSpace)->setChecked(true);
     } else {
         // Nothing
     }
@@ -1064,15 +1064,15 @@ bool ConfigTool::transferGUIToCfg()
     // 1.1 General
     cfg.general["workArea"] = ui->edBasePath->text().toStdString();
     switch (ui->btngrpUserWA->checkedId()) {
-    case Auto:
-        cfg.general["userAreaType"] = UserAreaName[UA_USER];
-        cfg.general["userArea"]     = ui->edBasePath->text().toStdString() + "/data/user";
+    case Nominal:
+        cfg.general["userAreaType"] = UserAreaName[UA_NOMINAL];
+        cfg.general["userArea"]     = ui->edBasePath->text().toStdString() + "/data/archive";
         break;
-    case LocalFolder:
+    case LocalDir:
         cfg.general["userAreaType"] = UserAreaName[UA_LOCAL];
-        cfg.general["userArea"]     = ui->nedUserReprocArea->text().toStdString();
+        cfg.general["userArea"]     = ui->nedTargetReprocDir->text().toStdString();
         break;
-    case VOSpaceFolder:
+    case VOSpace:
         cfg.general["userAreaType"] = UserAreaName[UA_VOSPACE];
         cfg.general["userArea"]     = ui->edVOSpaceFolder->text().toStdString();
         break;

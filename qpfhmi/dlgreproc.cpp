@@ -60,11 +60,9 @@ DlgReproc::DlgReproc(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->btngrpOutputsLocation->setId(ui->rbtnDefaultUserArea, DefUserArea);   
-    ui->btngrpOutputsLocation->setId(ui->rbtnCfgLocal       , CfgLocalDir);  
-    ui->btngrpOutputsLocation->setId(ui->rbtnCfgVOSpace     , CfgVOSpace);  
-    ui->btngrpOutputsLocation->setId(ui->rbtnLocal          , LocalDir);     
-    ui->btngrpOutputsLocation->setId(ui->rbtnVOSpace        , VOSpaceFolder);
+    ui->btngrpOutputsLocation->setId(ui->rbtnLocalArch, LocalArch);   
+    ui->btngrpOutputsLocation->setId(ui->rbtnLocalDir , LocalDir);     
+    ui->btngrpOutputsLocation->setId(ui->rbtnVOSpace  , VOSpaceFolder);
 
     connect(ui->tbtnLocal, SIGNAL(clicked()), this, SLOT(selectLocalFolder()));
 }
@@ -89,12 +87,10 @@ void DlgReproc::setFields(QStringList inProds, OutputsLocation out,
 {
     ui->lstInputProducts->addItems(inProds);
 
-    ui->edDefaultUserArea->setText(QS(cfg.general.workArea() + "/data/user"));
-    ui->edCfgLocal->setText(QS(cfg.general.userArea()));
-    ui->edCfgVOSpace->setText(QS("VOSpace://" + cfg.connectivity.vospace.user()
-                               + "/" + cfg.connectivity.vospace.folder()));
-    ui->edLocal->setText("");
-    ui->edVOSpace->setText("");
+    ui->edLocalArch->setText(QS(cfg.general.workArea() + "/data/user"));
+    ui->edLocalDir->setText(QS(cfg.general.userArea()));
+    ui->edVOSpace->setText(QS("VOSpace://" + cfg.connectivity.vospace.user()
+                            + "/" + cfg.connectivity.vospace.folder()));
 
     ui->btngrpOutputsLocation->button(out)->setChecked(true);
 
@@ -109,17 +105,11 @@ void DlgReproc::getFields(QStringList & inProds, OutputsLocation & out,
 {
     out = static_cast<OutputsLocation>(ui->btngrpOutputsLocation->checkedId());
     switch (out) {
-    case DefUserArea:
-        outDir = ui->edDefaultUserArea->text();
+    case LocalArch:
+        outDir = ui->edLocalArch->text();
         break;  
-    case CfgLocalDir:
-        outDir = ui->edCfgLocal->text();
-        break;  
-    case CfgVOSpace:
-        outDir = ""; //ui->edCfgVOSpace->text();
-        break;   
     case LocalDir:
-        outDir = ui->edLocal->text();
+        outDir = ui->edLocalDir->text();
         break;     
     case VOSpaceFolder:
         outDir = ui->edVOSpace->text();
@@ -142,7 +132,7 @@ void DlgReproc::selectLocalFolder()
                                                  pathName);
     QFileInfo fs(pathName);
     if (fs.exists()) {
-        ui->edLocal->setText(pathName);
+        ui->edLocalDir->setText(pathName);
     }
 }
 

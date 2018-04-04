@@ -39,8 +39,11 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="1">
-         <widget class="QRadioButton" name="rbtnLocal">
+        <item row="1" column="1">
+         <widget class="QRadioButton" name="rbtnLocalDir">
+          <property name="toolTip">
+           <string extracomment="Reprocessed files will be stored in the selected local directory (defaults to defined user area). Output products are NOT re-ingested into the system."/>
+          </property>
           <property name="text">
            <string>Local directory</string>
           </property>
@@ -49,61 +52,24 @@
           </attribute>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="QRadioButton" name="rbtnVOSpace">
-          <property name="text">
-           <string>Another VOSpace folder</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">btngrpOutputsLocation</string>
-          </attribute>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QRadioButton" name="rbtnCfgLocal">
-          <property name="text">
-           <string>Configured local directory</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">btngrpOutputsLocation</string>
-          </attribute>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="edCfgLocal">
-          <property name="styleSheet">
-           <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
-          </property>
-          <property name="frame">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QLineEdit" name="edVOSpace"/>
-        </item>
         <item row="2" column="1">
-         <widget class="QRadioButton" name="rbtnCfgVOSpace">
+         <widget class="QRadioButton" name="rbtnVOSpace">
+          <property name="toolTip">
+           <string extracomment="Reprocessed files will be uploaded to the specifed VOSpace folder (defaults to defined folder in the config. file). Output products are NOT re-ingested into the system."/>
+          </property>
           <property name="text">
-           <string>Configured VOSpace user area</string>
+           <string>VOSpace folder</string>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">btngrpOutputsLocation</string>
           </attribute>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLineEdit" name="edDefaultUserArea">
-          <property name="styleSheet">
-           <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
-          </property>
-          <property name="frame">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QLineEdit" name="edCfgVOSpace">
+         <widget class="QLineEdit" name="edVOSpace"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="edLocalArch">
           <property name="styleSheet">
            <string notr="true">* { background-color: rgba(0, 0, 0, 0); }</string>
           </property>
@@ -112,27 +78,30 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="2">
-         <widget class="QLineEdit" name="edLocal"/>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="edLocalDir"/>
         </item>
         <item row="0" column="1">
-         <widget class="QRadioButton" name="rbtnDefaultUserArea">
+         <widget class="QRadioButton" name="rbtnLocalArch">
+          <property name="toolTip">
+           <string extracomment="Reprocessed data will be stored in the QPF Local Archive, with the proper updated version.  As in the nominal processing, the outputs will be re-ingested into the system for further processing, if needed."/>
+          </property>
           <property name="text">
-           <string>Default user area</string>
+           <string>Local archive</string>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">btngrpOutputsLocation</string>
           </attribute>
          </widget>
         </item>
-        <item row="3" column="3">
+        <item row="1" column="3">
          <widget class="QToolButton" name="tbtnLocal">
           <property name="text">
            <string>...</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="1" column="0">
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -297,7 +266,7 @@
   <slot>selectProdTypes()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="btngrpAnalyzeSession"/>
   <buttongroup name="btngrpOutputsLocation"/>
+  <buttongroup name="btngrpAnalyzeSession"/>
  </buttongroups>
 </ui>

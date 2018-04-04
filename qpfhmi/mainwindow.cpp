@@ -1562,9 +1562,9 @@ void MainWindow::reprocessProduct()
     
     std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
     DlgReproc::OutputsLocation out =
-        ((userWAType == UserAreaName[UA_USER]) ?
-         DlgReproc::DefUserArea : ((userWAType == UserAreaName[UA_LOCAL]) ?
-                                   DlgReproc::CfgLocalDir : DlgReproc::CfgVOSpace));
+        ((userWAType == UserAreaName[UA_NOMINAL]) ?
+         DlgReproc::LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                 DlgReproc::LocalDir : DlgReproc::VOSpaceFolder));
     int flags = (cfg.flags.intermediateProducts() ?
                  DlgReproc::GenIntermProd : DlgReproc::NullFlags);
 
@@ -1584,11 +1584,9 @@ void MainWindow::reprocessProduct()
     foreach (QString fileName, inProds) {
         fns.parseFileName(fileName.toStdString(), md);
         md["urlSpace"]       = ReprocessingSpace;
-        md["procTargetType"] = (((out == DlgReproc::CfgLocalDir) ||
-                                 (out == DlgReproc::LocalDir)) ?
-                                UA_LOCAL : (((out == DlgReproc::CfgVOSpace) ||
-                                             (out == DlgReproc::VOSpaceFolder)) ?
-                                            UA_VOSPACE : UA_USER)); 
+        md["procTargetType"] = ((out == DlgReproc::LocalDir) ?
+                                UA_LOCAL : ((out == DlgReproc::VOSpaceFolder) ?
+                                               UA_VOSPACE : UA_NOMINAL)); 
         md["procTarget"]     = outLocation.toStdString();
         reprocProducts.products.push_back(md);
     }
@@ -1688,9 +1686,9 @@ void MainWindow::exportProduct()
     
     std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
     DlgReproc::OutputsLocation out =
-        ((userWAType == UserAreaName[UA_USER]) ?
-         DlgReproc::DefUserArea : ((userWAType == UserAreaName[UA_LOCAL]) ?
-                                   DlgReproc::CfgLocalDir : DlgReproc::CfgVOSpace));
+        ((userWAType == UserAreaName[UA_NOMINAL]) ?
+         DlgReproc::LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                 DlgReproc::LocalDir : DlgReproc::VOSpaceFolder));
     int flags = (cfg.flags.intermediateProducts() ?
                  DlgReproc::GenIntermProd : DlgReproc::NullFlags);
 
@@ -1712,11 +1710,10 @@ void MainWindow::exportProduct()
     foreach (QString fileName, inProds) {
         fns.parseFileName(fileName.toStdString(), md);
         md["urlSpace"]       = LocalArchSpace;
-        md["procTargetType"] = (((out == DlgReproc::CfgLocalDir) ||
-                                 (out == DlgReproc::LocalDir)) ?
-                                UA_LOCAL : (((out == DlgReproc::CfgVOSpace) ||
-                                             (out == DlgReproc::VOSpaceFolder)) ?
-                                            UA_VOSPACE : UA_USER)); 
+        md["procTargetType"] = ((out == DlgReproc::LocalArch) ?
+                                UA_NOMINAL :
+                                ((out == DlgReproc::VOSpaceFolder) ?
+                                 UA_VOSPACE : UA_LOCAL)); 
         md["procTarget"]     = outLocation.toStdString();
         exportProducts.products.push_back(md);
     }
