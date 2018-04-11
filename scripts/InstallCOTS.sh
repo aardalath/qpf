@@ -182,7 +182,9 @@ if [ "${PGSQL}" = "yes" ]; then
 	say ". Installing packages"
 	sudo yum -y install ${PSQL_PGDG}
 	sudo yum -y install ${PSQL_PKGS}
-	
+
+		sudo yum install -y libpq\*
+
 	PSQL_PTH=/usr/pgsql-9.6
     fi
 
