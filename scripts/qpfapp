@@ -44,9 +44,9 @@ DAEMON_NAME=QPFCore
 
 #-- Import function scripts
 
-. ${SCRIPT_PATH}/lib/tools.sh
-. ${SCRIPT_PATH}/lib/daemon.sh
-. ${SCRIPT_PATH}/lib/cfgmng.sh
+. ${QPF_SCRIPT_DIR}/lib/tools.sh
+. ${QPF_SCRIPT_DIR}/lib/daemon.sh
+. ${QPF_SCRIPT_DIR}/lib/cfgmng.sh
 
 #-- Script variables (miscellanea)
 

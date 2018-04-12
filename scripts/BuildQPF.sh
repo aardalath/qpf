@@ -350,7 +350,6 @@ if [ "${INSTALL_WA}" == "yes" ]; then
     perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/
     perform cp -R "'${QPF_WA_SRCDIR}'"/*  "'${QPF_WA_TGTDIR}'"/scripts/
     perform cp -R "'${SCRIPT_PATH}'"/lib  "'${QPF_WA_TGTDIR}'"/scripts/
-    install_scpt qpfapp
 fi
 
 ## Installing QPF executable and libraries
@@ -364,7 +363,8 @@ if [ "${INSTALL}" == "yes" ]; then
     fi
 
     install_scpt RunQPF.sh
-
+    install_scpt qpfapp
+    
     #QPF_INI="${RUN_PATH}/QPFHMI.conf"
     #if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
     #    mkdir -p ${HOME}/.config/QPF
@@ -446,8 +446,8 @@ say "  - include the directory ${WORK_AREA}/qpf/lib in the LD_LIBRARY_PATH varia
 say "To do that, just execute the following commands:"
 say "  export PATH=${WORK_AREA}/qpf/bin:\$PATH"
 say "  export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH"
-if [ -f ${HOME}/env_qpf.sh ]; then
-    (cat ~/env_qpf.sh; echo ""; echo "# BuildQPF section") | \
+#if [ -f ${HOME}/env_qpf.sh ]; then
+    (cat ~/env_qpf.sh 2>/dev/null ; echo ""; echo "# BuildQPF section") | \
     awk '(NR==1),/BuildQPF section/' > /tmp/$$.sh
     cat /tmp/$$.sh > ~/env_qpf.sh
     cat <<EOF>> ~/env_qpf.sh
@@ -461,16 +461,20 @@ EOF
     say "so that you can just update your environment by typing:"
     say "  source \$HOME/env_qpf.sh"
     say ""
-fi
+#fi
 say "In order to check that the QPF HMI executable and the libraries were correctly"
 say "installed, you may run:"
-say "  $ RunQPF.sh -H "
+say "  $ qpfapp core status "
 say "and see if the application shows a help message."
 say ""
 say "Initial configuration files (in JSON) are available at ${WORK_AREA}/qpf/cfg."
 say "You may need to modify them before launching any processing task from the HMI."
 say "(Runing qpfhmi without specifying a configuration file will mean reading"
 say "last configuration used from internal database)."
+say ""
+say "Finally, to start the QPF Core, just type:"
+say "$ qpfapp core start"
+say "$ qpfapp core status"
 say "-------------------------------------------------------------------------------"
 say ""
 
