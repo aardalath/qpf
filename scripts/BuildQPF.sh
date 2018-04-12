@@ -364,7 +364,12 @@ if [ "${INSTALL}" == "yes" ]; then
 
     install_scpt RunQPF.sh
     install_scpt qpfapp
-    
+
+    if [ ! -d "'${HOME}/.qpf'" ]; then
+        perform mkdir -p "'${HOME}'"/.qpf
+        perform cp "'${RUN_PATH}'"/qpfapp.config "'${HOME}'"/.qpf/
+    fi
+
     #QPF_INI="${RUN_PATH}/QPFHMI.conf"
     #if [ ! -f "${HOME}/.config/QPF/${QPF_INI}" ]; then
     #    mkdir -p ${HOME}/.config/QPF
