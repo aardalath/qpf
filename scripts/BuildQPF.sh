@@ -446,22 +446,21 @@ say "  - include the directory ${WORK_AREA}/qpf/lib in the LD_LIBRARY_PATH varia
 say "To do that, just execute the following commands:"
 say "  export PATH=${WORK_AREA}/qpf/bin:\$PATH"
 say "  export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH"
-#if [ -f ${HOME}/env_qpf.sh ]; then
-    (cat ~/env_qpf.sh 2>/dev/null ; echo ""; echo "# BuildQPF section") | \
-    awk '(NR==1),/BuildQPF section/' > /tmp/$$.sh
-    cat /tmp/$$.sh > ~/env_qpf.sh
-    cat <<EOF>> ~/env_qpf.sh
+
+(cat ~/env_qpf.sh 2>/dev/null ; echo ""; echo "# BuildQPF section") | \
+awk '(NR==1),/BuildQPF section/' > /tmp/$$.sh
+cat /tmp/$$.sh > ~/env_qpf.sh
+cat <<EOF>> ~/env_qpf.sh
 export PATH=${WORK_AREA}/qpf/bin:\$PATH
 export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH
 EOF
   
-    say ""
-    say "For your convenience, these commands have been saved into the file:"
-    say "  \$HOME/env_qpf.sh"
-    say "so that you can just update your environment by typing:"
-    say "  source \$HOME/env_qpf.sh"
-    say ""
-#fi
+say ""
+say "For your convenience, these commands have been saved into the file:"
+say "  \$HOME/env_qpf.sh"
+say "so that you can just update your environment by typing:"
+say "  source \$HOME/env_qpf.sh"
+say ""
 say "In order to check that the QPF HMI executable and the libraries were correctly"
 say "installed, you may run:"
 say "  $ qpfapp core status "
