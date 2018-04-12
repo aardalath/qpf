@@ -483,7 +483,7 @@ void URLHandler::sendToVOSpace(std::string user, std::string pwd,
     VOSpaceHandler vos(vosURL);
     vos.setAuth(user, pwd);
     if (!vos.uploadFile(folder, oFile)) {
-      TRC("ERROR! Cannot upload " << oFile);
+        TRC("ERROR! Cannot upload " << oFile);
     }
 }
 

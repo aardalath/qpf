@@ -69,7 +69,7 @@
 //----------------------------------------------------------------------
 FileNameSpec::FileNameSpec()
 {
-  if (reStr.empty()) { TRC("PROBLEM!!"); }
+    if (reStr.empty()) { TRC("PROBLEM!!"); }
 }
 
 FileNameSpec::FileNameSpec(std::string regexp, std::string assign)
