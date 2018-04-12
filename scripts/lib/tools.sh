@@ -24,7 +24,7 @@ TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 
 say () {
     echo -e "${_ONMSG}$*${_OFF}"
-    echo "$*" >> ${LOG_FILE}
+    if [ -f "$LOG_FILE" ]; then echo "$*" >> ${LOG_FILE}; fi
 }
 
 sayh () {
