@@ -367,7 +367,7 @@ if [ "${INSTALL}" == "yes" ]; then
 
     if [ ! -d "'${HOME}/.qpf'" ]; then
         perform mkdir -p "'${HOME}'"/.qpf
-        perform cp "'${RUN_PATH}'"/qpfapp.config "'${HOME}'"/.qpf/
+        perform cp "'${SCRIPT_PATH}'"/qpfapp.config "'${HOME}'"/.qpf/
     fi
 
     #QPF_INI="${RUN_PATH}/QPFHMI.conf"

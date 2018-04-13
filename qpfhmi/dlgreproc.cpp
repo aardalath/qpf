@@ -87,8 +87,10 @@ void DlgReproc::setFields(QStringList inProds, OutputsLocation out,
 {
     ui->lstInputProducts->addItems(inProds);
 
-    ui->edLocalArch->setText(QS(cfg.general.workArea() + "/data/user"));
-    ui->edLocalDir->setText(QS(cfg.general.userArea()));
+    ui->edLocalArch->setText(QS(cfg.general.workArea() + "/data/archive"));
+    ui->edLocalDir->setText(cfg.general.userArea().empty() ?
+                          QS(cfg.general.workArea() + "/data/user") :
+                          QS(cfg.general.userArea()));
     ui->edVOSpace->setText(QS("VOSpace://" + cfg.connectivity.vospace.user()
                             + "/" + cfg.connectivity.vospace.folder()));
 
@@ -118,10 +120,14 @@ void DlgReproc::getFields(QStringList & inProds, OutputsLocation & out,
         break;
     }
 
-    flags = (int(ui->chkGenIntermProd->isChecked() ? GenIntermProd : NullFlags) |
-             int(ui->chkIPython->isChecked() ? OpenIPython : NullFlags) |
-             int(ui->chkJupLab->isChecked() ? OpenJupyterLab : NullFlags) |
-             int(ui->chkBrowserVOSpace->isChecked() ? OpenVOSpace : NullFlags));
+    flags = (int(ui->chkGenIntermProd->isChecked()  && ui->chkGenIntermProd->isChecked()  ?
+                 GenIntermProd : NullFlags) |
+             int(ui->chkIPython->isChecked()        && ui->chkIPython->isChecked()        ?
+                 OpenIPython : NullFlags) |
+             int(ui->chkJupLab->isChecked()         && ui->chkJupLab->isChecked()         ?
+                 OpenJupyterLab : NullFlags) |
+             int(ui->chkBrowserVOSpace->isChecked() && ui->chkBrowserVOSpace->isChecked() ?
+                 OpenVOSpace : NullFlags));
 }
 
 void DlgReproc::selectLocalFolder()

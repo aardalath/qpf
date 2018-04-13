@@ -111,7 +111,7 @@ public:
     // Method: sendReprocCmd
     // Send a reprocessing request command to the EventMng
     //----------------------------------------------------------------------
-    void sendReprocCmd(ProductList & reprocList);
+    void sendReprocCmd(ProductList & reprocList, int flags);
 
     //----------------------------------------------------------------------
     // Method: sendCmd

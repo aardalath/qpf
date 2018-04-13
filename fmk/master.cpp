@@ -143,18 +143,19 @@ void Master::runEachIteration()
         }
 
         // b. Generate tasks for processing these products
-        tskOrc->createTasks(inData, tasks);
+        tskOrc->createTasks(inData, 0, tasks);
 
     }
 
     ProductList reprocData;
-    if (evtMng->getReprocData(reprocData)) {
+    int reprocFlags;
+    if (evtMng->getReprocData(reprocData, reprocFlags)) {
 
         // There are input products
         TRC("There are products to be reprocessed!");
         
         // b. Generate tasks for processing these products
-        tskOrc->createTasks(reprocData, tasks);
+        tskOrc->createTasks(reprocData, reprocFlags, tasks);
 
     }
 

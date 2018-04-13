@@ -222,7 +222,7 @@ void HMIProxy::sendProcHdlCmd(SubjectId subj, std::string subjName, SubcmdId sub
 // Method: sendReprocCmd
 // Send a reprocessing request command to the EventMng
 //----------------------------------------------------------------------
-void HMIProxy::sendReprocCmd(ProductList & reprocList)
+void HMIProxy::sendReprocCmd(ProductList & reprocList, int flags)
 {
     // Build product list to be sent in message
     
@@ -243,6 +243,7 @@ void HMIProxy::sendReprocCmd(ProductList & reprocList)
     // Create message and send
     body["cmd"]         = CmdReproc;
     body["products"]    = prodList;
+    body["flags"]       = flags;
     
     msg.buildBody(body);
     send(ChnlHMICmd, msg.str()); 

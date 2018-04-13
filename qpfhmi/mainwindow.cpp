@@ -96,8 +96,10 @@
 //#include "testrundlg.h"
 #include "qjsonmodel.h"
 #include "xmlsyntaxhighlight.h"
+
 #include "dlgalert.h"
 #include "dlgreproc.h"
+#include "dlguserpwd.h"
 
 #include "reqrep.h"
 #include "pubsub.h"
@@ -710,7 +712,8 @@ void MainWindow::showVerbLevel()
         Log::setMinLogLevel((Log::LogLevel)(minLvl));
         ui->lblVerbosity->setText(dlg.getVerbosityLevelName());
         hmiNode->sendMinLogLevel(dlg.getVerbosityLevelName().toStdString());
-        statusBar()->showMessage(tr("Setting Verbosity level to ") + dlg.getVerbosityLevelName(), 2 * MessageDelay);
+        statusBar()->showMessage(tr("Setting Verbosity level to ") +
+                                dlg.getVerbosityLevelName(), 2 * MessageDelay);
     }
 }
 
@@ -1075,7 +1078,8 @@ void MainWindow::showState()
             std::string ss = nodeStates[QString::fromStdString(n)].toStdString();
             int stateId = getStateIdx(ss);
             QString color = QString::fromStdString(stateColors[stateId]);
-            p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(QString::fromStdString(n));
+            p += QString("<font color=\"%1\">%2</font> ")
+                .arg(color).arg(QString::fromStdString(n));
         }
         
         // Now processing host lines
@@ -1496,7 +1500,8 @@ void MainWindow::openWith()
         QVBoxLayout vly;
         vly.addWidget(new QLabel("Current command line is:"));
         vly.addWidget(new QLabel(QString("\t%1 %2").arg(udt.exe).arg(args)));
-        vly.addWidget(new QLabel("\nSpecify the strings to be used in the additional placeholders:"));
+        vly.addWidget(new QLabel("\nSpecify the strings to be used in "
+                                 "the additional placeholders:"));
 
         QVector<QLineEdit*> edPh;
         for (int i = 1; i <= nph; ++i) {
@@ -1525,7 +1530,8 @@ void MainWindow::openWith()
             for (int i = 1; i <= nph; ++i) {
                 QString ph("%" + QString("%1").arg(i));
                 QLineEdit * e = edPh.at(i - 1);
-                DMsg(("Trying to substitute '" + ph + "' with '" + e->text() + "'").toStdString());
+                DMsg(("Trying to substitute '" + ph + "' with '" +
+                      e->text() + "'").toStdString());
                 args.replace(ph, e->text());
             }
         }
@@ -1552,21 +1558,22 @@ void MainWindow::reprocessProduct()
     QModelIndexList list = ui->treevwArchive->selectionModel()->selectedIndexes();
     foreach (QModelIndex m, list) {
         if (m.column() == NumOfURLCol) {
-            QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+            QString url = m.model()->index(m.row(), NumOfURLCol,
+                                          m.parent()).data().toString();
             QUrl archUrl(url);
             QString fileName = archUrl.path();
-            std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+            TRC("Request of reprocessing: " + fileName.toStdString());
             inProds << fileName;
         }
     }
     
-    std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
-    DlgReproc::OutputsLocation out =
-        ((userWAType == UserAreaName[UA_NOMINAL]) ?
-         DlgReproc::LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
-                                 DlgReproc::LocalDir : DlgReproc::VOSpaceFolder));
+    std::string userWAType = QString::fromStdString(cfg.general.userAreaType())
+        .toUpper().toStdString();
+    OutputsLocation out = ((userWAType == UserAreaName[UA_NOMINAL]) ?
+                           LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                        LocalDir : VOSpaceFolder));
     int flags = (cfg.flags.intermediateProducts() ?
-                 DlgReproc::GenIntermProd : DlgReproc::NullFlags);
+                 GenIntermProd : NullFlags);
 
     DlgReproc dlg;
     dlg.setFields(inProds, out, flags);
@@ -1575,8 +1582,8 @@ void MainWindow::reprocessProduct()
     QString outLocation;
     dlg.getFields(inProds, out, outLocation, flags);
 
-    std::cerr << userWAType << ' ' << out << " : " << flags
-              << " - " << outLocation.toStdString() << '\n';
+    TRC(userWAType + ' ' + std::to_string((int)(out)) + " : " +
+        std::to_string(flags) + " - " + outLocation.toStdString());
 
     ProductList reprocProducts;
     FileNameSpec fns;
@@ -1584,19 +1591,17 @@ void MainWindow::reprocessProduct()
     foreach (QString fileName, inProds) {
         fns.parseFileName(fileName.toStdString(), md);
         md["urlSpace"]       = ReprocessingSpace;
-        md["procTargetType"] = ((out == DlgReproc::LocalDir) ?
-                                UA_LOCAL : ((out == DlgReproc::VOSpaceFolder) ?
+        md["procTargetType"] = ((out == LocalDir) ?
+                                UA_LOCAL : ((out == VOSpaceFolder) ?
                                                UA_VOSPACE : UA_NOMINAL)); 
         md["procTarget"]     = outLocation.toStdString();
         reprocProducts.products.push_back(md);
     }
 
-    std::cerr << md.urlSpace() << ' '
-              << md.procTargetType() << ' '
-              << md.procTarget() << ' '
-              << '\n';
+    TRC(md.urlSpace() + " " + std::to_string(md.procTargetType()) +
+        " " + md.procTarget());
 
-    hmiNode->sendReprocCmd(reprocProducts);
+    hmiNode->sendReprocCmd(reprocProducts, flags + (int)(out));
 }
 
 //----------------------------------------------------------------------
@@ -1645,7 +1650,9 @@ void MainWindow::analyzeProduct()
         arguments << "-e"
                   << QString::fromStdString(cfg.connectivity.ipython.cmd())
                   << "-i" << "-c"
-                  << QString::fromStdString("'%cd " + cfg.connectivity.ipython.path() + "'");
+                  << QString::fromStdString("'%cd " +
+                                           cfg.connectivity.ipython.path() +
+                                           "'");
         ipythonProcess.startDetached(program, arguments);       
         // ipythonProcess.waitForFinished();
         // QByteArray result = ipythonProcess.readAllStandardOutput();
@@ -1676,21 +1683,22 @@ void MainWindow::exportProduct()
     QModelIndexList list = ui->treevwArchive->selectionModel()->selectedIndexes();
     foreach (QModelIndex m, list) {
         if (m.column() == NumOfURLCol) {
-            QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+            QString url = m.model()->index(m.row(), NumOfURLCol,
+                                          m.parent()).data().toString();
             QUrl archUrl(url);
             QString fileName = archUrl.path();
-            std::cerr << "Request of reprocessing: " << fileName.toStdString() << std::endl;
+            TRC("Request of reprocessing: " + fileName.toStdString());
             inProds << fileName;
         }
     }
     
-    std::string userWAType = QString::fromStdString(cfg.general.userAreaType()).toUpper().toStdString();
-    DlgReproc::OutputsLocation out =
-        ((userWAType == UserAreaName[UA_NOMINAL]) ?
-         DlgReproc::LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
-                                 DlgReproc::LocalDir : DlgReproc::VOSpaceFolder));
+    std::string userWAType = QString::fromStdString(cfg.general.userAreaType())
+        .toUpper().toStdString();
+    OutputsLocation out = ((userWAType == UserAreaName[UA_NOMINAL]) ?
+                           LocalArch : ((userWAType == UserAreaName[UA_LOCAL]) ?
+                                        LocalDir : VOSpaceFolder));
     int flags = (cfg.flags.intermediateProducts() ?
-                 DlgReproc::GenIntermProd : DlgReproc::NullFlags);
+                 GenIntermProd : NullFlags);
 
     DlgReproc dlg;
     dlg.setLabels("Export products", "The following products will be exported",
@@ -1701,8 +1709,8 @@ void MainWindow::exportProduct()
     QString outLocation;
     dlg.getFields(inProds, out, outLocation, flags);
 
-    std::cerr << userWAType << ' ' << out << " : " << flags
-              << " - " << outLocation.toStdString() << '\n';
+    TRC(userWAType + " " + std::to_string((int)(out)) + " : " +
+        std::to_string(flags) + " - " + outLocation.toStdString());
 
     ProductList exportProducts;
     FileNameSpec fns;
@@ -1710,18 +1718,21 @@ void MainWindow::exportProduct()
     foreach (QString fileName, inProds) {
         fns.parseFileName(fileName.toStdString(), md);
         md["urlSpace"]       = LocalArchSpace;
-        md["procTargetType"] = ((out == DlgReproc::LocalArch) ?
-                                UA_NOMINAL :
-                                ((out == DlgReproc::VOSpaceFolder) ?
-                                 UA_VOSPACE : UA_LOCAL)); 
+        md["procTargetType"] = ((out == LocalArch) ? UA_NOMINAL :
+                                ((out == VOSpaceFolder) ? UA_VOSPACE : UA_LOCAL)); 
         md["procTarget"]     = outLocation.toStdString();
         exportProducts.products.push_back(md);
     }
 
-    std::cerr << md.urlSpace() << ' '
-              << md.procTargetType() << ' '
-              << md.procTarget() << ' '
-              << '\n';
+    TRC(md.urlSpace() + " " + std::to_string(md.procTargetType()) +
+        " " + md.procTarget());
+
+    if ((md["procTargetType"] == UA_VOSPACE) &&
+        (cfg.connectivity.vospace.user().empty() ||
+         cfg.connectivity.vospace.pwd().empty())) {
+        DlgUserPwd up;
+        if (up.exec()) { up.storeValues(); }
+    }
 
     // Copy products to export location
     URLHandler urlh;

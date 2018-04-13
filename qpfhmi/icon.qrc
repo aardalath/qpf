@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>img/capslock.png</file>
     <file>img/xml.png</file>
     <file>img/json.png</file>
     <file>img/txt.png</file>

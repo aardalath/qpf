@@ -117,12 +117,12 @@ public:
     //----------------------------------------------------------------------
     // Method: createTasks
     //----------------------------------------------------------------------
-    void createTasks(ProductList & inData, std::vector<TaskInfo> & tasks);
+    void createTasks(ProductList & inData, int flags, std::vector<TaskInfo> & tasks);
     
     //----------------------------------------------------------------------
     // Method: createTask
     //----------------------------------------------------------------------
-    void createTask(Rule * rule, ProductList & inputs, TaskInfo & task);
+    void createTask(Rule * rule, ProductList & inputs, int flags, TaskInfo & task);
     
 protected:
     //----------------------------------------------------------------------

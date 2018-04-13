@@ -281,7 +281,7 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
 // Create tasks if any of the products is firing an orchestration rule,
 // and return the tasks created
 //----------------------------------------------------------------------
-void TskOrc::createTasks(ProductList & inData, std::vector<TaskInfo> & tasks)
+void TskOrc::createTasks(ProductList & inData, int flags, std::vector<TaskInfo> & tasks)
 {
     // Synthetic INDATA messages, that means reading products from folder
     for (auto & md : inData.products) {
@@ -301,7 +301,7 @@ void TskOrc::createTasks(ProductList & inData, std::vector<TaskInfo> & tasks)
 
                 // Generate task and store in output vector
                 TaskInfo task;
-                createTask(kv.first, kv.second, task);
+                createTask(kv.first, kv.second, flags, task);
                 tasks.push_back(task);
             }
         }
@@ -312,7 +312,7 @@ void TskOrc::createTasks(ProductList & inData, std::vector<TaskInfo> & tasks)
 // Method: createTask
 // Create a task for a given rule and input products
 //----------------------------------------------------------------------
-void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
+void TskOrc::createTask(Rule * rule, ProductList & inputs, int flags, TaskInfo & task)
 {
     DateTime epoch = timeTag();
     UUID uuid;
@@ -326,7 +326,8 @@ void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
     task["taskSet"]      = "CONTAINER";
     task["taskSession"]  = cfg.sessionId;
     task["params"]       = nullJson;
-
+    task["taskFlags"]    = flags;
+    
     std::string productId;
     
     URLHandler urlh;
@@ -356,6 +357,7 @@ void TskOrc::createTask(Rule * rule, ProductList & inputs, TaskInfo & task)
     addInfo["Proc"]      = task.taskPath();
     addInfo["Inputs"]    = task.inputs.str();
     addInfo["MainInput"] = productId;
+    addInfo["Flags"]     = flags;
 
     json taskData;
     taskData["Info"] = addInfo;

@@ -427,6 +427,7 @@ struct TaskInfo : public JRecord {
         DUMPJSTR(taskEnd);
         DUMPJINT(taskExitCode);
         DUMPJINT(taskStatus);
+        DUMPJINT(taskFlags);
         inputs.dump();
         outputs.dump();
         DUMPJSTRSTRMAP(params);
@@ -442,6 +443,7 @@ struct TaskInfo : public JRecord {
     JSTR(taskEnd);
     JINT(taskExitCode);
     JINT(taskStatus);
+    JINT(taskFlags);
     GRP(ProductList,inputs);
     GRP(ProductList,outputs);
     JSTRSTRMAP(params);

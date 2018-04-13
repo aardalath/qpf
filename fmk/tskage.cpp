@@ -492,11 +492,12 @@ void TskAge::sendTaskReport(std::string contId)
     addInfo["Proc"]      = task.taskPath();
     addInfo["Inputs"]    = task.inputs.str();
     addInfo["MainInput"] = task.inputs.products.at(0).productId();
+    addInfo["Flags"]     = task.taskFlags();
+    
     TRC("INPUTS: " + task.inputs.str());
-    
-    taskData["Info"] = addInfo;
-    
+        
     // Place all taskdata information into task structure
+    taskData["Info"] = addInfo;
     task["taskData"] = taskData;
 
     if ((taskStatus == TASK_FINISHED) || (taskStatus == TASK_FAILED)) {

@@ -228,7 +228,8 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             std::to_string(prodList.products.size()) + " products");
         std::lock_guard<std::mutex> lock(mtxReproc);
         reprocProducts.products = std::move(prodList.products);
-
+        reprocFlags = msg.body["flags"].asInt();
+        
     } else if (cmd == CmdQuit) { // Quit request
 
         requestQuit = true;
@@ -260,12 +261,13 @@ bool EvtMng::getInData(ProductList & inData, std::string & space)
 // Method: getReprocData
 // Store in argument variables the REPROCDATA products
 //----------------------------------------------------------------------
-bool EvtMng::getReprocData(ProductList & reprocData)
+bool EvtMng::getReprocData(ProductList & reprocData, int & flags)
 {
     bool retVal = reprocProducts.products.size() > 0;
     if (retVal) {
         std::lock_guard<std::mutex> lock(mtxReproc);
         reprocData.products = std::move(reprocProducts.products);
+        flags = reprocFlags;
     }
     return (retVal);
 }

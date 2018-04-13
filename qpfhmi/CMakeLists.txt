@@ -30,6 +30,7 @@ set (qpfGuiLib_src
   dlgdataing.cpp
   dlgshowtaskinfo.cpp
   dlgreproc.cpp
+  dlguserpwd.cpp
   anasession.cpp
   exporthdl.cpp
   conthostedit.cpp
@@ -42,6 +43,7 @@ set (qpfGuiLib_src
   frmagentstatus.cpp
   frmhostinfo.cpp
   hmipxy.cpp
+  keyevt.cpp
   logframe.cpp
   logwatcher.cpp
   mainwindow.cpp
@@ -76,6 +78,7 @@ set (qpfGuiLib_hdr
   dlgdataing.h
   dlgshowtaskinfo.h
   dlgreproc.h
+  dlguserpwd.h
   anasession.h
   exporthdl.h
   conthostedit.h
@@ -91,6 +94,7 @@ set (qpfGuiLib_hdr
   hmipxy.h
   hmitypes.h
   init.h
+  keyevt.h
   logframe.h
   logwatcher.h
   mainwindow.h
@@ -117,6 +121,7 @@ set (qpfGuiLib_ui
   dlgdataing.ui
   dlgshowtaskinfo.ui
   dlgreproc.ui
+  dlguserpwd.ui
   configtool.ui
   browserwidget.ui
   dbbrowser.ui

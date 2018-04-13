@@ -103,7 +103,7 @@ public:
     // Method: getReprocData
     // Store in argument variables the REPROCDATA products
     //----------------------------------------------------------------------
-    bool getReprocData(ProductList & reprocData);
+    bool getReprocData(ProductList & reprocData, int & flags);
     
     //----------------------------------------------------------------------
     // Method: isHMIActive
@@ -137,6 +137,7 @@ private:
 
     ProductList inboxProducts;
     ProductList reprocProducts;
+    int         reprocFlags;
 
     std::mutex mtxInData;
     std::mutex mtxReproc;

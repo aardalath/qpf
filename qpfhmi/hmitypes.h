@@ -56,6 +56,20 @@ struct QUserDefTool {
 
 typedef QMap<QString, QUserDefTool> MapOfUserDefTools;
 
+ enum Flags {
+    NullFlags      = 0x00,
+    GenIntermProd  = 0x01,
+    OpenIPython    = 0x02,
+    OpenJupyterLab = 0x04,
+    OpenVOSpace    = 0x08,
+};
+
+enum OutputsLocation {
+    LocalArch      = 0x100,
+    LocalDir       = 0x200,
+    VOSpaceFolder  = 0x400,
+};
+        
 }
 
 #endif // HMITYPES_H

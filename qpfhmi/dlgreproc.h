@@ -59,20 +59,6 @@ public:
     explicit DlgReproc(QWidget *parent = 0);
     ~DlgReproc();
 
-    enum Flags {
-        NullFlags      = 0x00,
-        GenIntermProd  = 0x01,
-        OpenIPython    = 0x02,
-        OpenJupyterLab = 0x04,
-        OpenVOSpace    = 0x08,
-    };
-
-    enum OutputsLocation {
-        LocalArch,
-        LocalDir,
-        VOSpaceFolder,
-    };
-        
 public:
     void setLabels(QString aTitle, QString desc, QString aHeading,
                    bool showAddOpt);
