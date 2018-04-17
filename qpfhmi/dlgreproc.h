@@ -44,6 +44,7 @@
 #include <QDialog>
 
 #include "hmitypes.h"
+#include "datatypes.h"
 
 namespace Ui {
 class DlgReproc;
@@ -69,6 +70,7 @@ public:
 
 public slots:
     void selectLocalFolder();
+    void selectLocalFolderToIPythonWorkDir(bool);
 
 private:
     Ui::DlgReproc *ui;

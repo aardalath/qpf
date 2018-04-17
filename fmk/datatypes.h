@@ -515,6 +515,23 @@ typedef std::vector<std::pair<std::string, TskStatSpectra>> TskStatTable;
 
 int getTskStatSpecValueFromStatus(TskStatSpectra & tss, TaskStatus st);
 
+//== Reprocessing flags and locations
+
+enum Flags {
+    NullFlags      = 0x00,
+    GenIntermProd  = 0x01,
+    OpenIPython    = 0x02,
+    OpenJupyterLab = 0x04,
+    OpenVOSpace    = 0x08,
+};
+
+enum OutputsLocation {
+    LocalArch      = 0x100,
+    LocalDir       = 0x200,
+    VOSpaceFolder  = 0x400,
+};        
+
+// Simple definition of macro to avoid "Unused var." messages
 #define UNUSED(x) (void)(x)
 
 //}

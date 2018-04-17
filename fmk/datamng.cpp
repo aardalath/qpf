@@ -61,6 +61,7 @@
 #include "channels.h"
 #include "message.h"
 #include "hostinfo.h"
+#include "launcher.h"
 
 #include "config.h"
 
@@ -190,16 +191,35 @@ void DataMng::saveTaskToDB(TaskInfo & taskInfo, bool initialStore)
             }
         }
         
-        // Move products to local archive
+        // Move products to local archive or to final destination
         for (auto & m : taskInfo.outputs.products) {
             urlh.setProduct(m);
             if (m.procTargetType() == UA_NOMINAL) {
                 m = urlh.fromGateway2LocalArch();
             } else {
-                m = urlh.fromGateway2FinalDestination();
+                try {
+                    m = urlh.fromGateway2FinalDestination();
+                } catch(...) {
+                    RaiseSysAlert(Alert(Alert::System,
+                                        Alert::Warning,
+                                        Alert::Resource,
+                                        std::string(__FILE__ ":" Stringify(__LINE__)),
+                                        "Cannot copy the output product to target " + m.procTarget(),
+                                        0));            
+                }
             }
         }
-        
+
+        int flags = taskInfo.taskFlags();
+        if (flags & OpenIPython) {
+            // Launch IPython session
+            IPythonLauncher * ipy = new IPythonLauncher(cfg.connectivity.ipython.cmd(),
+                                                        cfg.connectivity.ipython.path());
+            ipy->exec();
+        } else if (flags & OpenJupyterLab) {
+            // TODO Analyze product with Jupyter Lab
+        }
+            
         InfoMsg("Saving outputs...");
         saveProductsToDB(taskInfo.outputs);
         

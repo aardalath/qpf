@@ -361,14 +361,31 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chkIPython</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DlgReproc</receiver>
+   <slot>selectLocalFolderToIPythonWorkDir(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>345</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>242</x>
+     <y>439</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>showHelp()</slot>
   <slot>selectApp()</slot>
   <slot>selectProdTypes()</slot>
+  <slot>selectLocalFolderToIPythonWorkDir(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="btngrpAnalyzeSession"/>
   <buttongroup name="btngrpOutputsLocation"/>
+  <buttongroup name="btngrpAnalyzeSession"/>
  </buttongroups>
 </ui>

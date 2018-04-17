@@ -60,9 +60,9 @@ DlgReproc::DlgReproc(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->btngrpOutputsLocation->setId(ui->rbtnLocalArch, LocalArch);   
-    ui->btngrpOutputsLocation->setId(ui->rbtnLocalDir , LocalDir);     
-    ui->btngrpOutputsLocation->setId(ui->rbtnVOSpace  , VOSpaceFolder);
+    ui->btngrpOutputsLocation->setId(ui->rbtnLocalArch, 0);   
+    ui->btngrpOutputsLocation->setId(ui->rbtnLocalDir , 1);     
+    ui->btngrpOutputsLocation->setId(ui->rbtnVOSpace  , 2);
 
     connect(ui->tbtnLocal, SIGNAL(clicked()), this, SLOT(selectLocalFolder()));
 }
@@ -91,11 +91,11 @@ void DlgReproc::setFields(QStringList inProds, OutputsLocation out,
     ui->edLocalDir->setText(cfg.general.userArea().empty() ?
                           QS(cfg.general.workArea() + "/data/user") :
                           QS(cfg.general.userArea()));
-    ui->edVOSpace->setText(QS("VOSpace://" + cfg.connectivity.vospace.user()
-                            + "/" + cfg.connectivity.vospace.folder()));
+    ui->edVOSpace->setText(QS("VOSpace://" + cfg.connectivity.vospace.folder()));
 
-    ui->btngrpOutputsLocation->button(out)->setChecked(true);
-
+    ui->btngrpOutputsLocation->button((out & LocalArch) ? 0 : 
+                                    ((out & LocalDir) ? 1 :
+                                     ((out & VOSpaceFolder) ? 2 : 0)))->setChecked(true);
     ui->chkGenIntermProd->setChecked(flags & GenIntermProd);
     ui->chkIPython->setChecked(flags & OpenIPython);
     ui->chkJupLab->setChecked(flags & OpenJupyterLab);
@@ -105,7 +105,8 @@ void DlgReproc::setFields(QStringList inProds, OutputsLocation out,
 void DlgReproc::getFields(QStringList & inProds, OutputsLocation & out,
                           QString & outDir, int & flags)
 {
-    out = static_cast<OutputsLocation>(ui->btngrpOutputsLocation->checkedId());
+    static OutputsLocation outs[] = {LocalArch, LocalDir, VOSpaceFolder};
+    out = outs[ui->btngrpOutputsLocation->checkedId()];
     switch (out) {
     case LocalArch:
         outDir = ui->edLocalArch->text();
@@ -114,7 +115,7 @@ void DlgReproc::getFields(QStringList & inProds, OutputsLocation & out,
         outDir = ui->edLocalDir->text();
         break;     
     case VOSpaceFolder:
-        outDir = ui->edVOSpace->text();
+        outDir = ui->edVOSpace->text().remove("VOSpace://");
         break;
     default:
         break;
@@ -139,6 +140,17 @@ void DlgReproc::selectLocalFolder()
     QFileInfo fs(pathName);
     if (fs.exists()) {
         ui->edLocalDir->setText(pathName);
+    }
+}
+    
+void DlgReproc::selectLocalFolderToIPythonWorkDir(bool togl)
+{
+    if (togl) {
+        ui->edLocalDir->setText(QString::fromStdString(cfg.connectivity.ipython.path()));
+    } else {
+        ui->edLocalDir->setText(cfg.general.userArea().empty() ?
+                              QS(cfg.general.workArea() + "/data/user") :
+                              QS(cfg.general.userArea()));
     }
 }
 

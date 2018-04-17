@@ -376,15 +376,16 @@ ProductMetadata & URLHandler::fromGateway2FinalDestination()
     tgtFolder = product.procTarget();    
 
     if (tgtType == UA_VOSPACE) {
-        sendToVOSpace(cfg.connectivity.vospace.user(),
-                      cfg.connectivity.vospace.pwd(),
-                      cfg.connectivity.vospace.url(),
-                      ((tgtFolder.empty()) ?
-                       cfg.connectivity.vospace.folder() :
-                       tgtFolder),
-                      file);
-        (void)unlink(file.c_str());
-        product["urlSpace"] = ReprocessingVOSpace;
+        if (sendToVOSpace(cfg.connectivity.vospace.user(),
+                          cfg.connectivity.vospace.pwd(),
+                          cfg.connectivity.vospace.url(),
+                          ((tgtFolder.empty()) ?
+                           cfg.connectivity.vospace.folder() :
+                           tgtFolder),
+                          file)) {
+            (void)unlink(file.c_str());
+            product["urlSpace"] = ReprocessingVOSpace;
+        }
         return product;
     }
 
@@ -438,14 +439,15 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
     tgtFolder = product.procTarget();
 
     if (tgtType == UA_VOSPACE) {
-        sendToVOSpace(cfg.connectivity.vospace.user(),
-                      cfg.connectivity.vospace.pwd(),
-                      cfg.connectivity.vospace.url(),
-                      ((tgtFolder.empty()) ?
-                       cfg.connectivity.vospace.folder() :
-                       tgtFolder),
-                      file);
-        product["urlSpace"] = ReprocessingVOSpace;
+        if (sendToVOSpace(cfg.connectivity.vospace.user(),
+                          cfg.connectivity.vospace.pwd(),
+                          cfg.connectivity.vospace.url(),
+                          ((tgtFolder.empty()) ?
+                           cfg.connectivity.vospace.folder() :
+                           tgtFolder),
+                          file)) {
+            product["urlSpace"] = ReprocessingVOSpace;
+        }
         return product;
     }
 
@@ -476,7 +478,7 @@ ProductMetadata & URLHandler::fromLocalArch2ExportLocation()
 //----------------------------------------------------------------------
 // Method: sendToVOSpace
 //----------------------------------------------------------------------
-void URLHandler::sendToVOSpace(std::string user, std::string pwd,
+bool URLHandler::sendToVOSpace(std::string user, std::string pwd,
                                std::string vosURL, std::string folder,
                                std::string oFile)
 {
@@ -484,7 +486,9 @@ void URLHandler::sendToVOSpace(std::string user, std::string pwd,
     vos.setAuth(user, pwd);
     if (!vos.uploadFile(folder, oFile)) {
         TRC("ERROR! Cannot upload " << oFile);
+        return false;
     }
+    return true;
 }
 
 //----------------------------------------------------------------------

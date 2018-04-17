@@ -98,6 +98,9 @@ class MainWindow : public QMainWindow, StateMachine
     static const std::string RUNNING_StateName;
     static const std::string OPERATIONAL_StateName;
 
+    // URLs
+    static const QString VOSpaceURL;
+
 public:
     explicit MainWindow(QString url = QString("db://eucops:e314clid@localhost:5432/qpfdb"),
                         QString sessionName = QString(""),

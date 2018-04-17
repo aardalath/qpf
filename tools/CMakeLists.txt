@@ -16,6 +16,7 @@ set (libtools_hdr
   alert.h
   dwatcher.h
   filetools.h
+  launcher.h
   metadatareader.h
   rwc.h
   scopeexit.h
@@ -28,6 +29,7 @@ set (libtools_src
   alert.cpp
   dwatcher.cpp
   filetools.cpp
+  launcher.cpp
   rwc.cpp
   sm.cpp
   timer.cpp

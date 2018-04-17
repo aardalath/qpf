@@ -144,7 +144,7 @@ public:
     //----------------------------------------------------------------------
     // Method: sendToVOSpace
     //----------------------------------------------------------------------
-    void sendToVOSpace(std::string user, std::string pwd,
+    bool sendToVOSpace(std::string user, std::string pwd,
                        std::string vosURL, std::string folder,
                        std::string oFile);
     

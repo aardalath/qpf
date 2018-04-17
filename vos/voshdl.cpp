@@ -185,6 +185,7 @@ bool VOSpaceHandler::uploadJobRequest(RWC & rwc, std::string folder,
     std::string result;
     rwc.postContent(txUrl, txData, result);
     std::cerr << "Result: [" << result << "]\n";
+    if (result.find("401 Unauthorized") != std::string::npos) { return false; }
     
     // Get redirection URL
     std::string redirection = result.substr(result.find("Location: ") + 10);

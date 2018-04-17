@@ -105,6 +105,8 @@
 #include "pubsub.h"
 #include "pipeline.h"
 
+#include "launcher.h"
+
 using Configuration::cfg;
 
 Synchronizer synchro;
@@ -135,6 +137,11 @@ const std::string MainWindow::OFF_StateName("OFF");
 const std::string MainWindow::INITIALISED_StateName("INITIALISED");
 const std::string MainWindow::RUNNING_StateName("RUNNING");
 const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
+
+// Template for pushTo/pullFromVoSpace request file
+const QString MainWindow::VOSpaceURL =
+    "https://vospace.esac.esa.int/vospace/";
+
 
 void fwdCommandFromHMIPxy(void* context, std::string cmd, std::string arg) {
     static_cast<MainWindow*>(context)->commandFromHMIPxy(cmd, arg);
@@ -1602,6 +1609,8 @@ void MainWindow::reprocessProduct()
         " " + md.procTarget());
 
     hmiNode->sendReprocCmd(reprocProducts, flags + (int)(out));
+
+    if (flags & OpenVOSpace) { QDesktopServices::openUrl(QUrl(VOSpaceURL)); }
 }
 
 //----------------------------------------------------------------------
@@ -1642,21 +1651,11 @@ void MainWindow::analyzeProduct()
             urlh.setProduct(m);
             m = urlh.fromLocalArch2ExportLocation();
         }
-
+        
         // Launch IPython session
-        QProcess ipythonProcess;
-        QString program = "xterm";
-        QStringList arguments;
-        arguments << "-e"
-                  << QString::fromStdString(cfg.connectivity.ipython.cmd())
-                  << "-i" << "-c"
-                  << QString::fromStdString("'%cd " +
-                                           cfg.connectivity.ipython.path() +
-                                           "'");
-        ipythonProcess.startDetached(program, arguments);       
-        // ipythonProcess.waitForFinished();
-        // QByteArray result = ipythonProcess.readAllStandardOutput();
-        // const QString ipythonOutput(result);
+        IPythonLauncher * ipy = new IPythonLauncher(cfg.connectivity.ipython.cmd(),
+                                                    cfg.connectivity.ipython.path());
+        ipy->exec();
         
     } else if (acName == "AnalyzeWithJupyter") {
 
@@ -1734,12 +1733,24 @@ void MainWindow::exportProduct()
         if (up.exec()) { up.storeValues(); }
     }
 
+    statusBar()->showMessage(tr("Trying to export products . . ."), MessageDelay);
+
     // Copy products to export location
     URLHandler urlh;
+    std::string expLoc;
     for (auto & m : exportProducts.products) {
         urlh.setProduct(m);
+        statusBar()->showMessage(tr("Exporting %1 . . .")
+                                .arg(QString::fromStdString(m.baseName())),
+                                MessageDelay);
         m = urlh.fromLocalArch2ExportLocation();
+        expLoc = m.urlSpace();
     }
+    
+    if ((md["procTargetType"] == UA_VOSPACE) && (expLoc == ReprocessingVOSpace)) {
+        statusBar()->showMessage(tr("Products stored in VOSpace successfully"), MessageDelay);
+    }
+
 }
 
 //----------------------------------------------------------------------
