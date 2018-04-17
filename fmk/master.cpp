@@ -154,7 +154,7 @@ void Master::runEachIteration()
         // There are input products
         TRC("There are products to be reprocessed!");
         
-        // b. Generate tasks for processing these products
+        // c. Generate tasks for re-processing these products
         tskOrc->createTasks(reprocData, reprocFlags, tasks);
 
     }
@@ -163,11 +163,11 @@ void Master::runEachIteration()
         
         TRC("Created " + std::to_string(tasks.size()) + "tasks");
         
-        // c. Store tasks information into DB (initialStore = true)
+        // d. Store tasks information into DB (initialStore = true)
         TRC("Archiving tasks info");
         for (auto & task: tasks) { datMng->saveTaskToDB(task, true); }
 
-        // d. Schedule tasks (Task Manager will send them to requesters)
+        // e. Schedule tasks (Task Manager will send them to requesters)
         TRC("Scheduling tasks");
         for (auto & task: tasks) { tskMng->scheduleTask(task); }
         
