@@ -48,6 +48,7 @@ TEST_F(TestPkgStr, Test_split) {
               str::split(".This.is.a.test.", '.'));
 
     std::vector<std::string> tokens;
+
     str::split("1 2 3 4", ' ', tokens);
     EXPECT_EQ(std::vector<std::string>({"1", "2", "3", "4"}), tokens);
     tokens.clear();
