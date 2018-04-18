@@ -45,6 +45,16 @@ add_definitions(-DBUILD_ID="${BUILD_ID}")
 
 message ("Building ${CMAKE_PROJECT_NAME} version ${VERSION}, with build id. ${BUILD_ID}")
 
+#==== Coverage
+
+if (COV)
+  message ("Coverage will be computed . . .")
+  set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -coverage -fprofile-arcs -ftest-coverage")
+  set(GCC_COVERAGE_LINK_FLAGS    "-coverage -lgcov -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
+  set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
+endif()
+
 #== Define subprojects
 
 add_subdirectory (mongoose)
