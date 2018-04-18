@@ -84,4 +84,14 @@ bool JsonFileHandler::write()
     return true;
 }
 
+//----------------------------------------------------------------------
+// Method: getData
+// Return handler for internal data
+//----------------------------------------------------------------------
+Json::Value & JsonFileHandler::getData()
+{
+    return data;
+}
+
+
 // }

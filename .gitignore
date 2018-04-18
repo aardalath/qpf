@@ -1,3 +1,6 @@
 .tramp_history
 build/
 scripts/build*
+*.gcov
+*.gcn*
+
