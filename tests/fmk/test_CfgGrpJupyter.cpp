@@ -9,6 +9,7 @@
 namespace TestCfgGrpJupyter {
 
 TEST_F(TestCfgGrpJupyter, Test_operatorEq) {
+    CfgGrpJupyter x;
     
 }
 

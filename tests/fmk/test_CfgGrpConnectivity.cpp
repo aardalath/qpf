@@ -9,6 +9,7 @@
 namespace TestCfgGrpConnectivity {
 
 TEST_F(TestCfgGrpConnectivity, Test_operatorEq) {
+    CfgGrpConnectivity x;
     
 }
 

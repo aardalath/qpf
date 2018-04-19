@@ -9,7 +9,8 @@
 namespace TestDataMng {
 
 TEST_F(TestDataMng, Test_isProductAvailable) {
-    
+    EXPECT_DEATH({DataMng x("name", "address", 0);}, "failed");
+
 }
 
 TEST_F(TestDataMng, Test_getProductLatest) {

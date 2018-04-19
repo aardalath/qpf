@@ -9,6 +9,7 @@
 namespace TestUUID {
 
 TEST_F(TestUUID, Test_UUID) {
+    UUID u;
 }
 
 TEST_F(TestUUID, Test_clear) {

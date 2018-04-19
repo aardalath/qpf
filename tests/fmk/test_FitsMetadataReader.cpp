@@ -9,6 +9,7 @@
 namespace TestFitsMetadataReader {
 
 TEST_F(TestFitsMetadataReader, Test_setFile) {
+    FitsMetadataReader x;
     
 }
 

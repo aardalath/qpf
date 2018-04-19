@@ -9,6 +9,7 @@
 namespace TestCfgGrpSwarm {
 
 TEST_F(TestCfgGrpSwarm, Test_operatorEq) {
+    CfgGrpSwarm x;
     
 }
 

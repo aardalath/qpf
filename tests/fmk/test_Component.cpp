@@ -9,6 +9,7 @@
 namespace TestComponent {
 
 TEST_F(TestComponent, Test_run) {
+    EXPECT_DEATH({Component x("name", "address", 0);}, "failed");
     
 }
 

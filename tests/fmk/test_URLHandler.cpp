@@ -9,6 +9,7 @@
 namespace TestURLHandler {
 
 TEST_F(TestURLHandler, Test_getProduct) {
+    URLHandler x;
     
 }
 

@@ -9,6 +9,7 @@
 namespace TestCfgGrpNetwork {
 
 TEST_F(TestCfgGrpNetwork, Test_operatorEq) {
+    CfgGrpNetwork x;
     
 }
 

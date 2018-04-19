@@ -9,6 +9,7 @@
 namespace TestTskAge {
 
 TEST_F(TestTskAge, Test_getWorkDir) {
+    EXPECT_DEATH({TskAge x("name", "address", 0);}, "failed");
     
 }
 

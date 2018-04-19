@@ -9,6 +9,7 @@
 namespace TestHostInfo {
 
 TEST_F(TestHostInfo, Test_operatorEq) {
+    HostInfo x;
     
 }
 

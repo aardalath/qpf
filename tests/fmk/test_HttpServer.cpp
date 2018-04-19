@@ -9,6 +9,7 @@
 namespace TestHttpServer {
 
 TEST_F(TestHttpServer, Test_hello) {
+    EXPECT_DEATH({HttpServer x("name", "address", 0);}, "failed");
     
 }
 

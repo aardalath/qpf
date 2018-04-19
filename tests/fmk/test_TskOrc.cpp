@@ -9,6 +9,7 @@
 namespace TestTskOrc {
 
 TEST_F(TestTskOrc, Test_defineOrchestrationParams) {
+    EXPECT_DEATH({TskOrc x("name", "address", 0);}, "failed");
     
 }
 

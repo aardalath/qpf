@@ -9,6 +9,7 @@
 namespace TestJRecord {
 
 TEST_F(TestJRecord, Test_operatorEq) {
+    JRecord x;
     
 }
 

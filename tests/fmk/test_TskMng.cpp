@@ -9,6 +9,7 @@
 namespace TestTskMng {
 
 TEST_F(TestTskMng, Test_runEachIteration) {
+    EXPECT_DEATH({TskMng x("name", "address", 0);}, "failed");
     
 }
 

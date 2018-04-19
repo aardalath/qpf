@@ -9,6 +9,7 @@
 namespace TestCfgGrpIPython {
 
 TEST_F(TestCfgGrpIPython, Test_operatorEq) {
+    CfgGrpIPython x;
     
 }
 

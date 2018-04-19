@@ -9,6 +9,7 @@
 namespace TestCfgGrpFlags {
 
 TEST_F(TestCfgGrpFlags, Test_operatorEq) {
+    CfgGrpFlags x;
     
 }
 

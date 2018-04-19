@@ -9,6 +9,7 @@
 namespace TestCfgGrpRulesList {
 
 TEST_F(TestCfgGrpRulesList, Test_operatorEq) {
+    CfgGrpRulesList x;
     
 }
 

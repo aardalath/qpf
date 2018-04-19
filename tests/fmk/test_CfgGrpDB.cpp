@@ -9,6 +9,7 @@
 namespace TestCfgGrpDB {
 
 TEST_F(TestCfgGrpDB, Test_operatorEq) {
+    CfgGrpDB x;
     
 }
 

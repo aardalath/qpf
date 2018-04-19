@@ -9,6 +9,7 @@
 namespace TestContainerMng {
 
 TEST_F(TestContainerMng, Test_createContainer) {
+    ContainerMng x;
     
 }
 

@@ -8,6 +8,8 @@
 
 namespace TestConfig {
 
+using Configuration::cfg;
+
 TEST_F(TestConfig, Test__) {
     
 }

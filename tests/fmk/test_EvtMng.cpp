@@ -9,6 +9,7 @@
 namespace TestEvtMng {
 
 TEST_F(TestEvtMng, Test_fromRunningToOperational) {
+    EXPECT_DEATH({EvtMng x("name", "address", 0);}, "failed");
     
 }
 

@@ -9,6 +9,7 @@
 namespace TestFileNameSpec {
 
 TEST_F(TestFileNameSpec, Test_setFileNameSpec) {
+    FileNameSpec x;
     
 }
 

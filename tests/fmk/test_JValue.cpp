@@ -9,6 +9,7 @@
 namespace TestJValue {
 
 TEST_F(TestJValue, Test_operator) {
+    JValue x;
     
 }
 

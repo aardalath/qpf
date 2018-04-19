@@ -9,6 +9,7 @@
 namespace TestCfgGrpGeneral {
 
 TEST_F(TestCfgGrpGeneral, Test_operatorEq) {
+    CfgGrpGeneral x;
     
 }
 

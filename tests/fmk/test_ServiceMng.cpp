@@ -9,6 +9,8 @@
 namespace TestServiceMng {
 
 TEST_F(TestServiceMng, Test_createService) {
+    ServiceMng x(std::string("address"),
+                 std::vector<std::string> {"worker1", "worker2"});
     
 }
 

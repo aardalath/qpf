@@ -9,6 +9,7 @@
 namespace TestDockerMng {
 
 TEST_F(TestDockerMng, Test_createService) {
+    DockerMng x;
     
 }
 

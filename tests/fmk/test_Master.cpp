@@ -9,6 +9,7 @@
 namespace TestMaster {
 
 TEST_F(TestMaster, Test_init) {
+    EXPECT_DEATH({Master x("name", "address", 0);}, "failed");
     
 }
 

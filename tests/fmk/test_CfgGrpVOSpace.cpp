@@ -9,6 +9,7 @@
 namespace TestCfgGrpVOSpace {
 
 TEST_F(TestCfgGrpVOSpace, Test_operatorEq) {
+    CfgGrpVOSpace x;
     
 }
 

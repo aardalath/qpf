@@ -9,6 +9,7 @@
 namespace TestCfgGrpProducts {
 
 TEST_F(TestCfgGrpProducts, Test_operatorEq) {
+    CfgGrpProducts x;
     
 }
 

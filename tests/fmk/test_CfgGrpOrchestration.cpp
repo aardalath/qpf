@@ -9,6 +9,7 @@
 namespace TestCfgGrpOrchestration {
 
 TEST_F(TestCfgGrpOrchestration, Test_operatorEq) {
+    CfgGrpOrchestration x;
     
 }
 

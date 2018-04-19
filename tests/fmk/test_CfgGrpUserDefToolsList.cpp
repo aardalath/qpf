@@ -9,6 +9,7 @@
 namespace TestCfgGrpUserDefToolsList {
 
 TEST_F(TestCfgGrpUserDefToolsList, Test_operatorEq) {
+    CfgGrpUserDefToolsList x;
     
 }
 

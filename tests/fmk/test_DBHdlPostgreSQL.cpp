@@ -9,6 +9,7 @@
 namespace TestDBHdlPostgreSQL {
 
 TEST_F(TestDBHdlPostgreSQL, Test_openConnection) {
+    DBHdlPostgreSQL x;
     
 }
 
