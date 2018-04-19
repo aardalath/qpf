@@ -85,6 +85,15 @@ bool JsonFileHandler::write()
 }
 
 //----------------------------------------------------------------------
+// Method: setData
+// Sets the value of the internal data container
+//----------------------------------------------------------------------
+void JsonFileHandler::setData(Json::Value v)
+{
+    data = v;
+}
+
+//----------------------------------------------------------------------
 // Method: getData
 // Return handler for internal data
 //----------------------------------------------------------------------
