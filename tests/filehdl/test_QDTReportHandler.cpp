@@ -89,8 +89,4 @@ TEST_F(TestQDTReportHandler, Test_QDTRptHdl) {
     EXPECT_EQ(qrh.getIssues(issues), true);
 }
 
-TEST_F(TestQDTReportHandler, Test_checkDiagnostic) {
-    
-}
-
 }           
