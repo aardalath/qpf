@@ -161,7 +161,7 @@ TEST_F(TestPkgStr, Test_getDirName) {
 }
 
 TEST_F(TestPkgStr, Test_tagToTimestamp) {
-    EXPECT_EQ("2023-05-11 12:13:14.0", str::tagToTimestamp("20230511T121314"));
+    EXPECT_EQ("2023-05-11 12:13:14", str::tagToTimestamp("20230511T121314"));
     EXPECT_EQ("2023-05-11 12:13:14.5", str::tagToTimestamp("20230511T121314.5"));
     EXPECT_EQ("2023-05-11 12:13:14", str::tagToTimestamp("20230511T121314.0", false));
     EXPECT_EQ("2023-05-11 12:13:14.0", str::tagToTimestamp("20230511T121314.0"));
