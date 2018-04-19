@@ -273,9 +273,15 @@ void MainWindow::manualSetupUI()
     
     // Read settings and set title
     readSettings();
+    QString coreUptime, hmiUptime;
+    readParamInInternalConfig("lastcorerun", coreUptime);
+    readParamInInternalConfig("lasthmirun", hmiUptime);
+    QDateTime coreUpDateTime = QDateTime::fromString(coreUptime, "yyyyMMddHHmmss");
+    QDateTime hmiUpDateTime  = QDateTime::fromString(hmiUptime, "yyyyMMddHHmmss");
     setWindowTitle(tr("QLA Processing Framework"));
     setUnifiedTitleAndToolBarOnMac(true);
-    ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
+    ui->lblUptime->setText(coreUpDateTime.toString("yyyy-MM-dd hh:mm:ss.zzz"));
+    ui->lblUptimeHMI->setText(hmiUpDateTime.toString("yyyy-MM-dd hh:mm:ss.zzz"));
     ui->lblVerbosity->setText(QString::fromStdString(cfg.general.logLevel()));
     
     //== Tab panels handling ==========================================
@@ -450,6 +456,30 @@ void MainWindow::readConfig(QString dbUrl)
     putToSettings("lastAccess", QVariant(lastAccess));
 
     getUserToolsFromSettings();
+}
+
+//----------------------------------------------------------------------
+// Method: readParamInInternalConfig
+// Read parameter from internal configuration
+//----------------------------------------------------------------------
+void MainWindow::readParamInInternalConfig(QString key, QString & value)
+{
+    QFile file(QString("%1/.qpf/config").arg(getenv("HOME")));
+    if (file.open(QIODevice::ReadOnly)) {
+        QTextStream in(&file);      
+        while(! in.atEnd()) {
+            QString line = in.readLine();    
+            QStringList fields = line.split("=");
+            if (fields.at(0) == key) {
+                value = fields.at(1);
+                return;
+            }
+        }        
+    } else {
+        statusBar()->showMessage(tr("ERROR: Cannot open internal config file!"),
+                                MessageDelay);
+        value = "";
+    }
 }
 
 //----------------------------------------------------------------------

@@ -209,6 +209,7 @@ private slots:
 
 private:
     void readConfig(QString dbUrl);
+    void readParamInInternalConfig(QString key, QString & value);
     TextView *createTextView();
     void readSettings();
     void writeSettings();
