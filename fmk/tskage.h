@@ -221,7 +221,8 @@ private:
     std::map<std::string, time_t>    containerEpoch;
     
     TaskStatus               taskStatus;
-
+    TaskStatus               agStatus;
+    
     std::string              internalTaskNameIdx;
     std::string              exchangeDir;
     std::string              exchgIn;

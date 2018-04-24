@@ -2326,6 +2326,7 @@ void MainWindow::doHostSuspend()
 
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
     QString qhostId = hostForAgent[agName];
+    if (qhostId.isEmpty()) { return; }
     std::string hostId = qhostId.toStdString();
     if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
         hostProcStatus[qhostId] = TASK_RUNNING;
@@ -2335,6 +2336,10 @@ void MainWindow::doHostSuspend()
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_SUSPEND);
         hostProcStatus[qhostId] = TASK_PAUSED;
     }
+    TRC("HOST PROCESSING (Suspend): " +
+        agName.toStdString() + " @ " + qhostId.toStdString() + ": " +
+        TaskStatusName[hostStatus] + " => " +
+        TaskStatusName[hostProcStatus[qhostId]]);
 }
 
 //----------------------------------------------------------------------
@@ -2352,6 +2357,7 @@ void MainWindow::doHostStop()
 	
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
     QString qhostId = hostForAgent[agName];
+    if (qhostId.isEmpty()) { return; }
     std::string hostId = qhostId.toStdString();
     if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
         hostProcStatus[qhostId] = TASK_RUNNING;
@@ -2359,8 +2365,12 @@ void MainWindow::doHostStop()
     TaskStatus hostStatus = hostProcStatus[qhostId];
     if ((hostStatus == TASK_RUNNING) || (hostStatus == TASK_PAUSED)) {
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_STOP);
-        hostProcStatus[qhostId] = TASK_PAUSED;
+        hostProcStatus[qhostId] = TASK_STOPPED;
     }
+    TRC("HOST PROCESSING (Stop   ): " +
+        agName.toStdString() + " @ " + qhostId.toStdString() + ": " +
+        TaskStatusName[hostStatus] + " => " +
+        TaskStatusName[hostProcStatus[qhostId]]);
 }
 
 //----------------------------------------------------------------------
@@ -2378,16 +2388,21 @@ void MainWindow::doHostReactivate()
 	
     QString agName = QString::fromStdString(v["Info"]["Agent"].asString());
     QString qhostId = hostForAgent[agName];
+    if (qhostId.isEmpty()) { return; }
     std::string hostId = qhostId.toStdString();
     if (hostProcStatus.find(qhostId) == hostProcStatus.end()) {
         hostProcStatus[qhostId] = TASK_RUNNING;
-        return;
+        //return;
     }
     TaskStatus hostStatus = hostProcStatus[qhostId];
-    if (hostStatus == TASK_PAUSED) {
+    if ((hostStatus == TASK_PAUSED) || (hostStatus == TASK_STOPPED)) {
         hmiNode->sendProcHdlCmd(PROC_HOST, hostId, PROC_HDL_REACTIVATE);
         hostProcStatus[qhostId] = TASK_RUNNING;
     }
+    TRC("HOST PROCESSING (Reactiv): " +
+        agName.toStdString() + " @ " + qhostId.toStdString() + ": " +
+        TaskStatusName[hostStatus] + " => " +
+        TaskStatusName[hostProcStatus[qhostId]]);
 }
 
 //----------------------------------------------------------------------
