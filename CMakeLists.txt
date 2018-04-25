@@ -57,6 +57,7 @@ endif()
 
 #== Define subprojects
 
+add_subdirectory (nanomsg)
 add_subdirectory (mongoose)
 
 add_subdirectory (json)

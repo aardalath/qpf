@@ -9,12 +9,12 @@
 include (../../common.cmake)
 
 #===== Projec dir. =======
-project (survey)
+project (exsurvey)
 
-set (survey_src survey.cpp)
+set (exsurvey_src survey.cpp)
 
-add_executable(survey ${survey_src})
-target_include_directories (survey PUBLIC .
+add_executable(exsurvey ${exsurvey_src})
+target_include_directories (exsurvey PUBLIC .
   ${NNMSG_ROOT_DIR}/include
   ${NNCOMM_ROOT_DIR}
   ${FMK_ROOT_DIR}
@@ -24,13 +24,13 @@ target_include_directories (survey PUBLIC .
   ${UUID_ROOT_DIR}
   ${INFIX_ROOT_DIR}
   ${PSQLLIBDIR})
-target_link_libraries (survey
+target_link_libraries (exsurvey
   fmk json nncomm infix str log uuidxx
   nanomsg
   ${UUIDLIB} ${PSQLLIB}
   pthread)
-set_target_properties (survey PROPERTIES LINKER_LANGUAGE CXX)
-install (TARGETS survey
+set_target_properties (exsurvey PROPERTIES LINKER_LANGUAGE CXX)
+install (TARGETS exsurvey
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)

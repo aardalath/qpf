@@ -282,7 +282,7 @@ if [ "${HMI}" == "yes" ]; then
     searchlib Qt
 fi
 #searchlib zmq
-searchlib nanomsg
+#searchlib nanomsg
 searchlib pcre2
 #searchlib sodium
 #searchlib curl
