@@ -427,7 +427,7 @@ void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
             agStatus = TASK_PAUSED;
         } else if ((act == "CANCEL") || (act == "STOP")) {
             dckMng->runCmd("stop",    noargs, contId);
-            agStatus = TASK_STOPPED;
+            agStatus = (act == "STOP") ? TASK_STOPPED : TASK_PAUSED;
         }
         break;
     case TASK_PAUSED:
