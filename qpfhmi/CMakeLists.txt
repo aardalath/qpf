@@ -31,6 +31,8 @@ set (qpfGuiLib_src
   dlgshowtaskinfo.cpp
   dlgreproc.cpp
   dlguserpwd.cpp
+  dlgqdtfilter.cpp
+  frm_diagflt.cpp
   anasession.cpp
   exporthdl.cpp
   conthostedit.cpp
@@ -52,7 +54,9 @@ set (qpfGuiLib_src
   procalertmodel.cpp
   proctskstatmodel.cpp
   productsmodel.cpp
+  prodfiltmodel.cpp
   progbardlg.cpp
+  qdtfilters.cpp
   qjsonitem.cpp
   qjsonmodel.cpp
   qsimpletickergraph.cpp
@@ -79,6 +83,8 @@ set (qpfGuiLib_hdr
   dlgshowtaskinfo.h
   dlgreproc.h
   dlguserpwd.h
+  dlgqdtfilter.h
+  frm_diagflt.h
   anasession.h
   exporthdl.h
   conthostedit.h
@@ -103,7 +109,9 @@ set (qpfGuiLib_hdr
   procalertmodel.h
   proctskstatmodel.h
   productsmodel.h
+  prodfiltmodel.h
   progbardlg.h
+  qdtfilters.h
   qjsonitem.h
   qjsonmodel.h
   qsimpletickergraph.h
@@ -122,6 +130,8 @@ set (qpfGuiLib_ui
   dlgshowtaskinfo.ui
   dlgreproc.ui
   dlguserpwd.ui
+  dlgqdtfilter.ui
+  frm_diagflt.ui
   configtool.ui
   browserwidget.ui
   dbbrowser.ui

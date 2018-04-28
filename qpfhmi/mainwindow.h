@@ -152,6 +152,8 @@ private slots:
     void analyzeProduct();
     void exportProduct();
 
+    void reportFiltering();
+
     void processPendingEvents();
 
     void transitToOperational();

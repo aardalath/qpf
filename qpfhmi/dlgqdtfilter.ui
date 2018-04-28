@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgQdtFilter</class>
+ <widget class="QDialog" name="DlgQdtFilter">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>741</width>
+    <height>391</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set QLA diagnostics filtering</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,1">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Query name:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="edQryName"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Products selection:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cboxProdSel">
+       <item>
+        <property name="text">
+         <string>All</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Current Selection</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Product Type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Date Range</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QStackedWidget" name="stackedWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="pageAll"/>
+       <widget class="QWidget" name="pageCurrent"/>
+       <widget class="QWidget" name="pageProdType">
+        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,4">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QComboBox" name="cboxProdTypes"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>343</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="pageDateRange">
+        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,10,0,1,10,0">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>from: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateTimeEdit" name="datetimeFrom"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="tbtnFrom">
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="configtool.qrc">
+             <normaloff>:/img/img/calendar.png</normaloff>:/img/img/calendar.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>     to: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateTimeEdit" name="datetimeTo"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="tbtnTo">
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="configtool.qrc">
+             <normaloff>:/img/img/calendar.png</normaloff>:/img/img/calendar.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabDiagFlt">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabDiags">
+      <attribute name="title">
+       <string>Diagnostics filtering</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1000,1">
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>8</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollAreaFilters">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>701</width>
+            <height>202</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1000">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="FrmDiagFlt" name="wdgDiagFlt" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>54</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>30</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Meet these filter criteria:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnAll">
+           <property name="text">
+            <string>all of them</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btngrpAllOrAny</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnAny">
+           <property name="text">
+            <string>any of them</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btngrpAllOrAny</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabSQL">
+      <attribute name="title">
+       <string>Query</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,2,1">
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>8</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QPlainTextEdit" name="pltxtSQL"/>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="pltxtTrueSQL"/>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>33</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="4,1,1,0,1">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDiscard">
+       <property name="text">
+        <string>&amp;Discard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEval">
+       <property name="text">
+        <string>E&amp;valuate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExec">
+       <property name="text">
+        <string>&amp;Execute</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FrmDiagFlt</class>
+   <extends>QWidget</extends>
+   <header location="global">frm_diagflt.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>edQryName</tabstop>
+  <tabstop>cboxProdSel</tabstop>
+  <tabstop>tabDiagFlt</tabstop>
+  <tabstop>scrollAreaFilters</tabstop>
+  <tabstop>rbtnAll</tabstop>
+  <tabstop>rbtnAny</tabstop>
+  <tabstop>btnDiscard</tabstop>
+  <tabstop>btnExec</tabstop>
+  <tabstop>datetimeTo</tabstop>
+  <tabstop>tbtnTo</tabstop>
+  <tabstop>pltxtSQL</tabstop>
+  <tabstop>pltxtTrueSQL</tabstop>
+  <tabstop>tbtnFrom</tabstop>
+  <tabstop>datetimeFrom</tabstop>
+  <tabstop>cboxProdTypes</tabstop>
+ </tabstops>
+ <resources>
+  <include location="configtool.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>btnExec</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>go()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>665</x>
+     <y>366</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>576</x>
+     <y>326</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDiscard</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>447</x>
+     <y>361</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>679</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rbtnAll</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>matchAllCriteria()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>334</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>287</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rbtnAny</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>matchAnyCriteria()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>335</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>438</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pltxtSQL</sender>
+   <signal>textChanged()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>setCustomSQL()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>197</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>184</x>
+     <y>318</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEval</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>eval()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>597</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>537</x>
+     <y>357</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbtnFrom</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>selectDateTimeAndApply()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>489</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbtnTo</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>selectDateTimeAndApply()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>724</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>datetimeFrom</sender>
+   <signal>dateTimeChanged(QDateTime)</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>setDateFrom(QDateTime)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>datetimeTo</sender>
+   <signal>dateTimeChanged(QDateTime)</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>setDateTo(QDateTime)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>627</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cboxProdTypes</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>setProductType(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cboxProdSel</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgQdtFilter</receiver>
+   <slot>setProductSelectionType(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>740</x>
+     <y>16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cboxProdSel</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>344</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>removeFilter()</slot>
+  <slot>addFilter()</slot>
+  <slot>matchAllCriteria()</slot>
+  <slot>matchAnyCriteria()</slot>
+  <slot>setProductSelectionType(int)</slot>
+  <slot>setCustomSQL()</slot>
+  <slot>go()</slot>
+  <slot>selectDateTimeAndApply()</slot>
+  <slot>setProductType(QString)</slot>
+  <slot>setDateFrom(QDateTime)</slot>
+  <slot>setDateTo(QDateTime)</slot>
+  <slot>eval()</slot>
+ </slots>
+ <buttongroups>
+  <buttongroup name="btngrpAllOrAny"/>
+ </buttongroups>
+</ui>

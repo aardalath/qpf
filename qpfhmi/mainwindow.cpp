@@ -100,6 +100,9 @@
 #include "dlgalert.h"
 #include "dlgreproc.h"
 #include "dlguserpwd.h"
+#include "dlgqdtfilter.h"
+
+#include "prodfiltmodel.h"
 
 #include "reqrep.h"
 #include "pubsub.h"
@@ -302,6 +305,14 @@ void MainWindow::manualSetupUI()
     connect(ui->tabMainWgd, SIGNAL(customContextMenuRequested(const QPoint &)),
             actHdl, SLOT(showTabsContextMenu(const QPoint &)));
 
+    ui->tabwdgArchViews->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tabwdgArchViews, SIGNAL(customContextMenuRequested(const QPoint &)),
+            actHdl, SLOT(showTabsContextMenu(const QPoint &)));
+
+    ui->tabwdgMonitPages->setContextMenuPolicy(Qt::NoContextMenu);
+    //connect(ui->tabwdgMonitPages, SIGNAL(customContextMenuRequested(const QPoint &)),
+    //        actHdl, SLOT(showTabsContextMenu(const QPoint &)));
+
     ui->lstwdgNav->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->lstwdgNav, SIGNAL(customContextMenuRequested(const QPoint &)),
             actHdl, SLOT(showTabsContextMenu(const QPoint &)));
@@ -392,8 +403,7 @@ void MainWindow::readConfig(QString dbUrl)
     TRC("Config::PATHBase:    " << Config::PATHBase);
     TRC("Config::PATHSession: " << Config::PATHSession);
     TRC("Config::PATHLog:     " << Config::PATHLog);
-    */
-    
+    */    
     std::vector<std::string> runPaths {
         Config::PATHSession,
             Config::PATHLog,
@@ -1217,7 +1227,7 @@ void MainWindow::updateSystemView()
     if (isViewsUpdateActive) {
         
         int idx = ui->tabMainWgd->currentIndex();
-        int idx2 = ui->tabWidget->currentIndex();
+        int idx2 = ui->tabwdgMonitPages->currentIndex();
         
         switch (idx) {
             
@@ -1938,6 +1948,10 @@ void MainWindow::openLocalArchiveFullPath(QString fullPath)
     QRect g = tabbtn->geometry();
     tabbtn->resize(7, 7);
     tabbtn->move(g.x() + 14, g.y() + 2);
+
+    ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+    ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
+
 }
 
 //----------------------------------------------------------------------
@@ -2623,6 +2637,80 @@ void MainWindow::jumpToAlertSource(const QModelIndex & idx)
         wdg->setCurrentIndex(k);
     }
     ui->tabMainWgd->setCurrentIndex(tabIdx);
+}
+
+//----------------------------------------------------------------------
+// Method: reportFiltering
+// Create new filtered view by creating query to request report info
+//----------------------------------------------------------------------
+void MainWindow::reportFiltering()
+{
+    QVector<QStringList> chks
+        {
+         { "diagnostics", "Electronic_Offset", "result", "messages" },
+         { "diagnostics", "Electronic_Offset", "result", "outcome" },
+         { "diagnostics", "Electronic_Offset", "values", "Average of regions" },
+         { "diagnostics", "Electronic_Offset", "values", "Region 1" },
+         { "diagnostics", "Electronic_Offset", "values", "Region 2" },
+         { "diagnostics", "Electronic_Offset", "values", "Tot Avg" },
+         { "diagnostics", "Overflow_Pixels", "result", "outcome" },
+         { "diagnostics", "Overflow_Pixels", "values", "Total number overscan" },
+         { "diagnostics", "Overflow_Pixels", "values", "Total number prescan" },
+         { "diagnostics", "Overflow_Pixels", "values", "Total number science" },
+         { "diagnostics", "Readout_Noise", "result", "outcome" },
+         { "diagnostics", "Readout_Noise", "values", "Region 1" },
+         { "diagnostics", "Readout_Noise", "values", "Region 2" },
+         { "diagnostics", "Readout_Noise", "values", "value" },
+         { "diagnostics", "Saturated_pixels", "result", "outcome" },
+         { "diagnostics", "Saturated_pixels", "values", "number" },
+         { "diagnostics", "Saturation_Level", "result", "messages" },
+         { "diagnostics", "Saturation_Level", "result", "outcome" },
+         { "diagnostics", "Saturation_Level", "values", "map_counts" },
+         { "diagnostics", "Statistics", "result", "messages" },
+         { "diagnostics", "Statistics", "result", "outcome" },
+         { "diagnostics", "Statistics", "values", "average" },
+         { "diagnostics", "Statistics", "values", "median" },
+         { "diagnostics", "Statistics", "values", "std" },
+         { "diagnostics", "Underflow_Pixels", "result", "outcome" },
+         { "diagnostics", "Underflow_Pixels", "values", "Total number overscan" },
+         { "diagnostics", "Underflow_Pixels", "values", "Total number prescan" },
+         { "diagnostics", "Underflow_Pixels", "values", "Total number science" },
+         { "processing", "BIAS_COR" },
+         { "processing", "GAIN_COR" }
+        };
+                               
+    DlgQdtFilter d(chks, 0);
+
+    QStringList prodTypes;
+    for (auto & s : cfg.products.productTypes()) {
+        prodTypes << QString::fromStdString(s);
+    }
+    d.setProductsList(prodTypes);
+
+    QStringList ids;
+    ids << "1" << "23" << "456";
+    d.setCurrentSelection(ids);
+
+    // Show query creation dialog
+    if (! d.exec()) { return; }
+
+    // Get results and create new model
+    QString qryName, qryDef;
+    d.getQry(qryName, qryDef);
+
+    // Create view and new tab, and show view in the tab
+    QString viewName(qryName);
+    QTreeView * newView = new QTreeView;
+    ProductsFilterModel * prodFiltModel = new ProductsFilterModel(qryDef);
+    newView->setModel(prodFiltModel);
+    newView->setSortingEnabled(true);
+
+    int tabIdx = ui->tabwdgArchViews->addTab(newView, viewName);
+    ui->tabwdgArchViews->setTabIcon(tabIdx, QIcon(":/img/table.png"));
+    QString toolTip(qryDef);
+    toolTip.replace(" WHERE", " \nWHERE");
+    ui->tabwdgArchViews->setTabToolTip(tabIdx, toolTip);
+    ui->tabwdgArchViews->setTabsClosable(true);
 }
 
 //======================================================================

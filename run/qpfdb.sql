@@ -285,7 +285,8 @@ CREATE TABLE products_info (
     end_time timestamp without time zone,
     registration_time timestamp without time zone,
     url character varying(1024),
-    signature character varying
+    signature character varying,
+    report json
 );
 
 ALTER TABLE products_info OWNER TO eucops;
@@ -496,6 +497,58 @@ ALTER TABLE pvc_id_seq OWNER TO eucops;
 -- ----------------------------------------------------------------------
 -- Name: pvc_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: eucops
 ALTER SEQUENCE pvc_id_seq OWNED BY pvc.id;
+
+-- ======================================================================
+-- MATERIALIZED VIEWS
+-- ======================================================================
+
+create materialized view products_info_filter as 
+(
+    (select
+        products_info.id,
+        products_info.product_id,
+        products_info.start_time,
+        products_info.product_type,
+        products_info.url as url,
+        products.key as fits_file,
+        ccd.key as ccd,
+        q.key as q,
+        diag.key as diag,
+        values.key as values,
+        values.value
+    from
+        products_info
+    cross join json_each(products_info.report) products
+    cross join json_each(products.value) ccd
+    cross join json_each(ccd.value) q
+    cross join json_each(q.value) sec
+    cross join json_each(sec.value) diag
+    cross join json_each(diag.value) values 
+        where sec.key like 'diagnostics' and 
+              values.key not like 'name')
+union all
+    (select 
+        products_info.id,
+        products_info.product_id,
+        products_info.start_time,
+        products_info.product_type,
+        products_info.url as url,
+        products.key as fits_file,
+        ccd.key as ccd,
+        q.key as q,
+        diag.key as diag,
+        'values'::text as values,
+        ('{"value": ' || values.value::char || '}')::json
+    from
+        products_info
+    cross join json_each(products_info.report) products
+    cross join json_each(products.value) ccd
+    cross join json_each(ccd.value) q
+    cross join json_each(q.value) sec
+    cross join json_each(sec.value) diag
+    cross join json_each(diag.value) values 
+        where sec.key like 'processing')
+);
 
 -- ======================================================================
 -- DATA
