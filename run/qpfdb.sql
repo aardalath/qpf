@@ -550,6 +550,38 @@ union all
         where sec.key like 'processing')
 );
 
+create materialized view prodfilt_checks_ccd as
+select distinct
+    sec.key as sec,
+    diag.key as diag,
+    values.key as values,
+    items.key as item
+from
+    products_info
+cross join json_each(products_info.report) products
+cross join json_each(products.value) ccd
+cross join json_each(ccd.value) q
+cross join json_each(q.value) sec
+cross join json_each(sec.value) diag
+cross join json_each(diag.value) values
+cross join json_each(values.value) items
+where sec.key like 'diagnostics' and values.key not like 'name'
+order by sec.key, diag.key, values.key, items.key;
+
+create materialized view prodfilt_checks_file as
+select distinct
+    sec.key as sec,
+    diag.key as diag
+from
+    products_info
+cross join json_each(products_info.report) products
+cross join json_each(products.value) ccd
+cross join json_each(ccd.value) q
+cross join json_each(q.value) sec
+cross join json_each(sec.value) diag
+where sec.key not like 'diagnostics'
+order by sec.key, diag.key;
+
 -- ======================================================================
 -- DATA
 -- ======================================================================

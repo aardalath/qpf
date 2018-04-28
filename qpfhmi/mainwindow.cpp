@@ -81,6 +81,7 @@
 #include <QObject>
 #include <QTextStream>
 #include <QProcess>
+#include <QSqlDatabase>
 
 #include "acthdl.h"
 
@@ -101,6 +102,8 @@
 #include "dlgreproc.h"
 #include "dlguserpwd.h"
 #include "dlgqdtfilter.h"
+
+#include "frm_filtview.h"
 
 #include "prodfiltmodel.h"
 
@@ -300,6 +303,11 @@ void MainWindow::manualSetupUI()
             this, SLOT(selectRowInNav(int)));
     connect(ui->tabMainWgd, SIGNAL(tabCloseRequested(int)),
             actHdl, SLOT(closeTab(int)));
+    connect(ui->tabwdgArchViews, SIGNAL(tabCloseRequested(int)),
+            actHdl, SLOT(closeTab(int)));
+
+    //ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+    //ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 
     ui->tabMainWgd->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tabMainWgd, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -1949,9 +1957,6 @@ void MainWindow::openLocalArchiveFullPath(QString fullPath)
     tabbtn->resize(7, 7);
     tabbtn->move(g.x() + 14, g.y() + 2);
 
-    ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
-    ui->tabwdgArchViews->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
-
 }
 
 //----------------------------------------------------------------------
@@ -2645,53 +2650,62 @@ void MainWindow::jumpToAlertSource(const QModelIndex & idx)
 //----------------------------------------------------------------------
 void MainWindow::reportFiltering()
 {
-    QVector<QStringList> chks
-        {
-         { "diagnostics", "Electronic_Offset", "result", "messages" },
-         { "diagnostics", "Electronic_Offset", "result", "outcome" },
-         { "diagnostics", "Electronic_Offset", "values", "Average of regions" },
-         { "diagnostics", "Electronic_Offset", "values", "Region 1" },
-         { "diagnostics", "Electronic_Offset", "values", "Region 2" },
-         { "diagnostics", "Electronic_Offset", "values", "Tot Avg" },
-         { "diagnostics", "Overflow_Pixels", "result", "outcome" },
-         { "diagnostics", "Overflow_Pixels", "values", "Total number overscan" },
-         { "diagnostics", "Overflow_Pixels", "values", "Total number prescan" },
-         { "diagnostics", "Overflow_Pixels", "values", "Total number science" },
-         { "diagnostics", "Readout_Noise", "result", "outcome" },
-         { "diagnostics", "Readout_Noise", "values", "Region 1" },
-         { "diagnostics", "Readout_Noise", "values", "Region 2" },
-         { "diagnostics", "Readout_Noise", "values", "value" },
-         { "diagnostics", "Saturated_pixels", "result", "outcome" },
-         { "diagnostics", "Saturated_pixels", "values", "number" },
-         { "diagnostics", "Saturation_Level", "result", "messages" },
-         { "diagnostics", "Saturation_Level", "result", "outcome" },
-         { "diagnostics", "Saturation_Level", "values", "map_counts" },
-         { "diagnostics", "Statistics", "result", "messages" },
-         { "diagnostics", "Statistics", "result", "outcome" },
-         { "diagnostics", "Statistics", "values", "average" },
-         { "diagnostics", "Statistics", "values", "median" },
-         { "diagnostics", "Statistics", "values", "std" },
-         { "diagnostics", "Underflow_Pixels", "result", "outcome" },
-         { "diagnostics", "Underflow_Pixels", "values", "Total number overscan" },
-         { "diagnostics", "Underflow_Pixels", "values", "Total number prescan" },
-         { "diagnostics", "Underflow_Pixels", "values", "Total number science" },
-         { "processing", "BIAS_COR" },
-         { "processing", "GAIN_COR" }
-        };
-                               
-    DlgQdtFilter d(chks, 0);
+    // Generate checks
+    // This looks into the products table in the DB, and retrieves the list of
+    // diagnostics with possible entries and values
+    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
+	db.setHostName    (Config::DBHost.c_str());
+    db.setPort        (std::stoi(Config::DBPort.c_str()));
+	db.setDatabaseName(Config::DBName.c_str());
+	db.setUserName    (Config::DBUser.c_str());
+	db.setPassword    (Config::DBPwd.c_str());
 
+	if (! db.open()) {
+        int ret = QMessageBox::warning(this, tr("Problem with database"),
+                                       tr("Cannot access database!"),
+                                       QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+    
+    QVector<QStringList> completeListOfChecks;
+
+    // First, retrieve CCD diagnostics
+    QSqlQuery("refresh materialized view prodfilt_checks_ccd;").exec();
+    QSqlQuery query("select * from prodfilt_checks_ccd;");
+    while (query.next()) {
+        QStringList fields;
+        fields << query.value(0).toString()
+               << query.value(1).toString()
+               << query.value(2).toString()
+               << query.value(3).toString();
+        completeListOfChecks.append(fields);
+    }
+
+    // Second, retrieve entire file diagnostics
+    QSqlQuery("refresh materialized view prodfilt_checks_file;").exec();
+    QSqlQuery query2("select * from prodfilt_checks_file;");
+    while (query2.next()) {
+        QStringList fields;
+        fields << query2.value(0).toString()
+               << query2.value(1).toString();
+        completeListOfChecks.append(fields);     
+    }
+
+    // Then, get list of IDs of selected products (if any)
+    QStringList ids;
+    ids << "1" << "23" << "456";
+
+    // ... and build list of product types
     QStringList prodTypes;
     for (auto & s : cfg.products.productTypes()) {
         prodTypes << QString::fromStdString(s);
     }
-    d.setProductsList(prodTypes);
 
-    QStringList ids;
-    ids << "1" << "23" << "456";
+    // Finally, create and show dialog
+    DlgQdtFilter d(completeListOfChecks, 0);
+    d.setProductsList(prodTypes);
     d.setCurrentSelection(ids);
 
-    // Show query creation dialog
     if (! d.exec()) { return; }
 
     // Get results and create new model
@@ -2700,12 +2714,13 @@ void MainWindow::reportFiltering()
 
     // Create view and new tab, and show view in the tab
     QString viewName(qryName);
-    QTreeView * newView = new QTreeView;
+    FrmFiltView * filtView = new FrmFiltView;
+    QTreeView * newView = filtView->initialize(qryName, qryDef);
     ProductsFilterModel * prodFiltModel = new ProductsFilterModel(qryDef);
     newView->setModel(prodFiltModel);
     newView->setSortingEnabled(true);
 
-    int tabIdx = ui->tabwdgArchViews->addTab(newView, viewName);
+    int tabIdx = ui->tabwdgArchViews->addTab(filtView, viewName);
     ui->tabwdgArchViews->setTabIcon(tabIdx, QIcon(":/img/table.png"));
     QString toolTip(qryDef);
     toolTip.replace(" WHERE", " \nWHERE");

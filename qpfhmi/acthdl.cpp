@@ -403,7 +403,10 @@ void ActionHandler::activateClipboardFor(TextView * child)
 //----------------------------------------------------------------------
 void ActionHandler::closeTab(int n)
 {
-    if (tabWdgName == TabWidgetNames[TabWdg_Main]) { mw->removeRowInNav(n); }
+    if ((tabWdgName == TabWidgetNames[TabWdg_Main]) ||
+        (qobject_cast<QTabWidget*>(sender()) == mw->ui->tabMainWgd)) {
+        mw->removeRowInNav(n);
+    }
     delete qobject_cast<QTabWidget*>(tabWidgetSender)->widget(n);
 }
 
@@ -434,9 +437,15 @@ void ActionHandler::closeTabAction()
 void ActionHandler::closeAllTabAction()
 {
     static const int NumOfFixedTabs = 5;
-    for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        closeTab(i);
-    }
+    if (tabWdgName == TabWidgetNames[TabWdg_Main]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+            closeTab(i);
+        }
+    } else if (tabWdgName == TabWidgetNames[TabWdg_LocalArch]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= 1; --i) {
+            closeTab(i);
+        }
+    }        
 }
 
 //----------------------------------------------------------------------
@@ -452,11 +461,15 @@ void ActionHandler::closeOtherTabAction()
     } else {
         nTab = mw->ui->lstwdgNav->currentRow();
     }
-    for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        if (i != nTab) {
-            closeTab(i);
+    if (tabWdgName == TabWidgetNames[TabWdg_Main]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+            if (i != nTab) { closeTab(i); }
         }
-    }
+    } else if (tabWdgName == TabWidgetNames[TabWdg_LocalArch]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= 1; --i) {
+            if (i != nTab) { closeTab(i); }
+        }
+    }        
 }
 
 //----------------------------------------------------------------------

@@ -32,7 +32,6 @@ set (qpfGuiLib_src
   dlgreproc.cpp
   dlguserpwd.cpp
   dlgqdtfilter.cpp
-  frm_diagflt.cpp
   anasession.cpp
   exporthdl.cpp
   conthostedit.cpp
@@ -40,6 +39,8 @@ set (qpfGuiLib_src
   ruleedit.cpp
   exttooledit.cpp
   exttoolsdef.cpp
+  frm_diagflt.cpp
+  frm_filtview.cpp
   frm_filter.cpp
   frm_filterset.cpp
   frmagentstatus.cpp
@@ -84,7 +85,6 @@ set (qpfGuiLib_hdr
   dlgreproc.h
   dlguserpwd.h
   dlgqdtfilter.h
-  frm_diagflt.h
   anasession.h
   exporthdl.h
   conthostedit.h
@@ -93,6 +93,8 @@ set (qpfGuiLib_hdr
   exttooledit.h
   exttoolsdef.h
   filters.h
+  frm_diagflt.h
+  frm_filtview.h
   frm_filter.h
   frm_filterset.h
   frmagentstatus.h
@@ -131,7 +133,6 @@ set (qpfGuiLib_ui
   dlgreproc.ui
   dlguserpwd.ui
   dlgqdtfilter.ui
-  frm_diagflt.ui
   configtool.ui
   browserwidget.ui
   dbbrowser.ui
@@ -142,6 +143,8 @@ set (qpfGuiLib_ui
   exttooledit.ui
   exttoolsdef.ui
   multitextview.ui
+  frm_diagflt.ui
+  frm_filtview.ui
   frm_filterset.ui
   frm_filter.ui
   frmagentstatus.ui

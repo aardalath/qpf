@@ -50,7 +50,7 @@ ProductsFilterModel::ProductsFilterModel(QString qry)
     defineQuery("refresh materialized view products_info_filter; " + qry);
     
     defineHeaders({//"Product Id', "ID", "URL", "FITS_File",
-                   "Type", "Start", "CCD", "Q",
+                   "Product Id / Type", "Start", "CCD", "Q",
                    "Diagnostic", "Info", "Values"});
 
     skipColumns(4);
