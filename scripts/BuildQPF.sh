@@ -367,7 +367,8 @@ if [ "${INSTALL}" == "yes" ]; then
 
     if [ ! -d "'${HOME}/.qpf'" ]; then
         perform mkdir -p "'${HOME}'"/.qpf
-        perform cp "'${SCRIPT_PATH}'"/qpfapp.config "'${HOME}'"/.qpf/
+        perform cp "'${SCRIPT_PATH}'"/qpfapp.config "'${HOME}'"/.qpf/config
+        perform cp -R "'${SCRIPT_PATH}'"/lib "'${WORK_AREA}'"/qpf/scripts
     fi
 
     #QPF_INI="${RUN_PATH}/QPFHMI.conf"
@@ -449,14 +450,14 @@ say "Please, do not forget to:"
 say "  - include the directory ${WORK_AREA}/qpf/bin in the PATH variable, and"
 say "  - include the directory ${WORK_AREA}/qpf/lib in the LD_LIBRARY_PATH variable."
 say "To do that, just execute the following commands:"
-say "  export PATH=${WORK_AREA}/qpf/bin:\$PATH"
+say "  export PATH=${WORK_AREA}/qpf/bin:${WORK_AREA}/qpf/scripts:${WORK_AREA}/qpf/scripts/lib:\$PATH"
 say "  export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH"
 
 (cat ~/env_qpf.sh 2>/dev/null ; echo ""; echo "# BuildQPF section") | \
 awk '(NR==1),/BuildQPF section/' > /tmp/$$.sh
 cat /tmp/$$.sh > ~/env_qpf.sh
 cat <<EOF>> ~/env_qpf.sh
-export PATH=${WORK_AREA}/qpf/bin:\$PATH
+export PATH=${WORK_AREA}/qpf/bin:${WORK_AREA}/qpf/scripts:${WORK_AREA}/qpf/scripts/lib:\$PATH
 export LD_LIBRARY_PATH=${WORK_AREA}/qpf/lib:\$LD_LIBRARY_PATH
 EOF
   
