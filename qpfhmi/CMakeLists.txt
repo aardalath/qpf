@@ -31,6 +31,7 @@ set (qpfGuiLib_src
   dlgshowtaskinfo.cpp
   dlgreproc.cpp
   dlguserpwd.cpp
+  dlgqdtfilter.cpp
   anasession.cpp
   exporthdl.cpp
   conthostedit.cpp
@@ -38,6 +39,8 @@ set (qpfGuiLib_src
   ruleedit.cpp
   exttooledit.cpp
   exttoolsdef.cpp
+  frm_diagflt.cpp
+  frm_filtview.cpp
   frm_filter.cpp
   frm_filterset.cpp
   frmagentstatus.cpp
@@ -52,7 +55,9 @@ set (qpfGuiLib_src
   procalertmodel.cpp
   proctskstatmodel.cpp
   productsmodel.cpp
+  prodfiltmodel.cpp
   progbardlg.cpp
+  qdtfilters.cpp
   qjsonitem.cpp
   qjsonmodel.cpp
   qsimpletickergraph.cpp
@@ -79,6 +84,7 @@ set (qpfGuiLib_hdr
   dlgshowtaskinfo.h
   dlgreproc.h
   dlguserpwd.h
+  dlgqdtfilter.h
   anasession.h
   exporthdl.h
   conthostedit.h
@@ -87,6 +93,8 @@ set (qpfGuiLib_hdr
   exttooledit.h
   exttoolsdef.h
   filters.h
+  frm_diagflt.h
+  frm_filtview.h
   frm_filter.h
   frm_filterset.h
   frmagentstatus.h
@@ -103,7 +111,9 @@ set (qpfGuiLib_hdr
   procalertmodel.h
   proctskstatmodel.h
   productsmodel.h
+  prodfiltmodel.h
   progbardlg.h
+  qdtfilters.h
   qjsonitem.h
   qjsonmodel.h
   qsimpletickergraph.h
@@ -122,6 +132,7 @@ set (qpfGuiLib_ui
   dlgshowtaskinfo.ui
   dlgreproc.ui
   dlguserpwd.ui
+  dlgqdtfilter.ui
   configtool.ui
   browserwidget.ui
   dbbrowser.ui
@@ -132,6 +143,8 @@ set (qpfGuiLib_ui
   exttooledit.ui
   exttoolsdef.ui
   multitextview.ui
+  frm_diagflt.ui
+  frm_filtview.ui
   frm_filterset.ui
   frm_filter.ui
   frmagentstatus.ui

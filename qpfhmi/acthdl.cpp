@@ -47,6 +47,10 @@ using Configuration::cfg;
 
 namespace QPF {
 
+#define T(a) QString( #a )
+const QString TabWidgetNames[] = { LIST_OF_TABWIDGETS };
+#undef T
+    
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -399,8 +403,11 @@ void ActionHandler::activateClipboardFor(TextView * child)
 //----------------------------------------------------------------------
 void ActionHandler::closeTab(int n)
 {
-    mw->removeRowInNav(n);
-    delete mw->ui->tabMainWgd->widget(n);
+    if ((tabWdgName == TabWidgetNames[TabWdg_Main]) ||
+        (qobject_cast<QTabWidget*>(sender()) == mw->ui->tabMainWgd)) {
+        mw->removeRowInNav(n);
+    }
+    delete qobject_cast<QTabWidget*>(tabWidgetSender)->widget(n);
 }
 
 //----------------------------------------------------------------------
@@ -412,13 +419,15 @@ void ActionHandler::closeTabAction()
     static const int NumOfFixedTabs = 5;
     int nTab;
     if (isMenuForTabWidget) {
-        nTab = mw->ui->tabMainWgd->tabBar()->tabAt(menuPt);
+        nTab = qobject_cast<QTabWidget*>(tabWidgetSender)->tabBar()->tabAt(menuPt);
     } else {
         nTab = mw->ui->lstwdgNav->currentRow();
     }
-    if (nTab >= NumOfFixedTabs) {
-        closeTab(nTab);
-    }
+    if (tabWdgName == TabWidgetNames[TabWdg_Main]) {
+        if (nTab >= NumOfFixedTabs) { closeTab(nTab);}
+    } else if (tabWdgName == TabWidgetNames[TabWdg_LocalArch]) {
+        if (nTab > 0) { closeTab(nTab);}
+    }        
 }
 
 //----------------------------------------------------------------------
@@ -428,9 +437,15 @@ void ActionHandler::closeTabAction()
 void ActionHandler::closeAllTabAction()
 {
     static const int NumOfFixedTabs = 5;
-    for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        closeTab(i);
-    }
+    if (tabWdgName == TabWidgetNames[TabWdg_Main]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+            closeTab(i);
+        }
+    } else if (tabWdgName == TabWidgetNames[TabWdg_LocalArch]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= 1; --i) {
+            closeTab(i);
+        }
+    }        
 }
 
 //----------------------------------------------------------------------
@@ -442,15 +457,19 @@ void ActionHandler::closeOtherTabAction()
     static const int NumOfFixedTabs = 5;
     int nTab;
     if (isMenuForTabWidget) {
-        nTab = mw->ui->tabMainWgd->tabBar()->tabAt(menuPt);
+        nTab = qobject_cast<QTabWidget*>(tabWidgetSender)->tabBar()->tabAt(menuPt);
     } else {
         nTab = mw->ui->lstwdgNav->currentRow();
     }
-    for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
-        if (i != nTab) {
-            closeTab(i);
+    if (tabWdgName == TabWidgetNames[TabWdg_Main]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= NumOfFixedTabs; --i) {
+            if (i != nTab) { closeTab(i); }
         }
-    }
+    } else if (tabWdgName == TabWidgetNames[TabWdg_LocalArch]) {
+        for (int i = mw->ui->lstwdgNav->count() - 1; i >= 1; --i) {
+            if (i != nTab) { closeTab(i); }
+        }
+    }        
 }
 
 //----------------------------------------------------------------------
@@ -571,8 +590,13 @@ void ActionHandler::showArchiveTableContextMenu(const QPoint & p)
 void ActionHandler::showTabsContextMenu(const QPoint & p)
 {
     QWidget * w = qobject_cast<QWidget *>(sender());
-    mw->isMenuForTabWidget = (w == (QWidget*)(mw->ui->tabMainWgd));
+    isMenuForTabWidget = (strcmp(w->metaObject()->className(), "QTabWidget") == 0);
+    tabWidgetSender = w;
+    tabWdgName = w->accessibleName();
     menuPt = p;
+
+    mw->statusBar()->showMessage(QString(w->metaObject()->className()) + " / " +
+                               tabWdgName, 10000);
 
     QMenu menu(w);
     menu.addAction(acTabClose);

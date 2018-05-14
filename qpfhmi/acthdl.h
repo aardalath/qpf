@@ -52,6 +52,15 @@ namespace QPF {
 
 class MainWindow;
  
+#undef T
+#define LIST_OF_TABWIDGETS T(Main), T(Monit), T(LocalArch)
+
+#define T(a) TabWdg_ ## a
+enum TabWidgets { LIST_OF_TABWIDGETS };
+#undef T
+
+extern const QString TabWidgetNames[];
+
 class ActionHandler : public QObject
 {
     Q_OBJECT
@@ -155,6 +164,9 @@ private:
     QAction *acAboutQt;
 
     bool isMenuForTabWidget;
+    QWidget * tabWidgetSender;
+    QString tabWdgName;
+    
     QPoint menuPt;
     QAction * acTabClose;
     QAction * acTabCloseAll;
