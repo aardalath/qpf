@@ -190,6 +190,12 @@ std::string mid(std::string & s, int from, int howmany);
 std::string mid(std::string & s, int from);
 
 //----------------------------------------------------------------------
+// Function: right
+// Get the right part of a string
+//----------------------------------------------------------------------
+std::string right(std::string const& source, size_t const length);
+
+//----------------------------------------------------------------------
 // Function: mid
 // trim from end of string (right)
 //----------------------------------------------------------------------

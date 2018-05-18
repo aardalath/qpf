@@ -164,6 +164,16 @@ std::string mid(std::string & s, int from)
 }
 
 //----------------------------------------------------------------------
+// Function: right
+// Get the right part of a string
+//----------------------------------------------------------------------
+std::string right(std::string const& source, size_t const length)
+{
+    if (length >= source.size()) { return source; }
+    return source.substr(source.size() - length);
+}
+    
+//----------------------------------------------------------------------
 // Function: mid
 // trim from end of string (right)
 //----------------------------------------------------------------------
