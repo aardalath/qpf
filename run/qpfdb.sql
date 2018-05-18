@@ -262,7 +262,7 @@ ALTER TABLE observation_modes OWNER TO eucops;
 CREATE TYPE prod_instrument_enum  AS ENUM ('VIS', 'NISP', 'NIR', 'SIR', 'UNKNOWN_INST');
 CREATE TYPE prod_creator_enum     AS ENUM ('SOC_LE1', 'SOC_QLA_OPE', 'SOC_QLA_TEST');
 CREATE TYPE prod_status_enum      AS ENUM ('OK', 'NOTOK');
-CREATE TYPE prod_obsmode_enum     AS ENUM ('W', 'C', 'S', 'NOMINAL', 'TEST');
+CREATE TYPE prod_obsmode_enum     AS ENUM ('W', 'C', 'S', 'D', 'NOMINAL', 'TEST');
 
 ALTER TYPE prod_instrument_enum OWNER to eucops;
 ALTER TYPE prod_creator_enum    OWNER to eucops;
