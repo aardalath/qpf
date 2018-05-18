@@ -40,6 +40,7 @@
 
 #include <iterator>
 #include <arpa/inet.h>
+#include <fstream>
 
 #include "dbhdlpostgre.h"
 
@@ -134,13 +135,25 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
     std::stringstream ss;
 
     for (auto & m : prodList.products) {
+        // Get report content
+        std::string prodUrl(m.url());
+        std::string repFile(str::mid(prodUrl, 7));
+        std::string repContent("{}");
+        if (str::right(repFile, 4) == "json") {
+            std::ifstream t(repFile);
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            repContent = buffer.str();
+            if (repContent.empty()) { repContent = "{}"; }
+        }
+ 
         ss.str("");
-        TRC("Building SQL statement:");
-        TRC(m.startTime() << ", " << m.endTime() << ", " << timeTag());
         ss << "INSERT INTO products_info "
-           << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
+           << "(product_id, product_type, product_status_id, "
+            "product_version, product_size, creator_id, "
            << "obs_id, soc_id, "
-           << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
+           << "instrument_id, obsmode_id, signature, start_time, "
+            "end_time, registration_time, url, report) "
            << "VALUES ("
            << str::quoted(m.productId()) << ", "
            << str::quoted(m.productType()) << ", "
@@ -156,12 +169,16 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
            << str::quoted(str::tagToTimestamp(m.startTime())) << ", "
            << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
-           << str::quoted(m.url()) << ")";
+           << str::quoted(prodUrl) << ", "
+           << str::quoted(repContent) << "::json);";
         //TRC("PSQL> "+ ss.str());
         try { result = runCmd(ss.str()); } catch(...) { throw; }
         //TRC("Executed.");
         PQclear(res);
         nInsProd++;
+
+        result = runCmd("refresh materialized view products_info_filter;");
+        PQclear(res);
     }
 
     UNUSED(result);
