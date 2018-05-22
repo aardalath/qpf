@@ -451,5 +451,13 @@ void TskMng::scheduleTask(TaskInfo & task)
     }
 }
 
+//----------------------------------------------------------------------
+// Method: getRunningTasks
+// Get messages from tasks that are still running
+//----------------------------------------------------------------------
+void TskMng::getRunningTasks(std::map<std::string, MessageString> & tasks)
+{
+    tasks = containerTaskLastMessage;
+}
 
 //}

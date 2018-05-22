@@ -116,7 +116,13 @@ public:
     // Provide an update on the ProcessingFrameworkInfo structure
     //----------------------------------------------------------------------
     void getProcFmkInfoUpdate(json & fmkInfoValue);
-    
+
+    //----------------------------------------------------------------------
+    // Method: getRunningTasks
+    // Get messages from tasks that are still running
+    //----------------------------------------------------------------------
+    void getRunningTasks(std::map<std::string, MessageString> & tasks);
+
 protected:
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational

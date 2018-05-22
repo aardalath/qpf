@@ -243,6 +243,28 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
+// Method: sendStopAgentTasks
+// Store in argument variables the INDATA products
+//----------------------------------------------------------------------
+void EvtMng::sendStopAgentTasks()
+{
+    Message<MsgBodyCMD> msg;
+    MsgBodyCMD body;
+    msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
+                 compName, "*",
+                 "", "", "");
+    
+    // Create message and send
+    body["cmd"]         = CmdProcHdl;
+    body["subcmd"]      = SubcmdName[(int)(PROC_HDL_STOP)];
+    body["target_type"] = (int)(PROC_TASK);
+    body["target"]      = "*";
+    
+    msg.buildBody(body);
+    this->send(ChnlCmd, msg.str()); 
+}
+
+//----------------------------------------------------------------------
 // Method: getInData
 // Store in argument variables the INDATA products
 //----------------------------------------------------------------------
@@ -306,6 +328,11 @@ void EvtMng::quit()
     msg.buildBody(body);
     this->send(ChnlCmd, msg.str());
 
+    sleep(3);
+
+    // Send STOP tasks command to agents
+    sendStopAgentTasks();
+    
     // Transit to RUNNING (no way back)
     transitTo(RUNNING); 
 }

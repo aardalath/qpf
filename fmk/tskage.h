@@ -152,7 +152,8 @@ private:
     //----------------------------------------------------------------------
     // Method: applyActionOnContainer
     //----------------------------------------------------------------------
-    void applyActionOnContainer(std::string & act, std::string & contId);
+    void applyActionOnContainer(std::string & act, std::string & contId,
+                                bool isQuitting = false);
 
     //----------------------------------------------------------------------
     // Method: armHostInfoTimer

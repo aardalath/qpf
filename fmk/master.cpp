@@ -175,8 +175,7 @@ void Master::runEachIteration()
 
     // 2. Check QUIT request
     if (evtMng->isQuitRequested()) {
-        evtMng->quit();
-        transitTo(RUNNING);
+        doControlledQuit();
     }
 
     // 3. Retrieve and store Task reports
@@ -192,5 +191,22 @@ void Master::runEachIteration()
         evtMng->sendProcFmkInfoUpdate(fmkInfoValue);
         datMng->storeTaskStatusSpectra(fmkInfoValue);
     }   
+}
+
+//----------------------------------------------------------------------
+// Method: doControlledQuit
+//----------------------------------------------------------------------
+void Master::doControlledQuit()
+{
+    std::map<std::string, MessageString> runningTasks;
+    tskMng->getRunningTasks(runningTasks);
+    std::map<std::string, MessageString>::iterator it = runningTasks.begin();
+    while (it != runningTasks.end()) {
+        TRC(it->first + " ==> " + it->second);
+        ++it;
+    }
+
+    evtMng->quit();
+    transitTo(RUNNING);
 }
 

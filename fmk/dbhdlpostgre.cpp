@@ -146,6 +146,7 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
             repContent = buffer.str();
             if (repContent.empty()) { repContent = "{}"; }
         }
+        //TRC("====>>> PRODUCT " + prodUrl + " has content " + repContent);
  
         ss.str("");
         ss << "INSERT INTO products_info "
@@ -170,17 +171,19 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
            << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
            << str::quoted(prodUrl) << ", "
-           << str::quoted(repContent) << "::json);";
+           << str::quoted(repContent) << "::json) "
+           << "ON CONFLICT (product_id) DO UPDATE " 
+           << "SET report=" << str::quoted(repContent) << "::json;";
         //TRC("PSQL> "+ ss.str());
         try { result = runCmd(ss.str()); } catch(...) { throw; }
         //TRC("Executed.");
         PQclear(res);
         nInsProd++;
-
-        result = runCmd("refresh materialized view products_info_filter;");
-        PQclear(res);
     }
 
+
+    result = runCmd("refresh materialized view products_info_filter;");
+    PQclear(res);
     UNUSED(result);
 
     return nInsProd;
@@ -273,7 +276,7 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
        << str::quoted(task.taskStart()) << ", "
-       << str::quoted(taskData) << ")";
+       << str::quoted(taskData) << ");";
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 

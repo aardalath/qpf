@@ -183,6 +183,12 @@ set (unitTestsSet_src
 
 add_executable(unitTestsSet ${unitTestsSet_src})
 add_dependencies (unitTestsSet json sdc infix qpf libcomm)
+
+set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -coverage -fprofile-arcs -ftest-coverage")
+set(GCC_COVERAGE_LINK_FLAGS    "-coverage -lgcov -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
+set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
+
 target_include_directories (unitTestsSet PUBLIC . ..
   ${NNMSG_ROOT_DIR}/include
   ${NNCOMM_ROOT_DIR}

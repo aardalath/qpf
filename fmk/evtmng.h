@@ -126,6 +126,12 @@ public:
     //----------------------------------------------------------------------
     void sendProcFmkInfoUpdate(json & fmkInfoValue);
 
+    //----------------------------------------------------------------------
+    // Method: sendStopAgentTasks
+    // Store in argument variables the INDATA products
+    //----------------------------------------------------------------------
+    void sendStopAgentTasks();
+    
 protected:
     //----------------------------------------------------------------------
     // Method: processHMICmdMsg

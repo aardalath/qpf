@@ -321,7 +321,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     //----  * * * LAUNCH TASK * * *
     std::string contId;
     std::string procName(task.taskPath());
-    std::string sourceProcCfgFile = Config::PATHProcs + "/" + procName + "/sample.cfg.json";
+    std::string sourceProcCfgFile = (Config::PATHProcs + "/" +
+                                     procName + "/sample.cfg.json");
     std::string targetProcCfgFile = exchangeDir + "/" + procName + ".cfg";
     copyfile(sourceProcCfgFile, targetProcCfgFile);
     TRC("Copying " + sourceProcCfgFile + " to " + targetProcCfgFile);
@@ -366,6 +367,21 @@ void TskAge::processSubcmdMsg(MessageString & m)
 
     switch (subj) {
     case PROC_TASK:
+        if (subjName == "*") {
+            for (auto const & kv : containerEpoch) {
+                std::string contId = kv.first;
+                TaskInfo & task = (*(containerToTaskMap[contId]));
+                TaskStatus taskStatus = TaskStatus(task.taskStatus());
+                // Send new update on container info, unless it is too old
+                if ((taskStatus != TASK_FAILED) &&
+                    (taskStatus != TASK_FINISHED) &&
+                    (time(0) - kv.second) < cfg.MaxContainerAge) {
+                    applyActionOnContainer(subCmd, contId, true);
+                }
+            }
+            return;
+        }
+        
         if (containerToTaskMap.find(subjName) == containerToTaskMap.end()) { return; }
         TRC("Trying to " + subCmd + " container with id " + subjName);
         applyActionOnContainer(subCmd, subjName);
@@ -410,13 +426,15 @@ void TskAge::processSubcmdMsg(MessageString & m)
     default:
         break;
     }
+    
     TRC("Processing of subcmd message done.");
 }
 
 //----------------------------------------------------------------------
 // Method: applyActionOnContainer
 //----------------------------------------------------------------------
-void TskAge::applyActionOnContainer(std::string & act, std::string & contId)
+void TskAge::applyActionOnContainer(std::string & act, std::string & contId,
+                                    bool isQuitting)
 {
     std::vector<std::string> noargs;
 

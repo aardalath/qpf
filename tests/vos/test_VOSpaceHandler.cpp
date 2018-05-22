@@ -45,7 +45,7 @@ TEST_F(TestVOSpaceHandler, Test_uploadAndDownload) {
 
     std::string user("eucops"), pwd("Eu314_clid");
     vosHdl->setAuth(user, pwd);
-
+return;
     std::string folder("tests");
     std::string fileName1("file1-test.txt");
     std::string fileName2("file2-test.txt");
