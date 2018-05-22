@@ -266,7 +266,7 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
     ss.str("");
     ss << "INSERT INTO tasks_info "
        << "(task_id, task_status_id, task_progress, task_exitcode, "
-       << "task_path, task_size, registration_time, start_time, task_data) "
+       << "task_path, task_size, registration_time, start_time, task_info, task_data) "
        << "VALUES ("
        << str::quoted(task.taskName()) << ", "
        << task.taskStatus() << ", "
@@ -276,6 +276,7 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
        << str::quoted(task.taskStart()) << ", "
+       << str::quoted(task.str()) << ", "
        << str::quoted(taskData) << ");";
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
@@ -345,6 +346,7 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
 	    }
 	    updates.push_back(eqKeyValue("task_path", task.taskPath())); 
 	    updates.push_back(eqKeyValue("task_data", task["taskData"]));
+	    updates.push_back(eqKeyValue("task_info", task.str())); 
 	    //}
         result &= updateTable("tasks_info",
                               eqKeyValue("task_id", id),

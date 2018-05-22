@@ -378,6 +378,7 @@ CREATE TABLE tasks_info (
     task_exitcode integer,
     task_path character varying(1024),
     task_size integer,
+    task_info json,
     registration_time timestamp without time zone,
     start_time timestamp without time zone,
     end_time timestamp without time zone,

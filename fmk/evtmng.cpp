@@ -101,7 +101,7 @@ void EvtMng::runEachIteration()
     
     // 1. Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent ev;
-    while (dw -> nextEvent(ev)) { events.push_back(ev); }
+    while (dw->nextEvent(ev)) { events.push_back(ev); }
 
     // Process all events, at most 5 per second
     int numMaxEventsPerIter = 5;
@@ -109,7 +109,7 @@ void EvtMng::runEachIteration()
     while ((events.size() > 0) && (numEvents < numMaxEventsPerIter)) {
         auto & e = events.front();
         TRC("New DirWatchEvent: " + e.path + "/" + e.name
-                 + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
+            + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
         // Process only files
         // TODO: Process directories that appear at inbox
